@@ -231,7 +231,24 @@ void func_82D04C44(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D0599C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D05BD8.s")
+extern void func_82D02DA8(void *);
+extern void func_82D03CC0(void *);
+extern void func_82D049A0(void *);
+extern void func_82D04DC8(void *);
+extern void func_82D0599C(void *);
+void func_82D05BD8(u8 *row) {
+    if (row != 0 && (row[0xA] & 1)) {
+        switch (row[0]) {
+        case 0: func_82D02DA8(row); break;
+        case 4: func_82D03CC0(row); break;
+        case 3: func_82D049A0(row); break;
+        case 1: func_82D04B84(row); break;
+        case 2: func_82D04C44(row); break;
+        case 5: func_82D04DC8(row); break;
+        case 6: func_82D0599C(row); break;
+        }
+    }
+}
 
 void func_82D05C90(void) {
     u8 *row;
@@ -445,7 +462,32 @@ void func_82D06754(u8 *arg0)
   *((u8 *) (((u8 *) arg0) + 0xC)) = (u8) ((*((u8 *) (((u8 *) arg0) + 0xC))) - 1);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D067A0.s")
+void func_82D067A0(u8 *row) {
+    s32 timer;
+    switch (row[0xB]) {
+    case 1: func_82D06514(row); break;
+    case 2: func_82D065C0(row); break;
+    case 3: func_82D06670(row); break;
+    case 4: func_82D066BC(row); break;
+    case 5: func_82D06708(row); break;
+    case 6: func_82D06754(row); break;
+    case 7:
+        timer = row[0xC];
+        if (timer == 0) {
+            row[0xB] = 0;
+            row[0xA] &= ~1;
+        } else {
+            row[0xC] = timer - 1;
+        }
+        break;
+    }
+    if (row[0xA] & 2) {
+        func_82D00020(0);
+        if (row[0xC] == 0) {
+            row[0xA] &= ~2;
+        }
+    }
+}
 
 void func_82D068A0(void) {
     u8 *row;
@@ -470,7 +512,25 @@ void func_82D068F0(Fragment82MenuRow *row, s32 delay) {
     row->phase = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D0697C.s")
+void func_82D0697C(Fragment82MenuRow *row, s32 delay) {
+    switch (row->kind) {
+    case 2: row->timer = D_82D07184 + delay; break;
+    case 3: row->timer = D_82D07188 + delay; break;
+    case 4:
+    case 6: row->timer = D_82D0718C + delay; break;
+    case 5:
+        D_82D07198.y = *(s16 *)(D_82D06FB4 + 0x16C);
+        D_82D07198.width = 92;
+        D_82D07198.height = *(s16 *)(D_82D06FB4 + 0x170);
+        D_82D06FB4[0x14A] |= 1;
+        D_82D06FB4[0xA] |= 1;
+        D_82D06FB4[0x32] |= 1;
+        row->timer = D_82D07194 + delay;
+        break;
+    }
+    row->flags |= 2;
+    row->phase = 2;
+}
 
 void func_82D06A54(void *arg0, s32 arg1)
 {
