@@ -56,7 +56,16 @@ typedef struct F842029A8Record {
 } F842029A8Record;
 extern F842029A8State D_84203AD0;
 extern F842029A8Record *D_84203B54;
-extern u32 D_84203A40;
+typedef struct F80BattleParameters {
+    u32 flags;
+    u8 unk04[4];
+    u8 damage_weight, threat_weight, special_weight;
+    u8 unk0B[35];
+    u8 move_weight;
+    u8 unk2F[21];
+} F80BattleParameters;
+typedef char F80BattleParametersSize[sizeof(F80BattleParameters)==0x44 ? 1 : -1];
+extern F80BattleParameters D_84203A40;
 extern u8 TeamCandidate_SelectLead_fragment80(F84202744State *);
 extern u8 D_15833A0[], D_1587718[];
 extern void func_80003F74(u8 *, u8 *, u8 *, s32);
@@ -120,13 +129,6 @@ typedef struct unk_func_842016BC {
     u8 unk06[6];
     s32 damage, score;
 } unk_func_842016BC;
-typedef struct F80BattleParameters {
-    u32 flags;
-    u8 unk04[4];
-    u8 damage_weight, threat_weight, special_weight;
-    u8 unk0B[0x39];
-} F80BattleParameters;
-typedef char F80BattleParametersSize[sizeof(F80BattleParameters)==0x44 ? 1 : -1];
 typedef struct Fragment80DamageContext {
     unk_func_842016BC move;
     F80BattleParameters *parameters;
@@ -251,7 +253,47 @@ void func_84202294(void *arg0, u8 arg1, u8 arg2, u8 arg3, u8 arg4) {
     ((u8 *)arg0)[5] = arg4;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_842022F0.s")
+extern void *D_84203B58;
+extern u8 D_84203B5C;
+typedef struct Fragment80BattleRecord {
+    u8 species, item, moves[4], unk_06[22], unk_1C, level;
+    u16 unk_1E;
+    u32 unk_20[14];
+} Fragment80BattleRecord;
+typedef struct Fragment80BattleTeam {
+    u8 unk_00[7], roster_count, unk_08[16];
+    Fragment80BattleRecord members[6];
+    u8 unk_228[696];
+} Fragment80BattleTeam;
+typedef char Fragment80BattleRecordSizes[(sizeof(Fragment80BattleRecord)==88 && sizeof(Fragment80BattleTeam)==1248) ? 1 : -1];
+s32 TeamCandidate_PassesRules_fragment80(F84202744State *state) {
+    Fragment80BattleRecord *first;
+    Fragment80BattleRecord *second;
+    Fragment80BattleRecord *third;
+    s32 i;
+    u8 mask;
+    first = &((Fragment80BattleTeam *)D_84203B54)[state->unk01].members[state->indices[0]];
+    second = &((Fragment80BattleTeam *)D_84203B54)[state->unk01].members[state->indices[1]];
+    third = &((Fragment80BattleTeam *)D_84203B54)[state->unk01].members[state->indices[2]];
+    if (*(u16 *)((u8 *)D_84203B58 + 0x38) < first->level + second->level + third->level) return 0;
+    if (D_84203A40.flags & 0x2000) {
+        s32 last = D_84203B54[state->unk01].roster_count - 1;
+        if (last != state->indices[2]) return 0;
+    }
+    if (D_84203A40.flags & 0x1000) {
+        if (D_84203A88[state->indices[0]].rank == D_84203B5C) return 0;
+        if (D_84203A88[state->indices[1]].rank == D_84203B5C) return 0;
+        if (D_84203A88[state->indices[2]].rank == D_84203B5C) return 0;
+    }
+    if (D_84203A40.flags & 0x4000) {
+        mask = 0;
+        for (i = 0; i < 3; i++) {
+            mask |= 1 << (state->indices[i] % 3);
+        }
+        if (mask != 7) return 0;
+    }
+    return 1;
+}
 
 extern u8 func_8006397C(u8);
 extern u8 func_800639C0(u8);
@@ -274,7 +316,7 @@ void TeamCandidate_ApplySharedWeakness_fragment80(F84202744State *state) {
     first = (u8 *)&((Fragment80WeaknessTeam *)D_84203B54)[state->unk01].members[state->indices[0]];
     second = (u8 *)&((Fragment80WeaknessTeam *)D_84203B54)[state->unk01].members[state->indices[1]];
     third = (u8 *)&((Fragment80WeaknessTeam *)D_84203B54)[state->unk01].members[state->indices[2]];
-    if (!(D_84203A40 & 0x800)) {
+    if (!(D_84203A40.flags & 0x800)) {
         for (i = 0; i < 18; i++) {
             pairs = 0;
             primary = func_8006397C(first[0]);
@@ -337,12 +379,12 @@ void func_842029A8(u8 arg0) {
 }
 
 extern u8 D_84203B5C;
-s32 func_842022F0(void *);
+s32 TeamCandidate_PassesRules_fragment80(F84202744State *);
 void TeamCandidate_ApplySharedWeakness_fragment80(F84202744State *);
 void TeamCandidates_InsertRanked_fragment80(void *);
 extern u32 func_8003570C(void);
 extern void func_84202294(void *arg0, u8 arg1, u8 arg2, u8 arg3, u8 arg4);
-extern u32 D_84203A40;
+extern F80BattleParameters D_84203A40;
 void func_84202A20(u8 arg0) {
     s32 i;
     s32 j;
@@ -352,7 +394,7 @@ void func_84202A20(u8 arg0) {
     F84202744State state;
 
     D_84203B5C = (func_8003570C() & 1) + 1;
-    if (D_84203A40 & 0x80) {
+    if (D_84203A40.flags & 0x80) {
         limit = 1;
     } else {
         limit = 4;
@@ -363,7 +405,7 @@ void func_84202A20(u8 arg0) {
             second = j;
             for (k = j + 1; k < 6; k++) {
                 func_84202294(&state, arg0, first, second, k);
-                if (func_842022F0(&state)) {
+                if (TeamCandidate_PassesRules_fragment80(&state)) {
                     func_84202744(&state);
                     TeamCandidate_ApplySharedWeakness_fragment80(&state);
                     TeamCandidates_InsertRanked_fragment80(&state);
@@ -418,12 +460,12 @@ u8 TeamCandidate_SelectLead_fragment80(F84202744State *state) {
 u8 func_84202FE4(void *arg0) { func_84202BD0(arg0); return TeamCandidate_SelectLead_fragment80(arg0); }
 
 extern u8 func_84202FE4(void *arg0);
-extern u32 D_84203A40;
+extern F80BattleParameters D_84203A40;
 void TeamCandidate_PromoteChoice_fragment80(void *arg0) {
     s32 chosen;
     u8 temp;
-    if (!(D_84203A40 & 0x100)) {
-        if (D_84203A40 & 0x10) chosen = func_8003570C() % ((u8 *)arg0)[2];
+    if (!(D_84203A40.flags & 0x100)) {
+        if (D_84203A40.flags & 0x10) chosen = func_8003570C() % ((u8 *)arg0)[2];
         else chosen = func_84202FE4(arg0);
         temp = ((u8 *)arg0)[3];
         ((u8 *)arg0)[3] = ((u8 *)arg0)[chosen + 3];
@@ -458,7 +500,7 @@ void TeamRoster_ApplyCandidateOrder_fragment80(void *arg0) {
     }
 }
 
-extern u32 D_84203A40;
+extern F80BattleParameters D_84203A40;
 extern u32 func_8003570C(void);
 void TeamCandidate_PromoteChoice_fragment80(void *arg0);
 void TeamRoster_ApplyCandidateOrder_fragment80(void *arg0);
@@ -468,7 +510,7 @@ void func_842032AC(void) {
     s32 last;
 
     if (*(u8 *)&D_84203AD0 != 0) {
-        limit = (D_84203A40 & 0x40) ? 7 : 3;
+        limit = (D_84203A40.flags & 0x40) ? 7 : 3;
         last = *(u8 *)&D_84203AD0 - 1;
         if (limit >= last) {
             limit = last;
