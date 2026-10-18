@@ -58,7 +58,26 @@ extern F842029A8State D_84203AD0;
 extern F842029A8Record *D_84203B54;
 extern u32 D_84203A40;
 extern u8 TeamCandidate_SelectLead_fragment80(F84202744State *);
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_842017D0.s")
+extern u8 D_15833A0[], D_1587718[];
+extern void func_80003F74(u8 *, u8 *, u8 *, s32);
+extern void _bcopy(const void *, void *, s32);
+void TeamParameters_Load_fragment80(u8 arg0) {
+    s32 offset = arg0 * 0x4E0;
+    u8 mode = ((u8 *)D_84203B54 + offset)[0x49A];
+    u8 *end;
+    u32 buffer;
+    /* Whole u64s provide the minimum aligned capacity for the 68-byte DMA. */
+    u64 scratch[(0x44 + sizeof(u64) - 1) / sizeof(u64)];
+    u8 *start;
+    end = D_15833A0 + mode * 0x44;
+    buffer = ((u32)scratch & ~7U);
+    start = end - 0x44;
+    func_80003F74((u8 *)buffer, start, end, 0);
+    if (start != D_1587718) {
+        _bcopy((u8 *)buffer, (u8 *)D_84203B54 + offset + 0x49C, 0x44);
+    }
+    _bcopy((u8 *)D_84203B54 + offset + 0x49C, &D_84203A40, 0x44);
+}
 
 typedef struct Fragment80CandidateList {
     u8 count, unk01[3];
@@ -334,12 +353,37 @@ void TeamCandidate_PromoteChoice_fragment80(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84203090.s")
+void TeamRoster_ApplyCandidateOrder_fragment80(void *arg0) {
+    s32 i;
+    s32 next;
+    u8 team_index = ((F84202744State *)arg0)->unk01;
+    Fragment80WeaknessTeam *team = &((Fragment80WeaknessTeam *)D_84203B54)[team_index];
+    Fragment80WeaknessMember saved[6];
+    s32 used[6];
+    for (i = 0; i < ((u8 *)team)[7]; i++) {
+        saved[i] = team->members[i];
+        used[i] = 0;
+    }
+    for (i = 0; i < ((F84202744State *)arg0)->count; i++) {
+        team->members[i] = saved[((F84202744State *)arg0)->indices[i]];
+        used[((F84202744State *)arg0)->indices[i]] = 1;
+    }
+    next = 3;
+    for (i = 0; i < ((u8 *)team)[7]; i++) {
+        if (!used[i]) {
+            team->members[next] = saved[i];
+            next++;
+        }
+    }
+    for (i = 0; i < ((F84202744State *)arg0)->count; i++) {
+        func_842034B0((u8 *)team + i * 0x58 + 0x4C, 0);
+    }
+}
 
 extern u32 D_84203A40;
 extern u32 func_8003570C(void);
 void TeamCandidate_PromoteChoice_fragment80(void *arg0);
-void func_84203090(void *arg0);
+void TeamRoster_ApplyCandidateOrder_fragment80(void *arg0);
 void func_842032AC(void) {
     s32 index;
     s32 limit;
@@ -353,11 +397,11 @@ void func_842032AC(void) {
         }
         index = func_8003570C() % (limit + 1);
         TeamCandidate_PromoteChoice_fragment80((u8 *)&D_84203AD0 + (index * 0x10 + 4));
-        func_84203090((u8 *)&D_84203AD0 + (index * 0x10 + 4));
+        TeamRoster_ApplyCandidateOrder_fragment80((u8 *)&D_84203AD0 + (index * 0x10 + 4));
     }
 }
 
-void func_842017D0(u8);
+void TeamParameters_Load_fragment80(u8);
 void TeamCandidates_Reset_fragment80(void);
 void func_84201F2C(u8);
 void TeamScores_Rank_fragment80(u8);
@@ -366,7 +410,7 @@ void TeamCandidates_VisitMembers_fragment80(u8);
 void func_842032AC(void);
 void func_84203360(u8 arg0) {
     if (((u8 *)D_84203B54)[arg0 * 0x4E0 + 0x49A] != 0) {
-        func_842017D0(arg0);
+        TeamParameters_Load_fragment80(arg0);
         TeamCandidates_Reset_fragment80();
         func_84201F2C(arg0);
         TeamScores_Rank_fragment80(arg0);
