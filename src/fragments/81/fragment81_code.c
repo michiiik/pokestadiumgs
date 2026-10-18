@@ -356,6 +356,10 @@ typedef struct Fragment81MovePoolsPrefix {
     u8 secondary[80];
     u8 physical[80];
     u8 special[80];
+    u8 group2_primary[90];
+    u8 group2_secondary[90];
+    u8 group2_physical[90];
+    u8 group2_special[90];
 } Fragment81MovePoolsPrefix;
 extern Fragment81MovePoolsPrefix D_84302CA0;
 extern s32 func_800630F0(s32);
@@ -523,7 +527,58 @@ u8 func_843013A4(u8 *arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84301490.s")
+extern u8 Pokemon_GetBaseStat(u8, u8);
+u8 MoveSelection_ChooseFourth_fragment81(u8 *mon) {
+    s32 i;
+    u8 species;
+    u8 chosen;
+    u8 scanned_move;
+    u8 current_type;
+    u8 first_type;
+    u8 second_type;
+    u8 attack;
+    u8 special_attack;
+    u8 candidates[256];
+
+    species = mon[0];
+    chosen = 0;
+    first_type = func_80062D98(mon[2]);
+    second_type = func_80062D98(mon[3]);
+    attack = Pokemon_GetBaseStat(species, 1);
+    special_attack = Pokemon_GetBaseStat(species, 4);
+    candidates[0] = 0;
+    if (attack >= special_attack || func_84300348(D_84302F54) == 0) {
+        for (i = 1; func_84300348(D_84302EFA) >= i; i++) {
+            scanned_move = D_84302CA0.group2_physical[i];
+            current_type = func_80062D98(scanned_move);
+            if (current_type != first_type && current_type != second_type) {
+                func_84300200(candidates, scanned_move);
+            }
+        }
+    }
+    if (special_attack >= attack || func_84300348(D_84302EFA) == 0) {
+        for (i = 1; func_84300348(D_84302F54) >= i; i++) {
+            scanned_move = D_84302CA0.group2_special[i];
+            current_type = func_80062D98(scanned_move);
+            if (current_type != first_type && current_type != second_type) {
+                func_84300200(candidates, scanned_move);
+            }
+        }
+    }
+    if (func_84300348(candidates) > 0 && (func_8003570C() & 1)) {
+        chosen = ByteList_ChooseRandom_fragment81(candidates);
+    }
+    if (chosen == 0) {
+        if (func_84300348(D_84302FD2) > 0) {
+            chosen = ByteList_ChooseRandom_fragment81(D_84302FD2);
+            //!bug Removes the last scanned move instead of the choice; empty scans leave it unset.
+            ByteList_RemoveFirst_fragment81(D_84302FD2, scanned_move);
+        } else if (func_84300348(candidates) > 0) {
+            chosen = ByteList_ChooseRandom_fragment81(candidates);
+        }
+    }
+    return chosen;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843016CC.s")
 
@@ -617,7 +672,7 @@ extern void MovePools_ClassifyLearnable_fragment81(u8);
 extern u8 MoveSelection_ChooseFirst_fragment81(void);
 extern u8 MoveSelection_ChooseSecond_fragment81(u8 *);
 extern u8 func_843013A4(u8 *);
-extern u8 func_84301490(u8 *);
+extern u8 MoveSelection_ChooseFourth_fragment81(u8 *);
 void func_84301BA4(u8 *arg0) {
     u8 value;
 
@@ -640,7 +695,7 @@ void func_84301BA4(u8 *arg0) {
         arg0[2] = MoveSelection_ChooseFirst_fragment81();
         arg0[3] = MoveSelection_ChooseSecond_fragment81(arg0);
         arg0[4] = func_843013A4(arg0);
-        arg0[5] = func_84301490(arg0);
+        arg0[5] = MoveSelection_ChooseFourth_fragment81(arg0);
         return;
     }
 }
