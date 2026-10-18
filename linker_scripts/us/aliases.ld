@@ -407,3 +407,7 @@ func_844007D8 = Pokemon_GenerateLevel100_fragment86;
 func_844003E4 = MovePools_ClassifyCandidate_fragment86;
 func_84400528 = MoveSelection_ChooseSlot_fragment86;
 func_844008E4 = Teams_GenerateLevel100_fragment86;
+func_81B00020 = RoomDecor_SetBed_fragment87;
+func_81B000B4 = RoomDecor_SetCarpet_fragment87;
+func_81B0019C = RoomDecor_SetPlant_fragment87;
+func_81B00230 = RoomDecor_SetPoster_fragment87;
