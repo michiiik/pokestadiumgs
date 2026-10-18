@@ -6,10 +6,19 @@ s32 fragment80_main(const u8 *arg0) {
     return *(u16 *)(*(u8 **)(arg0 + 0x1C) + 0x2E) < *(u16 *)(*(u8 **)(arg0 + 0x18) + 0x2E);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_84200038.s")
-
 extern u8 func_8006397C(u8);
 extern u8 func_800639C0(u8);
+extern u8 func_84200094(u8 *, u8);
+extern u8 func_84203464(void);
+s32 Species_HasType_fragment80(u8 *arg0, s32 arg1) {
+    s32 result;
+    result = func_8006397C(arg0[0]) == (u8)arg1;
+    if (!result) {
+        result = func_800639C0(arg0[0]) == (u8)arg1;
+    }
+    return result;
+}
+
 extern u8 func_80063454(u8, u8, u8, s32);
 u8 func_84200094(u8 *arg0, u8 arg1) {
     struct {
@@ -27,21 +36,50 @@ u8 func_84200094(u8 *arg0, u8 arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_842000EC.s")
+u8 Ratio_ScaleToByte_fragment80(u16 value, u16 maximum) {
+    s32 scaled = 255;
+    u32 divisor = maximum;
+    if (divisor != 0) {
+        scaled = (value * 255) / (s32)divisor;
+    }
+    if (scaled > 255) {
+        scaled = 255;
+    }
+    return scaled;
+}
 
-extern u8 func_84203464(void);
 void func_84200150(u8 *arg0, u8 arg1) {
     u32 value = func_84203464();
     *(u8 **)(arg0 + 0x10) += (s32)((*(u8 **)(arg0 + 0x14))[0x0C] * value * arg1) / 0xFF;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_842001BC.s")
+void TypeScore_AddCoefficient0D_fragment80(u8 *arg0, u8 arg1) {
+    if (!Species_HasType_fragment80(*(u8 **)(arg0 + 0x1C), 3)) {
+        if (func_84200094(*(u8 **)(arg0 + 0x1C), arg0[3])) {
+            u32 value = func_84203464();
+            *(s32 *)(arg0 + 0x10) += (s32)((*(u8 **)(arg0 + 0x14))[13] * value * arg1) / 255;
+        }
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_84200258.s")
+void TypeScore_AddCoefficient0E_fragment80(u8 *arg0, u8 arg1) {
+    if (!Species_HasType_fragment80(*(u8 **)(arg0 + 0x1C), arg0[3])) {
+        if (func_84200094(*(u8 **)(arg0 + 0x1C), arg0[3])) {
+            u32 value = func_84203464();
+            *(s32 *)(arg0 + 0x10) += (s32)((*(u8 **)(arg0 + 0x14))[14] * value * arg1) / 255;
+        }
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_4194A0/func_842002F4.s")
+void TypeScore_AddCoefficient0F_fragment80(u8 *arg0, u8 arg1) {
+    if (!Species_HasType_fragment80(*(u8 **)(arg0 + 0x1C), arg0[3])) {
+        if (func_84200094(*(u8 **)(arg0 + 0x1C), arg0[3])) {
+            u32 value = func_84203464();
+            *(s32 *)(arg0 + 0x10) += (s32)((*(u8 **)(arg0 + 0x14))[15] * value * arg1) / 255;
+        }
+    }
+}
 
-extern u8 func_84200094(u8 *, u8);
 void func_84200390(u8 *arg0, u8 arg1) {
     if (func_84200094(*(u8 **)(arg0 + 0x1C), arg0[3])) {
         u32 value = func_84203464();
@@ -99,9 +137,8 @@ void func_84200758(u8 *arg0) {}
 
 void func_84200760(u8 *arg0) {}
 
-extern s32 func_84200038(u8 *arg0, s32 arg1);
 s32 func_84200768(u8 *arg0) {
-    return func_84200038(*(u8 **)(arg0 + 0x1C), 0x16);
+    return Species_HasType_fragment80(*(u8 **)(arg0 + 0x1C), 0x16);
 }
 
 void func_8420078C(u8 *arg0) { u32 value = func_842034A0(); *(u8 **)(arg0 + 0x10) += (*(u8 **)(arg0 + 0x14))[0x29] * value; }
@@ -125,7 +162,7 @@ void func_84200804(u8 *arg0) {}
 void func_8420080C(u8 *arg0) {}
 
 s32 func_84200814(u8 *arg0) {
-    return func_84200038(*(u8 **)(arg0 + 0x18), 8);
+    return Species_HasType_fragment80(*(u8 **)(arg0 + 0x18), 8);
 }
 
 void func_84200838(u8 *arg0) {}
