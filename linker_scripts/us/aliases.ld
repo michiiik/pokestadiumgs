@@ -413,3 +413,4 @@ func_81B0019C = RoomDecor_SetPlant_fragment87;
 func_81B00230 = RoomDecor_SetPoster_fragment87;
 func_81B00CA0 = RoomDecor_RestoreSavedView_fragment87;
 func_81B00E58 = RoomDecor_SetByCategory_fragment87;
+func_81B00788 = RoomDecor_RebuildObjects_fragment87;

@@ -252,11 +252,122 @@ s32 func_81B00764(u8 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/87/fragment87_code/func_81B00788.s")
+// Complete byte views of the 16-byte GB map-object and 40-byte actor records.
+typedef struct Fragment87MapObjectTemplate {
+    u8 bytes[16];
+} Fragment87MapObjectTemplate;
+
+typedef struct Fragment87ActorTemplate {
+    u8 bytes[40];
+} Fragment87ActorTemplate;
+extern Fragment87MapObjectTemplate D_81B00FB0, D_81B00FC0, D_81B00FD0, D_81B00FE0;
+extern Fragment87ActorTemplate D_81B00FF0, D_81B01018, D_81B01040, D_81B01068;
+extern u8 *func_8005FF0C(s32, u8);
+extern void _bzero(void *, s32);
+extern void func_800649E0(void);
+extern void func_80064A10(u8, u8);
+extern void func_80064AC8(void);
+extern void func_80064B84(u8);
+extern u8 func_80064A7C(u8);
+extern u8 * func_8005FE58(s32, u8);
+extern s32 func_81B006EC(u8 arg0);
+extern s32 func_81B00728(u8 arg0);
+extern s32 func_81B00764(u8 arg0);
+void RoomDecor_RebuildObjects_fragment87(u8 slot) {
+    u8 *decorations;
+    u8 *sprites;
+    u8 is_crystal; // Byte truth tests below preserve IDO's byte-valued flag handling.
+    u8 next_object;
+    u8 map_slot;
+    s32 save_index;
+    u8 *actors;
+    u8 *map_objects;
+
+    save_index = slot;
+    decorations = func_8005FA1C(save_index);
+    sprites = func_8005FD24(save_index);
+    is_crystal = func_8005D92C(save_index) == 7;
+    next_object = 1;
+    if (is_crystal) {
+        map_slot = 1;
+    } else {
+        map_slot = 2;
+    }
+    actors = func_8005FE58(save_index, 1);
+    map_objects = func_8005FF0C(save_index, map_slot);
+    _bzero(actors, 160);
+    func_800649E0();
+    func_80064A10(1, 1);
+    func_80064A10(240, sprites[0]);
+    func_80064A10(241, sprites[1]);
+    func_80064A10(242, sprites[2]);
+    func_80064A10(243, sprites[3]);
+    if (is_crystal) {
+        func_80064AC8();
+    }
+    func_80064B84(is_crystal);
+    *(Fragment87MapObjectTemplate *)map_objects = D_81B00FB0;
+    if (is_crystal) {
+        map_objects[10] += 120;
+        map_objects[11] += 15;
+    }
+    if (decorations[4] != 0) {
+        *(Fragment87ActorTemplate *)actors = D_81B00FF0;
+        actors[1] = map_slot;
+        actors[2] = func_80064A7C(240);
+        actors[6] = (actors[6] & 0xF8) + func_81B006EC(decorations[4]);
+        map_objects[0] = next_object++;
+        actors += 40;
+    }
+    map_slot++;
+    map_objects += 16;
+    *(Fragment87MapObjectTemplate *)map_objects = D_81B00FC0;
+    if (is_crystal) {
+        map_objects[10] += 120;
+        map_objects[11] += 15;
+    }
+    if (decorations[5] != 0) {
+        *(Fragment87ActorTemplate *)actors = D_81B01018;
+        actors[1] = map_slot;
+        actors[2] = func_80064A7C(241);
+        actors[6] = (actors[6] & 0xF8) + func_81B00728(decorations[5]);
+        map_objects[0] = next_object++;
+        actors += 40;
+    }
+    map_slot++;
+    map_objects += 16;
+    *(Fragment87MapObjectTemplate *)map_objects = D_81B00FD0;
+    if (is_crystal) {
+        map_objects[10] += 120;
+        map_objects[11] += 15;
+    }
+    if (decorations[6] != 0) {
+        *(Fragment87ActorTemplate *)actors = D_81B01040;
+        actors[1] = map_slot;
+        actors[2] = func_80064A7C(242);
+        actors[6] = (actors[6] & 0xF8) + func_81B00728(decorations[6]);
+        map_objects[0] = next_object++;
+        actors += 40;
+    }
+    map_slot++;
+    map_objects += 16;
+    *(Fragment87MapObjectTemplate *)map_objects = D_81B00FE0;
+    if (is_crystal) {
+        map_objects[10] += 120;
+        map_objects[11] += 15;
+    }
+    if (decorations[7] != 0) {
+        *(Fragment87ActorTemplate *)actors = D_81B01068;
+        actors[1] = map_slot;
+        actors[2] = func_80064A7C(243);
+        actors[6] = (actors[6] & 0xF8) + func_81B00764(decorations[7]);
+        map_objects[0] = next_object++;
+        actors += 40;
+    }
+}
 
 extern u8 func_8005FAB4(s32);
 extern u8 func_8005FB40(s32);
-extern u8 *func_8005FE58(s32, u8);
 extern void func_8005FBCC(s32, u8, u8);
 extern u8 func_8005FFB4(s32, u8);
 extern u8 D_81B01090[];
@@ -267,7 +378,7 @@ extern void func_81B002EC(u8 arg0, u8 arg1, s32 arg2);
 extern void func_81B003EC(u8 arg0, u8 arg1, s32 arg2);
 extern void func_81B004EC(u8 arg0, u8 arg1, s32 arg2);
 extern void func_81B005EC(u8 arg0, u8 arg1, s32 arg2);
-extern void func_81B00788(u8);
+extern void RoomDecor_RebuildObjects_fragment87(u8);
 // Restore the saved 30-block room view and player object, then reapply all decorations.
 void RoomDecor_RestoreSavedView_fragment87(u8 slot) {
     s32 i;
@@ -297,7 +408,7 @@ void RoomDecor_RestoreSavedView_fragment87(u8 slot) {
         func_81B003EC(slot, func_8005FFB4(save_index, 5), 1);
         func_81B004EC(slot, func_8005FFB4(save_index, 6), 1);
         func_81B005EC(slot, func_8005FFB4(save_index, 7), 1);
-        func_81B00788(slot);
+        RoomDecor_RebuildObjects_fragment87(slot);
     }
 }
 
@@ -342,7 +453,7 @@ void RoomDecor_SetByCategory_fragment87(u8 slot, u8 category, u8 decoration) {
 
 void func_81B00F78(u8 arg0) {
     if (func_80059AE0(arg0) != 0) {
-        func_81B00788(arg0);
+        RoomDecor_RebuildObjects_fragment87(arg0);
     }
 }
 #endif
