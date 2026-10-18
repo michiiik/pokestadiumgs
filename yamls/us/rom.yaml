@@ -727,6 +727,8 @@
     - [0x14A2E0, c,       fragments/22/fragment22_14A2E0]
     - [0x14B090, c,       fragments/22/fragment22_14B090]
     - [0x14D470, data,    fragments/22/fragment22_data]
+    - [0x14D5C0, .rodata, fragments/22/fragment22_14B090] # Both dispatcher tables, 64 bytes.
+    - [0x14D600, rodata,  fragments/22/fragment22_reloc]
   
   - name: fragment23
     type: code
