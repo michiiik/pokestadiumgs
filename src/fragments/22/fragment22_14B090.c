@@ -65,6 +65,13 @@ typedef char Fragment22RowEntrySizeCheck[sizeof(Fragment22RowEntry) == 40 ? 1 : 
 typedef char Fragment22RowOptionCountsSizeCheck[sizeof(Fragment22RowOptionCounts) == 10 ? 1 : -1];
 extern Fragment22RowOptionCounts D_82703280;
 extern u32 D_8270329C[];
+typedef struct Fragment22RowSelection {
+    s16 selection;
+    s16 count;
+} Fragment22RowSelection;
+extern s32 func_80035160(s32);
+extern void func_80025C50(u32);
+extern void func_8002A7E8(s32);
 
 s32 func_82700DD0(s32 value) {
     OSIntMask old_mask;
@@ -273,7 +280,112 @@ s32 func_82701920(void *arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82701978.s")
+void func_82701978(Fragment22Menu *menu) {
+    s32 save_requested;
+    s32 close_requested;
+    s32 previous;
+    Fragment22RowEntry *table;
+    Fragment22RowEntry *entry;
+    Fragment22RowSelection *choice;
+    s32 i;
+    s32 enabled;
+
+    save_requested = 0;
+    close_requested = 0;
+    previous = menu->unk_04;
+    table = menu->rows;
+    func_82700E70(1, 0, table, 16);
+    if (*(u16 *)((u8 *)D_80087200 + 12) & 0x800) {
+        menu->unk_04--;
+        if (menu->unk_04 < 0) {
+            menu->unk_04 = 0;
+        }
+    }
+    if (*(u16 *)((u8 *)D_80087200 + 12) & 0x400) {
+        menu->unk_04++;
+        if (menu->unk_04 >= 5) {
+            menu->unk_04 = 4;
+        }
+    }
+    if (previous != menu->unk_04) {
+        func_800226C0(1);
+    }
+    if (*(u16 *)((u8 *)D_80087200 + 8) & 0x8000) {
+        entry = func_82700E70(2, menu->unk_04, table, 16);
+        choice = (Fragment22RowSelection *)&entry->selection;
+        choice->selection++;
+        if (choice->selection >= choice->count) {
+            choice->selection = 0;
+        }
+        switch ((u16)(menu->unk_04 = func_82700DD0(menu->unk_04))) {
+        case 0:
+            func_80025C50(func_80035160(choice->selection));
+            func_800226C0(21);
+            break;
+        case 1:
+            if (choice->selection == 0) {
+                enabled = 1;
+            } else {
+                enabled = 0;
+            }
+            func_8002A7E8(enabled);
+            func_800226C0(18);
+            break;
+        case 3:
+            menu->state = 3;
+            menu->row_counter = 0;
+            menu->unk_16 = 3;
+            menu->unk_18 = &menu->selection;
+            menu->unk_10 = 0;
+            menu->flags &= ~2;
+            func_82701820(2, 4);
+            func_800226C0(16);
+            break;
+        case 2:
+            save_requested = 1;
+            menu->state = 8;
+            menu->row_counter = 0;
+            menu->flags &= ~2;
+            func_82701820(1, 0);
+            i = 0;
+            do {
+                entry = func_82700E70(2, i, table, 16);
+                if (i != 2) {
+                    func_82701820(2, i);
+                } else {
+                    func_8270188C(2, i, entry->position.x, 51);
+                }
+                i++;
+            } while (i != 5);
+            func_800226C0(16);
+            break;
+        case 4:
+            close_requested = 1;
+            break;
+        }
+    } else if (*(u16 *)((u8 *)D_80087200 + 8) & 0x4000) {
+        menu->unk_04 = 4;
+        close_requested = 1;
+    }
+    if (close_requested || save_requested) {
+        func_8270174C(menu);
+    }
+    if (close_requested) {
+        if (func_82701920(menu)) {
+            menu->state = 9;
+            menu->row_counter = 0;
+            menu->unk_16 = 4;
+            menu->unk_18 = &menu->unk_08;
+            menu->flags &= ~2;
+            func_82701820(2, 3);
+            func_82701820(2, 4);
+            func_800226C0(16);
+        } else {
+            menu->unk_0a = 4;
+            func_800226C0(3);
+        }
+    }
+}
 
 extern void *func_82700E70(s32, s32, void *, s32);
 extern s32 func_827015A4(s32, s32);
@@ -573,7 +685,76 @@ void func_827025F0(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14B090/func_82702658.s")
+extern Fragment22Menu D_827034E0;
+extern s16 D_827034E2;
+extern void func_8270160C(void *);
+extern void func_82702220(void *);
+extern void func_827010F0(void *);
+extern void func_82701188(void *);
+extern void func_82701278(void *);
+
+s32 func_82702658(void) {
+    Fragment22Menu *menu = &D_827034E0;
+    s32 i;
+    Fragment22RowEntry *entry;
+    s32 row_state;
+
+    if (menu->flags & 1) {
+        switch (D_827034E2) {
+        case 1:
+            func_8270160C(menu);
+            break;
+        case 2:
+            func_82701978(menu);
+            break;
+        case 3:
+            func_82701CB8(menu);
+            break;
+        case 4:
+            func_82701DF4(menu);
+            break;
+        case 5:
+            func_82701F7C(menu);
+            break;
+        case 6:
+            func_827020F4(menu);
+            break;
+        case 7:
+            func_8270216C(menu);
+            break;
+        case 8:
+            func_827025F0(menu);
+            break;
+        case 9:
+            func_82702220(menu);
+            break;
+        case 10:
+            func_82702364(menu);
+            break;
+        case 11:
+            func_82702528(menu);
+            break;
+        }
+        for (i = 0; i < 16; i++) {
+            entry = &D_827034E0.rows[i];
+            if (entry->kind != 0) {
+                row_state = entry->state;
+                switch (row_state) {
+                case 1:
+                    func_827010F0(entry);
+                    break;
+                case 3:
+                    func_82701188(entry);
+                    break;
+                case 4:
+                    func_82701278(entry);
+                    break;
+                }
+            }
+        }
+    }
+    return (D_827034EC & 1U) != 0;
+}
 
 typedef struct Fragment22TextureHeader {
     u16 width;
