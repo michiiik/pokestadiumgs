@@ -390,3 +390,6 @@ func_84301AEC = Pokemon_ShuffleMoves_fragment81;
 func_8430022C = ByteList_ChooseRandom_fragment81;
 func_8430049C = MoveLists_ApplySpeciesWeights_fragment81;
 func_843006B0 = HeldItem_IsRedundantForType_fragment81;
+func_84300A54 = SpeciesCandidates_AddType_fragment81;
+func_84300B30 = SpeciesCandidates_PopulateTypes_fragment81;
+func_84301CB4 = TeamRoster_Shuffle_fragment81;

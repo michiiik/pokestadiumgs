@@ -185,7 +185,23 @@ u8 HeldItem_IsRedundantForType_fragment81(u8 species, u8 held_item) {
 
 extern u8 HeldItem_IsRedundantForType_fragment81(u8, u8);
 extern u8 *D_84302C80;
-extern u8 D_84302C88[];
+// The initializer clears this 24-byte N64 state. Its caller passes the
+// rule-table flag as 0/1; see func_82601298.
+//@src/fragments/20/fragment20_128B10.c
+typedef struct Fragment81SelectionState {
+    u8 count;
+    u8 selector;
+    u8 unk_02;
+    u8 unk_03;
+    s32 unk_04;
+    s32 use_rule_table;
+    u16 unk_0C;
+    u16 stat_limit;
+    u32 used_types;
+    Fragment81RulePrefix *rules;
+} Fragment81SelectionState;
+
+extern Fragment81SelectionState D_84302C88;
 u8 func_843007BC(u8 arg0, u8 arg1) {
     s32 i;
     u8 *p;
@@ -197,7 +213,7 @@ u8 func_843007BC(u8 arg0, u8 arg1) {
         return 1;
     }
     p = D_84302C80;
-    for (i = 0; i < D_84302C88[0]; i++) {
+    for (i = 0; i < D_84302C88.count; i++) {
         if (p[0] != 0 && p[1] == arg1) {
             return 1;
         }
@@ -207,14 +223,14 @@ u8 func_843007BC(u8 arg0, u8 arg1) {
 }
 
 extern u8 *D_84302C80;
-extern u8 D_84302C88[];
+extern Fragment81SelectionState D_84302C88;
 s32 func_84300858(u8 arg0) {
     u8 *p;
     s32 i;
 
     p = D_84302C80;
     i = 0;
-    while (i < D_84302C88[0]) {
+    while (i < D_84302C88.count) {
         if (*p != 0 && *p == arg0) {
             return 0;
         }
@@ -239,7 +255,7 @@ s32 func_843008B0(u8 arg0) {
 }
 
 extern u8 * D_84302C80;
-extern u8 D_84302C88[];
+extern Fragment81SelectionState D_84302C88;
 s32 func_84300928(u8 arg0) {
     u8 *p;
     u8 *q;
@@ -247,7 +263,7 @@ s32 func_84300928(u8 arg0) {
     s32 j;
     p = D_84302C80;
     i = 0;
-    while (i < D_84302C88[0]) {
+    while (i < D_84302C88.count) {
         j = 0;
         q = p;
         while (j < 4) {
@@ -267,7 +283,7 @@ typedef struct {
     u8 tail[0x92];
 } Fragment81Row;
 extern u8 D_84302566[];
-extern u8 D_84302C88[];
+extern Fragment81SelectionState D_84302C88;
 extern u8 D_84303008[];
 extern u8 D_84303108[];
 extern s32 func_84300648(u8);
@@ -279,8 +295,8 @@ void func_843009A4(u8 arg0) {
 
     if (arg0 > 0 && arg0 < 0xFC) {
         result = func_84300648(arg0);
-        first = ((Fragment81Row *)D_84302566)[D_84302C88[1]].value;
-        limit = *(u16 *)(D_84302C88 + 0xE);
+        first = ((Fragment81Row *)D_84302566)[D_84302C88.selector].value;
+        limit = D_84302C88.stat_limit;
         if ((first < limit && result < limit) || (first >= limit && result >= limit)) {
             func_84300200(D_84303008, arg0);
         } else {
@@ -289,9 +305,46 @@ void func_843009A4(u8 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300A54.s")
+typedef struct Fragment81TypeEntry {
+    u8 count;
+    u8 *species;
+} Fragment81TypeEntry;
+typedef struct Fragment81TypeRow {
+    u8 level;
+    u8 unk_01;
+    u16 stat_cutoff;
+    Fragment81TypeEntry types[18];
+} Fragment81TypeRow;
+extern Fragment81TypeRow D_84302564[];
+void SpeciesCandidates_AddType_fragment81(u8 type, s32 force) {
+    Fragment81TypeRow *row = &D_84302564[D_84302C88.selector];
+    s32 i;
+    u8 species;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300B30.s")
+    if (row->types[type].species != NULL) {
+        for (i = 0; i < row->types[type].count; i++) {
+            species = row->types[type].species[i];
+            if (func_84300858(species) && (force || !func_843008B0(species))) {
+                func_843009A4(species);
+            }
+        }
+    }
+}
+
+void SpeciesCandidates_PopulateTypes_fragment81(u8 species) {
+    s32 type;
+    u8 mapped_type;
+
+    for (type = 0; type != 18; type++) {
+        if (D_84302C88.rules->types != NULL && (mapped_type = D_84302C88.rules->types[species]) != 0xFF) {
+            if (mapped_type == type) {
+                SpeciesCandidates_AddType_fragment81(type, 1);
+            }
+        } else if (!(D_84302C88.used_types & (1 << type))) {
+            SpeciesCandidates_AddType_fragment81(type, 0);
+        }
+    }
+}
 
 extern u8 ByteList_ChooseRandom_fragment81(u8 *);
 extern u16 D_84302CA0;
@@ -300,7 +353,7 @@ extern u8 func_8006397C(u8 arg0);
 extern u8 func_800639C0(u8 arg0);
 extern u8 func_84300348(u8 *arg0);
 extern s32 func_84300648(u8);
-extern u8 D_84302C88[];
+extern Fragment81SelectionState D_84302C88;
 extern u8 D_84303008[];
 extern u8 D_84303108[];
 u8 func_84300BE8(void) {
@@ -310,8 +363,8 @@ u8 func_84300BE8(void) {
     else if (func_84300348(D_84303108) > 0) result = ByteList_ChooseRandom_fragment81(D_84303108);
     if (result != 0) {
         D_84302CA0 = func_84300648(result);
-        *(u32 *)(D_84302C88 + 0x10) |= 1 << func_800630F0(func_8006397C(result) & 0xFF);
-        *(u32 *)(D_84302C88 + 0x10) |= 1 << func_800630F0(func_800639C0(result) & 0xFF);
+        D_84302C88.used_types |= 1 << func_800630F0(func_8006397C(result) & 0xFF);
+        D_84302C88.used_types |= 1 << func_800630F0(func_800639C0(result) & 0xFF);
     }
     return result;
 }
@@ -439,7 +492,24 @@ void func_84301C58(u8 *arg0) {
     } while (i != 4);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84301CB4.s")
+typedef struct Fragment81PokemonRecord {
+    u32 words[22];
+} Fragment81PokemonRecord;
+void TeamRoster_Shuffle_fragment81(void) {
+    u32 value;
+    u8 index;
+    Fragment81PokemonRecord saved;
+    s32 i;
+
+    i = 10;
+    while (i-- > 0) {
+        value = func_8003570C();
+        saved = ((Fragment81PokemonRecord *)D_84302C80)[0];
+        index = value % 6;
+        ((Fragment81PokemonRecord *)D_84302C80)[0] = ((Fragment81PokemonRecord *)D_84302C80)[index];
+        ((Fragment81PokemonRecord *)D_84302C80)[index] = saved;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84301DEC.s")
 
