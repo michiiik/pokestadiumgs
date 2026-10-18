@@ -133,7 +133,35 @@ void func_88700B58(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_88700C34.s")
+/* Encode nonzero character codes high byte first; wrap modes 0 and 1 every 16 characters. */
+void func_88700C34(void) {
+    u8 i;
+    u16 *character;
+    u8 *output;
+    output = D_88701E00->output;
+    i = 0;
+    character = D_88701E00->characters;
+    for (; i < D_88701E00->capacity; i++, character++) {
+        if (*character == 0) {
+            break;
+        }
+        switch (D_88701E00->mode) {
+        case 0:
+        case 1:
+            if (i != 0 && (i & 15) == 0) {
+                *output = 10;
+                output++;
+            }
+            break;
+        }
+        if ((s32)*character >= 256) {
+            *output = ((s32)*character >> 8) & 0xFF;
+            output++;
+        }
+        *output++ = *character & 0xFF;
+    }
+    *output = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_88700CE4.s")
 
