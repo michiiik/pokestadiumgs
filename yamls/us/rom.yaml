@@ -949,7 +949,8 @@
     - [0x1CCE70, c,       fragments/35/fragment35_1CCE70]
     - [0x1CE100, data,    fragments/35/fragment35_data]
     - [0x1CE3E0, .rodata, fragments/35/fragment35_1CCC20] # Dispatcher table, 112 bytes.
-    - [0x1CE450, rodata,  fragments/35/fragment35_tail]
+    - [0x1CE450, .rodata, fragments/35/fragment35_1CCE70] # Preview dispatch tables, 64 bytes.
+    - [0x1CE490, rodata,  fragments/35/fragment35_tail]
   
   - name: fragment36
     type: code

@@ -2,6 +2,9 @@
 
 
 #ifdef VERSION_US
+typedef struct Fragment35Rgba {
+    u8 r, g, b, a;
+} Fragment35Rgba;
 extern void func_8004C8C0(s32);
 extern s32 func_8004C990(s32, s32);
 extern s32 func_80001FF0(void);
@@ -17,14 +20,14 @@ void func_88600270(void) {
     D_886018AC = func_8004C990(2, 1);
     D_886018B0 = func_8004C990(2, 5);
     D_886018B4 = func_8004C990(2, 6);
-    D_886018B8 = ((((((((((s8)((u32)(((f32)func_80001FF0() * 4.0f) / 2))) & 0xFF) & 0xFF) & 0xFF) & 0xFF) & 0xFF) & 0xFF) & 0xFF) & 0xFF) & 0xFF;
+    D_886018B8 = ((((((((((s8)((u32)(((f32)func_80001FF0() * 4.0f) / 2))) & 0xFF) & 0xFF) & 0xFF) & 0xFF) & 0xFF) & 0xFF) & 0xFF) & 0xFF) & 0xFF; // FAKE: redundant masks affect the later conversion's temporary-register order.
     D_886018B9 = (s8)((u32)(((f32)func_80001FF0() * 0.5f) / 2));
 }
 
 extern u8 D_88601510[];
 s32 func_8860043C(s32 arg0) { u8 *table = D_88601510; s32 i = 0; do { if (table[i] == arg0) return i; i++; i &= 0xFF; } while (i < 0x12); }
 
-void func_8860047C(void) { extern u8 D_88601914[]; extern f32 D_886018D0[]; extern f32 D_886018E0[]; extern u8 D_88601918[]; D_886018D0[0] = D_88601914[0]; D_886018D0[1] = D_88601914[1]; D_886018D0[2] = D_88601914[2]; D_886018E0[0] = D_88601918[0]; D_886018E0[1] = D_88601918[1]; D_886018E0[2] = D_88601918[2]; }
+void func_8860047C(void) { extern Fragment35Rgba D_88601914; extern f32 D_886018D0[]; extern f32 D_886018E0[]; extern Fragment35Rgba D_88601918; D_886018D0[0] = D_88601914.r; D_886018D0[1] = D_88601914.g; D_886018D0[2] = D_88601914.b; D_886018E0[0] = D_88601918.r; D_886018E0[1] = D_88601918.g; D_886018E0[2] = D_88601918.b; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_88600578.s")
 
@@ -59,14 +62,119 @@ void func_886006B8(s32 arg0, u8 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_88600860.s")
-
-extern s32 func_886000F0(u16);
-extern void func_88600860(s32, s32, s32, u8);
-extern u8 func_8006397C(u8);
-extern u8 func_800639C0(u8);
 extern s32 D_886018BC;
 extern u8 D_886018C0;
+extern f32 D_88601924;
+extern f32 D_88601928;
+typedef struct Fragment35TexturePair {
+    s32 first;
+    s32 second;
+} Fragment35TexturePair;
+typedef struct Fragment35TypePreview {
+    s32 unk_00;
+    /* Low command-byte parameter of gDPSetPrimColor in func_88600D64. */
+    u8 lod_fraction;
+    Fragment35Rgba primary;
+    Fragment35Rgba secondary;
+    s8 unk_0D, unk_0E, unk_0F, unk_10, unk_11, unk_12, unk_13, unk_14;
+    f32 scale_x, scale_y;
+    Fragment35TexturePair *textures;
+} Fragment35TypePreview;
+extern Fragment35TypePreview D_88601524[];
+extern Fragment35TexturePair D_88601930;
+extern Fragment35Rgba D_88601914, D_88601918;
+extern s8 D_886018A0, D_886018A1, D_886018A2, D_886018A3;
+extern s32 D_8860190C;
+extern u8 D_88601910;
+extern s8 D_8860191C, D_8860191D, D_8860191E, D_8860191F;
+extern s8 D_88601920, D_88601921, D_88601922, D_88601923;
+extern s32 D_886018C4, D_886018C8;
+extern void func_88600578(void);
+
+void func_88600860(s32 first_type, s32 second_type, s32 mode, u8 step) {
+    Fragment35TypePreview *entry;
+    f32 duration;
+
+    D_886018C0 = step;
+    if (mode == 0 || mode == 1 || mode == 4 || mode == 7) {
+        D_886018A0 = D_886018A1 = D_886018A2 = D_886018A3 = 0;
+        if (mode == 0) {
+            mode = 2;
+        }
+    }
+    switch (mode) {
+    case 1:
+    case 2:
+    case 3:
+    case 7:
+        entry = &D_88601524[func_8860043C(first_type)];
+        D_8860190C = first_type;
+        break;
+    case 4:
+    case 5:
+    case 6:
+        entry = &D_88601524[func_8860043C(second_type)];
+        D_8860190C = second_type;
+        break;
+    }
+    D_88601930.first = entry->textures->first;
+    D_88601930.second = entry->textures->second;
+    D_88601910 = entry->lod_fraction;
+    switch (mode) {
+    default:
+        D_88601914 = entry->primary;
+        D_88601918 = entry->secondary;
+        break;
+    case 4:
+    case 7:
+        D_88601914.r = 0;
+        D_88601914.g = 0;
+        D_88601914.b = 0;
+        D_88601914.a = entry->primary.a;
+        D_88601918.r = 0;
+        D_88601918.g = 0;
+        D_88601918.b = 0;
+        D_88601918.a = entry->secondary.a;
+        break;
+    }
+    D_8860191C = entry->unk_0D;
+    D_8860191D = entry->unk_0E;
+    D_8860191E = entry->unk_0F;
+    D_8860191F = entry->unk_10;
+    D_88601920 = entry->unk_11;
+    D_88601921 = entry->unk_12;
+    D_88601922 = entry->unk_13;
+    D_88601923 = entry->unk_14;
+    D_88601924 = entry->scale_x;
+    D_88601928 = entry->scale_y;
+    D_886018BC = mode;
+    if (D_886018BC != 1) {
+        D_886018C4 = first_type;
+        D_886018C8 = second_type;
+        if (first_type == second_type) {
+            D_886018BC = 1;
+        } else {
+            duration = (u8)D_886018B9;
+            D_886018F0[0] = (u32)entry->primary.r / duration;
+            D_886018F0[1] = (u32)entry->primary.g / duration;
+            D_886018F0[2] = (u32)entry->primary.b / duration;
+            D_88601900[0] = (u32)entry->secondary.r / duration;
+            D_88601900[1] = (u32)entry->secondary.g / duration;
+            D_88601900[2] = (u32)entry->secondary.b / duration;
+            if (step == 0) {
+                func_8860047C();
+            } else {
+                func_8860047C();
+                func_886006B8(mode, step);
+                func_88600578();
+            }
+        }
+    }
+}
+
+extern s32 func_886000F0(u16);
+extern u8 func_8006397C(u8);
+extern u8 func_800639C0(u8);
 void func_88600C38(u16 species, s32 mode) {
     u8 type2;
     u8 type1;
@@ -102,8 +210,6 @@ void func_88600CC8(u16 species) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_88600D64.s")
 
 extern void func_88600D64(s32);
-extern f32 D_88601924;
-extern f32 D_88601928;
 extern void func_80044270(s32, s32, s32, s32, s32, s32, s32, s32, s32);
 typedef struct {
     u8 pad[4];
