@@ -370,3 +370,4 @@ func_84201234 = MoveDamage_ComputeBase_fragment80;
 func_8420138C = MoveDamage_ApplyTypeFactors_fragment80;
 func_8420151C = MoveDamage_ApplyEffect_fragment80;
 func_84201728 = MoveAccuracy_AdjustLevelDifference_fragment80;
+func_84201408 = MoveDamage_ApplyPowerEffect_fragment80;

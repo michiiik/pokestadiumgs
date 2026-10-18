@@ -2,6 +2,15 @@
 
 
 #ifdef VERSION_US
+/* Original debug text preceding this translation unit's jump table. */
+const char D_84203790[] = "SetPower...";
+const char D_8420379C[] = "end\n";
+const char D_842037A4[] = "SetPowerPSP\n";
+const char D_842037B4[] = "GetDamagePSP\n";
+const char D_842037C4[] = "ChkZokuseiPSP\n";
+const char D_842037D4[] = "aiesDamage\n";
+const char D_842037E0[] = "aiesSetEntrySimData\n";
+
 typedef struct Fragment80DamageContext {
     u8 move, effect, power, type, accuracy, level;
     u16 attack, defense;
@@ -71,7 +80,37 @@ void MoveDamage_ApplyTypeFactors_fragment80(void *arg0) {
     func_800632CC(&((Fragment80DamageContext *)arg0)->damage, ((Fragment80DamageContext *)arg0)->type, first, second, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41A5F0/func_84201408.s")
+void MoveDamage_ApplyPowerEffect_fragment80(void *arg0) {
+    Fragment80DamageContext *ctx = arg0;
+    switch (ctx->effect) {
+    case 99:
+        ctx->power = 60;
+        MoveDamage_LoadStats_fragment80(ctx);
+        break;
+    case 121:
+        MoveDamage_LoadStats_fragment80(ctx);
+        ctx->power = ctx->attacker[0x1C] * 10 / 25;
+        break;
+    case 122:
+        MoveDamage_LoadStats_fragment80(ctx);
+        ctx->power = 52;
+        break;
+    case 123:
+        MoveDamage_LoadStats_fragment80(ctx);
+        ctx->power = (255 - ctx->attacker[0x1C]) * 10 / 25;
+        break;
+    case 126:
+        MoveDamage_LoadStats_fragment80(ctx);
+        ctx->power = 64;
+        break;
+    case 135:
+        MoveDamage_LoadStats_fragment80(ctx);
+        break;
+    default:
+        MoveDamage_LoadStats_fragment80(ctx);
+        break;
+    }
+}
 
 void MoveDamage_ApplyEffect_fragment80(void *arg0) {
     Fragment80DamageContext *ctx = arg0;
@@ -118,7 +157,7 @@ void func_84201620(unk_func_84201620* arg0) {
     }
 }
 
-void func_8420168C(void *arg0) { func_84201408(arg0); MoveDamage_ApplyEffect_fragment80(arg0); func_84201620(arg0); }
+void func_8420168C(void *arg0) { MoveDamage_ApplyPowerEffect_fragment80(arg0); MoveDamage_ApplyEffect_fragment80(arg0); func_84201620(arg0); }
 
 typedef struct unk_func_842016BC {
     u8 unk_00;
