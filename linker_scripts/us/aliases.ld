@@ -8,6 +8,8 @@
  * undefined_syms.ld, and the other hand-written scripts are.
  */
 Audio_ThreadEntry = Audio_ThreadMain;
+/* Preserve address-keyed rectangle calls alongside the verified narrow API. */
+func_80044270 = GfxRect_DrawTextured;
 /* JPEG byte-stuffing state occupies the second byte of the existing flag slot. */
 Jpeg_LastByteWasFF = D_800D1218 + 1;
 /* Coordinate callback: structured access view of the existing scalar/data label.
