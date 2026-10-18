@@ -77,6 +77,8 @@ void func_82D02D00(void) {
     func_8004C4B0(0x43);
 }
 
+/* Legacy resource-selection calls use default argument promotions. */
+extern s32 func_8004C990();
 void func_82D02D20(s32 arg0, s32 arg1)
 {
   s32 temp_a2;
@@ -93,7 +95,41 @@ void func_82D02D5C(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     func_8004D19C((s32)arg0, (s32)arg1, value, 0, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02DA8.s")
+extern s32 func_8004C990(s32, s32);
+extern s32 func_8004CA10(u16 *);
+extern s32 func_8004CA24(u16 *);
+extern s32 func_8004CA38(u8 *);
+extern s32 func_8004CA4C(u8 *);
+extern u8 *func_8004CA60(u8 *);
+extern void func_800459AC(s32, s32, s32, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32);
+extern int func_80044270(s32, s32, int, int, int, int, int, int, int);
+extern Gfx D_82D07210[];
+void func_82D02DA8(void *arg0) {
+    u8 *asset;
+    s32 image_width;
+    Fragment82MenuRow *row = arg0;
+    s32 format;
+    s32 size;
+    u8 *texture;
+    s32 y;
+    asset = (u8 *)func_8004C990(0x153, 0);
+    image_width = func_8004CA10((u16 *)asset);
+    func_8004CA24((u16 *)asset);
+    format = func_8004CA38(asset);
+    size = func_8004CA4C(asset);
+    texture = func_8004CA60(asset);
+    gSPDisplayList(D_800D0510++, D_82D07210);
+    ParticleGfx_SetPrimColor_fragment82(row->primary.r, row->primary.g, row->primary.b, row->primary.a);
+    func_800459AC((s32)texture, format, size, image_width, 64, 1, 0, 0, 0, 7, 7, 0, 0);
+    for (y = 0; y < 512; y += 128) {
+        func_80044270(0, (s16)y, 640, 64, 0, 0, 0x400, 0x400, 0);
+    }
+    texture += 0x1000;
+    func_800459AC((s32)texture, format, size, image_width, 64, 1, 0, 0, 0, 7, 7, 0, 0);
+    for (y = 64; y != 576; y += 128) {
+        func_80044270(0, (s16)y, 640, 64, 0, 0, 0x400, 0x400, 0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02F78.s")
 
@@ -103,11 +139,36 @@ void func_82D03324(s16 arg0, s16 arg1, s32 arg2) {
     func_80044270((s32)arg0, (s32)arg1, (s16)arg2, 0x28, 0, 0, 0x400, 0x400, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03380.s")
+void func_82D03380(s16 x, s16 y, u16 width) {
+    u8 *asset;
+    s32 value; /* Image width, then the final cap's x coordinate. */
+    s32 row_width = width;
+    s32 format;
+    s32 size;
+    u8 *texture;
+    if (row_width >= 48) {
+        asset = (u8 *)func_8004C990(0xF7, 1);
+        value = func_8004CA10((u16 *)asset);
+        func_8004CA24((u16 *)asset);
+        format = func_8004CA38(asset);
+        size = func_8004CA4C(asset);
+        texture = func_8004CA60(asset);
+        func_800459AC((s32)texture, format, size, value, 80, 1, 0, 2, 2, 0, 0, 0, 0);
+        if (row_width >= 49) {
+            func_80044270(x, y, (s16)(row_width - 48), 80, 0, 0, 0, 0x400, 0);
+        }
+        func_80044270((s16)(x + row_width - 48), y, 48, 80, 0, 0, 0x400, 0x400, 0);
+        func_800459AC((s32)(texture + 0xF00), format, size, value, 14, 1, 0, 2, 2, 0, 0, 0, 0);
+        if (row_width >= 49) {
+            func_80044270(x, (s16)(y + 80), (s16)(row_width - 48), 14, 0, 0, 0, 0x400, 0);
+        }
+        value = (s16)(x + row_width - 48);
+        func_80044270((s16)value, (s16)(y + 80), 48, 14, 0, 0, 0x400, 0x400, 0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03598.s")
 
-extern int func_80044270(s32, s32, int, int, int, int, int, int, int);
 void func_82D03778(s16 x, s16 y, u16 width, u16 height) {
     s32 w = width;
     if (w > 0 && height > 0) {
@@ -169,7 +230,6 @@ void func_82D03BEC(s16 arg0, s16 arg1, u16 arg2) {
 
 extern u16 D_82D23D98[2], D_82D23D9A;
 extern u8 D_82D071D8[];
-extern void func_82D03380(s16, s16, u16);
 extern void func_8004989C(s32);
 extern void Ui_DrawAnimatedTextureMarker(s32, s32);
 extern void func_80049064(s32, s32, s32, s32);
@@ -297,7 +357,6 @@ void func_82D0599C(void *arg0) {
     func_82D02B44(D_82D07198.x, D_82D07198.y, D_82D07198.width, D_82D07198.height);
 }
 
-extern void func_82D02DA8(void *);
 extern void func_82D03CC0(void *);
 extern void func_82D049A0(void *);
 extern void func_82D04DC8(void *);
