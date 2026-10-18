@@ -156,7 +156,49 @@ void func_84202294(void *arg0, u8 arg1, u8 arg2, u8 arg3, u8 arg4) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_842022F0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_842024CC.s")
+extern u8 func_8006397C(u8);
+extern u8 func_800639C0(u8);
+extern u8 func_80063454(u8, u8, u8, s32);
+typedef struct Fragment80WeaknessMember { u32 words[22]; } Fragment80WeaknessMember;
+typedef struct Fragment80WeaknessTeam {
+    u8 unk00[0x18];
+    Fragment80WeaknessMember members[6];
+    u8 unk228[0x2B8];
+} Fragment80WeaknessTeam;
+typedef char Fragment80WeaknessTeamSize[sizeof(Fragment80WeaknessTeam)==0x4E0 ? 1 : -1];
+void TeamCandidate_ApplySharedWeakness_fragment80(F84202744State *state) {
+    u8 *first;
+    u16 weak[3];
+    u8 *second;
+    u8 *third;
+    s32 i;
+    u16 pairs;
+    u8 primary;
+    first = (u8 *)&((Fragment80WeaknessTeam *)D_84203B54)[state->unk01].members[state->indices[0]];
+    second = (u8 *)&((Fragment80WeaknessTeam *)D_84203B54)[state->unk01].members[state->indices[1]];
+    third = (u8 *)&((Fragment80WeaknessTeam *)D_84203B54)[state->unk01].members[state->indices[2]];
+    if (!(D_84203A40 & 0x800)) {
+        for (i = 0; i < 18; i++) {
+            pairs = 0;
+            primary = func_8006397C(first[0]);
+            weak[0] = func_80063454(i, primary, func_800639C0(first[0]), 0);
+            primary = func_8006397C(second[0]);
+            weak[1] = func_80063454(i, primary, func_800639C0(second[0]), 0);
+            primary = func_8006397C(third[0]);
+            weak[2] = func_80063454(i, primary, func_800639C0(third[0]), 0);
+            if (weak[0] < 10 && weak[1] < 10) pairs = 1;
+            if (weak[0] < 10 && weak[2] < 10) pairs++;
+            if (weak[1] < 10 && weak[2] < 10) pairs++;
+            if (state->total > 0) {
+                state->total *= 10 - pairs;
+                state->total /= 10;
+            } else {
+                state->total *= 10 + pairs;
+                state->total /= 10;
+            }
+        }
+    }
+}
 
 void func_84202744(F84202744State *arg0) {
     s32 i;
@@ -167,7 +209,24 @@ void func_84202744(F84202744State *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202798.s")
+void TeamCandidates_InsertRanked_fragment80(void *arg0) {
+    s32 i;
+    s32 j;
+    for (i = 0; i < 8; i++) {
+        if (((Fragment80CandidateList *)&D_84203AD0)->entries[i].total < ((F84202744State *)arg0)->total) break;
+        if (((Fragment80CandidateList *)&D_84203AD0)->entries[i].total == ((F84202744State *)arg0)->total && (func_8003570C() & 1)) break;
+    }
+    if (i < 8) {
+        for (j = 7; j > i; j--) {
+            ((Fragment80CandidateList *)&D_84203AD0)->entries[j] = ((Fragment80CandidateList *)&D_84203AD0)->entries[j - 1];
+        }
+        ((Fragment80CandidateList *)&D_84203AD0)->entries[i] = *(F84202744State *)arg0;
+        ((Fragment80CandidateList *)&D_84203AD0)->count++;
+        if (((Fragment80CandidateList *)&D_84203AD0)->count > 8) {
+            ((Fragment80CandidateList *)&D_84203AD0)->count = 8;
+        }
+    }
+}
 
 void func_842029A8(u8 arg0) {
     s32 i;
@@ -182,8 +241,8 @@ void func_842029A8(u8 arg0) {
 
 extern u8 D_84203B5C;
 s32 func_842022F0(void *);
-void func_842024CC(void *);
-void func_84202798(void *);
+void TeamCandidate_ApplySharedWeakness_fragment80(F84202744State *);
+void TeamCandidates_InsertRanked_fragment80(void *);
 extern u32 func_8003570C(void);
 extern void func_84202294(void *arg0, u8 arg1, u8 arg2, u8 arg3, u8 arg4);
 extern u32 D_84203A40;
@@ -209,8 +268,8 @@ void func_84202A20(u8 arg0) {
                 func_84202294(&state, arg0, first, second, k);
                 if (func_842022F0(&state)) {
                     func_84202744(&state);
-                    func_842024CC(&state);
-                    func_84202798(&state);
+                    TeamCandidate_ApplySharedWeakness_fragment80(&state);
+                    TeamCandidates_InsertRanked_fragment80(&state);
                 }
             }
         }
