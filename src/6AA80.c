@@ -486,7 +486,41 @@ extern void main_pool_try_free(void); void func_8006CB80(void) { main_pool_try_f
 
 s32 func_8006CBA0(s32 a,s32 b){s32 result=0; s32 next=a+1; if(b==next)result=1; return result;}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006CBB8.s")
+s32 func_8006CBB8(s32 arg0) {
+    s32 var_v1;
+
+    var_v1 = -1;
+    switch (arg0) {
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+            var_v1 = 0;
+            break;
+        case 14:
+        case 15:
+            var_v1 = 1;
+            break;
+        case 16:
+        case 17:
+        case 18:
+        case 19:
+        case 20:
+        case 21:
+        case 22:
+        case 23:
+        case 24:
+            var_v1 = 2;
+            break;
+    }
+
+    return var_v1;
+}
 
 extern s16 D_8009DF74; void func_8006CBFC(void) { D_8009DF74 = 1; }
 

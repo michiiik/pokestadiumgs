@@ -135,7 +135,7 @@ void func_814002E8(void) {
     } while (temp_v0 != 3);
 }
 
-extern s32 func_8006CBB8(s16, u16, void *);
+extern s32 func_8006CBB8(s32);
 extern s32 func_8004D690(s32);
 s32 func_81400398(void *arg0) {
     typedef struct { u8 pad_0034[0x34]; s16 kind; u8 pad_0036[4]; u16 value; } Header;
@@ -149,8 +149,7 @@ s32 func_81400398(void *arg0) {
     var_a1 = temp_v0->value;
     switch (temp_v1) {
     case 6: {
-        u16 sp1E;
-        temp_v0_2 = func_8006CBB8(((State *)arg0)->value_89E, (sp1E = var_a1), arg0);
+        temp_v0_2 = func_8006CBB8(((State *)arg0)->value_89E);
         switch (temp_v0_2) {
         case 0: var_a1 = 0x1A; break;
         case 1: var_a1 = 0x1B; break;

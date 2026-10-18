@@ -27,7 +27,7 @@ void func_81302634(void) {
     func_80008648();
 }
 
-extern s32 func_8006CBB8(u16);
+extern s32 func_8006CBB8(s32);
 extern void StageContext_SetClearColor(s32);
 void func_8130267C(u8 *arg0) {
     if (*(s16 *)(*(u8 **)(arg0 + 0x940) + 0x34) == 6) {
