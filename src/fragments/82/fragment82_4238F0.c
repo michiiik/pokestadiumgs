@@ -89,7 +89,14 @@ void func_82D03324(s16 arg0, s16 arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03598.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03778.s")
+extern int func_80044270(s32, s32, int, int, int, int, int, int, int);
+void func_82D03778(s16 x, s16 y, u16 width, u16 height) {
+    s32 w = width;
+    if (w > 0 && height > 0) {
+        func_82D02D20(0x102, 0);
+        func_80044270(x, y, (s16)w, (s16)height, 0, 0, (0x10000 / w) & 0xFFFF, 0, 0);
+    }
+}
 
 extern void func_82D02D20(s32 arg0, s32 arg1);
 extern Gfx* D_800D0510;
@@ -102,7 +109,6 @@ void func_82D03830(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 }
 
 extern void func_82D03598(s16, s16, u16, u16);
-extern void func_82D03778(s16, s16, s32, s32);
 void func_82D0396C(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     func_82D03778((s16) (arg0 + 3), (s16) (arg1 + 3), (arg2 - 6) & 0xFFFF, (arg3 - 6) & 0xFFFF);
     func_82D03598(arg0, arg1, arg2, arg3);
@@ -135,7 +141,6 @@ void func_82D03A5C(s16 arg0, s16 arg1, u16 arg2, f32 arg3) {
 extern f32 D_80087E50[];
 extern u16 D_82D07280;
 extern void func_82D02D5C(s16, s16, u16, u16);
-extern int func_80044270(s32, s32, int, int, int, int, int, int, int);
 void func_82D03BEC(s16 arg0, s16 arg1, u16 arg2) {
     s32 sp34;
     sp34 = (s32)(D_80087E50[(s32)D_82D07280 >> 4] * 2);
@@ -311,9 +316,35 @@ void func_82D05EB4(Fragment82RateState *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D05F30.s")
+void func_82D05F30(u8 *arg0) {
+    Fragment82MenuRow *row = (Fragment82MenuRow *)arg0;
+    f32 progress;
+    const f32 quarter_divisor = 4.0f;
+    const f32 size_scale = 2.0f;
+    if (D_82D0718C >= row->timer) {
+        row->flags |= 1;
+        progress = ((f32)(u32)row->timer / (f32)(u32)D_82D0718C) / quarter_divisor;
+        row->x = (s16)(row->start_x + row->delta_x * progress);
+        row->y = (s16)(row->start_y + row->delta_y * progress);
+        row->width = (s16)(row->delta_x * (1.0f - progress * size_scale));
+        row->height = (s16)(row->delta_y * (1.0f - progress * size_scale));
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06040.s")
+void func_82D06040(u8 *arg0) {
+    Fragment82MenuRow *row = (Fragment82MenuRow *)arg0;
+    f32 progress;
+    const f32 quarter_divisor = 4.0f;
+    const f32 size_scale = 2.0f;
+    if (D_82D0718C >= row->timer) {
+        row->flags |= 1;
+        progress = (1.0f - ((f32)(u32)row->timer / (f32)(u32)D_82D0718C)) / quarter_divisor;
+        row->x = (s16)(row->start_x + row->delta_x * progress);
+        row->y = (s16)(row->start_y + row->delta_y * progress);
+        row->width = (s16)(row->delta_x * (1.0f - progress * size_scale));
+        row->height = (s16)(row->delta_y * (1.0f - progress * size_scale));
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06150.s")
 
