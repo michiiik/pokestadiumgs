@@ -2,12 +2,114 @@
 
 
 #ifdef VERSION_US
+/* Original debug strings preceding the trainer name and jump tables. */
+const char D_84302A80[] = "ChkTasteWaza\n";
+const char D_84302A90[] = "SetupPokeMonList\n";
+const char D_84302AA4[] = "SetPokeMon\n";
+const char D_84302AB0[] = "SetWaza1\n";
+const char D_84302ABC[] = "SetWaza2\n";
+const char D_84302AC8[] = "SetWaza3\n";
+const char D_84302AD4[] = "SetWaza4\n";
+const char D_84302AE0[] = "SetItem\n";
+const char D_84302AEC[] = "SetupLearnWaza\n";
+const char D_84302AFC[] = "ShuffleWaza\n";
+const char D_84302B0C[] = "SetPP\n";
+const char D_84302B14[] = "ShufflePokeMon\n";
+const char D_84302B24[] = "SetPokeMonData\n";
+
 extern u32 func_8003570C(void);
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300020.s")
+u8 HeldItem_ForSpecies_fragment81(u8 species) {
+    u8 item = 0;
+
+    switch (species) {
+    case 113:
+        item = 30;
+        break;
+    case 83:
+        item = 105;
+        break;
+    case 104:
+    case 105:
+        item = 118;
+        break;
+    case 25:
+        item = 163;
+        break;
+    case 132:
+        item = 35;
+        break;
+    }
+    return item;
+}
 
 extern u8 D_843023A8[]; u8 func_8430009C(void) { return D_843023A8[(func_8003570C() & 3)]; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843000C8.s")
+u8 HeldItem_ForMoveType_fragment81(u8 type) {
+    u8 item = 0;
+
+    switch (type) {
+    case 0:
+        if (func_8003570C() & 1) {
+            item = 104;
+        } else {
+            item = 170;
+        }
+        break;
+    case 1:
+        item = 98;
+        break;
+    case 2:
+        item = 77;
+        break;
+    case 3:
+        item = 81;
+        break;
+    case 4:
+        item = 76;
+        break;
+    case 5:
+        item = 125;
+        break;
+    case 7:
+        item = 88;
+        break;
+    case 8:
+        item = 113;
+        break;
+    case 20:
+        item = 138;
+        break;
+    case 21:
+        item = 95;
+        break;
+    case 22:
+        item = 117;
+        break;
+    case 23:
+        item = 108;
+        break;
+    case 24:
+        item = 96;
+        break;
+    case 25:
+        item = 107;
+        break;
+    case 26:
+        if (func_8003570C() & 1) {
+            item = 144;
+        } else {
+            item = 151;
+        }
+        break;
+    case 27:
+        item = 102;
+        break;
+    case 9:
+        item = 143;
+        break;
+    }
+    return item;
+}
 
 extern u8 D_843023AC[]; u8 func_843001CC(void) { u32 value = func_8003570C(); u32 remainder = value % 10; return D_843023AC[remainder]; }
 
