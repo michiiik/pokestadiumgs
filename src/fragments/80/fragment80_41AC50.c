@@ -2,6 +2,26 @@
 
 
 #ifdef VERSION_US
+/* Original debug text preceding this translation unit's move-effect table. */
+const char D_84203890[] = "GuessMaxDamage\n";
+const char D_842038A0[] = "CalcBattleValue\n";
+const char D_842038B4[] = "%15s:%10d::";
+const char D_842038C0[] = "prob %3d atk %3d(%3d) dmg %3d(%3d) sp %5d\n";
+const char D_842038EC[] = "CalcPokeMonEntryValue\n";
+const char D_84203904[] = "%11s vs";
+const char D_8420390C[] = " %11s\n";
+const char D_84203914[] = "value = %11d\n";
+const char D_84203924[] = "CalcEntryValue\n";
+const char D_84203934[] = "[%d/%d]:(";
+const char D_84203940[] = "%d:Lv%3d";
+const char D_8420394C[] = "%11s(%12d)R%d ";
+const char D_8420395C[] = ") %10d\n";
+const char D_84203964[] = "CalcEntryList\n";
+const char D_84203974[] = "(%d)'s First %d\n";
+const char D_84203988[] = "%d:(%15s) ";
+const char D_84203994[] = "\n";
+const char D_84203998[] = "select party %d\n";
+
 typedef struct {
     u8 flags;
     u8 rank;
@@ -37,7 +57,7 @@ typedef struct F842029A8Record {
 extern F842029A8State D_84203AD0;
 extern F842029A8Record *D_84203B54;
 extern u32 D_84203A40;
-extern u8 func_84202EE4(void *);
+extern u8 TeamCandidate_SelectLead_fragment80(F84202744State *);
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_842017D0.s")
 
 typedef struct Fragment80CandidateList {
@@ -46,7 +66,7 @@ typedef struct Fragment80CandidateList {
 } Fragment80CandidateList;
 typedef char Fragment80CandidateListSizeCheck[sizeof(Fragment80CandidateList)==132 ? 1 : -1];
 extern void _bzero(void *, s32);
-extern s32 func_84201DDC(u8, u8, u8);
+extern s32 TeamMember_SumMatchupValues_fragment80(u8, u8, u8);
 extern u8 *func_842034B0(u8 *, u8 *);
 extern u32 func_8003570C(void);
 void TeamCandidates_Reset_fragment80(void) {
@@ -57,13 +77,39 @@ void TeamCandidates_Reset_fragment80(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_842018FC.s")
+s32 MoveEffect_UsesDamageSimulation_fragment80(u8 effect) {
+    switch (effect) {
+    case 3:
+    case 7:
+    case 8:
+    case 26:
+    case 38:
+    case 39:
+    case 80:
+    case 145:
+    case 148:
+    case 154:
+        return 0;
+    default:
+        return 1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_8420199C.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84201AEC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84201DDC.s")
+extern s32 func_84201AEC(u8, u8, u8, u8);
+s32 TeamMember_SumMatchupValues_fragment80(u8 arg0, u8 arg1, u8 arg2) {
+    s32 i;
+    s32 total = 0;
+    for (i = 0; i < D_84203B54[arg1].roster_count; i++) {
+        func_842034B0(D_84203B54[arg0].mons[arg2], 0);
+        func_842034B0(D_84203B54[arg1].mons[i], 0);
+        total += func_84201AEC(arg0, arg1, arg2, i);
+    }
+    return total;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84201F2C.s")
 
@@ -191,9 +237,29 @@ done:
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202BD0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202EE4.s")
+u8 TeamCandidate_SelectLead_fragment80(F84202744State *state) {
+    s32 i;
+    u8 member;
+    s32 best = -1;
+    s32 maximum = -2147483647 - 1;
+    F84202744Entry *entry;
+    for (i = 0; i < state->count; i++) {
+        member = state->indices[i];
+        entry = &D_84203A88[member];
+        if (maximum < entry->unk04) {
+            best = i;
+            maximum = entry->unk04;
+        } else if (maximum == entry->unk04) {
+            if (best == -1 || (func_8003570C() & 1)) {
+                best = i;
+                maximum = entry->unk04;
+            }
+        }
+    }
+    return best;
+}
 
-u8 func_84202FE4(void *arg0) { func_84202BD0(arg0); return func_84202EE4(arg0); }
+u8 func_84202FE4(void *arg0) { func_84202BD0(arg0); return TeamCandidate_SelectLead_fragment80(arg0); }
 
 extern u8 func_84202FE4(void *arg0);
 extern u32 D_84203A40;
