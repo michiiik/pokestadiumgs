@@ -47,6 +47,22 @@ typedef struct Fragment82DeckEntry {
 typedef char Fragment82DeckEntrySizeCheck[
     (sizeof(Fragment82DeckEntry) == 68 && sizeof(Fragment82DeckEntryFlags) == 1) ? 1 : -1];
 
+typedef struct Fragment82StoredDeck {
+    s8 name[20];
+    u8 species_mask[32];
+    u16 unk_34;
+    u8 unk_36, unk_37;
+    u16 unk_38;
+    u8 unk_3A[6];
+    u32 flags;
+} Fragment82StoredDeck;
+typedef struct Fragment82StoredDecks {
+    u8 count, unk_01[3];
+    Fragment82StoredDeck entries[8];
+} Fragment82StoredDecks;
+typedef char Fragment82StoredDeckSizeCheck[
+    (sizeof(Fragment82StoredDeck) == 68 && sizeof(Fragment82StoredDecks) == 548) ? 1 : -1];
+
 // The species mask stores 256 bits, including the unused tail bits.
 void SpeciesMask_Invert_fragment82(u8 *mask) {
     s32 i;
@@ -172,7 +188,7 @@ void func_82D00444_padding(void) {}
 
 extern u8 D_82D07428[];
 void func_82D00590(u8);
-void func_82D06B34(s32, s32, s32);
+void func_82D06B34(u8, u8, s32);
 void func_82D006B8(void) {
     D_82D07428[0x10E] = 0;
     D_82D07428[0xE] = 0;
@@ -228,7 +244,7 @@ extern s8 *HAL_Strcpy(s8 *, s8 *);
 extern void func_82D0087C(void), func_82D0049C(void);
 extern s32 Deck_ReadEntries(u8 *, s32, u8 *);
 extern s32 MenuName_HasNonspace_fragment82(char *text);
-extern void func_82D06B34(s32, s32, s32);
+extern void func_82D06B34(u8, u8, s32);
 extern u8 D_82D23830;
 extern u8 D_82D23D84;
 void DeckName_CommitEdit_fragment82(void) {
@@ -312,7 +328,7 @@ extern u8 D_82D2382A;
 extern u8 D_82D23830;
 extern u8 D_82D23D84;
 extern void func_800226C0(s32);
-extern void func_82D06B34(s32, s32, s32);
+extern void func_82D06B34(u8, u8, s32);
 void func_82D019D8(void) {
     s8 var_v0;
 
@@ -343,7 +359,7 @@ void func_82D019D8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D01AAC.s")
 
-extern void func_82D06B34(s32, s32, s32);
+extern void func_82D06B34(u8, u8, s32);
 void func_82D01D68(void) {
     s8 var_v0;
 
@@ -432,18 +448,32 @@ void func_82D0201C(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D0213C.s")
+extern s8 * HAL_Strcpy(s8 *, s8 *);
+extern u8 D_82D23830;
+extern u8 D_82D23938;
+void DeckMenu_SwapEntries_fragment82(void) {
+    s8 name[20];
+    Fragment82StoredDeck temp;
+    Fragment82StoredDecks *decks;
+    decks = (Fragment82StoredDecks *)&D_82D23938;
+    temp = decks->entries[((Fragment82NameState *)&D_82D23830)->selection];
+    decks->entries[((Fragment82NameState *)&D_82D23830)->selection] = decks->entries[((Fragment82NameState *)&D_82D23830)->secondary_selection];
+    decks->entries[((Fragment82NameState *)&D_82D23830)->secondary_selection] = temp;
+    HAL_Strcpy(name, ((Fragment82NameState *)&D_82D23830)->names[((Fragment82NameState *)&D_82D23830)->selection]);
+    HAL_Strcpy(((Fragment82NameState *)&D_82D23830)->names[((Fragment82NameState *)&D_82D23830)->selection], ((Fragment82NameState *)&D_82D23830)->names[((Fragment82NameState *)&D_82D23830)->secondary_selection]);
+    HAL_Strcpy(((Fragment82NameState *)&D_82D23830)->names[((Fragment82NameState *)&D_82D23830)->secondary_selection], name);
+}
 
 extern s8 D_82D23833;
 extern u16 D_82D23D88;
 extern void MenuSelection_StepSkipping_fragment82(s8 *, u8, u8, u8);
-extern void func_82D0213C(void);
+extern void DeckMenu_SwapEntries_fragment82(void);
 extern void func_800226C0(s32);
 void func_82D022D0(void) {
     MenuSelection_StepSkipping_fragment82(&D_82D23833, 0, ((((u8 *)&D_82D23830)[7] - 1) & 0xFF), ((u8 *)&D_82D23830)[1]);
     if (D_82D23D88 & 0xC000) {
         if (D_82D23D88 & 0x8000) {
-            func_82D0213C();
+        DeckMenu_SwapEntries_fragment82();
             *(s8 *)((u8 *)&D_82D23830 + 1) = *(s8 *)((u8 *)&D_82D23830 + 3);
             func_800226C0(0x44);
         } else {
@@ -457,7 +487,7 @@ void func_82D022D0(void) {
 
 extern u16 D_82D23D88; extern u8 D_82D2382A; extern u8 D_82D23D84; void func_82D02380(void) { if (D_82D23D88 != 0) { D_82D2382A = 0x17; D_82D23D84 = 1; } }
 
-extern void func_82D06B34(s32, s32, s32);
+extern void func_82D06B34(u8, u8, s32);
 
 void func_82D023AC(void) {
     if (D_82D23D88 != 0) {
@@ -570,7 +600,7 @@ void func_82D0284C(void) {
 extern void func_82D06C9C(s32, u8 *);
 extern u8 D_82D23837;
 extern void DeckMenu_LoadEntries_fragment82(void);
-extern void func_82D06B34(s32, s32, s32);
+extern void func_82D06B34(u8, u8, s32);
 extern u8 D_82D07420[];
 extern u8 D_82D07428[];
 extern u8 D_82D23828;

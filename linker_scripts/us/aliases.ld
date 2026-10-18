@@ -359,3 +359,4 @@ func_82D007CC = DeckName_CommitEdit_fragment82;
 func_82D00BB4 = DeckMenu_HandleSettingsInput_fragment82;
 func_82D0183C = DeckMenu_EditBoundedValue_fragment82;
 func_82D026C4 = DeckMenu_DispatchState_fragment82;
+func_82D0213C = DeckMenu_SwapEntries_fragment82;
