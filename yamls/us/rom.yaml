@@ -1607,6 +1607,8 @@
     - [0x41D750, textbin, fragments/81/fragment81_header]
     - [0x41D770, c,       fragments/81/fragment81_code]
     - [0x41F9D0, data,    fragments/81/fragment81_data]
+    - [0x4201D0, .rodata, fragments/81/fragment81_code] # original debug strings, trainer name, and both jump tables
+    - [0x4203D0, rodata] # following mutable state and overlay relocations
  
   - name: fragment82
     type: code
