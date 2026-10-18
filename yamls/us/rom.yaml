@@ -1668,6 +1668,12 @@
     - [0x434720, textbin, fragments/86/fragment86_header]
     - [0x434740, c,       fragments/86/fragment86_code]
     - [0x435140, data,    fragments/86/fragment86_data]
+    - [0x435360, .rodata, fragments/86/fragment86_code]
+    # Mutable state follows the constant pool; retain the .data input section.
+    - start: 0x435650
+      type: data
+      name: fragments/86/fragment86_tail
+      linker_section_order: .rodata
   
   - name: fragment87
     type: code

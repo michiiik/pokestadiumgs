@@ -404,3 +404,6 @@ func_844000C4 = ByteList_ChooseRandom_fragment86;
 func_84400348 = ByteList_FindIndex_fragment86;
 func_844006F8 = MoveSelection_AssignThree_fragment86;
 func_844007D8 = Pokemon_GenerateLevel100_fragment86;
+func_844003E4 = MovePools_ClassifyCandidate_fragment86;
+func_84400528 = MoveSelection_ChooseSlot_fragment86;
+func_844008E4 = Teams_GenerateLevel100_fragment86;
