@@ -267,7 +267,44 @@ void DeckMenu_HandleSettingsInput_fragment82(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D01590.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D0183C.s")
+extern u8 D_82D23926, D_82D23927;
+extern u16 D_82D23928;
+extern void func_800226C0(s32);
+extern s32 func_82D002CC(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+extern u8 D_82D23830;
+extern u8 D_82D23D84;
+extern u16 D_82D23D88;
+extern u16 D_82D23D8A;
+void DeckMenu_EditBoundedValue_fragment82(void) {
+    u16 lower, upper;
+    if (D_82D23D8A & 0x200) {
+        ((Fragment82NameState *)&D_82D23830)->digit--;
+        if (((Fragment82NameState *)&D_82D23830)->digit < 0) ((Fragment82NameState *)&D_82D23830)->digit = 2;
+        func_800226C0(1);
+    } else if (D_82D23D8A & 0x100) {
+        ((Fragment82NameState *)&D_82D23830)->digit++;
+        if (((Fragment82NameState *)&D_82D23830)->digit >= 3) ((Fragment82NameState *)&D_82D23830)->digit = 0;
+        func_800226C0(1);
+    }
+    lower = D_82D23926 * 3;
+    upper = D_82D23927 * 3;
+    switch (((Fragment82NameState *)&D_82D23830)->digit) {
+    case 0:
+        D_82D23928 = func_82D002CC(D_82D23928, 100, lower, upper);
+        break;
+    case 1:
+        D_82D23928 = func_82D002CC(D_82D23928, 10, lower, upper);
+        break;
+    case 2:
+        D_82D23928 = func_82D002CC(D_82D23928, 1, lower, upper);
+        break;
+    }
+    if (D_82D23D88 & 0xC000) {
+        D_82D23D84 = 2;
+        ((Fragment82NameState *)&D_82D23830)->kind = 4;
+        func_800226C0(146);
+    }
+}
 
 extern u8 D_82D07420[];
 extern s8 D_82D07421;
@@ -446,7 +483,55 @@ void func_82D0265C(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D026C4.s")
+extern void func_82D0265C(void), func_88700CE4(void);
+extern void func_82D0125C(void), func_82D01590(void), DeckMenu_EditBoundedValue_fragment82(void);
+extern void func_82D01E4C(void), func_82D0201C(void), func_82D022D0(void);
+extern void func_82D02380(void), func_82D023AC(void);
+extern u8 D_82D06F80;
+extern void DeckMenu_HandleSettingsInput_fragment82(void);
+extern u8 D_82D23D84;
+void DeckMenu_DispatchState_fragment82(void) {
+    switch (D_82D23D84) {
+    case 1:
+        func_82D0265C();
+        break;
+    case 2:
+        DeckMenu_HandleSettingsInput_fragment82();
+        break;
+    case 3:
+        func_88700CE4();
+        break;
+    case 4:
+        func_82D0125C();
+        break;
+    case 5:
+        func_82D01590();
+        break;
+    case 6:
+        DeckMenu_EditBoundedValue_fragment82();
+        break;
+    case 7:
+        func_82D01E4C();
+        break;
+    case 8:
+        func_82D0201C();
+        break;
+    case 9:
+        func_82D022D0();
+        break;
+    case 10:
+        func_82D02380();
+        break;
+    case 11:
+        func_82D023AC();
+        break;
+    case 12:
+        if (D_82D06F80 != 0) {
+            D_82D23D84 = 13;
+        }
+        break;
+    }
+}
 
 extern void *D_80087200;
 extern u16 D_82D23D86;
@@ -467,14 +552,14 @@ void func_82D027D4(void) {
 
 extern void func_80008648();
 extern void BgStage_DrawFrame();
-extern void func_82D026C4();
+extern void DeckMenu_DispatchState_fragment82(void);
 extern void func_82D027D4();
 extern void func_82D05C90();
 extern void func_82D068A0();
 void func_82D0284C(void) {
     do {
         func_82D027D4();
-        func_82D026C4();
+        DeckMenu_DispatchState_fragment82();
         func_82D068A0();
         BgStage_DrawFrame();
         func_82D05C90();

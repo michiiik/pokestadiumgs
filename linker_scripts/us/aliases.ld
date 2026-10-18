@@ -357,3 +357,5 @@ func_82D00784 = MenuName_HasNonspace_fragment82;
 func_82D0034C = DeckMenu_LoadEntries_fragment82;
 func_82D007CC = DeckName_CommitEdit_fragment82;
 func_82D00BB4 = DeckMenu_HandleSettingsInput_fragment82;
+func_82D0183C = DeckMenu_EditBoundedValue_fragment82;
+func_82D026C4 = DeckMenu_DispatchState_fragment82;
