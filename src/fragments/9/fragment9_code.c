@@ -114,19 +114,20 @@ void func_8FB01FCC(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB021F8.s")
 
-struct MsgState *func_8FB02418(void)
+extern s32 func_8006B7FC(s32);
+struct MsgState *func_8FB02418(s32 arg0)
 {
   s32 temp_v0;
-  temp_v0 = func_8006B7FC();
+  temp_v0 = func_8006B7FC(arg0);
   return func_800718B8(func_8006A600(temp_v0 & 0xFFFF, (temp_v0 & 0xFF) & 0xFFu, 0));
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB02454.s")
 
 struct MsgState { u8 pad[0x40]; u32 flags; };
-extern struct MsgState *func_8FB02418(void);
-s32 func_8FB02494(void) {
-    return (func_8FB02418()->flags >> 31) == 0;
+extern struct MsgState *func_8FB02418(s32);
+s32 func_8FB02494(s32 arg0) {
+    return (func_8FB02418(arg0)->flags >> 31) == 0;
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB024BC.s")
