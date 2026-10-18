@@ -1594,6 +1594,8 @@
     - [0x41AC50, c,       fragments/80/fragment80_41AC50]
     - [0x41C930, c,       fragments/80/fragment80_41C930]
     - [0x41C940, data,    fragments/80/fragment80_data]
+    - [0x41CC10, .rodata, fragments/80/fragment80_41A5F0] # original debug strings followed by the 37-entry damage-effect table
+    - [0x41CD10, rodata] # preserve the following debug strings and overlay relocations
 
   - name: fragment81
     type: code
