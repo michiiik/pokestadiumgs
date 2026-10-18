@@ -382,3 +382,4 @@ func_842024CC = TeamCandidate_ApplySharedWeakness_fragment80;
 func_84202798 = TeamCandidates_InsertRanked_fragment80;
 func_842017D0 = TeamParameters_Load_fragment80;
 func_84203090 = TeamRoster_ApplyCandidateOrder_fragment80;
+func_84201AEC = TeamMember_ComputeMatchupValue_fragment80;
