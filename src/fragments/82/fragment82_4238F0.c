@@ -131,9 +131,38 @@ void func_82D02DA8(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02F78.s")
+/* Clipped rectangle drawing with signed-halfword coordinates and increments.
+ * The address-keyed declaration above preserves the legacy caller context. */
+//@src/44E70.c
+extern void GfxRect_DrawTextured(s16, s16, s16, s16, s16, s16, s16, s16, s32);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03144.s")
+void func_82D02F78(s16 x, s16 y, u16 width, u16 height) {
+    if (width >= 48 && height >= 48) {
+        func_82D02D20(0x7C, 0);
+        GfxRect_DrawTextured(x, y, 24, (s16)(height - 24), 0, 0, 0x400, 0x400, 0);
+        if (width >= 49) {
+            GfxRect_DrawTextured((s16)(x + 24), y, (s16)(width - 48), (s16)(height - 24), 0x2E0, 0, 0, 0x400, 0);
+        }
+        func_82D02D20(0x7C, 1);
+        GfxRect_DrawTextured((s16)(x + width - 24), y, 24, (s16)(height - 24), 0, 0, 0x400, 0x400, 0);
+        func_82D02D20(0x7C, 2);
+        GfxRect_DrawTextured(x, (s16)(y + height - 24), (s16)(width - 24), 24, 0, 0, 0x400, 0x400, 0);
+        func_82D02D20(0x7C, 3);
+        GfxRect_DrawTextured((s16)(x + width - 24), (s16)(y + height - 24), 24, 24, 0, 0, 0x400, 0x400, 0);
+    }
+}
+
+void func_82D03144(s16 x, s16 y, u16 width, u16 height) {
+    if (width >= 32 && height >= 32) {
+        func_82D02D20(0x101, 4);
+        GfxRect_DrawTextured(x, y, (s16)(width - 16), 16, 0, 0, 0x400, 0x400, 0);
+        GfxRect_DrawTextured(x, (s16)(y + 16), (s16)(width - 16), (s16)(height - 32), 0, 0x1E0, 0x400, 0, 0);
+        GfxRect_DrawTextured((s16)(x + width - 16), y, 16, 16, 0, 0x200, 0x400, 0x400, 0);
+        GfxRect_DrawTextured((s16)(x + width - 16), (s16)(y + 16), 16, (s16)(height - 32), 0, 0x3E0, 0x400, 0, 0);
+        GfxRect_DrawTextured(x, (s16)(y + height - 16), (s16)(width - 16), 16, 0, 0x400, 0x400, 0x400, 0);
+        GfxRect_DrawTextured((s16)(x + width - 16), (s16)(y + height - 16), 16, 16, 0, 0x600, 0x400, 0x400, 0);
+    }
+}
 
 void func_82D03324(s16 arg0, s16 arg1, s32 arg2) {
     func_80044270((s32)arg0, (s32)arg1, (s16)arg2, 0x28, 0, 0, 0x400, 0x400, 0);
@@ -167,7 +196,17 @@ void func_82D03380(s16 x, s16 y, u16 width) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03598.s")
+void func_82D03598(s16 x, s16 y, u16 width, u16 height) {
+    if (width >= 6 && height >= 6) {
+        func_82D02D20(0x101, 5);
+        GfxRect_DrawTextured(x, y, 3, (s16)(height - 3), 0, 0, 0x400, 0x400, 0);
+        GfxRect_DrawTextured((s16)(x + 3), y, (s16)(width - 6), 3, 64, 0, 0, 0x400, 0);
+        GfxRect_DrawTextured((s16)(x + width - 3), y, 3, (s16)(height - 3), 96, 0, 0x400, 0x400, 0);
+        GfxRect_DrawTextured(x, (s16)(y + height - 3), 3, 3, 192, 0, 0x400, 0x400, 0);
+        GfxRect_DrawTextured((s16)(x + 3), (s16)(y + height - 3), (s16)(width - 6), 3, 256, 0, 0, 0x400, 0);
+        GfxRect_DrawTextured((s16)(x + width - 3), (s16)(y + height - 3), 3, 3, 96, 0, 0x400, 0x400, 0);
+    }
+}
 
 void func_82D03778(s16 x, s16 y, u16 width, u16 height) {
     s32 w = width;
@@ -177,7 +216,6 @@ void func_82D03778(s16 x, s16 y, u16 width, u16 height) {
     }
 }
 
-extern void func_82D02D20(s32 arg0, s32 arg1);
 void func_82D03830(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     s32 w = arg2;
     if (w > 0 && arg3 > 0) {
@@ -186,7 +224,6 @@ void func_82D03830(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     }
 }
 
-extern void func_82D03598(s16, s16, u16, u16);
 void func_82D0396C(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     func_82D03778((s16) (arg0 + 3), (s16) (arg1 + 3), (arg2 - 6) & 0xFFFF, (arg3 - 6) & 0xFFFF);
     func_82D03598(arg0, arg1, arg2, arg3);
@@ -332,7 +369,6 @@ void func_82D04C44(void *arg0) {
 
 extern Fragment82MenuColor D_82D06FA4;
 extern Gfx D_80094DE0[];
-extern void func_82D03144(s16, s16, u16, u16);
 extern void func_82D02AC8(u16 arg0, u16 arg1, u16 arg2, u16 arg3);
 extern void func_82D02B44(s16 x, s16 y, u16 width, u16 height);
 void func_82D0599C(void *arg0) {
