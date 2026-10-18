@@ -2,6 +2,22 @@
 
 
 #ifdef VERSION_US
+/* Model preview record initialized by ModelPreview_Create. */
+//@src/43700.c
+typedef struct Fragment22ModelPreview {
+    u16 flags, clear_color;
+    s16 width, height;
+    void *callback;
+    s16 countdown, rotation_step;
+    f32 scale;
+    void *resource;
+    void *layout;
+    u8 *model;
+    u8 *image;
+    u8 *depth;
+    u8 selection[8];
+} Fragment22ModelPreview;
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14A2E0/func_82700020.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14A2E0/func_827000B8.s")
@@ -23,7 +39,87 @@ void func_827005E4(u16 *arg0, u8 *arg1) {
     arg0[2] = (arg1[1] & 1) != 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/22/fragment22_14A2E0/func_82700604.s")
+typedef struct Fragment22GraphNode {
+    u8 unk_00, unk_01, unk_02, unk_03;
+    struct Fragment22GraphNode *unk_04;
+    struct Fragment22GraphNode *unk_08;
+    u8 *camera;
+    s32 (*callback)(s32, struct Fragment22GraphNode *);
+    void *unk_14;
+} Fragment22GraphNode;
+extern void *D_827031C0;
+extern s32 D_827031B4;
+extern void func_827030D0(s32);
+extern Fragment22ModelPreview *D_827031C4;
+extern void *D_82703358;
+extern u8 D_827031CC[], D_8270321C[], D_82703340[], D_82703350[];
+extern f32 D_827032F0;
+extern s32 func_8004C09C(u32);
+extern s32 func_8004C4B0(s32);
+extern s32 func_8004C8C0(u16);
+extern void func_827013F0(void *, void *);
+extern void PokeIcon_InitResourceArchives(void);
+extern void *PokeIcon_AllocLoadContext(u32);
+extern void *ModelPreview_Create(void *, s32, s32);
+extern s32 func_80042D54(u8 *, u16);
+extern s32 func_80042FBC(void *, s32);
+
+extern void ModelRenderer_InitDisplayRoots(void);
+extern s32 main_pool_get_available(void);
+extern void *MainPool_AllocState(s32, s32);
+extern void *process_geo_layout(void *, void *);
+extern void MainPool_FinalizeAllocation(void *);
+extern void func_82700020(void *);
+typedef struct Fragment22Vec3f { f32 x, y, z; } Fragment22Vec3f;
+/* Camera prefix shared with the geometry renderer. */
+//@src/229E0.c
+typedef struct Fragment22Camera {
+    Fragment22GraphNode node;
+    Vp *viewport;
+    s16 x, y, width, height;
+    Mtx *projection;
+    u16 perspective_normalization;
+    f32 fovy, aspect, near_plane, far_plane, perspective_scale;
+    Mtx *ortho;
+    f32 left, right, bottom, top, ortho_near, ortho_far, ortho_scale;
+    f32 (*view_matrix)[4];
+    f32 view[4][4];
+    LookAt *look_at;
+    Fragment22Vec3f eye, at, up;
+} Fragment22Camera;
+
+extern void Camera_ComputeEyeFromAngles(Fragment22Vec3f *, Fragment22Vec3f *, f32, s16, s16);
+void func_82700604(void) {
+    Fragment22Camera *camera;
+    void *pool;
+    void *model;
+
+    func_8004C09C(3);
+    func_8004C4B0(26);
+    func_8004C8C0(339);
+    func_8004C8C0(121);
+    func_827013F0(D_82703340, D_82703350);
+    if (D_827031B4 == 1) {
+        func_827030D0(D_827031B4);
+    }
+    PokeIcon_InitResourceArchives();
+    D_827031C0 = PokeIcon_AllocLoadContext(1);
+    D_827031C4 = ModelPreview_Create(D_827031C0, 128, 128);
+    func_80042D54((u8 *)D_827031C4, 0);
+    D_827031C4->flags &= ~2;
+    D_827031C4->flags &= ~4;
+    func_80042FBC(D_827031C4, 178);
+    D_827031C4->scale *= D_827032F0;
+    camera = (Fragment22Camera *)((Fragment22GraphNode *)D_827031C4->layout)->camera;
+
+    Camera_ComputeEyeFromAngles(&camera->at, &camera->eye, 1250.0f, 1820, 0);
+    ModelRenderer_InitDisplayRoots();
+    pool = MainPool_AllocState(main_pool_get_available(), 0);
+    D_82703358 = process_geo_layout(pool, D_827031CC);
+    model = process_geo_layout(pool, D_8270321C);
+    MainPool_FinalizeAllocation(pool);
+    func_82700020(model);
+}
 
 typedef struct Fragment22BackgroundTexture {
     u16 width;
@@ -61,8 +157,6 @@ void func_82700788(void) {
     }
 }
 
-extern void *D_827031C4;
-extern void *D_82703358;
 extern s32 func_80043678(void *);
 extern void BgStage_DrawFrame(void);
 extern void func_82700788(void);

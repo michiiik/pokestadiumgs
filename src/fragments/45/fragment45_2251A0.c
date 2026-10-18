@@ -585,7 +585,7 @@ s32 func_8AB01C04(s32 mode, void *record) {
 
 #ifdef VERSION_US
 extern void *D_8AB1678C;
-void func_80042FBC(void *arg0, void *arg1);
+s32 func_80042FBC(void *, s32);
 extern s16 D_8AB126A0;
 void func_8AB01F80(s16 arg0) {
     func_80042FBC(D_8AB1678C, arg0 + 1);
