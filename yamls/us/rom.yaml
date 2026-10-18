@@ -1684,6 +1684,12 @@
     - [0x435A70, textbin, fragments/87/fragment87_header]
     - [0x435A90, c,       fragments/87/fragment87_code]
     - [0x436A20, data,    fragments/87/fragment87_data]
+    - [0x436B20, .rodata, fragments/87/fragment87_code]
+    # The overlay relocation stream follows the table in its original .data section.
+    - start: 0x436B40
+      type: data
+      name: fragments/87/fragment87_tail
+      linker_section_order: .rodata
 
   - name: fragment88
     type: code
