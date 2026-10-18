@@ -14,7 +14,23 @@ void func_88300020(s32 arg0, s32 arg1) { func_8004300C(arg0); func_88600020(arg1
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_88300054.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_88300230.s")
+extern void *D_88308DF0;
+extern u16 D_88308DFA;
+extern s32 func_886000F0(u16);
+extern s32 func_80042FBC(void *, s32);
+
+extern u16 D_88308DF8[];
+void func_88300230(u16 species) {
+    if (func_886000F0(species) != 0) {
+        if (species != D_88308DF8[0]) {
+            if (func_80042FBC(D_88308DF0, species) != 0) {
+                D_88308DF8[0] = species;
+            }
+        }
+    } else {
+        D_88308DFA = D_88308DF8[0] = species;
+    }
+}
 
 s32 func_8004C4B0(s32 value);
 extern void func_8004C8C0();
@@ -47,9 +63,28 @@ void func_883004E4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_88300550.s")
+s32 func_88300550(void) {
+    s32 index;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_8830058C.s")
+    index = 0;
+    do {
+        if (D_88308E06[index] != 0) {
+            return 1;
+        }
+        index++;
+    } while (D_88308E09 != &D_88308E06[index]);
+    return 0;
+}
+
+void func_8830058C(u8 value) {
+    s32 index;
+
+    index = 0;
+    do {
+        D_88308E06[index] = value;
+        index++;
+    } while (D_88308E09 != &D_88308E06[index]);
+}
 
 s32 func_8004C990(s32, s32);
 extern void func_8004D1FC(s32);
