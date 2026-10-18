@@ -207,9 +207,117 @@ void func_88600CC8(u16 species) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_88600D64.s")
+typedef struct Fragment35TextureHeader {
+    u16 width, height;
+    u8 format, size;
+    u16 unk_06;
+} Fragment35TextureHeader;
+extern Gfx *D_800D0510;
+extern Gfx D_886017B0[];
+extern s32 D_886017AC;
+extern s32 D_88601934;
+extern s8 *D_88601500[4];
+extern u8 *func_8004CA60(u8 *);
+extern void func_800459AC(s32, s32, s32, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32);
+extern void func_80045DB4(s32, s32, s32, s32, s32, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32);
+void func_88600D64(s32 translucent) {
+    s32 combine_mode;
+    s32 i;
 
-extern void func_88600D64(s32);
+    gSPDisplayList(D_800D0510++, D_886017B0);
+    if (translucent != 0) {
+        gDPSetRenderMode(D_800D0510++, G_RM_PASS, G_RM_CLD_SURF2);
+    } else {
+        gDPSetRenderMode(D_800D0510++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
+    }
+    combine_mode = D_88601524[func_8860043C(D_8860190C)].unk_00;
+    switch (combine_mode) {
+    case 0:
+        gDPSetCombineLERP(D_800D0510++, TEXEL0, TEXEL1, PRIM_LOD_FRAC, TEXEL1, 1, 0, PRIMITIVE, 0,
+                          PRIMITIVE, ENVIRONMENT, COMBINED, ENVIRONMENT, 0, 0, 0, COMBINED);
+        break;
+    case 1:
+        gDPSetCombineLERP(D_800D0510++, NOISE, SHADE, PRIM_LOD_FRAC, TEXEL1, 1, 0, PRIMITIVE, 0,
+                          PRIMITIVE, ENVIRONMENT, COMBINED, ENVIRONMENT, 0, 0, 0, COMBINED);
+        break;
+    }
+    gDPSetPrimColor(D_800D0510++, 0, D_88601910,
+                   D_88601914.r, D_88601914.g, D_88601914.b, D_88601914.a);
+    gDPSetEnvColor(D_800D0510++, D_88601918.r, D_88601918.g, D_88601918.b, D_88601918.a);
+    if (D_886017AC != 0) {
+        D_886018A0 += D_8860191C;
+        D_886018A1 += D_8860191D;
+        D_886018A2 += D_8860191E;
+        D_886018A3 += D_8860191F;
+        //!bug: The upper wrap test cannot succeed for signed scroll bytes.
+        for (i = 0; i < 4; i++) {
+            if (*D_88601500[i] < 0) {
+                *D_88601500[i] = *D_88601500[i] + 128;
+            } else if (*D_88601500[i] >= 128) {
+                *D_88601500[i] = *D_88601500[i] - 128;
+            }
+        }
+    }
+    func_800459AC((s32)func_8004CA60((u8 *)D_88601930.first),
+                  ((Fragment35TextureHeader *)D_88601930.first)->format,
+                  ((Fragment35TextureHeader *)D_88601930.first)->size,
+                  ((Fragment35TextureHeader *)D_88601930.first)->width,
+                  ((Fragment35TextureHeader *)D_88601930.first)->height,
+                  1, 0, 0, 0, 5, 5, D_88601920, D_88601921);
+    func_80045DB4((s32)func_8004CA60((u8 *)D_88601934), 256, 1,
+                  ((Fragment35TextureHeader *)D_88601934)->format,
+                  ((Fragment35TextureHeader *)D_88601934)->size,
+                  ((Fragment35TextureHeader *)D_88601934)->width,
+                  ((Fragment35TextureHeader *)D_88601934)->height,
+                  1, 0, 0, 0, 5, 5, D_88601922, D_88601923);
+    gDPSetTileSize(D_800D0510++, 0, D_886018A0, D_886018A1, D_886018A0 + 124, D_886018A1 + 124);
+    gDPSetTileSize(D_800D0510++, 1, D_886018A2, D_886018A3, D_886018A2 + 124, D_886018A3 + 124);
+    if (D_886018BC != 1) {
+        if (D_886017AC != 0) {
+            D_886018C0++;
+            switch (D_886018BC) {
+            case 2:
+            case 5:
+                if (D_886018C0 >= (u8)D_886018B8) {
+                    if (D_886018BC == 2) {
+                        func_88600860(D_886018C4, D_886018C8, 3, 0);
+                    } else {
+                        func_88600860(D_886018C4, D_886018C8, 6, 0);
+                    }
+                }
+                break;
+            case 3:
+            case 6:
+                if (D_886018C0 >= (u8)D_886018B9) {
+                    if (D_886018BC == 3) {
+                        func_88600860(D_886018C4, D_886018C8, 4, 0);
+                    } else if (D_886018BC == 6) {
+                        func_88600860(D_886018C4, D_886018C8, 7, 0);
+                    }
+                } else {
+                    func_886006B8(D_886018BC, 1);
+                }
+                break;
+            case 4:
+            case 7:
+                if (D_886018C0 >= (u8)D_886018B9) {
+                    if (D_886018BC == 7) {
+                        func_88600860(D_886018C4, D_886018C8, 2, 0);
+                    } else if (D_886018BC == 4) {
+                        func_88600860(D_886018C4, D_886018C8, 5, 0);
+                    }
+                } else {
+                    func_886006B8(D_886018BC, 1);
+                }
+                break;
+            }
+        }
+        if (D_886018BC != 2 && D_886018BC != 5) {
+            func_88600578();
+        }
+    }
+}
+
 extern void func_80044270(s32, s32, s32, s32, s32, s32, s32, s32, s32);
 typedef struct {
     u8 pad[4];

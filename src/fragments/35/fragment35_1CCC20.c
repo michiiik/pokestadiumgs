@@ -21,7 +21,7 @@ void func_88600074(u8 *arg0) {
     *(s16 *)(arg0 + 0xC) = *(s16 *)(D_88601890 + 0x14);
 }
 
-s32 func_886000C8(u16 species) {
+u8 func_886000C8(u16 species) {
     s32 index = species;
 
     if (index == 201) {
@@ -29,7 +29,7 @@ s32 func_886000C8(u16 species) {
     } else {
         index -= 252;
     }
-    return index & 0xFF;
+    return index;
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCC20/func_886000F0.s")
