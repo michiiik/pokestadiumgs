@@ -2,9 +2,60 @@
 
 
 #ifdef VERSION_US
+typedef struct {
+    u8 flags;
+    u8 rank;
+    u8 unk02[2];
+    s32 unk04;
+    s32 score;
+} F84202744Entry;
+extern F84202744Entry D_84203A88[];
+typedef struct {
+    u8 unk00;
+    u8 unk01;
+    u8 count;
+    u8 indices[9];
+    s32 total;
+} F84202744State;
+typedef struct F842029A8State {
+    u8 active;
+    u8 pad01[4];
+    u8 selected;
+    u8 count;
+    u8 indices[9];
+    s32 total;
+    F84202744State other_entries[7];
+} F842029A8State;
+typedef struct F842029A8Record {
+    u8 unk00[7];
+    u8 roster_count;
+    u8 count;
+    u8 unk09[0x43];
+    u8 mons[6][0x58];
+    u8 unk25C[0x284];
+} F842029A8Record;
+extern F842029A8State D_84203AD0;
+extern F842029A8Record *D_84203B54;
+extern u32 D_84203A40;
+extern u8 func_84202EE4(void *);
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_842017D0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_842018A8.s")
+typedef struct Fragment80CandidateList {
+    u8 count, unk01[3];
+    F84202744State entries[8];
+} Fragment80CandidateList;
+typedef char Fragment80CandidateListSizeCheck[sizeof(Fragment80CandidateList)==132 ? 1 : -1];
+extern void _bzero(void *, s32);
+extern s32 func_84201DDC(u8, u8, u8);
+extern u8 *func_842034B0(u8 *, u8 *);
+extern u32 func_8003570C(void);
+void TeamCandidates_Reset_fragment80(void) {
+    s32 i;
+    _bzero(((Fragment80CandidateList *)&D_84203AD0), sizeof(Fragment80CandidateList));
+    for (i = 0; i < 8; i++) {
+        ((Fragment80CandidateList *)&D_84203AD0)->entries[i].total = -2147483647 - 1;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_842018FC.s")
 
@@ -16,11 +67,38 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84201F2C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202020.s")
+void TeamScores_Rank_fragment80(u8 arg0) {
+    u8 count = D_84203B54[arg0].roster_count;
+    s32 rank;
+    s32 i;
+    s32 best;
+    s32 maximum;
+    for (rank = 1; rank <= count; rank++) {
+        best = -1;
+        maximum = -2147483647 - 1;
+        for (i = 0; i < count; i++) {
+            if (D_84203A88[i].rank == 0 && maximum < D_84203A88[i].score) {
+                best = i;
+                maximum = D_84203A88[i].score;
+            }
+        }
+        D_84203A88[best].rank = rank;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202198.s")
+typedef char F80SelectionRecordSizes[(sizeof(F84202744Entry)==12 && sizeof(F842029A8Record)==0x4E0 && sizeof(F842029A8State)==132) ? 1 : -1];
+void TeamCandidates_VisitMembers_fragment80(u8 arg0) {
+    s32 i;
+    s32 j;
+    u8 member;
+    for (i = 0; i < ((Fragment80CandidateList *)&D_84203AD0)->count; i++) {
+        for (j = 0; j < ((Fragment80CandidateList *)&D_84203AD0)->entries[i].count; j++) {
+            member = ((Fragment80CandidateList *)&D_84203AD0)->entries[i].indices[j];
+            func_842034B0(D_84203B54[arg0].mons[member], 0);
+        }
+    }
+}
 
-extern void _bzero(void *, s32);
 void func_84202294(void *arg0, u8 arg1, u8 arg2, u8 arg3, u8 arg4) {
     _bzero(arg0, 0x10);
     ((u8 *)arg0)[1] = arg1;
@@ -34,44 +112,17 @@ void func_84202294(void *arg0, u8 arg1, u8 arg2, u8 arg3, u8 arg4) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_842024CC.s")
 
-typedef struct {
-    s32 unk00;
-    s32 unk04;
-    s32 value;
-} F84202744Entry;
-extern F84202744Entry D_84203A88[];
-typedef struct {
-    u8 unk00;
-    u8 unk01;
-    u8 count;
-    u8 indices[9];
-    s32 total;
-} F84202744State;
 void func_84202744(F84202744State *arg0) {
     s32 i;
 
     arg0->total = 0;
     for (i = 0; i < arg0->count; i++) {
-        arg0->total += D_84203A88[arg0->indices[i]].value;
+        arg0->total += D_84203A88[arg0->indices[i]].score;
     }
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202798.s")
 
-typedef struct F842029A8State {
-    u8 active;
-    u8 pad01[4];
-    u8 selected;
-    u8 count;
-    u8 indices[6];
-} F842029A8State;
-typedef struct F842029A8Record {
-    u8 pad00[8];
-    u8 count;
-    u8 pad09[0x4D7];
-} F842029A8Record;
-extern F842029A8State D_84203AD0;
-extern F842029A8Record *D_84203B54;
 void func_842029A8(u8 arg0) {
     s32 i;
 
@@ -142,15 +193,27 @@ done:
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84202EE4.s")
 
-void func_84202FE4(void *arg0) { func_84202BD0(arg0); func_84202EE4(arg0); }
+u8 func_84202FE4(void *arg0) { func_84202BD0(arg0); return func_84202EE4(arg0); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_8420300C.s")
+extern u8 func_84202FE4(void *arg0);
+extern u32 D_84203A40;
+void TeamCandidate_PromoteChoice_fragment80(void *arg0) {
+    s32 chosen;
+    u8 temp;
+    if (!(D_84203A40 & 0x100)) {
+        if (D_84203A40 & 0x10) chosen = func_8003570C() % ((u8 *)arg0)[2];
+        else chosen = func_84202FE4(arg0);
+        temp = ((u8 *)arg0)[3];
+        ((u8 *)arg0)[3] = ((u8 *)arg0)[chosen + 3];
+        ((u8 *)arg0)[chosen + 3] = temp;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/80/fragment80_41AC50/func_84203090.s")
 
 extern u32 D_84203A40;
 extern u32 func_8003570C(void);
-void func_8420300C(void *arg0);
+void TeamCandidate_PromoteChoice_fragment80(void *arg0);
 void func_84203090(void *arg0);
 void func_842032AC(void) {
     s32 index;
@@ -164,26 +227,26 @@ void func_842032AC(void) {
             limit = last;
         }
         index = func_8003570C() % (limit + 1);
-        func_8420300C((u8 *)&D_84203AD0 + (index * 0x10 + 4));
+        TeamCandidate_PromoteChoice_fragment80((u8 *)&D_84203AD0 + (index * 0x10 + 4));
         func_84203090((u8 *)&D_84203AD0 + (index * 0x10 + 4));
     }
 }
 
 void func_842017D0(u8);
-void func_842018A8(void);
+void TeamCandidates_Reset_fragment80(void);
 void func_84201F2C(u8);
-void func_84202020(u8);
+void TeamScores_Rank_fragment80(u8);
 void func_84202B58(u8);
-void func_84202198(u8);
+void TeamCandidates_VisitMembers_fragment80(u8);
 void func_842032AC(void);
 void func_84203360(u8 arg0) {
     if (((u8 *)D_84203B54)[arg0 * 0x4E0 + 0x49A] != 0) {
         func_842017D0(arg0);
-        func_842018A8();
+        TeamCandidates_Reset_fragment80();
         func_84201F2C(arg0);
-        func_84202020(arg0);
+        TeamScores_Rank_fragment80(arg0);
         func_84202B58(arg0);
-        func_84202198(arg0);
+        TeamCandidates_VisitMembers_fragment80(arg0);
         func_842032AC();
     }
 }
