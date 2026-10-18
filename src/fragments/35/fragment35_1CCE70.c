@@ -29,10 +29,19 @@ s32 func_8860043C(s32 arg0) { u8 *table = D_88601510; s32 i = 0; do { if (table[
 
 void func_8860047C(void) { extern Fragment35Rgba D_88601914; extern f32 D_886018D0[]; extern f32 D_886018E0[]; extern Fragment35Rgba D_88601918; D_886018D0[0] = D_88601914.r; D_886018D0[1] = D_88601914.g; D_886018D0[2] = D_88601914.b; D_886018E0[0] = D_88601918.r; D_886018E0[1] = D_88601918.g; D_886018E0[2] = D_88601918.b; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_88600578.s")
-
 extern f32 D_886018D0[];
 extern f32 D_886018E0[];
+extern Fragment35Rgba D_88601914, D_88601918;
+/* Signed rounding precedes byte narrowing; both alpha channels are preserved. */
+void func_88600578(void) {
+    D_88601914.r = (s32)(D_886018D0[0] + (D_886018D0[0] > 0.0f ? 0.5f : -0.5f));
+    D_88601914.g = (s32)(D_886018D0[1] + (D_886018D0[1] > 0.0f ? 0.5f : -0.5f));
+    D_88601914.b = (s32)(D_886018D0[2] + (D_886018D0[2] > 0.0f ? 0.5f : -0.5f));
+    D_88601918.r = (s32)(D_886018E0[0] + (D_886018E0[0] > 0.0f ? 0.5f : -0.5f));
+    D_88601918.g = (s32)(D_886018E0[1] + (D_886018E0[1] > 0.0f ? 0.5f : -0.5f));
+    D_88601918.b = (s32)(D_886018E0[2] + (D_886018E0[2] > 0.0f ? 0.5f : -0.5f));
+}
+
 extern f32 D_886018F0[];
 extern f32 D_88601900[];
 void func_886006B8(s32 arg0, u8 arg1) {
@@ -82,14 +91,12 @@ typedef struct Fragment35TypePreview {
 } Fragment35TypePreview;
 extern Fragment35TypePreview D_88601524[];
 extern Fragment35TexturePair D_88601930;
-extern Fragment35Rgba D_88601914, D_88601918;
 extern s8 D_886018A0, D_886018A1, D_886018A2, D_886018A3;
 extern s32 D_8860190C;
 extern u8 D_88601910;
 extern s8 D_8860191C, D_8860191D, D_8860191E, D_8860191F;
 extern s8 D_88601920, D_88601921, D_88601922, D_88601923;
 extern s32 D_886018C4, D_886018C8;
-extern void func_88600578(void);
 
 void func_88600860(s32 first_type, s32 second_type, s32 mode, u8 step) {
     Fragment35TypePreview *entry;
