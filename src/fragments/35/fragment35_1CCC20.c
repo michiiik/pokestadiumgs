@@ -32,7 +32,30 @@ u8 func_886000C8(u16 species) {
     return index;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCC20/func_886000F0.s")
+/* The initializer fills 251 species flags followed by 26 form flags. */
+//@src/fragments/32/fragment32_1B9390.c
+typedef struct Fragment35MembershipState {
+    s32 mode;
+    u8 unk_04[624];
+    u8 flags[277];
+    u8 unk_389[11];
+} Fragment35MembershipState;
+s32 func_886000F0(u16 species) {
+    s32 result;
+
+    result = 0;
+    if (((Fragment35MembershipState *)D_88601890)->mode >= 4) {
+        result = ((Fragment35MembershipState *)D_88601890)->flags[func_886000C8(species) + 250];
+    } else {
+        if (species >= 254) {
+            species = 201;
+        }
+        if (species > 0 && species < 252) {
+            result = ((Fragment35MembershipState *)D_88601890)->flags[species - 1];
+        }
+    }
+    return result;
+}
 
 extern s32 func_8004C990(s32, s32);
 extern s32 func_8004D19C(s32, s32, s32, s32, s32);
