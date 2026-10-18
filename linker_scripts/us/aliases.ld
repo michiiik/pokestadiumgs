@@ -391,6 +391,7 @@ func_8430022C = ByteList_ChooseRandom_fragment81;
 func_8430049C = MoveLists_ApplySelectionWeights_fragment81;
 MoveLists_ApplySpeciesWeights_fragment81 = MoveLists_ApplySelectionWeights_fragment81;
 func_84300CC0 = MoveSelection_ChooseFirst_fragment81;
+func_84301094 = MoveSelection_ChooseSecond_fragment81;
 func_8430188C = MovePools_ClassifyLearnable_fragment81;
 func_843006B0 = HeldItem_IsRedundantForType_fragment81;
 func_84300A54 = SpeciesCandidates_AddType_fragment81;
