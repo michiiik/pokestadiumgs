@@ -400,3 +400,7 @@ func_843006B0 = HeldItem_IsRedundantForType_fragment81;
 func_84300A54 = SpeciesCandidates_AddType_fragment81;
 func_84300B30 = SpeciesCandidates_PopulateTypes_fragment81;
 func_84301CB4 = TeamRoster_Shuffle_fragment81;
+func_844000C4 = ByteList_ChooseRandom_fragment86;
+func_84400348 = ByteList_FindIndex_fragment86;
+func_844006F8 = MoveSelection_AssignThree_fragment86;
+func_844007D8 = Pokemon_GenerateLevel100_fragment86;
