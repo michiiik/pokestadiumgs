@@ -2,7 +2,12 @@
 
 
 #ifdef VERSION_US
-/* Prefix of the 412-byte state allocated by func_88700364. */
+typedef struct Fragment36Envelope {
+    s16 tick, value, start, end;
+    u8 delay, rise, hold, fall;
+} Fragment36Envelope;
+
+/* The 412-byte name-entry state allocated by func_88700364. */
 typedef struct Fragment36NameEntry {
     s32 mode;
     u8 *output;
@@ -18,10 +23,13 @@ typedef struct Fragment36NameEntry {
     u8 keyboard_rows, unk_5F;
     u16 *keyboard;
     s16 slide_offset;
-    u8 unk_66[16];
+    s16 label_x, indicator_x;
+    Fragment36Envelope pulse;
     u8 error_flash, unk_77;
     s32 unk_78;
     s32 insert_sound, delete_sound, invalid_sound;
+    s32 confirm_sound;
+    u16 keyboard_copy[135];
 } Fragment36NameEntry;
 
 extern Fragment36NameEntry *D_88701E00;
@@ -40,10 +48,6 @@ void func_88700020(s32 x, s32 y, s32 character) {
     func_80049628(x, y, character);
 }
 
-typedef struct Fragment36Envelope {
-    s16 tick, value, start, end;
-    u8 delay, rise, hold, fall;
-} Fragment36Envelope;
 
 /* Advance a delay/rise/hold/fall cycle and return its rounded value. */
 s16 func_88700080(Fragment36Envelope *envelope) {
@@ -108,7 +112,113 @@ s32 func_8870032C(void) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/36/fragment36_code/func_88700364.s")
+extern s32 main_pool_push_state(s32);
+extern void *Util_Malloc(s32);
+extern s32 func_8004C4B0(s32);
+extern s32 func_8004C8C0(u16);
+extern s32 func_8003514C(void);
+extern void _bcopy(void *, void *, s32);
+extern void _bzero(void *, s32);
+extern void *func_8004C874(s32, s32);
+extern void func_8000612C(void);
+extern s32 func_80001FF0(void);
+extern u16 D_88701B00[], D_88701BD4[], D_88701CC4[];
+extern u16 D_88701DD4[5];
+/* Allocate the name-entry state and select its keyboard, sounds and pulse. */
+void func_88700364(u32 mode, u8 *output, u32 callback) {
+    s32 i;
+    u16 *cell;
+    s32 excluded_index;
+
+    main_pool_push_state(0x4E414D45);
+    D_88701E00 = Util_Malloc(sizeof(*D_88701E00));
+    func_8004C4B0(36);
+    func_8004C8C0(27);
+    func_8004C8C0(29);
+    func_8004C8C0(47);
+    D_88701E00->mode = mode;
+    D_88701E00->output = output;
+    D_88701E00->unk_08 = callback;
+    D_88701E00->panel_x = func_887002F4();
+    D_88701E00->panel_y = func_8870032C();
+    D_88701E00->keyboard_row = 0;
+    D_88701E00->keyboard_column = D_88701E00->keyboard_row;
+    switch (mode) {
+    default:
+        D_88701E00->entry_x = D_88701E00->panel_x + 31;
+        D_88701E00->entry_y = D_88701E00->panel_y + 47;
+        D_88701E00->capacity = 32;
+        break;
+    case 2:
+        D_88701E00->entry_x = D_88701E00->panel_x + 111;
+        D_88701E00->entry_y = D_88701E00->panel_y + 60;
+        D_88701E00->capacity = 8;
+        break;
+    case 3:
+        D_88701E00->entry_x = D_88701E00->panel_x + 101;
+        D_88701E00->entry_y = D_88701E00->panel_y + 60;
+        D_88701E00->capacity = 9;
+        break;
+    }
+    if (mode == 3) {
+        D_88701E00->unk_78 = 1;
+        D_88701E00->insert_sound = 2;
+        D_88701E00->delete_sound = 3;
+        D_88701E00->invalid_sound = 5;
+        D_88701E00->confirm_sound = 146;
+    } else {
+        D_88701E00->unk_78 = 70;
+        D_88701E00->insert_sound = 63;
+        D_88701E00->delete_sound = 64;
+        D_88701E00->invalid_sound = 73;
+        D_88701E00->confirm_sound = 98;
+    }
+    switch (func_8003514C()) {
+    case 1:
+        D_88701E00->keyboard_y = 127;
+        D_88701E00->keyboard_rows = 7;
+        D_88701E00->keyboard = D_88701B00;
+        break;
+    case 2:
+    case 3:
+        D_88701E00->keyboard_y = 119;
+        D_88701E00->keyboard_rows = 8;
+        D_88701E00->keyboard = D_88701BD4;
+        break;
+    case 4:
+    case 5:
+        D_88701E00->keyboard_y = 105;
+        D_88701E00->keyboard_rows = 9;
+        D_88701E00->keyboard = D_88701CC4;
+        break;
+    }
+    if (mode == 2) {
+        _bcopy(D_88701E00->keyboard, D_88701E00->keyboard_copy, D_88701E00->keyboard_rows * 30);
+        D_88701E00->keyboard = D_88701E00->keyboard_copy;
+        cell = D_88701E00->keyboard;
+        for (i = 0; i < D_88701E00->keyboard_rows * 15; i++, cell++) {
+            for (excluded_index = 4; excluded_index >= 0; excluded_index--) {
+                if (*cell == D_88701DD4[excluded_index]) {
+                    *cell = 32;
+                    break;
+                }
+            }
+        }
+    }
+    D_88701E00->slide_offset = D_88701E00->keyboard_y + D_88701E00->keyboard_rows * 16 + D_88701E00->keyboard_rows * 6 + 11;
+    D_88701E00->indicator_x = 340 - func_80049290(4, 0, func_8004C874(36, 5));
+    D_88701E00->label_x = D_88701E00->indicator_x - 18;
+    D_88701E00->cursor = 0;
+    _bzero(D_88701E00->characters, D_88701E00->capacity * 2);
+    func_8000612C();
+    /* Scale 60 Hz pulse durations to the TV rate, rounding to nearest. */
+    func_88700288(&D_88701E00->pulse, 0, 255, 0,
+        (s32)(((13.0f * (f32)func_80001FF0()) / 60.0f) + ((((13.0f * (f32)func_80001FF0()) / 60.0f) > 0.0f) ? 0.5f : -0.5f)),
+        (s32)(((10.0f * (f32)func_80001FF0()) / 60.0f) + ((((10.0f * (f32)func_80001FF0()) / 60.0f) > 0.0f) ? 0.5f : -0.5f)),
+        (s32)(((5.0f * (f32)func_80001FF0()) / 60.0f) + ((((5.0f * (f32)func_80001FF0()) / 60.0f) > 0.0f) ? 0.5f : -0.5f)),
+        (s32)(((7.0f * (f32)func_80001FF0()) / 60.0f) + ((((7.0f * (f32)func_80001FF0()) / 60.0f) > 0.0f) ? 0.5f : -0.5f)));
+    D_88701E00->error_flash = 0;
+}
 
 extern void main_pool_pop_state(s32);
 void Util_Free(s32 arg0);
