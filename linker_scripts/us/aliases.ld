@@ -387,3 +387,6 @@ func_842022F0 = TeamCandidate_PassesRules_fragment80;
 func_84300350 = ByteList_RemoveFirst_fragment81;
 func_843005B8 = MoveRules_MatchesEffect_fragment81;
 func_84301AEC = Pokemon_ShuffleMoves_fragment81;
+func_8430022C = ByteList_ChooseRandom_fragment81;
+func_8430049C = MoveLists_ApplySpeciesWeights_fragment81;
+func_843006B0 = HeldItem_IsRedundantForType_fragment81;
