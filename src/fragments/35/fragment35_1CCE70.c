@@ -61,9 +61,43 @@ void func_886006B8(s32 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_88600860.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_88600C38.s")
+extern s32 func_886000F0(u16);
+extern void func_88600860(s32, s32, s32, u8);
+extern u8 func_8006397C(u8);
+extern u8 func_800639C0(u8);
+extern s32 D_886018BC;
+extern u8 D_886018C0;
+void func_88600C38(u16 species, s32 mode) {
+    u8 type2;
+    u8 type1;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_88600CC8.s")
+    if (species >= 254) {
+        species = 201;
+    }
+    if (func_886000F0(species) == 1) {
+        func_88600860(19, 19, mode, 0);
+    } else {
+        type1 = func_8006397C(species);
+        type2 = func_800639C0(species);
+        func_88600860(type1, type2, mode, 0);
+    }
+}
+
+void func_88600CC8(u16 species) {
+    u8 type2;
+    u8 type1;
+
+    if (species >= 254) {
+        species = 201;
+    }
+    if (func_886000F0(species) == 1) {
+        func_88600860(19, 19, D_886018BC, D_886018C0);
+    } else {
+        type1 = func_8006397C(species);
+        type2 = func_800639C0(species);
+        func_88600860(type1, type2, D_886018BC, D_886018C0);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/35/fragment35_1CCE70/func_88600D64.s")
 
