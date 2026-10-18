@@ -375,3 +375,6 @@ func_842018A8 = TeamCandidates_Reset_fragment80;
 func_84202020 = TeamScores_Rank_fragment80;
 func_84202198 = TeamCandidates_VisitMembers_fragment80;
 func_8420300C = TeamCandidate_PromoteChoice_fragment80;
+func_842018FC = MoveEffect_UsesDamageSimulation_fragment80;
+func_84201DDC = TeamMember_SumMatchupValues_fragment80;
+func_84202EE4 = TeamCandidate_SelectLead_fragment80;
