@@ -961,6 +961,8 @@
     - [0x1CE9F0, textbin, fragments/36/fragment36_header]
     - [0x1CEA10, c,       fragments/36/fragment36_code]
     - [0x1D04F0, data,    fragments/36/fragment36_data]
+    - [0x1D07D0, .rodata, fragments/36/fragment36_code]
+    - [0x1D07F0, rodata,  fragments/36/fragment36_reloc]
   
   - name: fragment37
     type: code
