@@ -126,7 +126,7 @@ void func_81B002EC(u8 arg0, u8 arg1, s32 arg2) {
         }
     } else {
         sp2C[4] = 0;
-        if ((!arg1) && (!arg1)) { }
+        if ((!arg1) && (!arg1)) { } // FAKE: redundant empty condition.
         func_8005F9CC(temp_s0, 1857);
         if (arg2 != 0) {
             func_8005FDB0(temp_s0, sp27 & 0xFF, 0xFF);
@@ -157,7 +157,7 @@ void func_81B003EC(u8 arg0, u8 arg1, s32 arg2) {
         }
     } else {
         sp2C[5] = 0;
-        if ((!arg1) && (!arg1)) { }
+        if ((!arg1) && (!arg1)) { } // FAKE: redundant empty condition.
         func_8005F9CC(temp_s0, 1858);
         if (arg2 != 0) {
             func_8005FDB0(temp_s0, sp27 & 0xFF, 0xFF);
@@ -188,7 +188,7 @@ void func_81B004EC(u8 arg0, u8 arg1, s32 arg2) {
         }
     } else {
         sp2C[6] = 0;
-        if ((!arg1) && (!arg1)) { }
+        if ((!arg1) && (!arg1)) { } // FAKE: redundant empty condition.
         func_8005F9CC(temp_s0, 1859);
         if (arg2 != 0) {
             func_8005FDB0(temp_s0, sp27 & 0xFF, 0xFF);
@@ -219,7 +219,7 @@ void func_81B005EC(u8 arg0, u8 arg1, s32 arg2) {
         }
     } else {
         sp2C[7] = 0;
-        if ((!arg1) && (!arg1)) { }
+        if ((!arg1) && (!arg1)) { } // FAKE: redundant empty condition.
         func_8005F9CC(temp_s0, 1860);
         if (arg2 != 0) {
             func_8005FDB0(temp_s0, sp27 & 0xFF, 0xFF);
@@ -254,12 +254,91 @@ s32 func_81B00764(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/87/fragment87_code/func_81B00788.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/87/fragment87_code/func_81B00CA0.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/87/fragment87_code/func_81B00E58.s")
-
-s32 func_80059AE0(u8);
+extern u8 func_8005FAB4(s32);
+extern u8 func_8005FB40(s32);
+extern u8 *func_8005FE58(s32, u8);
+extern void func_8005FBCC(s32, u8, u8);
+extern u8 func_8005FFB4(s32, u8);
+extern u8 D_81B01090[];
+extern void RoomDecor_SetCarpet_fragment87(u8 slot, u8 decoration, s32 update_map);
+extern void RoomDecor_SetPlant_fragment87(u8 slot, u8 decoration, s32 update_map);
+extern void RoomDecor_SetPoster_fragment87(u8 slot, u8 decoration, s32 update_map);
+extern void func_81B002EC(u8 arg0, u8 arg1, s32 arg2);
+extern void func_81B003EC(u8 arg0, u8 arg1, s32 arg2);
+extern void func_81B004EC(u8 arg0, u8 arg1, s32 arg2);
+extern void func_81B005EC(u8 arg0, u8 arg1, s32 arg2);
 extern void func_81B00788(u8);
+// Restore the saved 30-block room view and player object, then reapply all decorations.
+void RoomDecor_RestoreSavedView_fragment87(u8 slot) {
+    s32 i;
+    u8 saved_x;
+    u8 saved_y;
+    u8 *player_object;
+    s32 save_index;
+
+    save_index = slot;
+    saved_x = func_8005FAB4(save_index);
+    saved_y = func_8005FB40(save_index);
+    player_object = func_8005FE58(save_index, 0);
+    if (saved_x != 2 || saved_y != 2) {
+        func_8005FBCC(save_index, 2, 2);
+        for (i = 0; i < 30; i++) {
+            func_8005FC7C(save_index, i, D_81B01090[i]);
+        }
+        player_object[16] = 6;
+        player_object[17] = 6;
+        player_object[18] = 6;
+        player_object[19] = 6;
+        RoomDecor_SetBed_fragment87(slot, func_8005FFB4(save_index, 0), 1);
+        RoomDecor_SetCarpet_fragment87(slot, func_8005FFB4(save_index, 1), 1);
+        RoomDecor_SetPlant_fragment87(slot, func_8005FFB4(save_index, 2), 1);
+        RoomDecor_SetPoster_fragment87(slot, func_8005FFB4(save_index, 3), 1);
+        func_81B002EC(slot, func_8005FFB4(save_index, 4), 1);
+        func_81B003EC(slot, func_8005FFB4(save_index, 5), 1);
+        func_81B004EC(slot, func_8005FFB4(save_index, 6), 1);
+        func_81B005EC(slot, func_8005FFB4(save_index, 7), 1);
+        func_81B00788(slot);
+    }
+}
+
+extern s32 func_80059AE0(s32);
+extern void RoomDecor_RestoreSavedView_fragment87(u8 slot);
+// Dispatch categories 0..7 to the saved room-decoration setters.
+void RoomDecor_SetByCategory_fragment87(u8 slot, u8 category, u8 decoration) {
+    s32 update_map;
+
+    update_map = func_80059AE0(slot);
+    if (update_map != 0) {
+        RoomDecor_RestoreSavedView_fragment87(slot);
+    }
+    switch (category) {
+    case 0:
+        RoomDecor_SetBed_fragment87(slot, decoration, update_map);
+        break;
+    case 1:
+        RoomDecor_SetCarpet_fragment87(slot, decoration, update_map);
+        break;
+    case 2:
+        RoomDecor_SetPlant_fragment87(slot, decoration, update_map);
+        break;
+    case 3:
+        RoomDecor_SetPoster_fragment87(slot, decoration, update_map);
+        break;
+    case 4:
+        func_81B002EC(slot, decoration, update_map);
+        break;
+    case 5:
+        func_81B003EC(slot, decoration, update_map);
+        break;
+    case 6:
+        func_81B004EC(slot, decoration, update_map);
+        break;
+    case 7:
+        func_81B005EC(slot, decoration, update_map);
+        break;
+    }
+}
+
 
 void func_81B00F78(u8 arg0) {
     if (func_80059AE0(arg0) != 0) {
