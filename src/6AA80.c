@@ -285,7 +285,33 @@ s32 func_8006B7B4(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(u8 *)((u
 
 s32 func_8006B7D8(s32 value) { s32 result = 0; if (D_8009DF70 != 0) { *(s16 *)((u8 *)(u32)D_8009DF70 + 0x18) = value; result = 1; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006B7FC.s")
+s32 func_8006B7FC(s32 arg0) {
+    s32 var_v1;
+
+    var_v1 = 0xFFFF;
+    switch (arg0) {
+        case 0:
+            var_v1 = 544;
+            break;
+        case 1:
+            var_v1 = 0;
+            break;
+        case 2:
+            var_v1 = 1;
+            break;
+        case 3:
+            var_v1 = 3;
+            break;
+        case 4:
+            var_v1 = 768;
+            break;
+        case 5:
+            var_v1 = 1536;
+            break;
+    }
+
+    return var_v1;
+}
 
 s32 func_8006B854(s32 arg0, s32 arg1) {
     s32 high;
