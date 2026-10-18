@@ -127,7 +127,30 @@ s32 func_82D002CC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D0034C.s")
+extern s32 Deck_ReadEntries(u8 *, s32, u8 *);
+extern s8 * HAL_Strcpy(s8 *, s8 *);
+extern u8 * func_8006218C(s32, s32, s32, s32);
+extern void func_80062304(u8 *);
+extern s8 D_82D23838[];
+extern u8 D_82D23938;
+extern u8 D_82D2393C[];
+extern u8 D_82D23B60[];
+void DeckMenu_LoadEntries_fragment82(void) {
+    typedef struct Fragment82WordDeckArchive {
+        u32 header;
+        Fragment82DeckEntry entries[8];
+    } Fragment82WordDeckArchive;
+    typedef char ArchiveSizeCheck[(sizeof(Fragment82WordDeckArchive) == 548) ? 1 : -1];
+    s32 i;
+    u8 *handle;
+    handle = func_8006218C(24, 0, 0, 0);
+    D_82D23938 = Deck_ReadEntries(D_82D2393C, 8, handle);
+    for (i = 0; i < D_82D23938; i++) {
+        HAL_Strcpy(D_82D23838 + i * 20, (s8 *)&((Fragment82DeckEntry *)D_82D2393C)[i]);
+    }
+    func_80062304(handle);
+    *(Fragment82WordDeckArchive *)D_82D23B60 = *(Fragment82WordDeckArchive *)&D_82D23938;
+}
 
 extern u8 D_82D23938;
 extern u8 D_82D2393C[];
@@ -184,11 +207,57 @@ s32 MenuName_HasNonspace_fragment82(char *text) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D007CC.s")
+typedef struct Fragment82NameState {
+    u8 kind;
+    s8 selection, digit, secondary_selection;
+    u8 unk_04[2], name_index, name_count;
+    s8 names[9][20];
+} Fragment82NameState;
+typedef struct Fragment82SettingsFlagWord {
+    u32 bits31_27 : 5;
+    u32 flag26 : 1;
+    u32 bits25_0 : 26;
+} Fragment82SettingsFlagWord;
+typedef char Fragment82SettingsFlagsSizeCheck[(sizeof(Fragment82SettingsFlagWord) == 4) ? 1 : -1];
+extern Fragment82SettingsFlagWord D_82D23930;
+extern s8 D_82D238D8[], D_82D238F0[];
+extern s8 D_82D23838[];
+extern u8 D_82D23B60[];
+extern void func_887009A0(void);
+extern s8 *HAL_Strcpy(s8 *, s8 *);
+extern void func_82D0087C(void), func_82D0049C(void);
+extern s32 Deck_ReadEntries(u8 *, s32, u8 *);
+extern s32 MenuName_HasNonspace_fragment82(char *text);
+extern void func_82D06B34(s32, s32, s32);
+extern u8 D_82D23830;
+extern u8 D_82D23D84;
+void DeckName_CommitEdit_fragment82(void) {
+    func_887009A0();
+    if (MenuName_HasNonspace_fragment82((char *)D_82D238D8) != 0) {
+        HAL_Strcpy(((Fragment82NameState *)&D_82D23830)->names[0] + ((Fragment82NameState *)&D_82D23830)->name_index * 20, D_82D238D8);
+        HAL_Strcpy(D_82D238F0, ((Fragment82NameState *)&D_82D23830)->names[0] + ((Fragment82NameState *)&D_82D23830)->name_index * 20);
+    }
+    D_82D23D84 = 2;
+    D_82D23830 = 4;
+    func_82D06B34(8, 6, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D0087C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D00BB4.s")
+extern void MenuSelection_StepSkipping_fragment82(s8 *selection, u8 first, u8 last, u8 skip);
+extern s8 D_82D23831;
+extern u16 D_82D23D88;
+void DeckMenu_HandleSettingsInput_fragment82(void) {
+    u8 skip;
+    skip = D_82D23930.flag26 ? 255 : 5;
+    MenuSelection_StepSkipping_fragment82(&D_82D23831, 0, 6, skip);
+    if (D_82D23D88 & 0x8000) {
+        func_82D0087C();
+    } else if (D_82D23D88 & 0x4000) {
+        D_82D23831 = 6;
+        func_82D0087C();
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D00C34.s")
 
@@ -415,7 +484,7 @@ void func_82D0284C(void) {
 
 extern void func_82D06C9C(s32, u8 *);
 extern u8 D_82D23837;
-extern void func_82D0034C(void);
+extern void DeckMenu_LoadEntries_fragment82(void);
 extern void func_82D06B34(s32, s32, s32);
 extern u8 D_82D07420[];
 extern u8 D_82D07428[];
@@ -443,7 +512,7 @@ void func_82D028B8(void) {
     func_82D06B34(6, 1, 0xC);
     func_82D06B34(7, 1, 0);
     func_82D06B34(8, 1, 0);
-    func_82D0034C();
+    DeckMenu_LoadEntries_fragment82();
     D_82D23837 = D_82D23938;
 }
 
