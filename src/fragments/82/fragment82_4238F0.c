@@ -28,7 +28,7 @@ extern void func_82D00020(u8);
 extern void func_82D067A0(u8 *);
 extern void func_82D05BD8(u8 *);
 extern void func_82D02B44(s16, s16, u16, u16);
-extern u8 D_82D06FB4[];
+extern Fragment82MenuRow D_82D06FB4[11];
 extern Fragment82Rectangle D_82D0716C, D_82D07174, D_82D0717C;
 extern u8 D_82D07190;
 extern u8 D_82D07184, D_82D07188, D_82D0718C, D_82D07194;
@@ -270,7 +270,32 @@ void func_82D04C44(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D04DC8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D0599C.s")
+extern Fragment82MenuColor D_82D06FA4;
+extern Gfx D_80094DE0[];
+extern void func_82D03144(s16, s16, u16, u16);
+extern void func_82D02AC8(u16 arg0, u16 arg1, u16 arg2, u16 arg3);
+extern void func_82D02B44(s16 x, s16 y, u16 width, u16 height);
+void func_82D0599C(void *arg0) {
+    Fragment82MenuRow *row = arg0;
+    func_82D02B44(row->x, row->y, row->width, row->height);
+    gSPDisplayList(D_800D0510++, D_80094DE0);
+    func_82D02AC8(D_82D06FA4.r, D_82D06FA4.g, D_82D06FA4.b, 1);
+    gDPScisFillRectangle(D_800D0510++, row->x + 4, row->y + 4, row->x + (s16)row->width - 5, row->y + (s16)row->height - 5);
+    gSPDisplayList(D_800D0510++, D_82D071D8);
+    ParticleGfx_SetPrimColor_fragment82(255, 255, 255, 255);
+    func_82D03144(row->x, row->y, row->width, row->height);
+    if (row->phase == 0) {
+        ParticleGfx_SetPrimColor_fragment82(255, 255, 100, 255);
+        func_82D02D5C(304, (s16)(row->y + 16), 0xAF, 0);
+        func_800498C4();
+        func_800496A4(8, 1);
+        func_8004989C(26);
+        func_8004972C(255, 255, 255, 255);
+        func_80049064(row->x + 16, row->y + 56, 0, func_8004C874(0x43, 0x23));
+        func_800499EC();
+    }
+    func_82D02B44(D_82D07198.x, D_82D07198.y, D_82D07198.width, D_82D07198.height);
+}
 
 extern void func_82D02DA8(void *);
 extern void func_82D03CC0(void *);
@@ -296,7 +321,7 @@ void func_82D05C90(void) {
     u8 *end;
     Fragment82GlobalState *viewport = &D_82D07198;
     func_82D02B44(viewport->x, viewport->y, viewport->width, viewport->height);
-    row = D_82D06FB4; end = (u8 *)&D_82D0716C;
+    row = ((u8 *)D_82D06FB4); end = (u8 *)&D_82D0716C;
     do {
         func_82D05BD8(row);
         row += sizeof(Fragment82MenuRow);
@@ -422,7 +447,7 @@ void func_82D0639C(u8 *arg0) {
         }
         switch (row->timer) {
         case 0:
-            ((Fragment82MenuRow *)D_82D06FB4)[8].flags &= ~1;
+            D_82D06FB4[8].flags &= ~1;
             break;
         case 1:
             func_82D06B34(0, 7, 2);
@@ -598,7 +623,7 @@ void func_82D068A0(void) {
     u8 *row;
     u8 *end;
     func_82D00020(1);
-    row = D_82D06FB4; end = (u8 *)&D_82D0716C;
+    row = ((u8 *)D_82D06FB4); end = (u8 *)&D_82D0716C;
     do {
         func_82D067A0(row);
         row += sizeof(Fragment82MenuRow);
@@ -624,12 +649,12 @@ void func_82D0697C(Fragment82MenuRow *row, s32 delay) {
     case 4:
     case 6: row->timer = D_82D0718C + delay; break;
     case 5:
-        D_82D07198.y = *(s16 *)(D_82D06FB4 + 0x16C);
+        D_82D07198.y = *(s16 *)(((u8 *)D_82D06FB4) + 0x16C);
         D_82D07198.width = 92;
-        D_82D07198.height = *(s16 *)(D_82D06FB4 + 0x170);
-        D_82D06FB4[0x14A] |= 1;
-        D_82D06FB4[0xA] |= 1;
-        D_82D06FB4[0x32] |= 1;
+        D_82D07198.height = *(s16 *)(((u8 *)D_82D06FB4) + 0x170);
+        ((u8 *)D_82D06FB4)[0x14A] |= 1;
+        ((u8 *)D_82D06FB4)[0xA] |= 1;
+        ((u8 *)D_82D06FB4)[0x32] |= 1;
         row->timer = D_82D07194 + delay;
         break;
     }
@@ -679,14 +704,14 @@ void func_82D06AFC(void *arg0, s32 arg1)
 
 void func_82D06B34(u8 index, u8 phase, s32 delay) {
     switch (phase) {
-    case 1: func_82D068F0(&((Fragment82MenuRow *)D_82D06FB4)[index], delay); break;
-    case 2: func_82D0697C(&((Fragment82MenuRow *)D_82D06FB4)[index], delay); break;
-    case 3: func_82D06A54(&((Fragment82MenuRow *)D_82D06FB4)[index], delay); break;
-    case 4: func_82D06A8C(&((Fragment82MenuRow *)D_82D06FB4)[index], delay); break;
-    case 5: func_82D06AC4(&((Fragment82MenuRow *)D_82D06FB4)[index], delay); break;
-    case 6: func_82D06AFC(&((Fragment82MenuRow *)D_82D06FB4)[index], delay); break;
+    case 1: func_82D068F0(&D_82D06FB4[index], delay); break;
+    case 2: func_82D0697C(&D_82D06FB4[index], delay); break;
+    case 3: func_82D06A54(&D_82D06FB4[index], delay); break;
+    case 4: func_82D06A8C(&D_82D06FB4[index], delay); break;
+    case 5: func_82D06AC4(&D_82D06FB4[index], delay); break;
+    case 6: func_82D06AFC(&D_82D06FB4[index], delay); break;
     case 7: {
-        Fragment82MenuRow *row = &((Fragment82MenuRow *)D_82D06FB4)[index];
+        Fragment82MenuRow *row = &D_82D06FB4[index];
         row->phase = phase;
         row->timer = delay;
         row->flags |= 2;
@@ -711,5 +736,40 @@ void func_82D06CC0(Fragment82MenuRow *row) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D06D50.s")
+extern u16 D_82D23D90, D_82D23D92, D_82D23D94;
+extern char D_82D0732C[];
+extern s32 func_80049148(s32, s32, void *);
+extern s32 func_800472E0(void *);
+extern void func_8004C09C(s32);
+extern void func_82D02C98(void);
+extern void func_82D02D00(void);
+void func_82D06D50(void) {
+    s32 width, height;
+    Fragment82MenuRow *rows;
+    s32 index;
+    func_8004C09C(11);
+    func_82D02C98();
+    func_82D02D00();
+    D_82D23D94 = 474 - func_80049148(4, 1, (void *)func_8004C874(0x43, 0x10));
+    D_82D23D90 = D_82D23D94 - func_80049148(8, 3, D_82D0732C) - 4;
+    if (D_82D23D94 == 474) D_82D23D90 += 4;
+    D_82D23D92 = D_82D23D90 - func_80049148(4, 1, (void *)func_8004C874(0x43, 0xF)) - 4;
+    width = func_80049148(8, 1, (void *)func_8004C874(0x43, 0x23)) + 32;
+    height = func_800472E0((void *)func_8004C874(0x43, 0x23)) * 26;
+    rows = D_82D06FB4;
+    rows[10].start_x = (640 - width) / 2;
+    rows[10].start_y = (408 - height) / 2;
+    rows[10].delta_x = width;
+    rows[10].delta_y = height + 72;
+    D_82D23D98[0] = 116;
+    D_82D23D9A = func_80049148(8, 1, (void *)func_8004C874(0x43, 0x20)) + 176;
+    index = 0;
+    do {
+        func_82D06CC0(&D_82D06FB4[index]);
+        *(Fragment82Rectangle *)&D_82D06FB4[index].x = *(Fragment82Rectangle *)&D_82D06FB4[index].start_x;
+        index++;
+    } while (index != 11);
+    D_82D06FB4[0].flags |= 1;
+    D_82D06FB4[1].flags |= 1;
+}
 #endif
