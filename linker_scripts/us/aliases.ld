@@ -350,3 +350,7 @@ func_80063D54 = Pokemon_CanLearnGen1Machine;
 func_80063838 = Pokemon_GetBaseStat;
 func_800640F8 = Pokemon_GetMoveLearnLevelForVersion;
 func_800641CC = Pokemon_IsSmeargleMoveAllowed;
+func_82D00108 = SpeciesMask_Invert_fragment82;
+func_82D001C0 = MenuSelection_StepSkipping_fragment82;
+func_82D00704 = DeckEntry_InitDefaults_fragment82;
+func_82D00784 = MenuName_HasNonspace_fragment82;

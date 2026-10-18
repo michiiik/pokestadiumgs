@@ -25,7 +25,35 @@ void func_82D000A0(u8 *arg0, u8 arg1) {
     arg0[byteIndex] ^= 1 << (7 - bitIndex);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D00108.s")
+typedef struct Fragment82DeckEntryFlags {
+    u8 bit7 : 1;
+    u8 bit6 : 1;
+    u8 bit5 : 1;
+    u8 bit4 : 1;
+    u8 bit3 : 1;
+    u8 bit2 : 1;
+    u8 bits1_0 : 2;
+} Fragment82DeckEntryFlags;
+typedef struct Fragment82DeckEntry {
+    u8 unk_00[20];
+    u8 species_mask[32];
+    u16 unk_34;
+    u8 unk_36, unk_37;
+    u16 unk_38;
+    u8 unk_3A[6];
+    Fragment82DeckEntryFlags flags;
+    u8 unk_41[3];
+} Fragment82DeckEntry;
+typedef char Fragment82DeckEntrySizeCheck[
+    (sizeof(Fragment82DeckEntry) == 68 && sizeof(Fragment82DeckEntryFlags) == 1) ? 1 : -1];
+
+// The species mask stores 256 bits, including the unused tail bits.
+void SpeciesMask_Invert_fragment82(u8 *mask) {
+    s32 i;
+    for (i = 0; i < 32; i++) {
+        mask[i] = ~mask[i];
+    }
+}
 
 extern s32 func_82D00030(u8 *, u8);
 s32 func_82D00158(u8 *arg0) {
@@ -41,7 +69,40 @@ s32 func_82D00158(u8 *arg0) {
     return count & 0xFFFF;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D001C0.s")
+extern void func_800226C0(s32);
+extern u16 D_82D23D8A;
+void MenuSelection_StepSkipping_fragment82(s8 *selection, u8 first, u8 last, u8 skip) {
+    s8 original = *selection;
+    if (D_82D23D8A & 0x800) {
+        (*selection)--;
+        if (*selection < first) {
+            *selection = last;
+        }
+        if (*selection == skip) {
+            (*selection)--;
+            if (*selection < first) {
+                *selection = last;
+            }
+        }
+        if (original != *selection) {
+            func_800226C0(1);
+        }
+    } else if (D_82D23D8A & 0x400) {
+        (*selection)++;
+        if (*selection > last) {
+            *selection = first;
+        }
+        if (*selection == skip) {
+            (*selection)++;
+            if (*selection > last) {
+                *selection = first;
+            }
+        }
+        if (original != *selection) {
+            func_800226C0(1);
+        }
+    }
+}
 
 extern u16 D_82D23D8A;
 extern void func_800226C0(s32);
@@ -97,9 +158,31 @@ void func_82D006B8(void) {
     func_82D06B34(9, 1, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D00704.s")
+void DeckEntry_InitDefaults_fragment82(Fragment82DeckEntry *entry) {
+    s32 i;
+    entry->unk_36 = 1;
+    entry->unk_37 = 100;
+    entry->unk_38 = 300;
+    entry->flags.bit7 = 0;
+    entry->flags.bit6 = 0;
+    entry->flags.bit5 = 0;
+    entry->flags.bit2 = 1;
+    entry->flags.bit3 = 1;
+    entry->unk_34 = 14;
+    for (i = 0; i < 32; i++) {
+        entry->species_mask[i] = 0xFF;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D00784.s")
+s32 MenuName_HasNonspace_fragment82(char *text) {
+    char *cursor = text;
+    while (*cursor != 0) {
+        if (*cursor++ != ' ') {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D007CC.s")
 
@@ -187,12 +270,12 @@ void func_82D01D68(void) {
 
 extern s8 D_82D23831;
 extern u16 D_82D23D88;
-extern void func_82D001C0(s8 *, u8, u8, u8);
+extern void MenuSelection_StepSkipping_fragment82(s8 *, u8, u8, u8);
 extern void func_82D01AAC(void);
 void func_82D01E4C(void) {
     s32 flags;
 
-    func_82D001C0(&D_82D23831, ((u8 *)&D_82D23830)[4], ((u8 *)&D_82D23830)[5], 0xFF);
+    MenuSelection_StepSkipping_fragment82(&D_82D23831, ((u8 *)&D_82D23830)[4], ((u8 *)&D_82D23830)[5], 0xFF);
     flags = D_82D23D88;
     if (flags & 0x8000) {
         func_82D01AAC();
@@ -247,11 +330,11 @@ void func_82D0201C(void) {
 
 extern s8 D_82D23833;
 extern u16 D_82D23D88;
-extern void func_82D001C0(s8 *, u8, u8, u8);
+extern void MenuSelection_StepSkipping_fragment82(s8 *, u8, u8, u8);
 extern void func_82D0213C(void);
 extern void func_800226C0(s32);
 void func_82D022D0(void) {
-    func_82D001C0(&D_82D23833, 0, ((((u8 *)&D_82D23830)[7] - 1) & 0xFF), ((u8 *)&D_82D23830)[1]);
+    MenuSelection_StepSkipping_fragment82(&D_82D23833, 0, ((((u8 *)&D_82D23830)[7] - 1) & 0xFF), ((u8 *)&D_82D23830)[1]);
     if (D_82D23D88 & 0xC000) {
         if (D_82D23D88 & 0x8000) {
             func_82D0213C();
@@ -279,11 +362,11 @@ void func_82D023AC(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_420EA0/func_82D023EC.s")
 
-extern void func_82D001C0(s8 *, u8, u8, u8);
+extern void MenuSelection_StepSkipping_fragment82(s8 *, u8, u8, u8);
 extern void func_82D023EC();
 extern s8 D_82D07421;
 void func_82D0265C(void) {
-    func_82D001C0(&D_82D07421, 0, 4, 0xFF);
+    MenuSelection_StepSkipping_fragment82(&D_82D07421, 0, 4, 0xFF);
     if (D_82D23D88 & 0x8000) {
         func_82D023EC();
         return;
