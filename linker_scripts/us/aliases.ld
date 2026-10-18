@@ -354,3 +354,6 @@ func_82D00108 = SpeciesMask_Invert_fragment82;
 func_82D001C0 = MenuSelection_StepSkipping_fragment82;
 func_82D00704 = DeckEntry_InitDefaults_fragment82;
 func_82D00784 = MenuName_HasNonspace_fragment82;
+func_82D0034C = DeckMenu_LoadEntries_fragment82;
+func_82D007CC = DeckName_CommitEdit_fragment82;
+func_82D00BB4 = DeckMenu_HandleSettingsInput_fragment82;
