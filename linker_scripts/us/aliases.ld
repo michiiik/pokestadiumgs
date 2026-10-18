@@ -378,3 +378,5 @@ func_8420300C = TeamCandidate_PromoteChoice_fragment80;
 func_842018FC = MoveEffect_UsesDamageSimulation_fragment80;
 func_84201DDC = TeamMember_SumMatchupValues_fragment80;
 func_84202EE4 = TeamCandidate_SelectLead_fragment80;
+func_842024CC = TeamCandidate_ApplySharedWeakness_fragment80;
+func_84202798 = TeamCandidates_InsertRanked_fragment80;
