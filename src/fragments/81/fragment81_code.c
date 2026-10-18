@@ -17,7 +17,22 @@ void func_84300200(u8 *arg0, u8 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_8430022C.s")
+u8 ByteList_ChooseRandom_fragment81(u8 *list) {
+    u32 count;
+    f32 fraction;
+    u8 index;
+    u32 offset;
+
+    fraction = (f32)((f64)func_8003570C() / 4294967296.0);
+    //!bug The count is read before the null-pointer guard.
+    count = list[0];
+    offset = (u32)((f32)count * fraction);
+    index = offset + 1;
+    if (count == 0 || list == NULL) {
+        return 0;
+    }
+    return list[index];
+}
 
 u8 func_84300348(u8 *arg0) {
     return *arg0;
@@ -68,7 +83,46 @@ void func_8430042C(u8 *arg0, u8 *arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_8430049C.s")
+typedef struct Fragment81MoveWeight {
+    u8 species;
+    u8 move;
+    u8 copies;
+} Fragment81MoveWeight;
+extern u8 D_843029DC[];
+extern void func_8430042C(u8 *, u8 *);
+extern u8 D_84302CA2[];
+extern u8 D_84302D06[];
+extern u8 D_84302D56[];
+extern u8 D_84302DA6[];
+extern u8 D_84302DF6[];
+extern u8 D_84302E46[];
+extern u8 D_84302EA0[];
+extern u8 D_84302EFA[];
+extern u8 D_84302F54[];
+extern u8 D_84302FAE[];
+extern u8 D_84302FD2[];
+void MoveLists_ApplySpeciesWeights_fragment81(u8 species) {
+    Fragment81MoveWeight *record = (Fragment81MoveWeight *)D_843029DC;
+
+    for (; record->species != 0; record++) {
+        if (record->species == species) {
+            break;
+        }
+    }
+    if (record->move > 0) {
+        func_8430042C(D_84302CA2, (u8 *)record);
+        func_8430042C(D_84302D06, (u8 *)record);
+        func_8430042C(D_84302D56, (u8 *)record);
+        func_8430042C(D_84302DA6, (u8 *)record);
+        func_8430042C(D_84302DF6, (u8 *)record);
+        func_8430042C(D_84302E46, (u8 *)record);
+        func_8430042C(D_84302EA0, (u8 *)record);
+        func_8430042C(D_84302EFA, (u8 *)record);
+        func_8430042C(D_84302F54, (u8 *)record);
+        func_8430042C(D_84302FAE, (u8 *)record);
+        func_8430042C(D_84302FD2, (u8 *)record);
+    }
+}
 
 typedef struct Fragment81RulePrefix {
     u8 *types;
@@ -103,9 +157,33 @@ s32 func_84300648(u8 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_843006B0.s")
+extern u8 func_8006397C(u8);
+extern u8 func_800639C0(u8);
+u8 HeldItem_IsRedundantForType_fragment81(u8 species, u8 held_item) {
+    switch (held_item) {
+    case 74: // PSNCUREBERRY: reject for Poison or Steel typing.
+        if (func_8006397C(species) == 3 || func_800639C0(species) == 3) {
+            return 1;
+        }
+        if (func_8006397C(species) == 9 || func_800639C0(species) == 9) {
+            return 1;
+        }
+        break;
+    case 80: // ICE_BERRY: reject for Fire typing.
+        if (func_8006397C(species) == 20 || func_800639C0(species) == 20) {
+            return 1;
+        }
+        break;
+    case 79: // BURNT_BERRY: reject for Ice typing.
+        if (func_8006397C(species) == 25 || func_800639C0(species) == 25) {
+            return 1;
+        }
+        break;
+    }
+    return 0;
+}
 
-extern u8 func_843006B0(u8, u8);
+extern u8 HeldItem_IsRedundantForType_fragment81(u8, u8);
 extern u8 *D_84302C80;
 extern u8 D_84302C88[];
 u8 func_843007BC(u8 arg0, u8 arg1) {
@@ -115,7 +193,7 @@ u8 func_843007BC(u8 arg0, u8 arg1) {
     if (arg1 == 0) {
         return 1;
     }
-    if (func_843006B0(arg0, arg1) != 0) {
+    if (HeldItem_IsRedundantForType_fragment81(arg0, arg1) != 0) {
         return 1;
     }
     p = D_84302C80;
@@ -215,7 +293,7 @@ void func_843009A4(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84300B30.s")
 
-extern u8 func_8430022C(u8 *);
+extern u8 ByteList_ChooseRandom_fragment81(u8 *);
 extern u16 D_84302CA0;
 extern s32 func_800630F0(s32);
 extern u8 func_8006397C(u8 arg0);
@@ -228,8 +306,8 @@ extern u8 D_84303108[];
 u8 func_84300BE8(void) {
     u8 result;
     result = 0;
-    if (func_84300348(D_84303008) > 0) result = func_8430022C(D_84303008);
-    else if (func_84300348(D_84303108) > 0) result = func_8430022C(D_84303108);
+    if (func_84300348(D_84303008) > 0) result = ByteList_ChooseRandom_fragment81(D_84303008);
+    else if (func_84300348(D_84303108) > 0) result = ByteList_ChooseRandom_fragment81(D_84303108);
     if (result != 0) {
         D_84302CA0 = func_84300648(result);
         *(u32 *)(D_84302C88 + 0x10) |= 1 << func_800630F0(func_8006397C(result) & 0xFF);
@@ -243,11 +321,11 @@ u8 func_84300BE8(void) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/81/fragment81_code/func_84301094.s")
 
 extern void ByteList_RemoveFirst_fragment81(u8 *, u8);
-extern s32 func_8430049C(u8);
+extern void MoveLists_ApplySpeciesWeights_fragment81(u8);
 extern u8 D_84302CA2[];
 extern u8 D_84302FAE[];
 extern u8 D_84302FD2[];
-extern u8 func_8430022C(u8 *);
+extern u8 ByteList_ChooseRandom_fragment81(u8 *);
 extern u8 func_84300348(u8 *arg0);
 extern s32 func_84300928(u8 arg0);
 u8 func_843013A4(u8 *arg0) {
@@ -255,19 +333,19 @@ u8 func_843013A4(u8 *arg0) {
 
     result = 0;
     if (func_84300348(D_84302CA2) > 0) {
-        result = func_8430022C(D_84302CA2);
+        result = ByteList_ChooseRandom_fragment81(D_84302CA2);
         ByteList_RemoveFirst_fragment81(D_84302CA2, result);
     } else if (func_84300348(D_84302FAE) > 0) {
-        result = func_8430022C(D_84302FAE);
+        result = ByteList_ChooseRandom_fragment81(D_84302FAE);
         if (func_84300928(result) == 0) {
-            result = func_8430022C(D_84302FAE);
+            result = ByteList_ChooseRandom_fragment81(D_84302FAE);
         }
         ByteList_RemoveFirst_fragment81(D_84302FAE, result);
     } else if (func_84300348(D_84302FD2) > 0) {
-        result = func_8430022C(D_84302FD2);
+        result = ByteList_ChooseRandom_fragment81(D_84302FD2);
         ByteList_RemoveFirst_fragment81(D_84302FD2, result);
     }
-    func_8430049C(result);
+    MoveLists_ApplySpeciesWeights_fragment81(result);
     return result;
 }
 
