@@ -2,6 +2,8 @@
 
 
 #ifdef VERSION_US
+typedef struct Fragment82MenuLabels { u8 kind, selection, first_text, second_text; } Fragment82MenuLabels;
+
 typedef struct Fragment82Rectangle { s16 x, y, width, height; } Fragment82Rectangle;
 
 /* Shared clipping rectangle, loaded as four halfwords by the draw traversal. */
@@ -43,7 +45,19 @@ void func_82D02AC8(u16 arg0, u16 arg1, u16 arg2, u16 arg3) {
         (((arg0 << 8) & 0xF800) | ((arg1 << 3) & 0x7C0) | ((arg2 >> 2) & 0x3E) | (arg3 & 1))));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D02B44.s")
+void func_82D02B44(s16 x, s16 y, u16 width, u16 height) {
+    s16 right;
+    s16 bottom;
+    if ((right = x + width - 1) >= 640) right = 639;
+    if (right < 0) right = 0;
+    if ((bottom = y + height - 1) >= 480) bottom = 479;
+    if (bottom < 0) bottom = 0;
+    if (x < 0) x = 0;
+    if (x >= 640) x = 639;
+    if (y < 0) y = 0;
+    if (y >= 480) y = 479;
+    gDPSetScissor(D_800D0510++, G_SC_NON_INTERLACE, x, y, right, bottom);
+}
 
 extern void func_8004C8C0(s32);
 void func_82D02C98(void) {
@@ -103,7 +117,6 @@ void func_82D03778(s16 x, s16 y, u16 width, u16 height) {
 }
 
 extern void func_82D02D20(s32 arg0, s32 arg1);
-extern Gfx* D_800D0510;
 void func_82D03830(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     s32 w = arg2;
     if (w > 0 && arg3 > 0) {
@@ -128,7 +141,6 @@ extern u8 D_82D07248[];
 extern void ParticleGfx_SetPrimColor_fragment82(u8 r, u8 g, u8 b, u8 a);
 extern void func_82D02D5C(s16 arg0, s16 arg1, u16 arg2, u16 arg3);
 extern void func_82D039E4(s16 arg0, s16 arg1, u16 arg2, u16 arg3);
-extern Gfx* D_800D0510;
 void func_82D03A5C(s16 arg0, s16 arg1, u16 arg2, f32 arg3) {
     s32 x;
     if (arg2 < 0x14) {
@@ -155,15 +167,43 @@ void func_82D03BEC(s16 arg0, s16 arg1, u16 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D03CC0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/82/fragment82_4238F0/func_82D049A0.s")
-
-extern s32 func_80049064(s32, s32, s32, s32);
-extern void func_800498C4(void);
-extern void func_800496A4(s32, s32);
-extern s32 func_8004C874(s32, s32);
-extern void func_800499EC(void);
+extern u16 D_82D23D98[2], D_82D23D9A;
 extern u8 D_82D071D8[];
-extern void func_82D02D20(s32 arg0, s32 arg1);
+extern void func_82D03380(s16, s16, u16);
+extern void func_8004989C(s32);
+extern void Ui_DrawAnimatedTextureMarker(s32, s32);
+extern void func_80049064(s32, s32, s32, s32);
+extern void func_800496A4(s32, s32);
+extern void func_800498C4(void);
+extern s32 func_8004C874(s32, s32);
+void func_82D049A0(void *arg0) {
+    Fragment82MenuRow *row = arg0;
+    Fragment82MenuLabels *labels = row->data;
+    gSPDisplayList(D_800D0510++, D_82D071D8);
+    ParticleGfx_SetPrimColor_fragment82(row->primary.r, row->primary.g, row->primary.b, row->primary.a);
+    func_82D03380(row->x, row->y, row->width);
+    if (row->phase == 0) {
+        func_800498C4();
+        func_800496A4(8, 1);
+        func_8004989C(26);
+        switch (labels->kind) {
+        case 0:
+            func_80049064(row->x + 76, row->y + 8, 0, func_8004C874(0x43, labels->first_text));
+            break;
+        case 1:
+            func_80049064(row->x + 76, row->y + 8, 0, func_8004C874(0x43, labels->first_text));
+            func_80049064(row->x + 76, row->y + 34, 0, func_8004C874(0x43, labels->second_text));
+            func_80049064(D_82D23D98[0] + row->x, row->y + 60, 0, func_8004C874(0x43, 0x20));
+            func_80049064(D_82D23D9A + row->x, row->y + 60, 0, func_8004C874(0x43, 0x21));
+            break;
+        }
+        if (labels->kind == 1) {
+            Ui_DrawAnimatedTextureMarker((s16)(D_82D23D98[labels->selection] + row->x - 40), (s16)(row->y + 60));
+        }
+    }
+}
+
+extern void func_800499EC(void);
 void func_82D04B84(void *arg0) {
     gSPDisplayList(D_800D0510++, D_82D071D8);
     ParticleGfx_SetPrimColor_fragment82(
@@ -187,14 +227,6 @@ void func_82D04B84(void *arg0) {
 }
 
 extern void func_8004972C(s32, s32, s32, s32);
-extern void Ui_DrawAnimatedTextureMarker(s32, s32);
-extern s32 func_80049064(s32, s32, s32, s32);
-extern void func_800498C4(void);
-extern void func_800496A4(s32, s32);
-extern s32 func_8004C874(s32, s32);
-extern void func_800499EC(void);
-extern u8 D_82D071D8[];
-extern void func_82D02D20(s32 arg0, s32 arg1);
 void func_82D04C44(void *arg0) {
     u8 *sp24;
 
@@ -281,7 +313,6 @@ void func_82D05CF4(Fragment82BaseRateState *arg0) {
 }
 
 extern u8 D_82D06F9B;
-extern u8 D_82D07184;
 void func_82D05D74(u8 *arg0) {
     typedef struct { u8 pad0[6]; s16 value6; u8 pad8[2]; u8 flagsA; u8 valueB; u8 countC; u8 padD[0x16]; u8 output23; u8 pad24[3]; u8 output27; } LocalRateState;
     LocalRateState *s = (LocalRateState *)arg0;
@@ -297,7 +328,6 @@ void func_82D05D74(u8 *arg0) {
     }
 }
 
-extern u8 D_82D07184;
 extern u8 D_82D07188;
 typedef struct { u8 pad0[6]; s16 value6; u8 pad8[2]; u8 flagsA; u8 valueB; u8 countC; u8 padD[7]; s16 output14; } Fragment82State;
 void func_82D05E38(Fragment82State *arg0) {
@@ -308,7 +338,6 @@ void func_82D05E38(Fragment82State *arg0) {
 }
 
 extern u8 D_82D06F97;
-extern u8 D_82D07188;
 typedef struct { u8 pad0[6]; s16 value6; u8 pad8[2]; u8 flagsA; u8 valueB; u8 countC; u8 padD[0x16]; u8 output23; } Fragment82RateState;
 void func_82D05EB4(Fragment82RateState *arg0) {
     if (D_82D07188 >= arg0->countC) {
