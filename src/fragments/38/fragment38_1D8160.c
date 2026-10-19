@@ -31,14 +31,14 @@ loop:
 
 extern s32 func_88902B70(u8 *); extern u8 D_889041A0; extern u8 func_80062E10(u8); void func_88902BE0(u8 *arg0, u8 arg1) { s32 i = func_88902B70(arg0); if (i < 4) i &= 0xff; else i = D_889041A0; *(u8 *)(arg0 + i + 2) = arg1; *(u8 *)(arg0 + i + 0x18) = func_80062E10(arg1); }
 
-// The type-color helper returns this three-byte RGB value by value.
+// The type-color helper writes three RGB bytes and returns their destination.
 //@src/fragments/29/fragment29_166060.c
 typedef struct LabPCMoveNameColor {
     u8 red;
     u8 green;
     u8 blue;
 } LabPCMoveNameColor;
-extern LabPCMoveNameColor func_88000510(s8);
+extern LabPCMoveNameColor *func_88000510(LabPCMoveNameColor *, s8);
 extern u8 func_80062D98(u8);
 extern s32 *func_80062CE0(u8);
 extern void *func_8004C874(s32, s32);
@@ -46,7 +46,7 @@ const char D_88903FE0[] = "<COL1,PUSH,%d,%d,%d,255>%s<COL1,POP>";
 char *LabPC_FormatColoredMoveName(char *output, u8 move) {
     LabPCMoveNameColor color;
 
-    color = func_88000510(move == 252 ? 0 : func_80062D98(move));
+    func_88000510(&color, move == 252 ? 0 : func_80062D98(move));
     sprintf(output, D_88903FE0, color.red, color.green, color.blue,
         move == 252 ? func_8004C874(69, 19) : (const char *)func_80062CE0(move));
     return output;
