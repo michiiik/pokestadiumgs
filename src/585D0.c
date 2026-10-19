@@ -2450,7 +2450,19 @@ void func_8005FBCC(s32 arg0, u8 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005FC7C.s")
+void GbSave_SetRoomMapBlock(s32 index, u8 entry, u8 value) {
+    if ((*(u32 *)(D_80128570 + index * 112) & 1) != 0) {
+        switch ((u32)func_8005D92C(index)) {
+        case 5:
+        case 6:
+            (*(u8 **)(D_80128570 + index * 112 + 0x60))[entry + 0x86C] = value;
+            break;
+        case 7:
+            (*(u8 **)(D_80128570 + index * 112 + 0x60))[entry + 0x847] = value;
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -2469,19 +2481,79 @@ u8 *GbSave_GetRoomSpriteIds(s32 index) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005FDB0.s")
+void GbSave_SetMapObjectState(s32 index, u8 entry, u8 value) {
+    if ((*(u32 *)(D_80128570 + index * 112) & 1) != 0) {
+        switch ((u32)func_8005D92C(index)) {
+        case 5:
+        case 6:
+            (*(u8 **)(D_80128570 + index * 112 + 0x60))[entry + 0x3AD] = value;
+            break;
+        case 7:
+            (*(u8 **)(D_80128570 + index * 112 + 0x60))[entry + 0x3AC] = value;
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005FE58.s")
+u8 *GbSave_GetMapActor(s32 index, u8 entry) {
+    if ((*(u32 *)(D_80128570 + index * 112) & 1) == 0) {
+        return 0;
+    }
+    switch ((u32)func_8005D92C(index)) {
+    case 5:
+    case 6:
+        return *(u8 **)(D_80128570 + index * 112 + 0x60) + entry * 40 + 0x65;
+    case 7:
+        return *(u8 **)(D_80128570 + index * 112 + 0x60) + entry * 40 + 0x64;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005FF0C.s")
+u8 *GbSave_GetMapObject(s32 index, u8 entry) {
+    if ((*(u32 *)(D_80128570 + index * 112) & 1) == 0) {
+        return 0;
+    }
+    switch ((u32)func_8005D92C(index)) {
+    case 5:
+    case 6:
+        return *(u8 **)(D_80128570 + index * 112 + 0x60) + entry * 16 + 0x2AD;
+    case 7:
+        return *(u8 **)(D_80128570 + index * 112 + 0x60) + entry * 16 + 0x2AC;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005FFB4.s")
+u8 GbSave_GetRoomDecoration(s32 index, u8 category) {
+    u8 *decorations;
+
+    if ((*(u32 *)(D_80128570 + index * 112) & 1) == 0) {
+        return 0;
+    }
+    decorations = GbSave_GetRoomDecorations(index);
+    switch (category) {
+    case 0:
+        return decorations[0];
+    case 1:
+        return decorations[1];
+    case 2:
+        return decorations[2];
+    case 3:
+        return func_8005F9A4(index, 716) ? decorations[3] : 0;
+    case 4:
+        return func_8005F9A4(index, 1857) ? 0 : decorations[4];
+    case 5:
+        return func_8005F9A4(index, 1858) ? 0 : decorations[5];
+    case 6:
+        return func_8005F9A4(index, 1859) ? 0 : decorations[6];
+    case 7:
+        return func_8005F9A4(index, 1860) ? 0 : decorations[7];
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
