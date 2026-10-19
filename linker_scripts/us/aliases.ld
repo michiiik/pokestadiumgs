@@ -418,3 +418,4 @@ func_81C00050 = MysteryGift_RollItemIndex_fragment88;
 func_81C004E4 = MysteryGift_SelectReward_fragment88;
 func_81C00174 = MysteryGift_RollDecorationIndex_fragment88;
 func_81C00408 = MysteryGift_ReceiveReward_fragment88;
+func_81C0034C = MysteryGift_TryPrepareSelections_fragment88;

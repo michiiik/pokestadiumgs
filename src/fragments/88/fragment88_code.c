@@ -92,9 +92,39 @@ void func_81C002E4(void *arg0, void *arg1, u8 arg2) {
     (*(s8 *)((u8 *)(arg1) + (2))) = MysteryGift_RollDecorationIndex_fragment88((*(u8 *)((u8 *)(arg0) + (1))), (*(u8 *)((u8 *)(arg0) + (0))), arg2);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/88/fragment88_code/func_81C0034C.s")
-
+extern void func_80035700(u32);
+extern void func_8005D9E0(s32, void *);
+extern void func_80060A84(u8 *, s32);
+extern u8 func_8005E03C(s32);
+extern void func_8005E0BC(s32, u8, u16);
+extern void func_8005E07C(s32, u8);
 extern u8 D_81C00972[];
+extern u8 D_81C00976[];
+// Record this save's ID while under the five-entry limit, then roll both selections.
+s32 MysteryGift_TryPrepareSelections_fragment88(u8 slot, u8 allow_special) {
+    u8 count;
+    s32 save_index;
+    s32 metadata[4];
+    u8 id_bytes[2];
+    s32 result;
+
+    result = 0;
+    func_80035700(osGetCount());
+    save_index = slot;
+    func_8005D9E0(save_index, metadata);
+    func_80060A84(id_bytes, *(u16 *)metadata);
+    count = func_8005E03C(save_index);
+    if (count < 5) {
+        func_8005E0BC(save_index, count, *(u16 *)metadata);
+        count++;
+        func_8005E07C(save_index, count);
+        func_81C002E4(id_bytes, D_81C00972, allow_special);
+        func_81C002E4(id_bytes, D_81C00976, allow_special);
+        result = 1;
+    }
+    return result;
+}
+
 extern s32 func_8005F790(s32, u8);
 extern void func_8005F7B8(s32, u8);
 extern void func_8005F9CC(s32, u16);
@@ -131,7 +161,6 @@ u16 MysteryGift_ReceiveReward_fragment88(u8 slot) {
     return result;
 }
 
-extern u8 D_81C00976[];
 // Prefer an unowned decoration (256 + decoration ID), then an item, then Berry.
 u16 MysteryGift_SelectReward_fragment88(s32 decoration_flags_addr) {
     u16 result;
@@ -159,10 +188,9 @@ u16 MysteryGift_SelectReward_fragment88(s32 decoration_flags_addr) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/88/fragment88_code/func_81C00584.s")
 
-s32 func_81C0034C(u8, u8);
 extern void func_81C00584(u8);
 void func_81C00740(u8 arg0, s16 *arg1, s16 *arg2, s32 arg3, u8 arg4) {
-    if (func_81C0034C(arg0, arg4) != 0) {
+    if (MysteryGift_TryPrepareSelections_fragment88(arg0, arg4) != 0) {
         func_81C00584(arg0);
         *arg1 = MysteryGift_ReceiveReward_fragment88(arg0);
         *arg2 = MysteryGift_SelectReward_fragment88(arg3);
