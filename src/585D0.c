@@ -330,7 +330,7 @@ s32 func_80058FD0(s32 arg0) {
 
 #ifdef VERSION_US
 extern u8 D_801285D4[];
-extern s32 GbPak_ReadCommand(s32, s32, s32, s32);
+extern s32 GbPak_ReadCommand(s32, u8 *, s32, s32);
 extern s32 func_800591BC(s32, s32);
 s32 func_80059050(s32 arg0, s32 arg1) {
     s32 base = *(s32 *)(D_801285D4 + arg0 * 112);
@@ -763,7 +763,15 @@ u8 func_8005A8EC(u8 arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A92C.s")
+extern s32 GbPak_ReadCommand(s32, u8 *, s32, s32);
+extern void _bcopy(s32, s32, s32);
+extern u8 D_80128570[];
+void GbSave_ReadAuxiliaryStatus(u8 port) {
+    u8 block[32];
+    if (GbPak_ReadCommand(port, block, 0x8000, sizeof(block)) == 0) {
+        _bcopy(block, D_80128570 + (u32)port * 112 + 0x49, 7);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1109,13 +1117,13 @@ s32 GbSave_GetGen1BoxCount(s32 index, s32 box) {
 #endif
 
 #ifdef VERSION_US
-u8 *func_8005B280();
+u8 *func_8005B280(s32, s32);
 
-u8 func_8005BF78(void) {
+u8 func_8005BF78(s32 index, s32 box) {
     u8 *temp_v0;
     u8 var_v1;
 
-    temp_v0 = func_8005B280();
+    temp_v0 = func_8005B280(index, box);
     if (temp_v0 != NULL) {
         var_v1 = *temp_v0;
     } else {
@@ -1126,7 +1134,15 @@ u8 func_8005BF78(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005BFA8.s")
+extern s32 GbSave_GetGen1BoxCount(s32 index, s32 box);
+extern s32 func_80057A80(s32 arg0);
+extern u8 func_8005BF78(s32 index, s32 box);
+s32 GbSave_GetBoxCount(s32 index, s32 box) {
+    if (func_80057A80(index) != 0) {
+        return GbSave_GetGen1BoxCount(index, box);
+    }
+    return func_8005BF78(index, box);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1234,7 +1250,14 @@ void func_8005C22C(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C2B4.s")
+extern u8 D_801285D0[];
+void GbSave_SetGen1ItemPair(s32 source, s32 port, s32 entry) {
+    typedef struct { u8 first; u8 second; } Pair;
+    s32 base = *(s32 *)(D_801285D0 + port * 112);
+    if ((entry >= 0) && (entry < 50)) {
+        ((Pair *)(base + 0x267))[entry] = *(Pair *)source;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1264,7 +1287,7 @@ void func_8005C348(s32 arg0, s32 arg1, s32 arg2)
 #endif
 
 #ifdef VERSION_US
-extern void func_8005C2B4(s32, s32, s32);
+extern void GbSave_SetGen1ItemPair(s32, s32, s32);
 extern void func_8005C2FC(s32, s32, s32);
 extern void func_8005C348(s32, s32, s32);
 void func_8005C394(s32 arg0, s32 arg1, s32 arg2) {
@@ -1273,7 +1296,7 @@ void func_8005C394(s32 arg0, s32 arg1, s32 arg2) {
         case 2:
         case 3:
         case 4:
-            func_8005C2B4(arg0, arg1, arg2);
+            GbSave_SetGen1ItemPair(arg0, arg1, arg2);
             break;
         case 5:
         case 6:
@@ -1449,7 +1472,7 @@ s32 func_8005CB38(s32 arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern u8 D_801285D0[];
-extern s32 func_8005BFA8(s32, s32);
+extern s32 GbSave_GetBoxCount(s32, s32);
 extern s32 func_8005CAA4(s32);
 s32 func_8005CC14(s32 arg0, s32 arg1, s32 arg2) {
     s32 result = 0;
@@ -1461,7 +1484,7 @@ s32 func_8005CC14(s32 arg0, s32 arg1, s32 arg2) {
         result = *(u8 *)(record + 0x9AC);
         break;
     case 0x21:
-        result = func_8005BFA8(arg1, arg2);
+        result = GbSave_GetBoxCount(arg1, arg2);
         break;
     case 0x22:
         result = *(u8 *)(record + 0x266);
@@ -2311,11 +2334,14 @@ void func_8005F3B0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F5D4.s")
+extern s32 func_8005F3E0(u8, u16, u8, u8, u8, u8);
+s32 GbSave_SetRelativeRtcTime(u8 port, u16 days, u8 hours, u8 minutes, u8 seconds) {
+    return func_8005F3E0(port, days, hours, minutes, seconds, 1);
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_8005F3E0(s32, s32, s32, s32, s32, s32);
+extern s32 func_8005F3E0(u8, u16, u8, u8, u8, u8);
 void func_8005F620(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4) {
     func_8005F3E0(arg0 & 0xFF, arg1 & 0xFFFF, arg2 & 0xFF, arg3 & 0xFF, (s32) arg4, 0);
 }
