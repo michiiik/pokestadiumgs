@@ -469,3 +469,4 @@ func_889033FC = LabPC_DrawSelectableTextList;
 func_889034DC = LabPC_InitTwoChoiceDialog;
 func_88903B2C = LabPC_CloseMessageDialog;
 func_88903C50 = LabPC_OpenMessageDialog;
+func_889035FC = LabPC_DrawMoveDetails;

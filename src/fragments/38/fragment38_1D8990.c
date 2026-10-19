@@ -98,7 +98,103 @@ void func_889035A0(void *arg0, u8 *arg1, s16 arg2, s16 arg3) {
     (*(s32 *)((u8 *)(arg0) + (0x10))) = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8990/func_889035FC.s")
+typedef struct LabPCMoveDetails {
+    u8 *window;
+    s16 x, y;
+    u8 *pokemon;
+    s16 selected;
+    u8 count;
+    u8 unk_0F;
+    s32 state;
+} LabPCMoveDetails;
+typedef struct LabPCMoveDetailsColor {
+    u8 red, green, blue;
+} LabPCMoveDetailsColor;
+extern Gfx *D_800D0510;
+extern Gfx D_80094DE0[];
+extern u8 D_88005FA0[];
+extern u8 *D_8800687C;
+extern const char D_88904170[];
+extern const char D_88904178[];
+extern const char D_88904180[];
+extern const char D_88904188[];
+extern void func_880008B0(s16,s16,s16);
+extern void func_880006BC(u8 *);
+extern void func_880006E0(void *);
+extern LabPCMoveDetailsColor *func_88000510(LabPCMoveDetailsColor *,s8);
+extern u8 func_80062D98(u8);
+extern u8 func_80062D5C(u8);
+extern u8 func_80062DD4(u8);
+extern s32 *func_80062CE0(u8);
+extern s32 func_80063270(u8);
+extern u8 func_80062EB0(u8,u8);
+extern s32 func_80048E30(u8 *,s32,s32,const char *,s32);
+extern void func_800495F8(s32,s32,s32,const char *,...);
+extern s32 func_80049290(s32,s32,const char *);
+extern void func_88002BA0(u8,u8,u8);
+extern s32 func_8004D334(s32,s32);
+extern void func_8004D40C(s32);
+extern void func_8004D5B8(s32,s32,s32,const char *,...);
+void LabPC_DrawMoveDetails(LabPCMoveDetails *pane) {
+    u32 i;
+    const char *header;
+    const char *names[4];
+    LabPCMoveDetailsColor color;
+    s8 type;
+    s16 x;
+    s16 y;
+    u8 value;
+    u8 move;
+
+    header = func_8004C874(69, 2);
+    gSPDisplayList(D_800D0510++, D_80094DE0);
+    func_880008B0(pane->x + 354, pane->y + 269, 157);
+    func_800498C4();
+    func_880006BC(D_88005FA0);
+    func_800496A4(8, 1);
+    y = pane->y + 165;
+    for (i = 0; i < pane->count; i++, y += 26) {
+        move = pane->pokemon[i + 2];
+        func_880006E0(func_88000510(&color, move == 252 ? 0 : func_80062D98(move)));
+        names[i] = move == 252 ? func_8004C874(69, 19) : (const char *)func_80062CE0(move);
+        func_80048E30(D_8800687C, pane->x + 354, y, names[i], 1);
+    }
+    func_880006E0(D_88005FA0);
+    func_800496A4(4, 0);
+    x = pane->x + 354;
+    y = pane->y + 277;
+    func_80048E30(D_8800687C, x, y, header, 1);
+    move = pane->pokemon[pane->selected + 2];
+    if (move != 252) {
+        value = func_80062D5C(move);
+        y += 20;
+        if (value == 0 || value == 1) {
+            func_800495F8(x, y, 0, D_88904170, func_8004C874(69, 3), func_8004C874(69, 5));
+        } else {
+            func_800495F8(x, y, 0, D_88904178, func_8004C874(69, 3), value);
+        }
+        y += 20;
+        func_800495F8(x, y, 0, D_88904180, func_8004C874(69, 4),
+            (s32)((func_80062DD4(move) * 100) / 255.0f +
+                (0.0f < (func_80062DD4(move) * 100) / 255.0f ? 0.5f : -0.5f)));
+        type = func_80062D98(move);
+        func_880006E0(func_88000510(&color, type));
+    }
+    func_80048E30(D_8800687C, x + *(s8 *)(D_8800687C + 120) + func_80049290(0, *(s8 *)(D_8800687C + 120), header), pane->y + 277,
+        (const char *)func_80063270(move == 252 ? 19 : type), 1);
+    func_88002BA0(255,255,255);
+    func_8004D334(239,0);
+    func_8004D40C(1);
+    y = pane->y + 171;
+    for (i = 0; i < pane->count; i++, y += 26) {
+        if (pane->pokemon[i + 2] != 252) {
+            func_8004D5B8(pane->x + 494, y, 0, D_88904188,
+                func_80062EB0(pane->pokemon[i + 2], pane->pokemon[i + 24]) & 63);
+        }
+    }
+    func_880009A8(*(s32 *)(pane->window + 44), pane->x + 354,
+        pane->y + pane->selected * 26 + 165, 157, 20, 6, 6);
+}
 
 extern s32 D_880068B8;
 void func_88903B00(void) {
