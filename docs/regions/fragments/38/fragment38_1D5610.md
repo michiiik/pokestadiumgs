@@ -62,5 +62,58 @@ complete rebuild of both code and data objects passed the retail checksum.
 No C switch from that experiment was installed. Investigate the extraction
 and assembly-stub size changes before migrating these tables again.
 
-`func_889027A4` remains assembly and has no jump-table prerequisite. Its
-view-opening flow is the next controller owner to recover.
+An isolated fragment-only extraction of the US controller source narrows
+one failure to `func_88900528`. The tested source has SHA-256
+`4ac0f7b8f3905e39182adb5924ab4bd6f39c30fb3195f38b663708116b96b35d`.
+The baseline's complete text, function
+extents, and resolved relocations equal retail; eight relocation spellings
+change only because current descriptive aliases resolve inside or outside
+the object. Migrating the 384-byte run leaves a four-byte gap immediately
+after the predicate and moves every later function by four. In this isolated
+case the text section stays 0x2B50 because its final alignment absorbs the
+growth; this does not explain every difference from the earlier whole-tree
+experiment.
+
+Passive stock-compiler input/output capture, calibrated on the current unit
+and the exact retained migration with stock/blank/off/on/on-blank controls,
+shows the cause of that gap: the predicate's temporary asm-processor
+placeholder is 56 bytes, but its assembly body is 52 bytes. The placeholder
+uses three instructions for its double literal, nine for a synthetic switch,
+and two for the return. The processor budgets only thirteen instructions
+and copies the 52-byte body without removing the extra return-delay word.
+//@tools/asm-processor/asm_processor.py
+
+Moving the existing placeholder store after the switch produces 52 bytes
+but relocates the literal from pool offset 0 to 32, so it is not a valid
+replacement for the current placeholder mechanism. No processor, generated
+assembly, linker layout, or source workaround from these diagnostics was
+installed. A scaffold fix must preserve both text extent and literal/table
+order, then pass the unchanged-owner full-ROM gate before C switches resume.
+
+## Matching view opener (2026-10-20)
+
+`LabPC_OpenEvolutionView` (`func_889027A4`) now matches through ordinary C.
+It selects the model's Pokemon, initializes the audio buffer, selects window
+coordinates/colors and sounds, creates the 376-by-303 window, records the
+Pokemon/context/callback, copies the display names, and starts the appropriate
+evolution or move transition. Signed byte offsets and slot arguments, the
+actual byte-returning window API, and the unsigned frame-timer conversion
+preserve the original instructions. The model-selection API receives both
+the model and Pokemon pointers; the original retains incoming `a1` there.
+//@src/43700.c
+//@src/229E0.c
+//@src/fragments/29/fragment29_168330.c
+
+The first eight-variant batch accepted its direct-expression candidate.
+Coordinate locals change the argument narrowing/scheduling; keeping the
+immediately consumed coordinates in the window call matches naturally.
+The instruction body is 960 bytes; the original 972-byte assembly symbol
+includes twelve final zero bytes supplied by ordinary translation-unit
+alignment. No padding helper or pragma was added. The formatter's historical
+assembly name and descriptive C name cause preliminary relocation-name
+drift; the sequential full-ROM gate resolves the alias and passes retail
+comparison. Complete-unit independent retail links verify the physical
+bytes, rather than treating that preliminary symbol-name check as proof.
+
+Only the four layout-prerequisite owners listed above remain assembly in
+this controller file.
