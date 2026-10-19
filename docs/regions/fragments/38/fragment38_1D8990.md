@@ -34,12 +34,12 @@ original assembly extent also includes four trailing zero bytes. Verification
 must check the entire 2672-byte translation-unit text region, including
 those original zero bytes, rather than inserting a padding helper.
 
-## Move-details renderer requeue (`func_889035FC`)
+## Matching move-details renderer (`func_889035FC`, 2026-10-20)
 
-The remaining owner draws move names, power/accuracy/type, PP values, and
-the selected-row frame. Its best controlled candidate has the original
-1284-byte size and 144-byte frame, with raw similarity 0.9626 and normalized
-similarity 0.9813. It remains assembly; it is not an accepted C replacement.
+`LabPC_DrawMoveDetails` draws move names, power/accuracy/type, PP values,
+and the selected-row frame. Its 1284 bytes and 144-byte frame match the
+original through the normal native runner and full-ROM comparison. This
+replacement leaves all ten functions in this translation unit in C.
 
 A byte-sized move ID reproduces the distinct saved-register carriers used
 by comparisons and narrow move-query arguments. Inlining the consumed
@@ -50,10 +50,22 @@ the helper and its existing formatter caller.
 //@src/fragments/29/fragment29_166060.c
 //@src/fragments/38/fragment38_1D8160.c
 
-Forty-eight source variants cover move-ID widths, label lifetimes, cursor
-reset/progression, coordinate grouping, and accuracy-result lifetime. The
-remaining differences are loop scheduling, two caller-temporary stack
-locations (92/96 versus retail 96/100), and coordinate-expression scheduling.
-Next: inspect the retained best parent's local/temporary-area allocation
-and expression provenance before further variants. A new diagnostic compiler
-mode needs current known and exact-parent stock/blank/off/on/on-blank controls.
+The type-name coordinate uses its width calculation directly in the drawing
+call, after the x-coordinate and font tracking. A separate width local adds
+a home and shifts the power/accuracy label homes from retail offsets 96/100
+to 92/96, despite preserving the overall frame size. Inlining the consumed
+width expression also reproduces the coordinate load/add order.
+
+Each row loop advances its index and signed halfword y-coordinate together
+in the `for` update expression. Keeping the y update in the body leaves
+instruction-order differences in the name-list and PP loops. Combining the
+updates reproduces both original delay-slot schedules without instruction
+rewrites, explicit register placement, dummy work, or extra storage.
+
+These mechanisms close the previous raw-similarity 0.9626 requeue after
+64 total source variants. A logging-only frame observer was first checked
+against both the current known source and exact retained parent in stock,
+stock-plus-blank, observer-off, observer-on, and observer-on-plus-blank modes.
+All ten complete game fingerprints matched before traces were interpreted;
+the trace identified local homes rather than temporary-area spills. The
+acceptance itself uses the stock canonical compiler, with no observer.
