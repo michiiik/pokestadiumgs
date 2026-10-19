@@ -186,12 +186,52 @@ u16 MysteryGift_SelectReward_fragment88(s32 decoration_flags_addr) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/88/fragment88_code/func_81C00584.s")
+extern void _bzero(void *, s32);
+extern void *func_8004C874(s32, s32);
+extern u8 *func_80060EC8(void *, void *);
+extern u8 func_8005D92C(s32);
+extern void func_8005E1F0(u8, void *);
+typedef struct Fragment88GiftPokemon {
+    u8 level;
+    u8 species;
+    u8 moves[4];
+} Fragment88GiftPokemon;
+typedef struct Fragment88GiftTeam {
+    u8 name[11];
+    u8 version;
+    Fragment88GiftPokemon pokemon[6];
+    u8 marker;
+    u8 unk_31;
+} Fragment88GiftTeam;
+extern Fragment88GiftPokemon D_81C00830[3][6];
+extern Fragment88GiftTeam D_81C00940;
+// Fill and save a six-Pokemon Mystery Gift team from one of three ROM templates.
+void MysteryGift_BuildTeam_fragment88(u8 slot) {
+    u8 template_index;
+    s32 i;
 
-extern void func_81C00584(u8);
+    _bzero(&D_81C00940, sizeof(D_81C00940));
+    func_80060EC8(&D_81C00940, func_8004C874(61, 62));
+    switch (func_8005D92C(slot)) {
+    case 5:
+    case 7:
+        D_81C00940.version = 1;
+        break;
+    case 6:
+        D_81C00940.version = 2;
+        break;
+    }
+    template_index = func_8003570C() % 3;
+    for (i = 0; i < 6; i++) {
+        D_81C00940.pokemon[i] = D_81C00830[template_index][i];
+    }
+    D_81C00940.marker = 0xFF;
+    func_8005E1F0(slot, &D_81C00940);
+}
+
 void func_81C00740(u8 arg0, s16 *arg1, s16 *arg2, s32 arg3, u8 arg4) {
     if (MysteryGift_TryPrepareSelections_fragment88(arg0, arg4) != 0) {
-        func_81C00584(arg0);
+        MysteryGift_BuildTeam_fragment88(arg0);
         *arg1 = MysteryGift_ReceiveReward_fragment88(arg0);
         *arg2 = MysteryGift_SelectReward_fragment88(arg3);
     }
