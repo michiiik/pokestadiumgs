@@ -458,3 +458,6 @@ func_88232F88 = LabPC_DrawMoveFieldValue;
 func_88233040 = LabPC_StartMoveFieldAnimation;
 func_882331D8 = LabPC_DrawStatChangeHighlights;
 func_88233330 = LabPC_DrawStatChangeValues;
+func_882330E0 = LabPC_FinishStatChangeAnimation;
+func_88233484 = LabPC_StartStatChangeAnimation;
+func_88902E8C = LabPC_FindLevelUpEvolution;

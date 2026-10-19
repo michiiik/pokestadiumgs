@@ -88,9 +88,80 @@ s32 func_88902CF0(void *arg0, u8 *arg1, s8 arg2) {
     return 0;
 }
 
-extern s32 func_80064800(u8); extern s32 func_88902CF0(void *, u8 *, s8); void func_88902E4C(u32 *arg0, u8 *arg1, s8 arg2) { *arg0 = func_80064800(arg1[0]); func_88902CF0(arg0, arg1, arg2); }
+extern s32 func_80064800(u8);
+s32 func_88902E4C(u32 *cursor, u8 *pokemon, s8 slot) {
+    *cursor = func_80064800(pokemon[0]);
+    return func_88902CF0(cursor, pokemon, slot);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88902E8C.s")
+extern s32 func_80063BB8(u8);
+extern s32 func_8800005C(void);
+extern void func_8005F37C(s32, s32, s32, s32, s32);
+extern u8 D_88006868;
+s32 LabPC_FindLevelUpEvolution(u8 *pokemon, s32 use_clock) {
+    u8 *rule;
+    u16 days;
+    u8 hour;
+    u8 minute;
+    u8 second;
+
+    rule = (u8 *)func_80063BB8(pokemon[0]);
+    if (rule != NULL && pokemon[1] != 112) {
+        while (rule[0] != 0) {
+            switch (rule[0]) {
+            case 1:
+                if (pokemon[29] >= rule[1]) {
+                    return rule[2];
+                }
+                break;
+            case 3:
+                if (func_8800005C() != 0) {
+                    break;
+                }
+                if (pokemon[28] >= 221) {
+                    if (rule[1] == 1) {
+                        return rule[2];
+                    }
+                    if (use_clock != 0) {
+                        func_8005F37C(D_88006868, (s32)&days, (s32)&hour, (s32)&minute, (s32)&second);
+                        if (hour >= 4 && hour < 18) {
+                            return 196;
+                        }
+                        return 197;
+                    }
+                    return rule[2];
+                }
+                break;
+            case 5:
+                if (func_8800005C() != 0 || pokemon[29] < rule[1]) {
+                    break;
+                }
+                if (*(u16 *)(pokemon + 44) < *(u16 *)(pokemon + 42)) {
+                    return rule[2];
+                }
+                break;
+            case 6:
+                if (func_8800005C() != 0 || pokemon[29] < rule[1]) {
+                    break;
+                }
+                if (*(u16 *)(pokemon + 42) < *(u16 *)(pokemon + 44)) {
+                    return rule[2];
+                }
+                break;
+            case 7:
+                if (func_8800005C() != 0 || pokemon[29] < rule[1]) {
+                    break;
+                }
+                if (*(u16 *)(pokemon + 44) == *(u16 *)(pokemon + 42)) {
+                    return rule[2];
+                }
+                break;
+            }
+            rule += 3;
+        }
+    }
+    return 0;
+}
 
 u8 func_88903084(u8 arg0) { u8 result = 0; switch (arg0) { case 0x1e: result=0x1f; break; case 0x21: result=0x22; break; case 0x23: result=0x24; break; case 0x27: result=0x28; break; default: break; } return result; }
 
