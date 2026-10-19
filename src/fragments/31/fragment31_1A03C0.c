@@ -253,7 +253,85 @@ void LabPC_UpdateListChoiceDialogInput(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822DEBC.s")
+typedef struct {
+    s32 enabled;
+    u8 *flags;
+} F29TextMask;
+extern Gfx *D_800D0510;
+extern Gfx D_80094E38[];
+extern Gfx D_80094F50[];
+extern u8 *D_88A01C30;
+extern u8 *D_88A01C34;
+extern char D_88234540[];
+extern void func_88002BA0(u8, u8, u8);
+extern s32 func_8004D334(s32, s32);
+extern void func_8004D40C(s32);
+extern void func_8004D5B8(s32, s32, s32, const char *, ...);
+extern void func_88000FC4(s32, s32, s32, s32, s16, s16);
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_88002820(s16, s16, s8, u8 **, u16, s16, F29TextMask *);
+extern void func_800499EC(void);
+extern void func_880009A8(s32, s16, s16, s16, s16, s16, s16);
+extern void func_8004B314(s32, s32, s32, s32);
+// Draw the menu and selected list, then mark the focused row.
+void LabPC_DrawListChoiceDialog(void) {
+    u32 i;
+    s16 x;
+    s16 y;
+    s16 cursor_y;
+    u8 *list;
+    u8 *entry;
+    s16 row;
+
+    switch (*(s16 *)((u8 *)D_88234950 + 16)) {
+    case 1:
+        entry = D_88A01C34 + 24 * D_88A01C30[16];
+        list = (u8 *)D_88234950 + 0x34;
+        break;
+    case 2:
+        entry = D_88A01C34 + 24 * D_88A01C30[16] + 24 * D_88A01C30[36];
+        list = (u8 *)D_88234950 + 0x44;
+        break;
+    }
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    func_88002BA0(255, 255, 255);
+    func_8004D334(239, 0);
+    func_8004D40C(2);
+    func_8004D5B8(*(s16 *)((u8 *)D_88234950 + 0x2E), *(s16 *)(*(u8 **)((u8 *)D_88234950 + 4) + 14) + 19,
+        0, D_88234540, D_88A01C34[21], D_88A01C34[20]);
+    if (*(s16 *)((u8 *)D_88234950 + 16) == 1 || *(s16 *)((u8 *)D_88234950 + 16) == 2) {
+        x = *(u16 *)((u8 *)D_88234950 + 0x5C) + *(s16 *)(*(u8 **)((u8 *)D_88234950 + 8) + 12) + 30;
+        y = *(s16 *)(*(u8 **)((u8 *)D_88234950 + 8) + 14) + 12;
+        for (i = 0; i < *(u16 *)(list + 4); i++) {
+            func_88000FC4(x, y, 1, 2, entry[21], entry[20]);
+            y += 20;
+            entry += 24;
+        }
+    }
+    gSPDisplayList(D_800D0510++, D_80094F50);
+    func_800498C4();
+    func_800496A4(4, 1);
+    if (*(s16 *)((u8 *)D_88234950 + 16) == 1 || *(s16 *)((u8 *)D_88234950 + 16) == 2) {
+        func_88002820(*(s16 *)(*(u8 **)((u8 *)D_88234950 + 8) + 12) + 24,
+            *(s16 *)(*(u8 **)((u8 *)D_88234950 + 8) + 14) + 11, 0,
+            *(u8 ***)list, *(u16 *)(list + 4), *(s16 *)((u8 *)D_88234950 + 0x5A), (F29TextMask *)(list + 8));
+    }
+    x = *(s16 *)(*(u8 **)((u8 *)D_88234950 + 4) + 12) + 15;
+    y = *(s16 *)(*(u8 **)((u8 *)D_88234950 + 4) + 14) + 13;
+    func_800496A4(8, 1);
+    func_88002820(x, y, 0, (u8 **)((u8 *)D_88234950 + 0x20), 3, 6, (F29TextMask *)((u8 *)D_88234950 + 20));
+    func_800499EC();
+    cursor_y = y;
+    func_880009A8(*(s32 *)((u8 *)D_88234950 + 12), x, (cursor_y += 26 * *(s16 *)((u8 *)D_88234950 + 16)),
+        *(s16 *)((u8 *)D_88234950 + 0x2C), 20, 5, 5);
+    if (*(s32 *)((u8 *)D_88234950 + 12) == 0) {
+        row = (*(s16 *)((u8 *)D_88234950 + 16) == 1) ? *(s16 *)((u8 *)D_88234950 + 0x3A) : *(s16 *)((u8 *)D_88234950 + 0x4A);
+        func_8004B314(*(s16 *)(*(u8 **)((u8 *)D_88234950 + 8) + 12) + 19,
+            20 * row + *(s16 *)(*(u8 **)((u8 *)D_88234950 + 8) + 14) + 6,
+            *(u16 *)((u8 *)D_88234950 + 0x5E) + 10, 26);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822E290.s")
 #endif
