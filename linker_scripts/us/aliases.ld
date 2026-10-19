@@ -507,3 +507,7 @@ func_8005CCD8 = GbSave_GetGsRecordCount;
 func_8005CDDC = GbSave_GetCrystalRecordCount;
 func_8005D698 = GbSave_ReadRecord;
 func_8005D778 = GbSave_WriteRecord;
+func_8005C41C = GbSave_ClampInventoryPacket;
+func_8005D194 = GbSave_TruncateCrystalRecordCount;
+func_8005D4FC = GbSave_IncrementCrystalRecordCount;
+func_8005EF78 = GbSave_WriteGen2BoxName;

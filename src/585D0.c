@@ -1452,7 +1452,51 @@ void func_8005C394(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C41C.s")
+extern s32 GbSave_GetRecordCapacity(s32 selector);
+// Clamp item/key-item/ball pocket counts and item/ball quantities.
+void GbSave_ClampInventoryPacket(u8 *data) {
+    s32 i;
+
+    {
+        s32 limit;
+
+        limit = GbSave_GetRecordCapacity(43);
+        if (limit < data[57]) {
+            data[57] = limit;
+        }
+    }
+    for (i = 0; i < data[57]; i++) {
+        if (data[59 + i * 2] >= 100) {
+            data[59 + i * 2] = 99;
+        }
+    }
+    i = 0;
+    {
+        s32 limit;
+
+        limit = GbSave_GetRecordCapacity(44);
+        if (limit < data[99]) {
+            data[99] = limit;
+        }
+    }
+    {
+        s32 limit;
+
+        limit = GbSave_GetRecordCapacity(45);
+        if (limit < data[126]) {
+            data[126] = limit;
+        }
+    }
+    {
+        u8 *entry = data;
+
+        for (; i < data[126]; i++, entry += 2) {
+            if (entry[128] >= 100) {
+                entry[128] = 99;
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1482,7 +1526,7 @@ void func_8005C5CC(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8005C41C();
+extern void GbSave_ClampInventoryPacket(u8 *);
 void func_8005C614(s32 arg0, s32 arg1) {
     switch (func_8005D92C(arg1)) {
         case 1:
@@ -1499,7 +1543,7 @@ void func_8005C614(s32 arg0, s32 arg1) {
             func_8005C5CC(arg0, arg1);
             break;
     }
-    func_8005C41C(arg0);
+    GbSave_ClampInventoryPacket((u8 *)arg0);
 }
 #endif
 
@@ -1529,7 +1573,7 @@ extern u8 func_8005D92C(s32 index);
 
 void func_8005C750(s32 arg0, s32 arg1) {
     u8 temp_v0;
-    func_8005C41C(arg0, arg1);
+    GbSave_ClampInventoryPacket((u8 *)arg0);
     temp_v0 = func_8005D92C(arg1);
     switch (temp_v0) {
     case 1:
@@ -1951,7 +1995,47 @@ void func_8005D0B0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D194.s")
+extern void func_8005C060(s32 arg0, s32 arg1, s32 arg2);
+extern s32 func_8005CF20(s32 arg0, s32 arg1, s32 arg2);
+extern u8 D_80128570[];
+extern s32 D_80128730[];
+extern u8 D_80128744[];
+void GbSave_TruncateCrystalRecordCount(s32 selector, s32 port, s32 box, s32 count) {
+    u8 *data = *(u8 **)((D_80128570 + port * 112) + 96);
+    u8 *mail = *(u8 **)((D_80128570 + port * 112) + 104);
+
+    if (count < func_8005CF20(selector, port, box)) {
+        switch (selector) {
+        case 32:
+            data[2149] = count;
+            data[2150 + count] = 0xFF;
+            break;
+        case 33:
+            func_8005C060(port, box, count);
+            break;
+        case 34:
+            data[1151] = count;
+            data[1152 + count * 2] = 0xFF;
+            data[1153 + count * 2] = 1;
+            break;
+        case 35:
+        case 37:
+            break;
+        case 36:
+            mail[1035] = count;
+            break;
+        case 38:
+            ((u8 *)D_80128730[port])[1] = count;
+            break;
+        case 39:
+            ((u8 *)D_80128730[port])[0] = count;
+            break;
+        case 40:
+            D_80128744[port] = count;
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1959,7 +2043,7 @@ extern u8 func_8005D92C(s32 index);
 
 extern void func_8005CFE8(s32, s32, s32, s32);
 extern void func_8005D0B0(s32, s32, s32, s32);
-extern void func_8005D194(s32, s32, s32, s32);
+extern void GbSave_TruncateCrystalRecordCount(s32, s32, s32, s32);
 void func_8005D2BC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     switch (func_8005D92C(arg1)) {
     case 1:
@@ -1973,7 +2057,7 @@ void func_8005D2BC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
         func_8005D0B0(arg0, arg1, arg2, arg3);
         break;
     case 7:
-        func_8005D194(arg0, arg1, arg2, arg3);
+        GbSave_TruncateCrystalRecordCount(arg0, arg1, arg2, arg3);
         break;
     }
 }
@@ -2044,7 +2128,46 @@ void func_8005D418(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D4FC.s")
+extern s32 GbSave_GetCrystalRecordCount(s32 selector, s32 port, s32 box);
+extern s32 GbSave_GetRecordCapacity(s32 selector);
+extern void func_8005C060(s32 arg0, s32 arg1, s32 arg2);
+extern u8 D_80128570[];
+extern s32 D_80128730[];
+void GbSave_IncrementCrystalRecordCount(s32 selector, s32 port, s32 box) {
+    u8 *data = *(u8 **)((D_80128570 + port * 112) + 96);
+    u8 *mail = *(u8 **)((D_80128570 + port * 112) + 104);
+    s32 count;
+
+    count = GbSave_GetCrystalRecordCount(selector, port, box);
+    if (count < GbSave_GetRecordCapacity(selector)) {
+        count++;
+        switch (selector) {
+        case 32:
+            data[2149] = count;
+            data[2150 + count] = 0xFF;
+            break;
+        case 33:
+            func_8005C060(port, box, count);
+            break;
+        case 34:
+            data[1151] = count;
+            data[1152 + count * 2] = 0xFF;
+            break;
+        case 35:
+        case 37:
+            break;
+        case 36:
+            mail[1035] = count;
+            break;
+        case 38:
+            ((u8 *)D_80128730[port])[1] = count;
+            break;
+        case 39:
+            ((u8 *)D_80128730[port])[0] = count;
+            break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -2052,7 +2175,7 @@ extern u8 func_8005D92C(s32 index);
 
 extern void func_8005D348(s32, s32, s32);
 extern void func_8005D418(s32, s32, s32);
-extern void func_8005D4FC(s32, s32, s32);
+extern void GbSave_IncrementCrystalRecordCount(s32, s32, s32);
 void func_8005D610(s32 arg0, s32 arg1, s32 arg2) {
     s32 state = func_8005D92C(arg1);
     switch (state) {
@@ -2067,7 +2190,7 @@ void func_8005D610(s32 arg0, s32 arg1, s32 arg2) {
         func_8005D418(arg0, arg1, arg2);
         break;
     case 7:
-        func_8005D4FC(arg0, arg1, arg2);
+            GbSave_IncrementCrystalRecordCount(arg0, arg1, arg2);
         break;
     }
 }
@@ -2709,7 +2832,28 @@ void *func_8005EE88(s32 arg0, s32 arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005EF78.s")
+extern void func_80060F38(void *, void *);
+extern u8 func_8005D92C(s32 index);
+extern u8 D_80128570[];
+s32 GbSave_WriteGen2BoxName(s32 port, s32 box, void *text) {
+    s32 result = 0;
+
+    if ((*(u32 *)(D_80128570 + port * 112) & 1) == 0) {
+        return 0;
+    }
+    switch ((u32)func_8005D92C(port)) {
+    case 5:
+    case 6:
+        func_80060F38(*(u8 **)((D_80128570 + port * 112) + 96) + box * 9 + 1831, text);
+        result = 1;
+        break;
+    case 7:
+        func_80060F38(*(u8 **)((D_80128570 + port * 112) + 96) + box * 9 + 1795, text);
+        result = 1;
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
