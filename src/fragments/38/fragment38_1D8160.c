@@ -31,7 +31,26 @@ loop:
 
 extern s32 func_88902B70(u8 *); extern u8 D_889041A0; extern u8 func_80062E10(u8); void func_88902BE0(u8 *arg0, u8 arg1) { s32 i = func_88902B70(arg0); if (i < 4) i &= 0xff; else i = D_889041A0; *(u8 *)(arg0 + i + 2) = arg1; *(u8 *)(arg0 + i + 0x18) = func_80062E10(arg1); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88902C3C.s")
+// The type-color helper returns this three-byte RGB value by value.
+//@src/fragments/29/fragment29_166060.c
+typedef struct LabPCMoveNameColor {
+    u8 red;
+    u8 green;
+    u8 blue;
+} LabPCMoveNameColor;
+extern LabPCMoveNameColor func_88000510(s8);
+extern u8 func_80062D98(u8);
+extern s32 *func_80062CE0(u8);
+extern void *func_8004C874(s32, s32);
+const char D_88903FE0[] = "<COL1,PUSH,%d,%d,%d,255>%s<COL1,POP>";
+char *LabPC_FormatColoredMoveName(char *output, u8 move) {
+    LabPCMoveNameColor color;
+
+    color = func_88000510(move == 252 ? 0 : func_80062D98(move));
+    sprintf(output, D_88903FE0, color.red, color.green, color.blue,
+        move == 252 ? func_8004C874(69, 19) : (const char *)func_80062CE0(move));
+    return output;
+}
 
 extern s32 func_88902BA0(void *, u8);
 extern u8 func_8005D92C(s32 index);
@@ -165,7 +184,22 @@ s32 LabPC_FindLevelUpEvolution(u8 *pokemon, s32 use_clock) {
 
 u8 func_88903084(u8 arg0) { u8 result = 0; switch (arg0) { case 0x1e: result=0x1f; break; case 0x21: result=0x22; break; case 0x23: result=0x24; break; case 0x27: result=0x28; break; default: break; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_889030D8.s")
+u8 LabPC_FindFireStoneEvolution(u8 species) {
+    u8 result = 0;
+
+    switch (species) {
+    case 133:
+        result = 136;
+        break;
+    case 37:
+        result = 38;
+        break;
+    case 58:
+        result = 59;
+        break;
+    }
+    return result;
+}
 
 u8 func_8890311C(u8 arg0) {
     u8 result = 0;
@@ -179,9 +213,42 @@ u8 func_8890311C(u8 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_88903150.s")
+u8 LabPC_FindWaterStoneEvolution(u8 species) {
+    u8 result = 0;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D8160/func_889031A4.s")
+    switch (species) {
+    case 133:
+        result = 134;
+        break;
+    case 61:
+        result = 62;
+        break;
+    case 90:
+        result = 91;
+        break;
+    case 120:
+        result = 121;
+        break;
+    }
+    return result;
+}
+
+u8 LabPC_FindLeafStoneEvolution(u8 species) {
+    u8 result = 0;
+
+    switch (species) {
+    case 70:
+        result = 71;
+        break;
+    case 102:
+        result = 103;
+        break;
+    case 44:
+        result = 45;
+        break;
+    }
+    return result;
+}
 
 u8 func_889031EC(u8 arg0) { u8 result = 0; switch (arg0) { case 0x2c: result=0xb6; break; case 0xbf: result=0xc0; break; default: break; } return result; }
 

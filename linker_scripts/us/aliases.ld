@@ -461,3 +461,7 @@ func_88233330 = LabPC_DrawStatChangeValues;
 func_882330E0 = LabPC_FinishStatChangeAnimation;
 func_88233484 = LabPC_StartStatChangeAnimation;
 func_88902E8C = LabPC_FindLevelUpEvolution;
+func_88902C3C = LabPC_FormatColoredMoveName;
+func_889030D8 = LabPC_FindFireStoneEvolution;
+func_88903150 = LabPC_FindWaterStoneEvolution;
+func_889031A4 = LabPC_FindLeafStoneEvolution;

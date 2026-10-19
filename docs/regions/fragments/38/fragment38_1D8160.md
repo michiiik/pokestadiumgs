@@ -18,13 +18,12 @@ reproduces the original 56-byte frame and all clock-output addresses.
 Its former `void` declaration discarded an observable return contract; the
 explicit return preserves the complete translation-unit game fingerprint.
 
-## Requeue: colored move-name formatter (`func_88902C3C`)
+## Matching colored move-name formatter (`func_88902C3C`)
 
-The best source has the original 180-byte instruction sequence and 48-byte
-frame. Its sole remaining residual is a caller-save home: the live move
-value is saved/reloaded at stack offset 32, whereas retail uses offset 36.
-The four affected instructions occur at function offsets 44, 48, 72, and 76.
-The best raw similarity is 0.9111; normalized 1.0 is not acceptance.
+`LabPC_FormatColoredMoveName` matches the original 180-byte instruction
+sequence and 48-byte frame. It passes the resolved name directly to `sprintf`
+instead of keeping a separate name local. This lets the compiler place the
+live move value's caller-save home at offset 36, as in retail.
 
 `func_88000510` returns the actual three-byte RGB struct defined in
 `src/fragments/29/fragment29_166060.c`; the hidden result address is passed
@@ -32,12 +31,25 @@ in the first argument register. The original format string is
 `<COL1,PUSH,%d,%d,%d,255>%s<COL1,POP>`. Move 252 uses the special-name lookup;
 other moves use the move-name and move-type APIs.
 
-Forty source variants tested declaration order, narrow versus word move
-types, direct type expressions, real selected-move caches, struct-result
-initialization, and name scope. Caches either retain the same residual or
-change the frame/argument loads; do not repeat those families unchanged.
-Next action: inspect caller-save/home allocation for the three-byte struct
-result and the retained byte parameter using a known-matching control before
-new compiler diagnostics. Do not add dummy locals, widen the RGB object, or
-introduce artificial padding to occupy the missing home. The owner remains
-assembly; no candidate from this search is accepted.
+Earlier spellings with a name local put that home at offset 32: four raw
+instruction differences despite normalized similarity 1.0. Narrow types,
+selected-move caches, disjoint scopes, and branching on the RGB result did
+not resolve that residual. A passive frame trace, calibrated against current
+known and retained-parent stock/blank/off/on/on-blank complete-object
+controls, identified a local-home difference rather than a temporary-area
+spill. Inlining the consumed name expression closes it without dummy locals,
+wider RGB storage, artificial padding, or compiler changes.
+
+## Matching stone-evolution maps
+
+The three species maps are fire (37 to 38, 58 to 59, 133 to 136), water
+(61 to 62, 90 to 91, 120 to 121, 133 to 134), and leaf (44 to 45, 70 to 71,
+102 to 103). Each returns zero for a species without a listed evolution.
+`func_88902624` selects these maps when applying an evolution item.
+//@src/fragments/38/fragment38_1D5610.c
+
+Ordinary C switches reproduce the original early-return/shared-tail shape
+with source case order 133/37/58 for fire, 133/61/90/120 for water, and
+70/102/44 for leaf. Sorted cases produce different basic-block order. No
+manual branch encoding or padding is required. Together with the formatter,
+these replacements leave `fragment38_1D8160.c` entirely in C.
