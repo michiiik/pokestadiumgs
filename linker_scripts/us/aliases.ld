@@ -495,3 +495,7 @@ func_8005B280 = GbSave_GetGen2BoxBuffer;
 func_889007A0 = LabPC_HandleChoiceInput;
 func_88900B08 = LabPC_OpenChoiceWindow;
 func_88900C78 = LabPC_HandleMovePaneInput;
+func_8005C9E0 = GbSave_IsRecordTypeAvailable;
+func_8005CAA4 = GbSave_GetRecordCapacity;
+func_8005CBA0 = GbSave_GetRecordSize;
+func_8006092C = GbSave_GetGen2HeaderFlag80;
