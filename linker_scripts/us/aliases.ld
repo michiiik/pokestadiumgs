@@ -435,3 +435,7 @@ func_8823145C = LabPC_DrawInColumnSwapHighlights;
 func_88231540 = LabPC_DrawInColumnSwapEntries;
 func_882316D0 = LabPC_DrawCrossColumnSwapHighlights;
 func_88231784 = LabPC_DrawCrossColumnSwapEntries;
+func_882318F0 = LabPC_DrawQuantityTransferHighlights;
+func_882319A4 = LabPC_DrawQuantityTransferEntries;
+func_88231B20 = LabPC_DrawListSwapHighlights;
+func_88231C04 = LabPC_DrawListSwapEntries;
