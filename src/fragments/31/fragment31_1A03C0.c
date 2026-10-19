@@ -199,7 +199,59 @@ void func_8822DC34(void) {
     D_880068B8 = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822DC84.s")
+extern void func_88208010(u8, u8, u8);
+// Handle menu/list selection and tint the choice window for the active list.
+void LabPC_UpdateListChoiceDialogInput(void) {
+    u8 *list;
+    s32 mode;
+
+    mode = *(s16 *)((u8 *)D_88234950 + 16);
+    switch (mode) {
+    case 1:
+        list = (u8 *)D_88234950 + 0x34;
+        break;
+    case 2:
+        list = (u8 *)D_88234950 + 0x44;
+        break;
+    }
+    if (*(s32 *)((u8 *)D_88234950 + 12)) {
+        if (*(u16 *)((u8 *)D_80087200 + 8) & B_BUTTON) {
+            func_800226C0(72);
+            func_8822DC34();
+        } else if (*(u16 *)((u8 *)D_80087200 + 8) & A_BUTTON) {
+            func_800226C0(71);
+            if (*(s16 *)((u8 *)D_88234950 + 16) == 0) {
+                func_88208010(*(u8 *)D_88234950, 0, 0);
+                func_8822DC34();
+            } else {
+                *(s32 *)((u8 *)D_88234950 + 12) = 0;
+            }
+        } else {
+            func_88002720((u8 *)D_88234950 + 16, 3, (u8 *)D_88234950 + 20);
+        }
+    } else {
+        if (*(u16 *)((u8 *)D_80087200 + 8) & B_BUTTON) {
+            func_800226C0(72);
+            *(s32 *)((u8 *)D_88234950 + 12) = 1;
+        } else if (*(u16 *)((u8 *)D_80087200 + 8) & A_BUTTON) {
+            func_800226C0(71);
+            func_88208010(*(u8 *)D_88234950, *((u8 *)D_88234950 + 17), list[7]);
+            func_8822DC34();
+        } else if (mode == 1 || mode == 2) {
+            func_88002720(list + 6, *(u16 *)(list + 4), list + 8);
+        }
+    }
+    mode = *(s16 *)((u8 *)D_88234950 + 16);
+    if (mode != 1 && mode != 2) {
+        (*(u8 **)((u8 *)D_88234950 + 8))[28] = 150;
+        (*(u8 **)((u8 *)D_88234950 + 8))[29] = 150;
+        (*(u8 **)((u8 *)D_88234950 + 8))[30] = 130;
+    } else {
+        (*(u8 **)((u8 *)D_88234950 + 8))[28] = 220;
+        (*(u8 **)((u8 *)D_88234950 + 8))[29] = 220;
+        (*(u8 **)((u8 *)D_88234950 + 8))[30] = 180;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822DEBC.s")
 
