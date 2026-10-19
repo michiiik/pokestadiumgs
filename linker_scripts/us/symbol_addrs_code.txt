@@ -10896,6 +10896,6 @@ func_81C002E4 = 0x81C002E4; // type:func
 MysteryGift_TryPrepareSelections_fragment88 = 0x81C0034C; // type:func
 MysteryGift_ReceiveReward_fragment88 = 0x81C00408; // type:func
 MysteryGift_SelectReward_fragment88 = 0x81C004E4; // type:func
-func_81C00584 = 0x81C00584; // type:func
+MysteryGift_BuildTeam_fragment88 = 0x81C00584; // type:func
 func_81C00740 = 0x81C00740; // type:func
 func_81C007A4 = 0x81C007A4; // type:func
