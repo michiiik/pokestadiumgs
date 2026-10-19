@@ -87,7 +87,30 @@ void func_8822D778(void) {
     Util_Free(D_88234940);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822D7B4.s")
+extern void func_800226C0(s32);
+extern void func_88004990(u8, u8);
+extern void func_88002720(void *, u16, void *);
+extern void func_8822D45C(u8);
+// B closes the dialog; A applies the selected sort order before closing it.
+void LabPC_UpdateSortDialogInput(void) {
+    u8 *view;
+    u32 pressed;
+
+    pressed = *(u16 *)((u8 *)D_80087200 + 8);
+    view = (u8 *)D_88234940 + 0x20;
+    if (pressed & B_BUTTON) {
+        func_800226C0(72);
+        func_88004990((*(u8 **)D_88234940)[0], 0);
+        D_880068B8 = 1;
+    } else if (pressed & A_BUTTON) {
+        func_800226C0(68);
+        func_8822D45C(view[0x29]);
+        func_88004990((*(u8 **)D_88234940)[0], 0);
+        D_880068B8 = 1;
+    } else {
+        func_88002720(view + 0x28, *(u16 *)(view + 0xC), view + 0x2C);
+    }
+}
 
 extern void func_8821D930(s32);
 void func_8822D874(void) {
@@ -102,10 +125,26 @@ void func_8822DB00(void) {
     D_880068B8 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822DB28.s")
-
-extern void func_88004990(u8, s32);
 extern void *D_88234950;
+// Free both child-allocation lists, their backing buffers and the shared owner.
+void LabPC_DestroyOwnedLists(void) {
+    u32 i;
+
+    Input_SetRepeatController(D_80087200);
+    D_880068B4 = 1;
+    for (i = 0; i < *(u16 *)((u8 *)D_88234950 + 0x38); i++) {
+        Util_Free((*(s32 **)((u8 *)D_88234950 + 0x60))[i]);
+    }
+    for (i = 0; i < *(u16 *)((u8 *)D_88234950 + 0x48); i++) {
+        Util_Free((*(s32 **)((u8 *)D_88234950 + 0x64))[i]);
+    }
+    Util_Free(*(s32 *)((u8 *)D_88234950 + 0x40));
+    Util_Free(*(s32 *)((u8 *)D_88234950 + 0x50));
+    Util_Free(*(s32 *)((u8 *)D_88234950 + 0x60));
+    Util_Free(*(s32 *)((u8 *)D_88234950 + 0x64));
+    Util_Free((s32)D_88234950);
+}
+
 void func_8822DC34(void) {
     func_88004990(*(*(u8 **)((u8 *)(D_88234950) + (4))), 0);
     func_88004990(*(*(u8 **)((u8 *)(D_88234950) + (8))), 0);
