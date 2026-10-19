@@ -2330,9 +2330,8 @@ void func_8005F7E0(s32 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-s32 func_8005F9A4(s32 arg0, s32 arg1) {
-    s32 *p = &arg1; // FAKE: unused address-taken local.
-    return func_8005F808(arg0, arg1 & 0xFFFF, 0);
+s32 func_8005F9A4(s32 arg0, u16 arg1) {
+    return func_8005F808(arg0, arg1, 0);
 }
 #endif
 

@@ -82,6 +82,7 @@ s32 func_88B046F0(void) {
 extern u8 D_88006868[];
 extern u16 D_88B05D1C;
 extern void *func_88B043EC(u8 arg0);
+extern s32 func_8005F9A4(s32, u16);
 s32 func_88B048C4(void)
 {
   s32 result;

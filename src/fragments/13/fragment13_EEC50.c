@@ -674,7 +674,7 @@ s32 Fragment13_GetGroupedListItem(struct Fragment13GroupedList *arg0, s32 group,
     return (arg0->entries + arg0->starts[group])[index];
 }
 
-extern s32 func_8005F9A4(s32, s32);
+extern s32 func_8005F9A4(s32, u16);
 
 void Fragment13_InitAvailableGroupedList(struct Fragment13GroupedList *arg0, s32 handle) {
     s32 cursor = 0;
