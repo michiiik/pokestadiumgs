@@ -1001,7 +1001,7 @@ void Fragment13_ResetGroupCamera(struct Fragment13CameraState *arg0) {
     arg0->eye.z += arg0->offsetZ;
 }
 
-extern void func_8005D9E0(s32, s32 *);
+extern void func_8005D9E0(s32, void *);
 extern s32 Fragment13_FindNearestGroup(struct Fragment13MotionVector *);
 extern s8 *HAL_Strcpy(s8 *, s8 *);
 extern void func_80006158(void);

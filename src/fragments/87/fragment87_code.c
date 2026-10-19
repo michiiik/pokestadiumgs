@@ -74,8 +74,8 @@ void RoomDecor_SetPlant_fragment87(u8 slot, u8 decoration, s32 update_map) {
     }
 }
 
-extern void func_8005F9CC(s32, s32);
-extern void func_8005F9F4(s32, s32);
+extern void func_8005F9CC(s32, u16);
+extern void func_8005F9F4(s32, u16);
 void RoomDecor_SetPoster_fragment87(u8 slot, u8 decoration, s32 update_map) {
     u8 *decorations;
     u8 block_id;

@@ -416,3 +416,5 @@ func_81B00E58 = RoomDecor_SetByCategory_fragment87;
 func_81B00788 = RoomDecor_RebuildObjects_fragment87;
 func_81C00050 = MysteryGift_RollItemIndex_fragment88;
 func_81C004E4 = MysteryGift_SelectReward_fragment88;
+func_81C00174 = MysteryGift_RollDecorationIndex_fragment88;
+func_81C00408 = MysteryGift_ReceiveReward_fragment88;
