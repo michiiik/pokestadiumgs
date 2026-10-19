@@ -1132,7 +1132,7 @@ void func_8005BECC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 
 #ifdef VERSION_US
 extern s32 func_8005B1C4(s32 arg0, s32 arg1);
-extern s32 func_8005CAA4(s32);
+extern s32 GbSave_GetRecordCapacity(s32);
 s32 GbSave_GetGen1BoxCount(s32 index, s32 box) {
     u8 *data;
     s32 limit;
@@ -1140,7 +1140,7 @@ s32 GbSave_GetGen1BoxCount(s32 index, s32 box) {
 
     data = (u8 *)func_8005B1C4(index, box);
     if (data != 0) {
-        limit = func_8005CAA4(33);
+        limit = GbSave_GetRecordCapacity(33);
         count = data[0];
         if (count <= limit) {
             return count;
@@ -1467,11 +1467,81 @@ void func_8005C988(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005C9E0.s")
+extern u8 D_80128570[];
+s32 GbSave_IsRecordTypeAvailable(u8 port, u8 selector) {
+    switch (selector) {
+    case 33:
+        if ((*(u32 *)(D_80128570 + port * 112) & 4) == 0) {
+            return 0;
+        }
+    case 32:
+    case 34:
+    case 35:
+    case 42:
+    case 43:
+    case 44:
+    case 45:
+        if (*(u32 *)(D_80128570 + port * 112) & 1) {
+            break;
+        }
+        return 0;
+    case 36:
+    case 37:
+        if (*(u32 *)(D_80128570 + port * 112) & 2) {
+            break;
+        }
+        return 0;
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005CAA4.s")
+s32 GbSave_GetRecordCapacity(s32 selector) {
+    s32 result = 0;
+    switch (selector) {
+    case 32:
+        result = 6;
+        break;
+    case 33:
+        result = 20;
+        break;
+    case 34:
+        result = 50;
+        break;
+    case 35:
+        result = 1;
+        break;
+    case 36:
+        result = 10;
+        break;
+    case 37:
+        result = 6;
+        break;
+    case 38:
+        result = 5;
+        break;
+    case 39:
+        result = 3;
+        break;
+    case 40:
+        result = 1;
+        break;
+    case 42:
+        result = 57;
+        break;
+    case 43:
+        result = 20;
+        break;
+    case 44:
+        result = 25;
+        break;
+    case 45:
+        result = 12;
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1501,13 +1571,45 @@ s32 func_8005CB38(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005CBA0.s")
+s32 GbSave_GetRecordSize(s32 selector) {
+    s32 result = 0;
+    switch (selector) {
+    case 32:
+        result = 88;
+        break;
+    case 33:
+        result = 88;
+        break;
+    case 34:
+        result = 2;
+        break;
+    case 35:
+        result = 152;
+        break;
+    case 36:
+        result = 118;
+        break;
+    case 37:
+        result = 118;
+        break;
+    case 38:
+        result = 68;
+        break;
+    case 39:
+        result = 1168;
+        break;
+    case 40:
+        result = 437;
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
 extern u8 D_801285D0[];
 extern s32 GbSave_GetBoxCount(s32, s32);
-extern s32 func_8005CAA4(s32);
+extern s32 GbSave_GetRecordCapacity(s32);
 s32 func_8005CC14(s32 arg0, s32 arg1, s32 arg2) {
     s32 result = 0;
     s32 record = *(s32 *)(D_801285D0 + arg1 * 112);
@@ -1531,10 +1633,10 @@ s32 func_8005CC14(s32 arg0, s32 arg1, s32 arg2) {
         break;
     }
 
-    if (result < func_8005CAA4(arg0)) {
+    if (result < GbSave_GetRecordCapacity(arg0)) {
         ret = result;
     } else {
-        ret = func_8005CAA4(arg0);
+        ret = GbSave_GetRecordCapacity(arg0);
     }
     return ret;
 }
@@ -1549,14 +1651,14 @@ s32 func_8005CC14(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-extern s32 func_8005C9E0(u8, u8);
+extern s32 GbSave_IsRecordTypeAvailable(u8, u8);
 extern u8 func_8005D92C(s32 index);
 extern s32 func_8005CC14(s32, s32, s32);
 extern s32 func_8005CCD8(s32, s32, s32);
 extern s32 func_8005CDDC(s32, s32, s32);
 s32 func_8005CF20(s32 arg0, s32 arg1, s32 arg2) {
     s32 result = 0;
-    if (func_8005C9E0(arg1, arg0) == 0) {
+    if (GbSave_IsRecordTypeAvailable(arg1, arg0) == 0) {
         return 0;
     }
     switch (func_8005D92C(arg1)) {
@@ -1658,7 +1760,7 @@ void func_8005D2BC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 
 #ifdef VERSION_US
 extern void func_8005C060(s32 arg0, s32 arg1, s32 arg2);
-extern s32 func_8005CAA4(s32);
+extern s32 GbSave_GetRecordCapacity(s32);
 extern s32 func_8005CC14(s32 arg0, s32 arg1, s32 arg2);
 extern u8 D_801285D0[];
 void func_8005D348(s32 arg0, s32 arg1, s32 arg2)
@@ -1668,7 +1770,7 @@ void func_8005D348(s32 arg0, s32 arg1, s32 arg2)
 
     data = *(u8 **)(D_801285D0 + arg1 * 112);
     count = func_8005CC14(arg0, arg1, arg2);
-    if (count < func_8005CAA4(arg0)) {
+    if (count < GbSave_GetRecordCapacity(arg0)) {
         count++;
         switch (arg0) {
             case 0x20:
@@ -1691,14 +1793,14 @@ void func_8005D348(s32 arg0, s32 arg1, s32 arg2)
 
 #ifdef VERSION_US
 extern void func_8005C060(s32 arg0, s32 arg1, s32 arg2);
-extern s32 func_8005CAA4(s32);
+extern s32 GbSave_GetRecordCapacity(s32);
 extern s32 func_8005CCD8(s32, s32, s32);
 extern u8 D_80128570[];
 void func_8005D418(s32 arg0, s32 arg1, s32 arg2) {
     s32 base = *(s32 *)(D_80128570 + arg1 * 112 + 0x60);
     s32 data = *(s32 *)(D_80128570 + arg1 * 112 + 0x68);
     s32 result = func_8005CCD8(arg0, arg1, arg2);
-    if (result < func_8005CAA4(arg0)) {
+    if (result < GbSave_GetRecordCapacity(arg0)) {
         result++;
         switch (arg0) {
         case 0x20:
@@ -2808,5 +2910,19 @@ u8 func_800606F4(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8006092C.s")
+extern u8 func_8005D92C(s32 index);
+extern u8 D_801285D0[];
+s32 GbSave_GetGen2HeaderFlag80(s32 index) {
+    s32 result = 0;
+    switch ((u32)func_8005D92C(index)) {
+    case 5:
+    case 6:
+        result = ((*(u8 **)(D_801285D0 + index * 112))[0x50] & 0x80) != 0;
+        break;
+    case 7:
+        result = ((*(u8 **)(D_801285D0 + index * 112))[0x50] & 0x80) != 0;
+        break;
+    }
+    return result;
+}
 #endif
