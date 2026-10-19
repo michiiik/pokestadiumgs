@@ -117,7 +117,55 @@ void func_8822D874(void) {
     func_8821D930(D_88234940 + 4);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822D89C.s")
+extern void *Util_Malloc(s32);
+extern void *func_8004C874(s32, s32);
+extern s32 func_8004C54C(s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
+extern s32 func_8800005C(void);
+extern u8 *func_88002AA8(u8 *, s32, u8 **, u16, s32, s16, s16, s16, s16, s16, s16, s32, s16, void *);
+extern u8 func_88004804(s32, s32, s16, s16, s32, s32, u8, u8, u8, s32 *, s32 *, s32 *, s32 *, u8, u8);
+extern u8 D_88006020[];
+extern u8 D_8800ED50[];
+// Create the two-choice sort dialog and attach its input and lifecycle callbacks.
+void LabPC_CreateSortDialog(s32 collection, void *selection, void *label_override) {
+    s32 message;
+    u32 slot;
+    void *label;
+    u32 i;
+
+    D_88234940 = (u32)Util_Malloc(232);
+    *(s32 *)(D_88234940 + 0xDC) = collection;
+    *(void **)(D_88234940 + 0xE0) = selection;
+    for (i = 0; i < 2; i++) {
+        *(void **)(D_88234940 + 0x54 + i * 4) = func_8004C874(33, i + 28);
+    }
+    func_88002AA8((u8 *)D_88234940 + 0x20, 0, (u8 **)(D_88234940 + 0x54), 2, 8, 1, 6, 0, 0, 0, 0, 0, 0, D_88006020);
+    switch (collection) {
+    case 0:
+        message = func_8800005C() ? 17 : 18;
+        label = func_8004C874(33, message);
+        break;
+    case 1:
+        label = label_override;
+        break;
+    case 2:
+        label = func_8004C874(33, 20);
+        break;
+    case 3:
+        label = func_8004C874(33, 21);
+        break;
+    }
+    func_8004C54C(74, (s32)label);
+    *(void **)(D_88234940 + 12) = func_8004C8A0((u8 *)D_88234940 + 0x5C, 128, 33, 27);
+    *(s32 *)(D_88234940 + 8) = 0;
+    *(s32 *)(D_88234940 + 16) = 4;
+    *(s16 *)(D_88234940 + 20) = 1;
+    *(s16 *)(D_88234940 + 22) = 4;
+    slot = func_88004804(D_88234940 + 4, 2, 320, 240, 4, 1, 220, 220, 180,
+        (s32 *)LabPC_UpdateSortDialogInput, (s32 *)func_8822D874, (s32 *)func_8822D750, (s32 *)func_8822D778, 0, 0);
+    *(u8 **)D_88234940 = D_8800ED50 + 76 * slot;
+    D_880068B4 = 0;
+}
 
 
 void func_8822DB00(void) {

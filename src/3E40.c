@@ -52,9 +52,10 @@ extern u32 D_800871F0; u32 func_800033A8(void) { return D_800871F0; }
 
 
 extern void * D_800CCDF0;
-extern void mem_pool_alloc(void *, s32);
-void Util_Malloc(s32 arg0) {
-    mem_pool_alloc(D_800CCDF0, arg0);
+struct MemPool3A00;
+extern void *mem_pool_alloc(struct MemPool3A00 *, s32);
+void *Util_Malloc(s32 arg0) {
+    return mem_pool_alloc(D_800CCDF0, arg0);
 }
 
 

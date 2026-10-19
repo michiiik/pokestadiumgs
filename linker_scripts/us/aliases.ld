@@ -427,3 +427,4 @@ func_8822D2F4 = LabPC_FindPrimaryByteOrderIndex;
 func_8822D3A8 = LabPC_FindAlternateByteOrderIndex;
 func_8822DB28 = LabPC_DestroyOwnedLists;
 func_8822D7B4 = LabPC_UpdateSortDialogInput;
+func_8822D89C = LabPC_CreateSortDialog;
