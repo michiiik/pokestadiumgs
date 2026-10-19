@@ -36,9 +36,9 @@ s32 func_8004B754(s32 a) {
     return r;
 }
 
-extern s32 func_8004C874(s32, s32);
-s32 func_8004B7A4(s32 arg0) {
-    s32 result = 0;
+extern void *func_8004C874(s32, s32);
+void *func_8004B7A4(s32 arg0) {
+    void *result = NULL;
     s32 value = func_8004B754(arg0);
     if (value >= 0) {
         result = func_8004C874(0, value);
