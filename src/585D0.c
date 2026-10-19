@@ -229,7 +229,17 @@ s32 func_80058850(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005892C.s")
+extern void GbSave_ComputeChecksum(u8 *start, u8 *end);
+extern s32 func_80057BCC(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+extern u8 D_80128570[];
+s32 GbSave_WriteGen1SaveBlock(s32 index) {
+    struct SaveBuffer { u8 *p; } data;
+
+    data = *(struct SaveBuffer *)(&D_80128570[index * 112] + 0x60);
+    GbSave_ComputeChecksum(data.p + 0x18, data.p + 0xFA3);
+    *(u16 *)(&D_80128570[index * 112] + 6) = data.p[0xFA3];
+    return func_80057BCC(index, (s32)data.p, 0x2580, 0xFC0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -249,7 +259,7 @@ s32 func_80058D18(s32 arg0)
     case 2:
     case 3:
     case 4:
-        result = func_8005892C(arg0);
+        result = GbSave_WriteGen1SaveBlock(arg0);
         break;
     case 5:
     case 6:
@@ -1079,7 +1089,23 @@ void func_8005BECC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005BF28.s")
+extern s32 func_8005B1C4(s32 arg0, s32 arg1);
+extern s32 func_8005CAA4(s32);
+s32 GbSave_GetGen1BoxCount(s32 index, s32 box) {
+    u8 *data;
+    s32 limit;
+    s32 count;
+
+    data = (u8 *)func_8005B1C4(index, box);
+    if (data != 0) {
+        limit = func_8005CAA4(33);
+        count = data[0];
+        if (count <= limit) {
+            return count;
+        }
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1948,7 +1974,28 @@ void func_8005E0BC(s32 arg0, u8 arg1, u16 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005E12C.s")
+extern u16 func_80060A4C(const u8 *);
+extern u8 D_80128570[];
+s32 GbSave_IsGiftTrainerUnrecorded(s32 index, u16 value) {
+    u8 *record = D_80128570 + index * 112;
+    u8 count;
+    s32 result = 0;
+    s32 i;
+
+    if ((*(u32 *)record & 2) != 0) {
+        count = (*(u8 **)(record + 0x68))[0x5E5];
+        if (count != 0xFF) {
+            result = 1;
+            for (i = 0; i < count; i++) {
+                if (value == func_80060A4C(*(u8 **)(record + 0x68) + i * 2 + 0x5E6)) {
+                    result = 0;
+                    break;
+                }
+            }
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -2575,7 +2622,23 @@ s32 func_80060110(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_800601A4.s")
+extern u8 func_8005D92C(s32 index);
+extern u8 D_80128570[];
+s32 GbSave_GetUnownDexEntry(s32 index, u8 entry) {
+    u8 *record = D_80128570 + index * 112;
+    if ((*(u32 *)record & 1) != 0) {
+        if (entry < 26) {
+            switch ((u32)func_8005D92C(index)) {
+            case 5:
+            case 6:
+                return (*(u8 **)(record + 0x60) + 0xA8C)[entry];
+            case 7:
+                return (*(u8 **)(record + 0x60) + 0xA67)[entry];
+            }
+        }
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
