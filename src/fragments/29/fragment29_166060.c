@@ -61,7 +61,7 @@ typedef struct {
 } Color_88000510;
 extern s8 D_88005FE8[];
 extern Color_88000510 D_88005FAC[];
-Color_88000510 func_88000510(s8 arg0) {
+Color_88000510 *func_88000510(Color_88000510 *dest, s8 arg0) {
     s32 index;
 
     for (index = 0; index < 0x12; index++) {
@@ -69,7 +69,8 @@ Color_88000510 func_88000510(s8 arg0) {
             break;
         }
     }
-    return D_88005FAC[index];
+    *dest = D_88005FAC[index];
+    return dest;
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/29/fragment29_166060/func_88000578.s")

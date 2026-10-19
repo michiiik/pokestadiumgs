@@ -25,9 +25,12 @@ sequence and 48-byte frame. It passes the resolved name directly to `sprintf`
 instead of keeping a separate name local. This lets the compiler place the
 live move value's caller-save home at offset 36, as in retail.
 
-`func_88000510` returns the actual three-byte RGB struct defined in
-`src/fragments/29/fragment29_166060.c`; the hidden result address is passed
-in the first argument register. The original format string is
+`func_88000510` writes the actual three-byte RGB struct defined in
+`src/fragments/29/fragment29_166060.c` to its first argument and returns that
+destination pointer. This explicit interface and the earlier struct-return
+spelling produce identical complete game objects for the helper and its
+formatter caller. The explicit pointer result also lets renderers pass the
+destination directly to `func_880006E0`. The original format string is
 `<COL1,PUSH,%d,%d,%d,255>%s<COL1,POP>`. Move 252 uses the special-name lookup;
 other moves use the move-name and move-type APIs.
 

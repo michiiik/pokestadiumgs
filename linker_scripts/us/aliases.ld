@@ -465,3 +465,7 @@ func_88902C3C = LabPC_FormatColoredMoveName;
 func_889030D8 = LabPC_FindFireStoneEvolution;
 func_88903150 = LabPC_FindWaterStoneEvolution;
 func_889031A4 = LabPC_FindLeafStoneEvolution;
+func_889033FC = LabPC_DrawSelectableTextList;
+func_889034DC = LabPC_InitTwoChoiceDialog;
+func_88903B2C = LabPC_CloseMessageDialog;
+func_88903C50 = LabPC_OpenMessageDialog;
