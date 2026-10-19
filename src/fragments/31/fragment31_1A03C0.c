@@ -2,20 +2,71 @@
 
 
 #ifdef VERSION_US
-typedef struct { u8 first, second; } Func8822D140Pair;
-void func_8822D140(Func8822D140Pair *arg0, Func8822D140Pair *arg1) {
-    Func8822D140Pair temp = *arg0;
+typedef struct { u8 first, second; } LabPCBytePair;
+extern u32 D_88234940;
+
+void LabPC_SwapBytePairContents(LabPCBytePair *arg0, LabPCBytePair *arg1) {
+    LabPCBytePair temp = *arg0;
     *arg0 = *arg1;
     *arg1 = temp;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822D180.s")
+// Sort the pointed-to pair contents; the pointer-array positions do not move.
+void LabPC_SortBytePairContents(LabPCBytePair **entries, s32 count, s32 (*compare)(LabPCBytePair *, LabPCBytePair *)) {
+    LabPCBytePair **limit;
+    LabPCBytePair **current;
+    LabPCBytePair **cursor;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822D238.s")
+    limit = entries + count;
+    for (current = entries; current < limit; current++) {
+        cursor = current;
+        while ((cursor > entries) && (compare(cursor[-1], cursor[0]) > 0)) {
+            LabPC_SwapBytePairContents(cursor[0], cursor[-1]);
+            cursor--;
+        }
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822D2F4.s")
+// Compare active first-byte ranks, then second bytes descending, then addresses.
+// func_8822D45C selects the rank callback at state offset 0xE4.
+s32 LabPC_CompareRankedBytePairs(LabPCBytePair *left, LabPCBytePair *right) {
+    s32 result;
+    u8 first_rank;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822D3A8.s")
+    first_rank = (*(u8 (**)(u8))(D_88234940 + 0xE4))(left->first);
+    result = first_rank - (*(u8 (**)(u8))(D_88234940 + 0xE4))(right->first);
+    if (result != 0) {
+        return result;
+    }
+    result = right->second - left->second;
+    return (result != 0) ? result : ((left == right) ? 0 : ((left < right) ? -1 : 1));
+}
+
+extern u8 D_88233920[];
+extern u8 D_88233A1C[];
+// Search the primary 250-byte order; absence returns 0, as does a match at index 0.
+u8 LabPC_FindPrimaryByteOrderIndex(u8 value) {
+    s32 i;
+
+    for (i = 0; i < 250; i++) {
+        if (D_88233920[i] == value) {
+            return i;
+        }
+    }
+    return 0;
+}
+
+// Alternate order selected by func_8822D45C; the same index/absence convention.
+u8 LabPC_FindAlternateByteOrderIndex(u8 value) {
+    s32 i;
+
+    for (i = 0; i < 250; i++) {
+        if (D_88233A1C[i] == value) {
+            return i;
+        }
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822D45C.s")
 
@@ -30,7 +81,6 @@ void func_8822D750(void) {
 
 extern s32 D_880068B4;
 extern void Util_Free(s32);
-extern u32 D_88234940;
 void func_8822D778(void) {
     Input_SetRepeatController(D_80087200);
     D_880068B4 = 1;
