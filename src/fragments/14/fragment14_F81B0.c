@@ -158,7 +158,7 @@ extern u8 D_81312180;
 extern void *func_81609530(s32);
 extern s8 *HAL_Strcpy(s8 *, s8 *);
 extern void func_81307DC0(void *, s32, s32, s32, void *);
-extern void func_8005D9E0(s32, s32 *);
+extern void func_8005D9E0(s32, void *);
 extern void func_81302EE4(void *, void *, void *, s32, void *, void *);
 extern s32 func_8130A460(void *, s32, s32, void *);
 extern s32 func_81304178(u8 *, s32, s32, s32);

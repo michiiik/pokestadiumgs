@@ -1728,7 +1728,7 @@ s32 func_8005D964(s32 arg0) {
 
 #ifdef VERSION_US
 extern u8 D_80128570[];
-void func_8005D9E0(s32 arg0, s32 *arg1) { u8 *record = D_80128570 + arg0 * 112; *(s64 *)((u8 *)arg1 + 0) = *(s64 *)(record + 0x50); *(s64 *)((u8 *)arg1 + 8) = *(s64 *)(record + 0x58); }
+void func_8005D9E0(s32 arg0, void *arg1) { u8 *record = D_80128570 + arg0 * 112; *(s64 *)((u8 *)arg1 + 0) = *(s64 *)(record + 0x50); *(s64 *)((u8 *)arg1 + 8) = *(s64 *)(record + 0x58); }
 #endif
 
 #ifdef VERSION_US
@@ -1898,8 +1898,8 @@ u8 func_8005DF98(s32 i) {
 
 #ifdef VERSION_US
 extern u8 D_80128570[];
-extern void func_8005F9CC(s32, s32);
-extern void func_8005F9F4(s32, s32);
+extern void func_8005F9CC(s32, u16);
+extern void func_8005F9F4(s32, u16);
 void func_8005DFD4(s32 arg0, u8 arg1)
 {
   u8 *rec = D_80128570 + (arg0 * 112);
@@ -1964,14 +1964,14 @@ void func_8005E1F0(u8 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-void func_8005E278(u8 arg0, s32 arg1) {
+void func_8005E278(u8 arg0, void *arg1) {
     s32 idx = arg0;
     _bcopy(*(s32 *)(D_801285D8 + idx * 112) + 0x5FA, arg1, 3);
 }
 #endif
 
 #ifdef VERSION_US
-void func_8005E2BC(u8 arg0, s32 arg1) {
+void func_8005E2BC(u8 arg0, void *arg1) {
     _bcopy(arg1, *(s32 *)(D_801285D8 + arg0 * 112) + 0x5FA, 3);
 }
 #endif
@@ -2307,24 +2307,21 @@ s32 func_8005F668(s32 arg0, u8 arg1, u8 arg2)
 
 #ifdef VERSION_US
 extern s32 func_8005F668(s32, u8, u8);
-extern s32 func_8005F808(s32, s32, s32);
-void func_8005F790(s32 arg0, s32 arg1) {
-    s32 *p = &arg1;
-    func_8005F668(arg0, arg1 & 0xFF, 0);
+extern s32 func_8005F808(s32, u16, u8);
+s32 func_8005F790(s32 arg0, u8 arg1) {
+    return func_8005F668(arg0, arg1, 0);
 }
 #endif
 
 #ifdef VERSION_US
-void func_8005F7B8(s32 arg0, s32 arg1) {
-    s32 *p = &arg1;
-    func_8005F668(arg0, arg1 & 0xFF, 1);
+void func_8005F7B8(s32 arg0, u8 arg1) {
+    func_8005F668(arg0, arg1, 1);
 }
 #endif
 
 #ifdef VERSION_US
-void func_8005F7E0(s32 arg0, s32 arg1) {
-    s32 *p = &arg1;
-    func_8005F668(arg0, arg1 & 0xFF, 2);
+void func_8005F7E0(s32 arg0, u8 arg1) {
+    func_8005F668(arg0, arg1, 2);
 }
 #endif
 
@@ -2334,23 +2331,21 @@ void func_8005F7E0(s32 arg0, s32 arg1) {
 
 #ifdef VERSION_US
 s32 func_8005F9A4(s32 arg0, s32 arg1) {
-    s32 *p = &arg1;
+    s32 *p = &arg1; // FAKE: unused address-taken local.
     return func_8005F808(arg0, arg1 & 0xFFFF, 0);
 }
 #endif
 
 #ifdef VERSION_US
-void func_8005F9CC(s32 arg0, s32 arg1) {
-    s32 *p = &arg1;
-    func_8005F808(arg0, arg1 & 0xFFFF, 1);
+void func_8005F9CC(s32 arg0, u16 arg1) {
+    func_8005F808(arg0, arg1, 1);
 }
 #endif
 
 #ifdef VERSION_US
 
-void func_8005F9F4(s32 arg0, s32 arg1) {
-    s32 *p = &arg1;
-    func_8005F808(arg0, arg1 & 0xFFFF, 2);
+void func_8005F9F4(s32 arg0, u16 arg1) {
+    func_8005F808(arg0, arg1, 2);
 }
 #endif
 
