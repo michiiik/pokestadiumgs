@@ -2307,7 +2307,7 @@ s32 func_8005F668(s32 arg0, u8 arg1, u8 arg2)
 
 #ifdef VERSION_US
 extern s32 func_8005F668(s32, u8, u8);
-extern s32 func_8005F808(s32, u16, u8);
+extern s32 GbSave_AccessEventFlag(s32, u16, u8);
 s32 func_8005F790(s32 arg0, u8 arg1) {
     return func_8005F668(arg0, arg1, 0);
 }
@@ -2326,38 +2326,107 @@ void func_8005F7E0(s32 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F808.s")
+// Modes 0, 1, and 2 read, set, and clear a saved event flag.
+s32 GbSave_AccessEventFlag(s32 index, u16 flag, u8 mode) {
+    s32 flag_index;
+    u8 *base;
+
+    if ((*(u32 *)(D_80128570 + index * 112) & 1) == 0) {
+        return 0;
+    }
+    switch ((u32)func_8005D92C(index)) {
+    case 5:
+    case 6:
+        base = *(u8 **)(D_80128570 + index * 112 + 0x60) + 0x61F;
+        break;
+    case 7:
+        base = *(u8 **)(D_80128570 + index * 112 + 0x60) + 0x600;
+        break;
+    }
+    flag_index = flag;
+    if (flag_index < 0x800) {
+        switch (mode) {
+        case 0:
+            return (base[(u8)(flag_index / 8)] & (1 << (u8)(flag_index % 8))) != 0;
+        case 1:
+            base[(u8)(flag_index / 8)] |= 1 << (u8)(flag_index % 8);
+            break;
+        case 2:
+            base[(u8)(flag_index / 8)] &= ~(1 << (u8)(flag_index % 8));
+            break;
+        }
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
 s32 func_8005F9A4(s32 arg0, u16 arg1) {
-    return func_8005F808(arg0, arg1, 0);
+    return GbSave_AccessEventFlag(arg0, arg1, 0);
 }
 #endif
 
 #ifdef VERSION_US
 void func_8005F9CC(s32 arg0, u16 arg1) {
-    func_8005F808(arg0, arg1, 1);
+    GbSave_AccessEventFlag(arg0, arg1, 1);
 }
 #endif
 
 #ifdef VERSION_US
 
 void func_8005F9F4(s32 arg0, u16 arg1) {
-    func_8005F808(arg0, arg1, 2);
+    GbSave_AccessEventFlag(arg0, arg1, 2);
 }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005FA1C.s")
+u8 *GbSave_GetRoomDecorations(s32 index) {
+    u8 *result;
+
+    if ((*(u32 *)(D_80128570 + index * 112) & 1) == 0) {
+        return 0;
+    }
+    switch ((u32)func_8005D92C(index)) {
+    case 5:
+    case 6:
+        result = *(u8 **)(D_80128570 + index * 112 + 0x60) + 0x7C1;
+        break;
+    case 7:
+        result = *(u8 **)(D_80128570 + index * 112 + 0x60) + 0x79D;
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005FAB4.s")
+u8 GbSave_GetSavedMapX(s32 index) {
+    if ((*(u32 *)(D_80128570 + index * 112) & 1) == 0) {
+        return 0;
+    }
+    switch ((u32)func_8005D92C(index)) {
+    case 5:
+    case 6:
+        return (*(u8 **)(D_80128570 + index * 112 + 0x60))[0x86B];
+    case 7:
+        return (*(u8 **)(D_80128570 + index * 112 + 0x60))[0x846];
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005FB40.s")
+u8 GbSave_GetSavedMapY(s32 index) {
+    if ((*(u32 *)(D_80128570 + index * 112) & 1) == 0) {
+        return 0;
+    }
+    switch ((u32)func_8005D92C(index)) {
+    case 5:
+    case 6:
+        return (*(u8 **)(D_80128570 + index * 112 + 0x60))[0x86A];
+    case 7:
+        return (*(u8 **)(D_80128570 + index * 112 + 0x60))[0x845];
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -2385,7 +2454,18 @@ void func_8005FBCC(s32 arg0, u8 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005FD24.s")
+u8 *GbSave_GetRoomSpriteIds(s32 index) {
+    if ((*(u32 *)(D_80128570 + index * 112) & 1) == 0) {
+        return 0;
+    }
+    switch ((u32)func_8005D92C(index)) {
+    case 5:
+    case 6:
+        return *(u8 **)(D_80128570 + index * 112 + 0x60) + 0x3BD;
+    case 7:
+        return *(u8 **)(D_80128570 + index * 112 + 0x60) + 0x3BC;
+    }
+}
 #endif
 
 #ifdef VERSION_US

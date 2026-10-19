@@ -334,5 +334,74 @@ void func_88900EE4(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D5610/func_88902624.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/38/fragment38_1D5610/func_889027A4.s")
+typedef struct { u8 r, g, b, a; } LabPCControllerColor;
+extern LabPCControllerColor *Color_SetRGB(LabPCControllerColor *, u8, u8, u8);
+extern void func_80042F94(void *, void *);
+extern void Audio_InitializeBufferMemory(void *);
+extern u8 D_880068C0[];
+extern s8 *HAL_Strcpy(s8 *, s8 *);
+extern s32 func_8005DC48(s32, s32);
+extern void func_88902624(s32, u8 *, s8);
+extern void func_88900F54(void);
+extern void func_88901A24(void);
+extern s32 func_88902E4C(u32 *, u8 *, s8);
+extern char *LabPC_FormatColoredMoveName(char *, u8);
+extern void func_88005048(void);
+
+u8 LabPC_OpenEvolutionView(s32 kind, u8 *pokemon, s8 slot, s32 context,
+                         s32 *cb2, s32 *cb3, void (*done)(void), u8 delay) {
+    func_80042F94(*(void **)(D_88904190 + 96), pokemon);
+    Audio_InitializeBufferMemory(D_880068C0);
+    if (kind == 0) {
+        *(s8 *)(D_88904190 + 301) = -26;
+        *(s8 *)(D_88904190 + 302) = -57;
+        Color_SetRGB((LabPCControllerColor *)(D_88904190 + 297), 230, 255, 240);
+        *(s32 *)(D_88904190 + 328) = 2;
+        *(s32 *)(D_88904190 + 332) = 3;
+    } else {
+        *(s8 *)(D_88904190 + 301) = 8;
+        *(s8 *)(D_88904190 + 302) = 0;
+        Color_SetRGB((LabPCControllerColor *)(D_88904190 + 297), 220, 220, 180);
+        *(s32 *)(D_88904190 + 328) = 71;
+        *(s32 *)(D_88904190 + 332) = 72;
+    }
+    *(u8 **)(D_88904190 + 0) = D_8800ED50 + func_88004804(
+        0, 3, (s16)(*(s8 *)(D_88904190 + 301) + 159),
+        (s16)(*(s8 *)(D_88904190 + 302) + 146), 0, 2,
+        *(u8 *)(D_88904190 + 297), *(u8 *)(D_88904190 + 298), *(u8 *)(D_88904190 + 299),
+        (s32 *)func_88900F54, (s32 *)func_88901A24, cb2, cb3, delay, 0) * 76;
+    *(s16 *)(*(u8 **)(D_88904190 + 0) + 16) = 376;
+    *(s16 *)(*(u8 **)(D_88904190 + 0) + 18) = 303;
+    *(s32 *)(D_88904190 + 92) = kind;
+    *(u8 **)(D_88904190 + 104) = pokemon;
+    *(s8 *)(D_88904190 + 282) = slot;
+    *(s32 *)(D_88904190 + 284) = context;
+    *(void (**)(void))(D_88904190 + 304) = done;
+    HAL_Strcpy((s8 *)(D_88904190 + 108), (s8 *)(pokemon + 52));
+    func_8005DC48(slot, (s32)(D_88904190 + 140));
+    func_88902624(kind, pokemon, slot);
+    *(u8 *)(D_88904190 + 300) = 3;
+    *(u8 *)(D_88904190 + 296) = 0;
+    if (kind == 1) {
+        *(u8 *)(D_88904190 + 296) |= 1;
+        *(u8 *)(D_88904190 + 316) = func_88902E4C((u32 *)(D_88904190 + 312), pokemon, slot);
+    }
+    if (kind == 1 && *(u8 *)(D_88904190 + 316) != 0) {
+        LabPC_FormatColoredMoveName((char *)(D_88904190 + 154), *(u8 *)(D_88904190 + 316));
+        func_88900638();
+    } else if (kind == 0 && *(u8 *)(D_88904190 + 308) == 0) {
+        *(s32 *)(D_88904190 + 288) = 0;
+        *(s32 *)(D_88904190 + 292) = 5;
+        *(s16 *)(D_88904190 + 318) = (s16)(u32)((f32)func_80001FF0() / 2);
+    } else {
+        func_8890055C();
+    }
+    *(u8 *)(D_88904190 + 317) = 0;
+    *(u8 *)(D_88904190 + 320) = 1;
+    *(s16 *)(D_88904190 + 322) = 0;
+    *(s16 *)(D_88904190 + 324) = 0;
+    *(s16 *)(D_88904190 + 326) = 0;
+    func_88005048();
+    return *(u8 *)(D_88904190 + 308);
+}
 #endif
