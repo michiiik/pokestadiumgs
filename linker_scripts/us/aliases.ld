@@ -431,3 +431,7 @@ func_8822D89C = LabPC_CreateSortDialog;
 func_8822DC84 = LabPC_UpdateListChoiceDialogInput;
 func_8822DEBC = LabPC_DrawListChoiceDialog;
 func_8822D45C = LabPC_ApplyBytePairSortOrder;
+func_8823145C = LabPC_DrawInColumnSwapHighlights;
+func_88231540 = LabPC_DrawInColumnSwapEntries;
+func_882316D0 = LabPC_DrawCrossColumnSwapHighlights;
+func_88231784 = LabPC_DrawCrossColumnSwapEntries;
