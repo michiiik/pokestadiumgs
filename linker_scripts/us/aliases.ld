@@ -470,3 +470,7 @@ func_889034DC = LabPC_InitTwoChoiceDialog;
 func_88903B2C = LabPC_CloseMessageDialog;
 func_88903C50 = LabPC_OpenMessageDialog;
 func_889035FC = LabPC_DrawMoveDetails;
+func_88900030 = LabPC_InitEvolutionView;
+func_889007A0 = LabPC_HandleChoiceInput;
+func_88900B08 = LabPC_OpenChoiceWindow;
+func_88900C78 = LabPC_HandleMovePaneInput;
