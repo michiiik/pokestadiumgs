@@ -2,6 +2,19 @@
 
 
 #ifdef VERSION_US
+// func_8005D964 refreshes this identity and clears the two bytes at 0x5E.
+// func_8005D9E0 copies the ID, decoded name area and cleared pair as 16 bytes.
+typedef struct {
+    u32 flags;
+    u8 version;
+    u8 unk_05[75];
+    u16 trainer_id;
+    u8 trainer_name[12];
+    u8 reserved_5E[2];
+    u8 *save_data;
+    u8 unk_64[12];
+} GbSavePortView;
+
 typedef u8 GbSaveBoxName[11];
 typedef struct {
     u8 count;
@@ -1027,17 +1040,20 @@ void func_8005B314(u8 *arg0, const u8 *arg1, const u8 *arg2)
 #endif
 
 #ifdef VERSION_US
-extern s32 func_8005B378(s32, s32, s32);
-extern s32 func_8005B4B8(s32, s32, s32);
-extern s32 func_8005B5D4(s32, s32, s32);
-s32 func_8005B6F0(s32 arg0, s32 arg1, s32 arg2) {
+extern void func_8005B378(u8 *, s32, s32);
+extern void func_8005B4B8(u8 *, s32, s32);
+extern void func_8005B5D4(u8 *, s32, s32);
+void func_8005B6F0(u8 *arg0, s32 arg1, s32 arg2) {
     switch (func_8005D92C(arg1)) {
         case 1: case 2: case 3: case 4:
-            return func_8005B378(arg0, arg1, arg2);
+            func_8005B378(arg0, arg1, arg2);
+            return;
         case 5: case 6:
-            return func_8005B4B8(arg0, arg1, arg2);
+            func_8005B4B8(arg0, arg1, arg2);
+            return;
         case 7:
-            return func_8005B5D4(arg0, arg1, arg2);
+            func_8005B5D4(arg0, arg1, arg2);
+            return;
     }
 }
 #endif
@@ -1106,13 +1122,36 @@ void func_8005BA00(u8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005BA88.s")
+extern void func_80060FF8(u8 *, u8 *);
+extern void func_80062BD4(void *, s32, void *);
+extern void *func_8004B7A4(s32);
+extern s32 HAL_Strcmp(const s8 *, const s8 *);
+extern s32 func_8005B1C4(s32 arg0, s32 arg1);
+extern void func_8005B314(u8 *arg0, const u8 *arg1, const u8 *arg2);
+extern u8 D_80128570[];
+void GbSave_ReadGen1BoxPokemon(u8 *mon, s32 port, s32 box, s32 slot) {
+    GbSaveGen1BoxView *base = (GbSaveGen1BoxView *)func_8005B1C4(port, box);
+
+    if (base != 0) {
+        func_80060FF8(mon, base->pokemon[slot]);
+        func_80062BD4(mon, port, (void *)2);
+        bcopy(base->trainer_names[slot], mon + 76, 11);
+        func_8005B314(mon + 52, base->nicknames[slot], (u8 *)func_8004B7A4(mon[0]));
+        func_8005B314(mon + 64, base->trainer_names[slot], ((GbSavePortView *)D_80128570)[port].trainer_name);
+        mon[30] = 0;
+        if (mon[0] == 25 && ((GbSavePortView *)D_80128570)[port].version == 4 &&
+            *(u16 *)(mon + 6) == ((GbSavePortView *)D_80128570)[port].trainer_id &&
+            HAL_Strcmp((s8 *)(mon + 64), (s8 *)(((GbSavePortView *)D_80128570)[port].trainer_name)) == 0) {
+            mon[30] |= 2;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
 extern void func_80061124(u8 *, u8 *);
 extern void func_80062BD4(void *, s32, void *);
-extern s32 func_8004B7A4(s32);
+extern void *func_8004B7A4(s32);
 extern u8 * GbSave_GetGen2BoxBuffer(s32 index, s32 box);
 extern void func_8005B314(u8 *arg0, const u8 *arg1, const u8 *arg2);
 extern u8 D_80128570[];
@@ -1137,11 +1176,11 @@ void GbSave_ReadGen2BoxPokemon(u8 *mon, s32 port, s32 box, s32 slot) {
 
 #ifdef VERSION_US
 s32 func_80057A80(s32);
-extern void func_8005BA88(s32, s32, s32, s32);
+extern void GbSave_ReadGen1BoxPokemon(u8 *, s32, s32, s32);
 extern void GbSave_ReadGen2BoxPokemon(u8 *, s32, s32, s32);
 void func_8005BCF0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     if (func_80057A80(arg1) != 0) {
-        func_8005BA88(arg0, arg1, arg2, arg3);
+        GbSave_ReadGen1BoxPokemon(arg0, arg1, arg2, arg3);
         return;
     }
     GbSave_ReadGen2BoxPokemon(arg0, arg1, arg2, arg3);
@@ -1712,19 +1751,132 @@ s32 func_8005CC14(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005CCD8.s")
+extern u8 D_80128744[];
+extern s32 GbSave_GetBoxCount(s32 index, s32 box);
+extern s32 GbSave_GetRecordCapacity(s32 selector);
+extern u8 D_80128570[];
+s32 GbSave_GetGsRecordCount(s32 selector, s32 port, s32 box) {
+    s32 result = 0;
+    u8 *record = D_80128570 + port * 112;
+    u8 *data = *(u8 **)(record + 96);
+    u8 *mail = *(u8 **)(record + 104);
+    s32 ret;
+
+    switch (selector) {
+    case 32:
+        result = data[2186];
+        break;
+    case 33:
+        result = GbSave_GetBoxCount(port, box);
+        break;
+    case 34:
+        result = data[1150];
+        break;
+    case 35:
+        result = 1;
+        break;
+    case 36:
+        result = mail[1035];
+        if (result >= 11) {
+            result = 0;
+        }
+        break;
+    case 37:
+        result = 6;
+        break;
+    case 42:
+        result = 57;
+        break;
+    case 43:
+        result = data[1055];
+        break;
+    case 44:
+        result = data[1097];
+        break;
+    case 45:
+        result = data[1124];
+        break;
+    }
+    if (result < GbSave_GetRecordCapacity(selector)) {
+        ret = result;
+    } else {
+        ret = GbSave_GetRecordCapacity(selector);
+    }
+    return ret;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005CDDC.s")
+extern s32 GbSave_GetBoxCount(s32 index, s32 box);
+extern s32 GbSave_GetRecordCapacity(s32 selector);
+extern u8 D_80128570[];
+extern s32 D_80128730[];
+s32 GbSave_GetCrystalRecordCount(s32 selector, s32 port, s32 box) {
+    s32 result = 0;
+    u8 *record = D_80128570 + port * 112;
+    u8 *data = *(u8 **)(record + 96);
+    u8 *mail = *(u8 **)(record + 104);
+    s32 ret;
+
+    switch (selector) {
+    case 32:
+        result = data[2149];
+        break;
+    case 33:
+        result = GbSave_GetBoxCount(port, box);
+        break;
+    case 34:
+        result = data[1151];
+        break;
+    case 35:
+        result = 1;
+        break;
+    case 36:
+        result = mail[1035];
+        if (result >= 11) {
+            result = 0;
+        }
+        break;
+    case 37:
+        result = 6;
+        break;
+    case 38:
+        result = ((u8 *)D_80128730[port])[1];
+        break;
+    case 39:
+        result = ((u8 *)D_80128730[port])[0];
+        break;
+    case 40:
+        result = D_80128744[port];
+        break;
+    case 42:
+        result = 57;
+        break;
+    case 43:
+        result = data[1056];
+        break;
+    case 44:
+        result = data[1098];
+        break;
+    case 45:
+        result = data[1125];
+        break;
+    }
+    if (result < GbSave_GetRecordCapacity(selector)) {
+        ret = result;
+    } else {
+        ret = GbSave_GetRecordCapacity(selector);
+    }
+    return ret;
+}
 #endif
 
 #ifdef VERSION_US
 extern s32 GbSave_IsRecordTypeAvailable(u8, u8);
 extern u8 func_8005D92C(s32 index);
 extern s32 func_8005CC14(s32, s32, s32);
-extern s32 func_8005CCD8(s32, s32, s32);
-extern s32 func_8005CDDC(s32, s32, s32);
+extern s32 GbSave_GetGsRecordCount(s32, s32, s32);
+extern s32 GbSave_GetCrystalRecordCount(s32, s32, s32);
 s32 func_8005CF20(s32 arg0, s32 arg1, s32 arg2) {
     s32 result = 0;
     if (GbSave_IsRecordTypeAvailable(arg1, arg0) == 0) {
@@ -1735,10 +1887,10 @@ s32 func_8005CF20(s32 arg0, s32 arg1, s32 arg2) {
             result = func_8005CC14(arg0, arg1, arg2);
             break;
         case 5: case 6:
-            result = func_8005CCD8(arg0, arg1, arg2);
+            result = GbSave_GetGsRecordCount(arg0, arg1, arg2);
             break;
         case 7:
-            result = func_8005CDDC(arg0, arg1, arg2);
+            result = GbSave_GetCrystalRecordCount(arg0, arg1, arg2);
             break;
     }
     return result;
@@ -1863,12 +2015,12 @@ void func_8005D348(s32 arg0, s32 arg1, s32 arg2)
 #ifdef VERSION_US
 extern void func_8005C060(s32 arg0, s32 arg1, s32 arg2);
 extern s32 GbSave_GetRecordCapacity(s32);
-extern s32 func_8005CCD8(s32, s32, s32);
+extern s32 GbSave_GetGsRecordCount(s32, s32, s32);
 extern u8 D_80128570[];
 void func_8005D418(s32 arg0, s32 arg1, s32 arg2) {
     s32 base = *(s32 *)(D_80128570 + arg1 * 112 + 0x60);
     s32 data = *(s32 *)(D_80128570 + arg1 * 112 + 0x68);
-    s32 result = func_8005CCD8(arg0, arg1, arg2);
+    s32 result = GbSave_GetGsRecordCount(arg0, arg1, arg2);
     if (result < GbSave_GetRecordCapacity(arg0)) {
         result++;
         switch (arg0) {
@@ -1922,11 +2074,96 @@ void func_8005D610(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D698.s")
+extern void func_8005C7D0(s32, s32, s32);
+extern void func_8005C8D8(s32, s32, s32);
+extern void func_8005B6F0(u8 *arg0, s32 arg1, s32 arg2);
+extern void func_8005BCF0(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+extern void func_8005C22C(s32 arg0, s32 arg1, s32 arg2);
+extern void func_8005C614(s32 arg0, s32 arg1);
+extern s32 func_8005CF20(s32 arg0, s32 arg1, s32 arg2);
+s32 GbSave_ReadRecord(s32 selector, s32 port, s32 box, s32 slot, s32 output) {
+    s32 result = 0;
+
+    if (slot < func_8005CF20(selector, port, box)) {
+        switch (selector) {
+        case 32:
+            func_8005B6F0((u8 *)output, port, slot);
+            break;
+        case 33:
+            func_8005BCF0(output, port, box, slot);
+            break;
+        case 34:
+            func_8005C22C(output, port, slot);
+            break;
+        case 35:
+            func_8005C614(output, port);
+            break;
+        case 36:
+            func_8005C7D0(output, port, slot);
+            break;
+        case 37:
+            func_8005C8D8(output, port, slot);
+            break;
+        case 38:
+        case 39:
+        case 40:
+            break;
+        }
+        result = 1;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005D778.s")
+extern s32 GbSave_GetRecordCapacity(s32 selector);
+extern void func_8005BA00(u8 *arg0, s32 arg1, s32 arg2);
+extern void func_8005BECC(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+extern void func_8005C394(s32 arg0, s32 arg1, s32 arg2);
+extern void func_8005C750(s32 arg0, s32 arg1);
+extern void func_8005C880(s32 arg0, s32 arg1, s32 arg2);
+extern void func_8005C988(s32 arg0, s32 arg1, s32 arg2);
+extern s32 func_8005CF20(s32 arg0, s32 arg1, s32 arg2);
+extern void func_8005D610(s32 arg0, s32 arg1, s32 arg2);
+s32 GbSave_WriteRecord(s32 selector, s32 port, s32 box, s32 slot, s32 input) {
+    s32 result = 0;
+    s32 capacity;
+    s32 count;
+
+    capacity = GbSave_GetRecordCapacity(selector);
+    count = func_8005CF20(selector, port, box);
+    if (slot < count || (slot == count && slot < capacity)) {
+        switch (selector) {
+        case 32:
+            func_8005BA00(input, port, slot);
+            break;
+        case 33:
+            func_8005BECC(input, port, box, slot);
+            break;
+        case 34:
+            func_8005C394(input, port, slot);
+            break;
+        case 35:
+            func_8005C750(input, port);
+            break;
+        case 36:
+            func_8005C880(input, port, slot);
+            break;
+        case 37:
+            func_8005C988(input, port, slot);
+            break;
+        case 38:
+        case 39:
+        case 40:
+            break;
+        }
+        if (slot == count) {
+            func_8005D610(selector, port, box);
+        }
+        result = 1;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
