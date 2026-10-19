@@ -28,7 +28,7 @@ void LabPC_SortBytePairContents(LabPCBytePair **entries, s32 count, s32 (*compar
 }
 
 // Compare active first-byte ranks, then second bytes descending, then addresses.
-// func_8822D45C selects the rank callback at state offset 0xE4.
+// LabPC_ApplyBytePairSortOrder selects the rank callback at state offset 0xE4.
 s32 LabPC_CompareRankedBytePairs(LabPCBytePair *left, LabPCBytePair *right) {
     s32 result;
     u8 first_rank;
@@ -56,7 +56,7 @@ u8 LabPC_FindPrimaryByteOrderIndex(u8 value) {
     return 0;
 }
 
-// Alternate order selected by func_8822D45C; the same index/absence convention.
+// Alternate order selected by LabPC_ApplyBytePairSortOrder; the same index/absence convention.
 u8 LabPC_FindAlternateByteOrderIndex(u8 value) {
     s32 i;
 
@@ -68,7 +68,79 @@ u8 LabPC_FindAlternateByteOrderIndex(u8 value) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1A03C0/func_8822D45C.s")
+extern u8 *D_88A01C64;
+extern u8 *func_88A00710(s32, s16);
+extern u8 func_88A007BC(s32);
+extern s32 func_88A008CC(u8 *);
+extern s32 func_8800005C(void);
+extern u8 func_800735A0(u8);
+extern u8 func_80073600(u8);
+extern void func_88001D0C(void *);
+typedef struct LabPCSortControl {
+    s32 collection;
+    u8 *selection;
+    u8 (*rank)(u8);
+} LabPCSortControl;
+// Sort the selected collections and restore the selected pair's list position.
+void LabPC_ApplyBytePairSortOrder(u8 mode) {
+    u32 j;
+    s32 group;
+    s32 groups = 1;
+    s32 count;
+    s32 wrote;
+    LabPCBytePair *work[256];
+    LabPCBytePair **cursor;
+    s32 alternate;
+    s32 changed;
+    LabPCBytePair selected;
+    u8 *first;
+
+    changed = 0;
+    selected = *(LabPCBytePair *)func_88A00710(*(s32 *)((u8 *)D_88234940 + 0xDC), *(s16 *)(((LabPCSortControl *)(D_88234940 + 0xDC))->selection + 8));
+    wrote = 0;
+    if (func_8800005C() == 0 && *(s32 *)(D_88234940 + 0xDC) == 0) {
+        groups = 4;
+    }
+    for (group = 0; group != groups; group++) {
+        if (groups == 4) {
+            if (group == 2) continue;
+            count = (D_88A01C64 + group)[1];
+            first = D_88A01C64;
+            first += 2 * (D_88A01C64 + group)[5];
+            first += 9;
+        } else {
+            first = func_88A00710(*(s32 *)(D_88234940 + 0xDC), 0);
+            count = func_88A007BC(*(s32 *)(D_88234940 + 0xDC));
+        }
+        if (count >= 2) {
+            if (!wrote) {
+                *(s32 *)(D_88A01C64 + 4 * *(s32 *)((u8 *)D_88234940 + 0xDC) + 0x104) = 1;
+                alternate = func_88A008CC(first);
+                wrote = 1;
+            }
+            if (mode == 0) {
+                *(u8 (**)(u8))((u8 *)D_88234940 + 0xE4) = alternate ? LabPC_FindAlternateByteOrderIndex : LabPC_FindPrimaryByteOrderIndex;
+            } else {
+                *(u8 (**)(u8))((u8 *)D_88234940 + 0xE4) = alternate ? func_80073600 : func_800735A0;
+            }
+            for (j = 0, cursor = work; j < count; j++, cursor++) {
+                *cursor = (LabPCBytePair *)first;
+                first += 2;
+            }
+            LabPC_SortBytePairContents(work, count, LabPC_CompareRankedBytePairs);
+            changed = 1;
+        }
+    }
+    if (changed) {
+        first = func_88A00710(*(s32 *)(D_88234940 + 0xDC), 0);
+        count = func_88A007BC(*(s32 *)(D_88234940 + 0xDC));
+        for (j = 0; j < count; j++, first += 2) {
+            if (first[0] == selected.first && first[1] == selected.second) break;
+        }
+        *(s16 *)(((LabPCSortControl *)(D_88234940 + 0xDC))->selection + 10) = j - (*(s16 *)(((LabPCSortControl *)(D_88234940 + 0xDC))->selection + 8) - *(s16 *)(((LabPCSortControl *)(D_88234940 + 0xDC))->selection + 10));
+        func_88001D0C(((LabPCSortControl *)(D_88234940 + 0xDC))->selection);
+    }
+}
 
 extern void Input_SetRepeatController(s32);
 extern s32 D_80087200;
@@ -90,7 +162,6 @@ void func_8822D778(void) {
 extern void func_800226C0(s32);
 extern void func_88004990(u8, u8);
 extern void func_88002720(void *, u16, void *);
-extern void func_8822D45C(u8);
 // B closes the dialog; A applies the selected sort order before closing it.
 void LabPC_UpdateSortDialogInput(void) {
     u8 *view;
@@ -104,7 +175,7 @@ void LabPC_UpdateSortDialogInput(void) {
         D_880068B8 = 1;
     } else if (pressed & A_BUTTON) {
         func_800226C0(68);
-        func_8822D45C(view[0x29]);
+        LabPC_ApplyBytePairSortOrder(view[0x29]);
         func_88004990((*(u8 **)D_88234940)[0], 0);
         D_880068B8 = 1;
     } else {

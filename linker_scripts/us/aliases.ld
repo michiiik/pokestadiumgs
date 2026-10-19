@@ -430,3 +430,4 @@ func_8822D7B4 = LabPC_UpdateSortDialogInput;
 func_8822D89C = LabPC_CreateSortDialog;
 func_8822DC84 = LabPC_UpdateListChoiceDialogInput;
 func_8822DEBC = LabPC_DrawListChoiceDialog;
+func_8822D45C = LabPC_ApplyBytePairSortOrder;
