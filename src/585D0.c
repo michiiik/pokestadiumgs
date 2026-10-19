@@ -2,6 +2,23 @@
 
 
 #ifdef VERSION_US
+typedef u8 GbSaveBoxName[11];
+typedef struct {
+    u8 count;
+    u8 species[21];
+    u8 pokemon[20][33];
+    GbSaveBoxName trainer_names[20];
+    GbSaveBoxName nicknames[20];
+} GbSaveGen1BoxView;
+typedef struct {
+    u8 count;
+    u8 species[21];
+    u8 pokemon[20][32];
+    GbSaveBoxName trainer_names[20];
+    GbSaveBoxName nicknames[20];
+    u8 unk_44E[2];
+} GbSaveGen2BoxView;
+
 u16 func_800579D0(const u8* arg0) {
     return (u16)((arg0[1] << 8) | arg0[0]);
 }
@@ -983,7 +1000,7 @@ u8 *GbSave_GetGen2BoxBuffer(s32 index, s32 box) {
 extern s32 func_80062C24(void *);
 extern void func_80060E88(void *, void *);
 extern void _bcopy(s32, s32, s32);
-void func_8005B314(s32 arg0, s32 arg1, s32 arg2)
+void func_8005B314(u8 *arg0, const u8 *arg1, const u8 *arg2)
 {
     u8 buffer[11];
 
@@ -1093,40 +1110,92 @@ void func_8005BA00(u8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005BBD4.s")
+extern void func_80061124(u8 *, u8 *);
+extern void func_80062BD4(void *, s32, void *);
+extern s32 func_8004B7A4(s32);
+extern u8 * GbSave_GetGen2BoxBuffer(s32 index, s32 box);
+extern void func_8005B314(u8 *arg0, const u8 *arg1, const u8 *arg2);
+extern u8 D_80128570[];
+void GbSave_ReadGen2BoxPokemon(u8 *mon, s32 port, s32 box, s32 slot) {
+    GbSaveGen2BoxView *base = (GbSaveGen2BoxView *)GbSave_GetGen2BoxBuffer(port, box);
+
+    if (base != 0) {
+        func_80061124(mon, base->pokemon[slot]);
+        func_80062BD4(mon, port, 0);
+        bcopy(base->trainer_names[slot], mon + 76, 11);
+        func_8005B314(mon + 52, base->nicknames[slot], (u8 *)func_8004B7A4(mon[0]));
+        func_8005B314(mon + 64, base->trainer_names[slot], D_80128570 + port * 112 + 0x52);
+        mon[30] = 0;
+        if (base->species[slot] == 0xFD) {
+            mon[30] |= 1;
+        } else {
+            mon[30] &= ~1;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
 s32 func_80057A80(s32);
 extern void func_8005BA88(s32, s32, s32, s32);
-extern void func_8005BBD4(s32, s32, s32, s32);
+extern void GbSave_ReadGen2BoxPokemon(u8 *, s32, s32, s32);
 void func_8005BCF0(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     if (func_80057A80(arg1) != 0) {
         func_8005BA88(arg0, arg1, arg2, arg3);
         return;
     }
-    func_8005BBD4(arg0, arg1, arg2, arg3);
+    GbSave_ReadGen2BoxPokemon(arg0, arg1, arg2, arg3);
 }
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005BD4C.s")
+extern s32 func_8005B1C4(s32 arg0, s32 arg1);
+extern u8 * func_80060EC8(void *, void *);
+extern void func_800613F8(u8 *, u8 *);
+void GbSave_WriteGen1BoxPokemon(u8 *mon, s32 port, s32 box, s32 slot) {
+    GbSaveGen1BoxView *base = (GbSaveGen1BoxView *)func_8005B1C4(port, box);
+
+    if (base != 0) {
+        func_800613F8(base->pokemon[slot], mon);
+        bcopy(mon + 76, base->trainer_names[slot], 11);
+        func_80060EC8(base->nicknames[slot], mon + 52);
+        base->species[slot] = base->pokemon[slot][0];
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005BE08.s")
+extern void func_800613F8(u8 *, u8 *);
+extern void func_800614EC(u8 *, u8 *);
+extern u8 * GbSave_GetGen2BoxBuffer(s32 index, s32 box);
+extern u8 * func_80060EC8(void *, void *);
+void GbSave_WriteGen2BoxPokemon(u8 *mon, s32 port, s32 box, s32 slot) {
+    GbSaveGen2BoxView *base;
+
+    base = (GbSaveGen2BoxView *)GbSave_GetGen2BoxBuffer(port, box);
+    if (base != 0) {
+        func_800614EC(base->pokemon[slot], mon);
+        func_80060EC8(base->nicknames[slot], mon + 52);
+        bcopy(mon + 76, base->trainer_names[slot], 11);
+        if (mon[30] & 1) {
+            base->species[slot] = 0xFD;
+        } else {
+            base->species[slot] = mon[0];
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
 s32 func_80057A80(s32);
-extern void func_8005BD4C(s32, s32, s32, s32);
-extern void func_8005BE08(s32, s32, s32, s32);
+extern void GbSave_WriteGen1BoxPokemon(u8 *, s32, s32, s32);
+extern void GbSave_WriteGen2BoxPokemon(u8 *, s32, s32, s32);
 void func_8005BECC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     if (func_80057A80(arg1) != 0) {
-        func_8005BD4C(arg0, arg1, arg2, arg3);
+        GbSave_WriteGen1BoxPokemon(arg0, arg1, arg2, arg3);
         return;
     }
-    func_8005BE08(arg0, arg1, arg2, arg3);
+    GbSave_WriteGen2BoxPokemon(arg0, arg1, arg2, arg3);
 }
 #endif
 

@@ -499,3 +499,6 @@ func_8005C9E0 = GbSave_IsRecordTypeAvailable;
 func_8005CAA4 = GbSave_GetRecordCapacity;
 func_8005CBA0 = GbSave_GetRecordSize;
 func_8006092C = GbSave_GetGen2HeaderFlag80;
+func_8005BBD4 = GbSave_ReadGen2BoxPokemon;
+func_8005BD4C = GbSave_WriteGen1BoxPokemon;
+func_8005BE08 = GbSave_WriteGen2BoxPokemon;
