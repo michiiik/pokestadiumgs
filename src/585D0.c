@@ -225,7 +225,26 @@ s32 func_80058850(u8 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_80058880.s")
+extern s32 GbPak_ReadCommand(s32, u8 *, s32, s32);
+extern s32 func_80058850(u8 arg0);
+extern s32 func_8005F790(s32 arg0, u8 arg1);
+extern void func_8005F9CC(s32 arg0, u16 arg1);
+extern u8 D_801285D8[];
+s32 GbSave_ReadGiftDataAndSyncFlags(s32 index) {
+    s32 result;
+    u8 *buffer = *(u8 **)(D_801285D8 + index * 112);
+    s32 i;
+
+    result = GbPak_ReadCommand(index, buffer, 0x600, 0x640) == 0;
+    if (result) {
+        for (i = 1; i != 43; i++) {
+            if (func_8005F790(index, (u8)i)) {
+                func_8005F9CC(index, func_80058850((u8)i));
+            }
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -541,7 +560,7 @@ extern u8 D_80128570[]; s32 func_80059AE0(s32 index) { return (*(u32 *)(D_801285
 #ifdef VERSION_US
 extern s32 main_pool_alloc_with_func(s32, s32, s32, void (*)(s32, u32));
 extern s32 main_pool_try_free(s32);
-extern s32 func_80058880(s32);
+extern s32 GbSave_ReadGiftDataAndSyncFlags(s32);
 extern void func_800596D0(s32 arg0, u32 arg1);
 extern u8 D_80128570[];
 s32 func_80059D00(s32 arg0) {
@@ -550,7 +569,7 @@ s32 func_80059D00(s32 arg0) {
     *(s32 *)(D_80128570 + arg0 * 112 + 0x68) = main_pool_alloc_with_func(0x640, 0, arg0 + 0x44543230, (s32)func_800596D0);
     if (*(s32 *)(D_80128570 + arg0 * 112 + 0x68) != 0) {
         *(s32 *)(D_80128570 + arg0 * 112) |= 2;
-        result = func_80058880(arg0);
+        result = GbSave_ReadGiftDataAndSyncFlags(arg0);
         if (result == 0) main_pool_try_free(*(s32 *)(D_80128570 + arg0 * 112 + 0x68));
     }
     return result;
@@ -942,7 +961,22 @@ s32 func_8005B1C4(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B280.s")
+extern s32 func_8005DB84(s32 arg0);
+extern u8 D_801285D4[];
+u8 *GbSave_GetGen2BoxBuffer(s32 index, s32 box) {
+    u8 *result = 0;
+    s32 state = func_8005DB84(index);
+    u8 *base = *(u8 **)(D_801285D4 + index * 112);
+    s32 offset = box * 0x450;
+    if (state > 0) {
+        if (box >= 7) {
+            result = base + offset + 0x1D0;
+        } else {
+            result = base + offset;
+        }
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1117,13 +1151,13 @@ s32 GbSave_GetGen1BoxCount(s32 index, s32 box) {
 #endif
 
 #ifdef VERSION_US
-u8 *func_8005B280(s32, s32);
+u8 *GbSave_GetGen2BoxBuffer(s32, s32);
 
 u8 func_8005BF78(s32 index, s32 box) {
     u8 *temp_v0;
     u8 var_v1;
 
-    temp_v0 = func_8005B280(index, box);
+    temp_v0 = GbSave_GetGen2BoxBuffer(index, box);
     if (temp_v0 != NULL) {
         var_v1 = *temp_v0;
     } else {
@@ -1164,7 +1198,7 @@ void func_8005BFF0(s32 arg0, s32 arg1, s32 arg2) {
 
 #ifdef VERSION_US
 void func_8005C028(s32 arg0, s32 arg1, s32 arg2) {
-    S1_GbSaveBoxEntry* temp_v0 = func_8005B280(arg0, arg1);
+    S1_GbSaveBoxEntry* temp_v0 = GbSave_GetGen2BoxBuffer(arg0, arg1);
 
     if (temp_v0 != NULL) {
         temp_v0->count = arg2;
