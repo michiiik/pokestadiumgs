@@ -3,13 +3,49 @@
 
 #ifdef VERSION_US
 extern void Game_ShutdownAndLoadFragment(s32, s32);
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056390.s")
+extern u8 D_801283B0;
+extern u8 D_8012855C[];
+s32 GbPak_EnableRamAccess(u8 port) {
+    s32 result;
+    s32 i;
+    u8 status;
+    u8 data[32];
+
+    result = osGbpakGetStatus((OSPfs *)&D_801283B0 + port, &status);
+    if (result != 0) {
+        return result;
+    }
+    for (result = 0; result < 32; result++) {
+        data[result] = 1;
+    }
+    result = osGbpakReadWrite((OSPfs *)&D_801283B0 + port, OS_WRITE, 0x6000, data, 32);
+    if (result != 0) {
+        return result;
+    }
+    i = 0;
+    do {
+        data[i] = 0;
+        i++;
+    } while (i < 32);
+    data[31] = 10;
+    result = osGbpakReadWrite((OSPfs *)&D_801283B0 + port, OS_WRITE, 0, data, 32);
+    if (result != 0) {
+        return result;
+    }
+    D_8012855C[port] = 0xFF;
+    result = osGbpakGetStatus((OSPfs *)&D_801283B0 + port, &status);
+    if (result == 0) {
+        if ((status & OS_GBPAK_POWER) == 0) {
+            result = PFS_ERR_CONTRFAIL;
+        }
+    }
+    return result;
+}
 
 extern u8 D_801283B0;
 extern u8 D_80128550[];
 extern u8 D_8012855C[];
 extern OSMesgQueue D_800CE100;
-extern s32 func_80056390(u8);
 s32 GbPak_SelectRamBank(u8 port, u8 bank) {
     s32 result;
     OSPfs *pfs;
@@ -79,7 +115,6 @@ extern u8 D_801283B0;
 extern u8 D_80128550[];
 extern u8 D_8012855C[];
 extern OSMesgQueue D_800CE100;
-extern s32 func_80056390(u8);
 extern void Game_ShutdownAndLoadFragment(s32, s32);
 extern s32 GbPak_DetectRam(s32 arg0, u8* arg1);
 s32 GbPak_ReadIdAndDetectRam(s32 port, u8 *previous_state, u8 *ram_buffer) {
@@ -99,7 +134,7 @@ s32 GbPak_ReadIdAndDetectRam(s32 port, u8 *previous_state, u8 *ram_buffer) {
     }
     if ((status & OS_GBPAK_RSTB_STATUS) != 0 &&
         osGbpakCheckConnector((OSPfs *)&D_801283B0 + port, &status) == 0) {
-        func_80056390((u8)port);
+        GbPak_EnableRamAccess((u8)port);
         result = GbPak_DetectRam(port, ram_buffer);
     }
     D_80128550[port] = 1;
@@ -200,7 +235,64 @@ s32 func_80056BA4(u8 *arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056C98.s")
+extern u8 D_80128554;
+extern u8 D_80128555;
+extern u8 D_80128556;
+extern u8 D_80128557;
+extern u8 D_80128558;
+extern u8 D_80128550[];
+extern u8 D_801283B0;
+extern OSMesgQueue D_800CE100;
+extern s32 func_8000B690(void);
+s32 GbPak_InitializePorts(void) {
+    s32 port;
+    s32 result;
+    u8 status;
+    OSGbpakId id;
+
+    D_80128555 = 0;
+    D_80128554 = 0;
+    D_80128557 = 0;
+    D_80128558 = 0;
+    osPfsIsPlug(&D_800CE100, &D_80128556);
+    for (port = 0; port != 4; port++) {
+        if ((D_80128556 & (1 << port)) == 0 ||
+            (port == 3 && func_8000B690() != 0)) {
+            continue;
+        }
+        if (osGbpakInit(&D_800CE100, (OSPfs *)&D_801283B0 + port, port) != 0) {
+            continue;
+        }
+        D_80128554 |= 1 << port;
+        result = osGbpakReadId((OSPfs *)&D_801283B0 + port, &id, &status);
+        if (result == 0) {
+            if ((status & OS_GBPAK_RSTB_STATUS) == 0) {
+                Game_ShutdownAndLoadFragment(port, 2);
+            }
+            if (func_80056BA4((u8 *)&id) != 0) {
+                if (osGbpakCheckConnector((OSPfs *)&D_801283B0 + port, &status) == 0) {
+                    u8 *state;
+
+                    GbPak_EnableRamAccess((u8)port);
+                    state = &D_80128550[port];
+                    *state = 1;
+                    D_80128555 |= 1 << port;
+                } else {
+                    Game_ShutdownAndLoadFragment(port, 2);
+                }
+            } else {
+                D_80128555 |= 1 << port;
+                D_80128550[port] = 1;
+            }
+        } else {
+            D_80128550[port] = 0;
+            if (result == PFS_ERR_CONTRFAIL) {
+                Game_ShutdownAndLoadFragment(port, 2);
+            }
+        }
+    }
+    return (D_80128555 << 16) | D_80128554;
+}
 
 s32 GbPak_IsCartOff(s32 arg0) {
     u8 local[12];
@@ -227,7 +319,6 @@ extern u8 D_801283B0;
 extern u8 D_80128550[];
 extern u8 D_8012855C[];
 extern OSMesgQueue D_800CE100;
-extern s32 func_80056390(u8);
 s32 GbPak_InitializeCartridge(s32 port) {
     u8 *state = &D_80128550[port];
     u8 status;
@@ -239,7 +330,7 @@ s32 GbPak_InitializeCartridge(s32 port) {
         osGbpakReadId((OSPfs *)((u8 *)&D_801283B0 + port * sizeof(OSPfs)), &id, &status) == 0 &&
         (status & OS_GBPAK_RSTB_STATUS) != 0 &&
         osGbpakCheckConnector((OSPfs *)((u8 *)&D_801283B0 + port * sizeof(OSPfs)), &status) == 0) {
-        func_80056390((u8)port);
+        GbPak_EnableRamAccess((u8)port);
         *state = 1;
     }
     return *state == 1;
