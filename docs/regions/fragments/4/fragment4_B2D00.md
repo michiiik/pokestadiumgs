@@ -53,15 +53,74 @@ Retail ROM comparison passes, MD5 1561c75d11cedf356a8ddb1a4a5f9d5d.
 No new padding, instruction rewrite, dummy local, coverage update or private
 experiment driver is part of this batch.
 
-### Constructor requeue
+### 2026-10-21: construction and drawing batch accepted
 
-81804954 remains assembly after twelve candidates. Its best result has the
-correct 172-byte extent but raw similarity 0.6977. Ordinary controller guards,
-direct versus locally viewed state pointers, and explicit fifth-argument
-captures preserve the same prefix residual: retail loads that incoming word
-early and saves s0 before ra, whereas the candidate loads it later and changes
-the controller-address temporary sequence. The existing integer fifth-argument
-contract is verified by fragment 5/8 callers; changing it to a pointer does not
-solve the residual. Next: inspect compiler input/emission ordering for the
-fifth-word load and initialization prefix before another spelling grid. Keep
-the owner active as a requeue; do not manufacture frame space or force registers.
+Three more US owners pass the normal runner and retail ROM comparison,
+covering 796 original bytes including the final owner's eight alignment bytes:
+
+- 81804954: WidgetState_Initialize, 172 bytes. Set the state's integer context,
+  reset the two paired variant bytes, initialize progress/status fields, select
+  one of four 40-byte controller slots or NULL, and initialize the definition
+  list. Fragment 5/8 callers establish the five-argument interface. Moving the
+  real context assignment first reproduces the early incoming stack-word load;
+  chained byte clears reproduce the remaining initializer temporary sequence.
+  The passive compiler observer was calibrated against stock/off/on/blank
+  builds before interpreting the incoming-word emission evidence.
+- 81805308: WidgetDefinitions_Draw, 288 bytes. Prepare drawing once, walk a
+  null-terminated definition list, obtain each variant's resource, ask its
+  bounds callback for four signed halfwords, test clipping and optional context
+  visibility, then invoke its draw callback. The existing scissor helper
+  func_818017A8 and rectangle helper func_81801C90 corroborate the draw name.
+  Preserve height-times-width operand order in the positive-area test.
+- 818057D0: WidgetResources_DrawRecords, 336 original bytes. Resolve the
+  variant and transition weight; position the optional offset-28 resource;
+  traverse both signed-ID-terminated, 32-byte drawing-record tables. The first
+  table is enclosed by func_800498C4/func_800499EC and uses weighted alpha;
+  the second calls func_81803964. The actual third float argument of
+  func_81803558 is visible in its mtc1 a2/fa0 and subsequent floating use.
+  Its accepted wrapper func_81805644 now explicitly forwards all three input
+  words. Known/explicit-caller/twenty-blank complete-TU controls prove that
+  correction byte-inert before probing the new owner.
+
+The draw access view is a 32-byte prefix, with callbacks at offsets 8/12 and
+content at 28. Target-compiler assertions verify these offsets and the existing
+56-byte state view. No stored object is introduced or resized. Semantic names
+retain address-keyed linker aliases for assembly and cross-file callers.
+
+Every first successful gate froze the entire changed TU and four collateral
+TUs before returning. Receipts were reread and every artifact externally
+hashed immediately afterward. Fresh named, twenty-blank and target-layout
+controls preserve all 4608 game bytes, all 24 original function starts, and
+semantic relocation targets. The last C symbol is 328 bytes while assembly
+counts 336: the final eight identical zero bytes are natural translation-unit
+alignment, not added source padding. Other function sizes remain identical.
+
+The final named-source normal gate freezes eight complete TUs, including
+direct callees, the frame-time producer, fragment 5/8 constructor callers,
+and core/save collateral. Main object SHA256:
+eac3dfc144b3436b681c69a80978098da3c5faaad1857df5f55fead5accb8f28.
+Main source SHA256:
+ef0bd5654db32ab74f63567641463c4a829937ebe525c916ea359cc504b7dd08.
+Retail ROM MD5: 1561c75d11cedf356a8ddb1a4a5f9d5d.
+Private observers, experiment drivers, coverage changes, padding, dummy locals
+and instruction/relocation rewrites are excluded from this batch.
+
+### Remaining requeues
+
+81805428 remains assembly after 22 source candidates. Best result is 76 bytes,
+with 17/19 instruction words exact: the bit-30 test's shift and branch use t8
+instead of retail t9. Byte/member views, signed/unsigned masks, explicit shifts,
+comparison forms and real flag carriers do not close the tie. Fifteen complete
+stock/blank/off/on observer controls pass on the known TU and two exact retained
+parents. UGEN emits an AND-immediate into t8; the final assembler lowers this
+to the observed shift/sign branch. Next: trace that lowering's input/temporary
+choice, rather than repeat declaration or mask grids. Any accepted two-argument
+interface must also fix fragment 7's func_83006308, which currently omits its
+second actual argument in C; prove that caller cleanup whole-TU byte-inert.
+
+8180567C remains assembly after eight candidates. The well-defined masked-shift
+forms reach 340 bytes and raw similarity 0.7529, but frame size is 56 versus
+retail 72. Local declaration reversal and combined versus explicit status
+computations do not repair this. Next: compare stack-home allocation for the
+weight, mask, selected index and boolean result; do not add unused frame locals.
+81804BC8 and 81804FD0 remain assembly and were not probed in this batch.
