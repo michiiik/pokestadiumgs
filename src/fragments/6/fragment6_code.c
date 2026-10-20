@@ -370,7 +370,72 @@ void Fragment6_DrawSelectionControls(void *definition, u8 *state, u8 *origin) {
     WidgetResources_DrawSelection((s32)definition, (s32)state, (s32)origin);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83101400.s")
+extern Gfx *D_800D0510;
+extern Gfx D_80094DB8[];
+extern u8 D_83103208[], D_83103228[];
+extern void func_800498C4(void);
+extern void func_800499EC(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800495BC(s32, s32, const char *, ...);
+extern void Gfx_FillRectRgba(s16, s16, s16, s16, u8, u8, u8, u8);
+extern void *func_8004C874(s32, s32);
+void Fragment6_DrawAvailableEntryList(void *definition, u8 *state, s16 *origin) {
+    s32 selected;
+    s32 i;
+    s32 label;
+    f32 weight;
+    s32 slot;
+    s32 row_y;
+    s32 scroll;
+
+    func_818054D0(definition, state[31]);
+    weight = func_818055E0(definition, state);
+    selected = -1;
+    if (func_81804A20(state)) {
+        selected = state[64] - 1;
+    }
+    WidgetResources_DrawRecords((s32)definition, (s32)state, (s32)origin);
+    gSPDisplayList(D_800D0510++, D_80094DB8);
+    Gfx_FillRectRgba((s16)(origin[0] + 54), (s16)(origin[1] + 54), 253, 286, 0, 0, 0, (u8)(100.0f * weight));
+    func_800498C4();
+    func_800496A4(8, 1);
+    func_8004972C(255, 255, 255, (s32)(255.0f * weight));
+    for (i = 0; i < 10; i++) {
+        scroll = state[67];
+        label = 31;
+        if (scroll + i > 0) {
+            slot = *((s8 *)state + i + scroll + 171);
+            if (slot < 0) {
+                continue;
+            }
+            if (slot >= 0) {
+                label = slot + 32;
+            } else {
+                label = 62;
+            }
+        }
+        row_y = i * 26;
+        if (i == selected) {
+            func_8004972C(255, 255, 0, (s32)(255.0f * weight));
+        } else if (label == 62) {
+            func_8004972C(128, 128, 128, (s32)(255.0f * weight));
+        } else {
+            func_8004972C(255, 255, 255, (s32)(255.0f * weight));
+        }
+        func_800495BC(origin[0] + 111, origin[1] + row_y + 70, func_8004C874(44, label));
+    }
+    func_800499EC();
+    scroll = state[67];
+    if (scroll > 0) {
+        func_81803964(D_83103208, origin, weight, 0);
+    }
+    scroll = state[67];
+    if (scroll + 10 <= state[203]) {
+        func_81803964(D_83103228, origin, weight, 0);
+    }
+    WidgetResources_DrawSelection((s32)definition, (s32)state, (s32)origin);
+}
 
 extern void func_800226C0(s32);
 void func_83101714(void *arg0, s32 arg1) {
@@ -498,7 +563,6 @@ extern void func_8004C8C0(s32);
 extern void WidgetTree_OpenMessagePanel_fragment4(void *);
 extern void func_8004C594(s32, s32);
 extern void func_817000A4(void);
-extern s32 func_8004C874(s32, s32);
 extern void func_81700974(s32, s32, s32, s32, s32, void *, void *, s32);
 extern void func_81700C70(s32);
 extern void func_81700C0C(s32);
@@ -518,9 +582,9 @@ void func_83101D74(void *arg0) {
     func_8004C594(1, ((u8 *)arg0)[0x40] + ((u8 *)arg0)[0x43] - 1);
     func_8004C594(2, ((u8 *)arg0)[0xCB]);
     func_817000A4();
-    temp_v1 = func_8004C874(0x2C, 0x3F);
+    temp_v1 = (s32)func_8004C874(0x2C, 0x3F);
     func_81700974(0, 0, 0x30, 0x10, temp_v1, D_831038C7, D_831038D0, 0);
-    temp_v1 = func_8004C874(0x2C, 0x40);
+    temp_v1 = (s32)func_8004C874(0x2C, 0x40);
     func_81700974(1, 0x280, 0x30, 8, temp_v1, D_831038C7, D_831038D0, 0);
     if (((u8 *)arg0)[0x1F] != 0) {
         func_81700C70(0);
