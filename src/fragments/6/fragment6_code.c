@@ -173,7 +173,35 @@ void func_83100D10(void *arg0, u8 *arg1, void *arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83100DBC.s")
+extern s32 func_81804A20(void *);
+extern s32 func_81805524(void *, u8 *);
+s32 Fragment6_HandleAvailableListScroll(void *definition, u8 *state) {
+    s32 selection;
+    s32 scroll;
+    s32 handled;
+
+    func_818054D0(definition, state[0x1F]);
+    handled = 0;
+    if (func_81804A20(state)) {
+        selection = state[0x40];
+        if (selection < 2 && (*(u16 *)(state + 0x16) & 0x800) && (scroll = state[0x43]) > 0) {
+            state[0x43] = scroll - 1;
+            func_800226C0(1);
+            handled = 1;
+        } else if (selection >= 10 && (*(u16 *)(state + 0x16) & 0x400)) {
+            scroll = state[0x43];
+            if (scroll + 10 <= state[0xCB]) {
+                state[0x43] = scroll + 1;
+                func_800226C0(1);
+                handled = 1;
+            }
+        }
+    }
+    if (!handled) {
+        handled = func_81805524(definition, state);
+    }
+    return handled;
+}
 
 void func_83100E98(u8 *arg0, s32 arg1)
 {
