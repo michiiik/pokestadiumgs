@@ -576,3 +576,5 @@ func_81803CD4 = WidgetSelection_WrapAngle;
 func_81803D44 = WidgetSelection_AngleDifference;
 func_81804534 = WidgetSelection_DrawMarker;
 func_81802EA0 = WidgetFrame_DrawNineSlice;
+func_83101244 = Fragment6_DrawSelectionControls;
+func_83101C80 = Fragment6_InitializeSelectionState;

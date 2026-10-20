@@ -316,7 +316,59 @@ void func_831011A0(void *arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83101244.s")
+typedef struct {
+    s16 archive, entry, x, y;
+    u8 settings[8];
+    s32 blend;
+    void *styles[3];
+} Fragment6TextRecord;
+typedef struct { Fragment6TextRecord records[3]; } Fragment6TextList;
+extern Fragment6TextList D_83103168;
+extern u8 D_83102B4C[], D_83102B64[], D_83102F64[], D_831031C8[], D_831031E8[];
+extern void WidgetResources_DrawRecords(s32, s32, s32);
+extern void WidgetResources_DrawSelection(s32, s32, s32);
+extern void func_818042E4(void *, void *, void *, f32, s32);
+extern void WidgetText_DrawRecordListWithSetup(u8 *, void *, f32, s32);
+extern void WidgetText_DrawRecordWithSetup(void *, void *, f32, s32);
+extern void WidgetTexture_DrawRecord(u8 *, u8 *, f32, s32);
+extern u8 * func_818054D0(void *, u8);
+extern f32 func_818055E0(void *, u8 *);
+void Fragment6_DrawSelectionControls(void *definition, u8 *state, u8 *origin) {
+    Fragment6TextList text;
+    u8 *resource;
+    f32 weight;
+    Fragment6TextRecord *records;
+    s32 variant;
+
+    text = D_83103168;
+    records = text.records;
+    resource = func_818054D0(definition, state[0x1F]);
+    weight = func_818055E0(definition, state);
+    WidgetResources_DrawRecords((s32)definition, (s32)state, (s32)origin);
+    if (*(void **)(resource + 32) != D_83102B4C) {
+        func_818042E4(D_83102B4C, origin, state, weight, 0);
+    } else {
+        records[0].blend = 1;
+    }
+    if (*(void **)(resource + 32) != D_83102B64) {
+        func_818042E4(D_83102B64, origin, state, weight, 0);
+    } else {
+        records[0].blend = 1;
+    }
+    if (*(void **)(resource + 32) != D_83102F64) {
+        func_818042E4(D_83102F64, origin, state, weight, 0);
+    } else {
+        records[1].blend = 1;
+    }
+    WidgetText_DrawRecordListWithSetup((u8 *)records, origin, weight, 0);
+    variant = 2;
+    if (state[0x1F] == 4 && state[0x3E] < 6) {
+        variant = 0;
+    }
+    WidgetText_DrawRecordWithSetup(D_831031C8, origin, weight, variant);
+    WidgetTexture_DrawRecord(D_831031E8, origin, weight, variant);
+    WidgetResources_DrawSelection((s32)definition, (s32)state, (s32)origin);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83101400.s")
 
@@ -412,7 +464,32 @@ void func_83101C24(void *arg0, u8 *arg1, void *arg2) {
     func_81801CB8(arg2, first_offset, (u8 *)second + 0x10, *(s32 *)(arg1 + 0x2C));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83101C80.s")
+typedef struct {
+    u8 bytes[9];
+} Fragment6SelectionConfiguration;
+extern void _bzero(void *, s32);
+extern void WidgetState_Initialize(void *, s32, s32, void *, s32);
+extern u8 D_831038A0[];
+extern void func_831001A8(u8 *);
+void Fragment6_InitializeSelectionState(void *arg0, void *memory, s32 setup_address) {
+    u8 *state = arg0;
+
+    _bzero(state, 756);
+    *(void **)(state + 0x38) = (void *)setup_address;
+    WidgetState_Initialize(state, *(s8 *)*(void **)(state + 0x38), 9, D_831038A0, (s32)memory);
+    if ((*(u8 **)(state + 0x38))[12] > 0) {
+        *(Fragment6SelectionConfiguration *)(state + 0x3C) = *(Fragment6SelectionConfiguration *)(*(u8 **)(state + 0x38) + 4);
+        state[0x1E] = state[0x1C] = state[0x1D] = state[0x1F] = (*(u8 **)(state + 0x38))[12];
+    } else {
+        state[0x1E] = 1;
+    }
+    *(s16 *)(state + 0x60) = func_83100020();
+    *(s16 *)(state + 0x62) = func_83100020();
+    func_83100584(state);
+    func_831000FC(state);
+    func_831001A8(state);
+    func_83100E98(state, (u8)D_8009F864);
+}
 
 extern void main_pool_push_state(s32);
 extern void func_8004C09C(s32);
@@ -556,7 +633,7 @@ extern void MainPool_FinalizeAllocation(void *);
 extern void Gfx_InitDisplayListBuffers(s32, s32);
 extern s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_80047588(s32, s32);
-extern void func_83101C80(void *, void *, s32);
+extern void Fragment6_InitializeSelectionState(void *, void *, s32);
 extern void func_83101D74(void *);
 extern void func_80008514(s32);
 extern void func_800086A4(s32);
@@ -580,7 +657,7 @@ void func_831020D0(s32 arg0, s32 arg1) {
     Gfx_InitDisplayListBuffers(0x10000, 0);
     sp24 = StageContext_Allocate(1, 0, 2, 0, 2, 1);
     func_80047588(0x1C, 0);
-    func_83101C80(D_831039B0, D_83103CA4, arg1);
+    Fragment6_InitializeSelectionState(D_831039B0, D_83103CA4, arg1);
     func_83101D74(D_831039B0);
     func_80008514(sp24);
     func_800086A4(2);
