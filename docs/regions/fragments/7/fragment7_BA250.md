@@ -121,3 +121,46 @@ func_8300A208: matched (call_chain:state_reload:integer_cast_named_fields), 1 it
 ## 2026-10-12
 
 func_83000F04: matched (call_sequence:permuter_exact:compact_struct_spelling), 1 iterations, agent codex
+
+## 2026-10-21
+
+Four-owner native batch based on 271d80b1: accepted through the recorded
+candidate runner and full US-ROM comparison; original ROM MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+- `func_830018B0` / `Fragment7_DrawSavedRecordList` (396 bytes): header byte 1
+  bounds the names at byte 4 with a 68-byte stride; header byte 0 determines
+  the horizontal separators. Indexed source lets IDO derive both row pointers
+  and the 26-pixel vertical induction. Uses the SDK display-list macro.
+- `func_83002988` / `Fragment7_DrawRecordSummary` (340 bytes): draws the first
+  entry when the count at state byte `0x3D959` is nonzero, copies its draw origin, and
+  draws the icon and the halfword at entry byte 12. A named, used text-alpha
+  intermediate preserves the original coordinate temporary's stack location.
+- `func_83008188` / `Fragment7_DrawSelectedRecordView` (264 bytes): state byte
+  71 chooses the record/data pair; selections at least 4 include byte 87's
+  bank offset. Load the selection inside each branch, then apply the offset
+  with a compound assignment. Combining that update into the address
+  expressions reverses an operand in the generated index addition.
+- `func_8300A898` / `Fragment7_RunSelectionMenu` (328-byte oracle range): loops
+  through selection, device checks, dispatch, and cleanup. Its state pointer
+  alias preserves the state/range-pointer allocation. The C symbol is 320
+  bytes; the remaining eight bytes are unchanged end-of-section alignment
+  nops, included in the assembly symbol. No source padding was added.
+
+`func_8300A81C` receives three arguments from the menu and forwards them to
+the existing three-argument `func_8300A50C`. Making that call explicit is
+whole-object byte-inert and removes the host-only unprototyped-call workaround.
+The complete 43,456-byte text and 224-byte rodata sections and semantic
+relocations agree with the original object. All other function extents agree;
+the menu's verified alignment-tail metadata split is the sole size difference.
+Cleanup and naming also pass fresh and twenty-blank-line whole-unit controls.
+
+`func_83008DC0`: requeue. Ordinary aggregate-copy candidates produce the right
+452-byte size but a 32-byte frame rather than the original 24-byte frame;
+best raw similarity in this batch is 0.7168. Pointer aliases and signed/unsigned
+integer-address spellings retain an extra shared biased-base carrier across
+the sound call. The oracle copies 68 bytes using a compiler-style three-word
+loop and two-word tail. Next inspect the record producers and real state
+layout before choosing a typed field-access representation; do not hand-unroll
+the copy or add artificial fields to force the frame. Earlier compile failures
+were declaration-placement conflicts, not evidence against these source forms.
