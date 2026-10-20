@@ -511,3 +511,5 @@ func_8005C41C = GbSave_ClampInventoryPacket;
 func_8005D194 = GbSave_TruncateCrystalRecordCount;
 func_8005D4FC = GbSave_IncrementCrystalRecordCount;
 func_8005EF78 = GbSave_WriteGen2BoxName;
+func_8005B778 = GbSave_WriteGen1PartyPokemon;
+func_8005A174 = GbSave_ResetPortCache;
