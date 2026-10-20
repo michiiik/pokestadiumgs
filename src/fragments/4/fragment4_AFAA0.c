@@ -469,7 +469,79 @@ void func_81802E54(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802EA0.s")
+typedef struct { s16 left, top, right, bottom; } WidgetFrameInsets;
+typedef struct { s16 s, t, scale, unk_06; } WidgetFrameCornerTile;
+typedef struct {
+    s16 archive, entry;
+    WidgetFrameInsets border;
+    u8 *border_style;
+    WidgetFrameCornerTile corners[4];
+    s16 center_archive, center_entry;
+    WidgetFrameInsets center;
+    u8 *center_style;
+    s16 center_s, center_t, center_width, center_height;
+} WidgetFrameNineSlicePrefix;
+extern void func_81800020(f32, f32, f32, f32, s32, s32, f32, f32);
+extern void Gfx_FillRectRgb(s16, s16, s16, s16, u8, u8, u8);
+extern void Gfx_FillRectRgba(s16, s16, s16, s16, u8, u8, u8, u8);
+void WidgetFrame_DrawNineSlice(WidgetFrameNineSlicePrefix *record, s32 x, s32 y, s32 width, s32 height) {
+    WidgetFrameInsets *border;
+    f32 scale_x;
+    f32 scale_y;
+    WidgetFrameInsets *center;
+
+    border = &record->border;
+    if (width >= border->left + border->right && height >= border->top + border->bottom) {
+        func_81802CA8(record, 0);
+        func_81800020((f32)x, (f32)y, border->left, border->top,
+                     record->corners[0].s, record->corners[0].t, record->corners[0].scale * 0.03125f, record->corners[0].scale * 0.03125f);
+        func_81800020((x + width) - border->right, (f32)y, border->right, border->top,
+                     record->corners[1].s, record->corners[1].t, record->corners[1].scale * 0.03125f, record->corners[1].scale * 0.03125f);
+        func_81800020((f32)x, (y + height) - border->bottom, border->left, border->bottom,
+                     record->corners[2].s, record->corners[2].t, record->corners[2].scale * 0.03125f, record->corners[2].scale * 0.03125f);
+        func_81800020((x + width) - border->right, (y + height) - border->bottom, border->right, border->bottom,
+                     record->corners[3].s, record->corners[3].t, record->corners[3].scale * 0.03125f, record->corners[3].scale * 0.03125f);
+        func_81800020((f32)x, border->top + y, border->left, height - border->bottom - border->top,
+                     record->corners[2].s, record->corners[2].t, record->corners[0].scale * 0.03125f, 0.0f);
+        func_81800020(border->left + x, (f32)y, width - border->left - border->right, border->top,
+                     record->corners[1].s, record->corners[1].t, 0.0f, record->corners[1].scale * 0.03125f);
+        func_81800020((x + width) - border->right, border->top + y, border->right, height - border->bottom - border->top,
+                     record->corners[3].s, record->corners[3].t, record->corners[3].scale * 0.03125f, 0.0f);
+        func_81800020(border->left + x, (y + height) - border->bottom, width - border->left - border->right, border->bottom,
+                     record->corners[3].s, record->corners[3].t, 0.0f, record->corners[2].scale * 0.03125f);
+        if (func_81802CA8(&record->center_archive, record->center_height < 0 || record->center_width < 0) != NULL) {
+            center = &record->center;
+            if (record->center_width >= 0) {
+                scale_x = (f32)record->center_width / (f32)(width - center->left - center->right);
+            } else {
+                scale_x = 1.0f;
+            }
+            if (record->center_height >= 0) {
+                scale_y = (f32)record->center_height / (f32)(height - center->top - center->bottom);
+            } else {
+                scale_y = 1.0f;
+            }
+            func_81800020(center->left + x, center->top + y, (f32)(width - center->left - center->right), (f32)(height - center->top - center->bottom),
+                         record->center_s, record->center_t, scale_x, scale_y);
+        } else {
+            u8 *color = record->center_style;
+
+            center = &record->center;
+
+            if (color[3] >= 255) {
+                Gfx_FillRectRgb((s16)(center->left + x), (s16)(center->top + y),
+                                (s16)(width - center->left - center->right),
+                                (s16)(height - center->top - center->bottom),
+                                color[0], color[1], color[2]);
+            } else {
+                Gfx_FillRectRgba((s16)(center->left + x), (s16)(center->top + y),
+                                 (s16)(width - center->left - center->right),
+                                 (s16)(height - center->top - center->bottom),
+                                 color[0], color[1], color[2], color[3]);
+            }
+        }
+    }
+}
 
 void func_8004989C(s32 arg0);
 void func_800496A4(s32 a0, s32 a1);
@@ -537,7 +609,6 @@ void func_818037A0(u8 *arg0, u8 *arg1, s32 arg2, s32 arg3) {
     if (*(s16 *)(arg1 + 6) < 0) *(s16 *)(arg1 + 6) = (s16)arg3;
 }
 
-extern void func_81800020(f32, f32, f32, f32, s32, s32, f32, f32);
 extern s32 func_8004D1FC(u8 *);
 void func_81803868(u8 *arg0, void *arg1, void *arg2) {
     func_8004D1FC(arg0);
