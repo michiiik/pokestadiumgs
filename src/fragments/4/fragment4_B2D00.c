@@ -124,7 +124,27 @@ void WidgetDefinitions_Initialize(Fragment4DefinitionView **list, Fragment4State
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804954.s")
+void WidgetState_Initialize(Fragment4StateView *state, s32 controller, s32 count, void *definitions, s32 arg4) {
+    state->unk_04 = arg4;
+    state->unk_1C = state->unk_1F = 0;
+    state->unk_1D = state->unk_1E = 0;
+    state->unk_21 = 0;
+    state->count = count;
+    state->unk_28 = 1.0f;
+    state->unk_2C = 1.0f;
+    if (controller >= 0 && controller < 4) {
+        state->controller = D_800CE060 + controller * 40;
+    } else {
+        state->controller = NULL;
+    }
+    state->unk_14 = 0;
+    state->unk_16 = 0;
+    state->unk_18 = 0;
+    state->unk_1A = 0;
+    state->definitions = definitions;
+    state->progress = 0.0f;
+    WidgetDefinitions_Initialize(definitions, state);
+}
 
 extern void func_81804858(s32);
 void WidgetTree_OpenMessagePanel_fragment4(u8 *arg0) {
@@ -187,7 +207,50 @@ s32 WidgetResources_UseTransitionWeight(void *arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804FD0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81805308.s")
+extern void func_81801420(void);
+extern void func_81800A90(void);
+extern void func_81600B30(s32);
+extern s32 func_81600DA8(void *, void *);
+extern s32 func_81801C90(u8 *);
+extern void func_818017A8(void);
+typedef struct {
+    u8 unk_00[8];
+    void (*draw)(void *, void *, s16 *);
+    void (*bounds)(void *, void *, s16 *);
+    u8 unk_10[12];
+    void *content;
+} Fragment4DrawResourceView;
+void WidgetDefinitions_Draw(Fragment4StateView *state) {
+    Fragment4DrawResourceView *resource;
+    Fragment4DefinitionView **list;
+    s32 context;
+    s16 rect[4];
+
+    list = state->definitions;
+    context = state->unk_04;
+    func_81801420();
+    if (list != NULL) {
+        if (context != 0) {
+            func_81600B30(context);
+        }
+        func_81800A90();
+        while (*list != NULL) {
+            resource = (Fragment4DrawResourceView *)func_818054D0(*list, state->unk_1F);
+            if (resource->draw != NULL) {
+                resource->bounds(*list, state, rect);
+                if (func_81801C90((u8 *)rect) != 0) {
+                    if (resource->content == NULL || rect[3] * rect[2] > 0) {
+                        if (context == 0 || func_81600DA8((void *)context, *list) != 0) {
+                            func_818017A8();
+                            resource->draw(*list, state, rect);
+                        }
+                    }
+                }
+            }
+            list++;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81805428.s")
 
@@ -275,14 +338,50 @@ f32 func_818055E0(void *arg0, u8 *arg1) {
 }
 
 extern void func_8180567C(s32, s32, s32);
-extern void func_818057D0();
+extern void WidgetResources_DrawRecords(s32, s32, s32);
 
 void func_81805644(s32 arg0, s32 arg1, s32 arg2) {
-    func_818057D0();
+    WidgetResources_DrawRecords(arg0, arg1, arg2);
     func_8180567C(arg0, arg1, arg2);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_8180567C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_818057D0.s")
+extern void func_81802EA0(void *, s32, s32, s32, s32);
+extern void func_81801E3C(u8 *, u8 *);
+extern void func_800498C4(void);
+extern void func_800499EC(void);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_81803558(u8 *, u8 *, f32, s32);
+extern void func_81803964(u8 *, u8 *, f32, s32);
+void WidgetResources_DrawRecords(s32 arg0, s32 arg1, s32 arg2) {
+    Fragment4ResourceView *resource;
+    u8 *first;
+    u8 *second;
+    f32 weight;
+
+    resource = (Fragment4ResourceView *)func_818054D0((void *)arg0, ((Fragment4StateView *)arg1)->unk_1F);
+    first = resource->unk_24;
+    second = resource->unk_28;
+    weight = func_818055E0((void *)arg0, (u8 *)arg1);
+    if (resource->unk_1C != NULL) {
+        func_81802EA0(resource->unk_1C, ((s16 *)arg2)[0], ((s16 *)arg2)[1], ((s16 *)arg2)[2], ((s16 *)arg2)[3]);
+        func_81801E3C((u8 *)arg2, (u8 *)resource->unk_1C + 72);
+    }
+    if (first != NULL) {
+        func_800498C4();
+        func_8004972C(255, 255, 255, (s32)(255.0f * weight));
+        while (*(s16 *)first >= 0) {
+            func_81803558(first, (u8 *)arg2, weight, 0);
+            first += 32;
+        }
+        func_800499EC();
+    }
+    if (second != NULL) {
+        while (*(s16 *)second >= 0) {
+            func_81803964(second, (u8 *)arg2, weight, 0);
+            second += 32;
+        }
+    }
+}
 #endif

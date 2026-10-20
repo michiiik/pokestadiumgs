@@ -13,6 +13,10 @@ func_81804720 = WidgetResources_Release;
 func_818048A4 = WidgetDefinitions_Initialize;
 func_81804A2C = WidgetState_AdvanceTransition;
 func_81804B74 = WidgetResources_UseTransitionWeight;
+/* Fragment 4 state construction and rectangle/resource drawing. */
+func_81804954 = WidgetState_Initialize;
+func_81805308 = WidgetDefinitions_Draw;
+func_818057D0 = WidgetResources_DrawRecords;
 /* func_800195C0 reads and writes this same byte in the original assembly. */
 Audio_AiHdwrBugFlag = D_8008FAA0;
 /* Preserve address-keyed rectangle calls alongside the verified narrow API. */
