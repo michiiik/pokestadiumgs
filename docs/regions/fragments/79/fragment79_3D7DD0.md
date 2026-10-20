@@ -111,33 +111,56 @@ function extents, all 7200 text bytes and the exact 48-byte pool. Canonical/
 named, native/public-wrapper, twenty-leading-blank and target-layout controls
 pass. Full-ROM MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 
-### Update requeues
+### Six-slot updates (2026-10-20)
 
-`func_84168CA4`: **requeue**. The donor-shaped 924-byte candidate has an
-isolated relocation-masked hit but calls the wrong GS anchor helper; the
-full-ROM gate correctly rejects it. Retail calls `func_84109780`, whose
-existing interface accepts an address as `s32`. Correct-interface candidates
-use `(s32)&anchor` and currently produce 856-byte bodies with different
-allocation and division-check scheduling. Do not install the wrong helper,
-reinterpret a relocation mask as acceptance, or introduce an invented
-pointer prototype. Next investigate a genuinely consumed address carrier
-and its lifetime with the actual helper interface. Retail also reads a phase
-local without initializing it; this is an original bug, not permission to
-invent a phase initialization.
+Both update requeues are resolved by normal full-ROM acceptance:
 
-`func_84169040`: **requeue**. GS uses a completion-triggered fifty-tick
-deadline and a twenty-tick fade, rather than the donor's per-record seventy-
-tick threshold. Real pool-base and counter initialization variants produce
-the correct 468-byte size, but allocation and prologue scheduling still
-differ. Getter return type remains the actual `u32`; signed consumed flags,
-named active-state constants and earlier base initialization do not close
-the residual. Next inspect the retained allocation/lifetime diagnostics
-before repeating that initialization family.
+| Original owner | Name | Body bytes |
+| --- | --- | ---: |
+| `func_84168CA4` | `BattleAnim_SixSlotTrail_UpdateSlot` | 924 |
+| `func_84169040` | `BattleAnim_SixSlotTrail_UpdateAll` | 468 |
+
+UpdateSlot anchors nodes during their countdown using randomized sine
+offsets, then integrates their velocity, angle and bounded scale. Its GS
+anchor helper is `func_84109780`, whose real interface accepts an address
+as `s32`. A consumed `S1_Vec3f *anchor_pointer`, initialized before the node
+loop and passed as `(s32)anchor_pointer`, reproduces the retail allocation
+and division checks. This preserves the real helper definition and callers;
+no pointer prototype is invented. Direct address casts and late pointer
+carriers produced the earlier 856-byte nonmatches.
+
+The donor helper had the wrong relocation even when the isolated instruction
+shape matched; the full-ROM gate rejected it. The accepted source uses the
+correct helper, pointer lifetime and actual float-returning sine prototype.
+Retail reads the phase local without initializing it (the original assembly
+loads its stack slot before any store). The C preserves that original bug
+with an explicit `//!bug` comment; it does not invent an initialization or
+claim deterministic phase behavior.
+
+UpdateAll increments the GS tick, observes the real `u32` getter through a
+consumed signed flag, sets a fifty-tick completion deadline once, updates
+active slots and applies the final twenty-tick fade. Initializing the live
+record count after the completion-trigger check reproduces the saved-register
+assignment and scheduling; keeping it live across the getter did not. The
+pool pointer is computed before the tick update. Both lifetimes represent
+consumed values; no unused locals, padding, forced registers, manual unrolling
+or instruction/relocation rewrites are added. Original-address aliases remain.
+
+Each first-success gate froze the complete changed object and four collateral
+objects before returning; receipt counts and every external SHA-256 were
+rechecked before further compilation. The named/cleanup gate freezes fourteen
+whole units. Independent unmodified-linker checks cover original, both
+accepted and named stages: all eighteen function extents, all 7200 text bytes
+and all 48 pool bytes are retail-identical. Canonical/named, native/public-
+wrapper, twenty-leading-blank and target-layout controls pass; all thirteen
+collateral fingerprints are unchanged. The relocation-masked probes are not
+the acceptance proof: both normal sequential full-ROM gates and the final
+named gate pass. ROM MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 
 ## Remaining owners and inherited work
 
-Five owners remain assembly: `func_84168B00`, `func_84168C18`,
-`func_84168CA4`, `func_84169040` and `func_84169618`. Their constant-pool
+Three owners remain assembly: `func_84168B00`, `func_84168C18`
+and `func_84169618`. Their constant-pool
 layout prerequisite is now verified; their function bodies still require
 normal runner acceptance and full-ROM verification.
 
