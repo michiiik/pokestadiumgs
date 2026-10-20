@@ -572,3 +572,6 @@ func_81801FE8 = WidgetTexture_TileViewport;
 func_818024B0 = WidgetTexture_SetWeightedColors;
 func_81802BAC = WidgetTexture_ApplyStyle;
 func_81803964 = WidgetTexture_DrawRecord;
+func_81803CD4 = WidgetSelection_WrapAngle;
+func_81803D44 = WidgetSelection_AngleDifference;
+func_81804534 = WidgetSelection_DrawMarker;
