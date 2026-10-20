@@ -63,7 +63,6 @@ typedef struct { u32 words[2]; } Words818017A8;
 extern Rect818017A8 D_81805FE0;
 extern void Gfx_SetScissorRect(Gfx **, s32, s32, s32, s32);
 extern Gfx * D_800D0510;
-extern u8 * D_81805930;
 void func_818017A8(void) {
     Gfx_SetScissorRect(&D_800D0510, *(s16 *)(D_81805930 + 0), *(s16 *)(D_81805930 + 2), *(s16 *)(D_81805930 + 4), *(s16 *)(D_81805930 + 6));
     D_81805FE0 = *(Rect818017A8 *)D_81805930;
@@ -193,8 +192,6 @@ void func_81801CB8(u8 *arg0, u8 *arg1, u8 *arg2, f32 arg3) {
 
 extern void Gfx_SetScissorRect(Gfx **, s32, s32, s32, s32);
 extern void func_81801A10(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
-extern Gfx * D_800D0510;
-extern u8 * D_81805930;
 void func_81801D04(u8 *arg0) {
     s32 x, y, w, h;
     s32 max_x, max_y;
@@ -264,7 +261,31 @@ u8 *WidgetTexture_GetDescriptor(void *arg0) {
     return value;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801FE8.s")
+extern Gfx D_80094E38[];
+extern Gfx D_80094F50[];
+extern s32 func_8004CA10(u16 *);
+extern s32 func_8004CA24(u16 *);
+extern s32 func_8004D19C(s32, s32, s32, s32, s32);
+void WidgetTexture_TileViewport(void *arg0, u8 red, u8 green, u8 blue) {
+    u8 *texture;
+    s32 x;
+    s32 y;
+
+    texture = WidgetTexture_GetDescriptor(arg0);
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
+    gDPSetEnvColor(D_800D0510++, red, green, blue, 255);
+    x = *(s16 *)(D_81805930 + 0);
+    while (x < *(s16 *)(D_81805930 + 4)) {
+        y = *(s16 *)(D_81805930 + 2);
+        while (y < *(s16 *)(D_81805930 + 6)) {
+            func_8004D19C(x, y, (s32)texture, 0, 0);
+            y += func_8004CA24((u16 *)texture);
+        }
+        x += func_8004CA10((u16 *)texture);
+    }
+    gSPDisplayList(D_800D0510++, D_80094F50);
+}
 
 u8 *WidgetText_GetString(void *arg0) {
     u8 *value;
@@ -291,7 +312,6 @@ u8 *WidgetText_GetBufferedString(void *arg0) {
     return value;
 }
 
-extern Gfx *D_800D0510;
 void func_81802208(s32 arg0, f32 arg1) {
     if (arg1 < 1.0f) {
         gDPSetRenderMode(D_800D0510++, 0x00504240, 0);
@@ -331,7 +351,13 @@ void func_81802438(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_818024B0.s")
+extern s32 func_8180128C(u8 *);
+void WidgetTexture_SetWeightedColors(void *arg0, f32 weight) {
+    u8 *style = arg0;
+
+    gDPSetPrimColor(D_800D0510++, 0, 0, style[4], style[5], style[6], (f32)style[7] * weight);
+    gDPSetEnvColor(D_800D0510++, style[0], style[1], style[2], (f32)style[3] * weight);
+}
 
 extern void func_80049770(s32, s32, s32, s32, s32);
 extern void func_80049828(s32, s32, s32, s32, s32);
@@ -349,8 +375,12 @@ void func_81802690(u8 *arg0, f32 arg1) {
 extern void func_81802438(s32);
 extern void func_81802208(s32, f32);
 extern void func_81802308(s32);
-extern void func_818024B0(s32, s32);
-void func_81802BAC(s32 arg0, s32 arg1) { func_81802438(arg0); func_81802208(arg0, *(f32 *)&arg1); func_81802308(arg0); func_818024B0(arg0, arg1); }
+void WidgetTexture_ApplyStyle(void *style, f32 weight) {
+    func_81802438((s32)style);
+    func_81802208((s32)style, weight);
+    func_81802308((s32)style);
+    WidgetTexture_SetWeightedColors(style, weight);
+}
 
 s32 func_81802BF0(s32 arg0) {
     s32 count = 0;
@@ -400,7 +430,7 @@ u8 *func_81802CA8(void *arg0, s32 arg1) {
     }
     func_81802208(*(s32 *)((u8 *)(u32)arg0 + 0xC), 1.0f);
     func_81802308(*(s32 *)((u8 *)(u32)arg0 + 0xC));
-    func_818024B0(*(s32 *)((u8 *)(u32)arg0 + 0xC), 0x3F800000);
+    WidgetTexture_SetWeightedColors(*(void **)((u8 *)arg0 + 12), 1.0f);
     return value;
 }
 
@@ -515,10 +545,31 @@ void func_81803868(u8 *arg0, void *arg1, void *arg2) {
 }
 void func_81803868_padding(void) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803964.s")
+void WidgetTexture_DrawRecord(u8 *record, u8 *origin, f32 weight, s32 variant) {
+    u8 *texture;
+    u32 size;
+    Rect818017A8 destination;
+    Rect818017A8 source_rect;
+    s32 height;
+    s32 width;
 
-extern void func_81803964(u8 *, u8 *, f32, s32);
-void func_81803A74(u8 *arg0, u8 *arg1, f32 arg2, s32 arg3) { while (*(s16 *)arg0 >= 0) { func_81803964(arg0, arg1, arg2, arg3); arg0 += 0x20; } }
+    texture = WidgetTexture_GetDescriptor(record);
+    size = (u32)func_8180128C(texture);
+    destination = *(Rect818017A8 *)(record + 4);
+    source_rect = *(Rect818017A8 *)(record + 12);
+    func_81801854((u8 *)&destination, (u8 *)&destination, origin);
+    width = func_8004CA10((u16 *)texture);
+    height = func_8004CA24((u16 *)texture);
+    func_818037A0((u8 *)&destination, (u8 *)&source_rect, width, height);
+    WidgetTexture_ApplyStyle(*(void **)(record + 20 + variant * 4), weight);
+    if (size <= 4096U) {
+        func_81803868(texture, &destination, &source_rect);
+    } else {
+        func_8004D19C(destination.x, destination.y, (s32)texture, 0, 1);
+    }
+}
+
+void func_81803A74(u8 *arg0, u8 *arg1, f32 arg2, s32 arg3) { while (*(s16 *)arg0 >= 0) { WidgetTexture_DrawRecord(arg0, arg1, arg2, arg3); arg0 += 0x20; } }
 
 s32 func_81803AE4(u16 arg0) {
     if (arg0 & 0x8000)
