@@ -305,9 +305,65 @@ void AuxiliaryEffect_Update(s16 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84169F18.s")
+extern f32 __sinf(f32);
+extern u32 Gfx_AllocDisplayList(s32);
+extern Gfx D_84188690[];
+extern u8 *D_80094908;
+extern void func_80070DEC(f32 [4][4], void *);
+Gfx* AuxiliaryEffect_DrawOne(Gfx* gfx, AuxiliaryEffectNode* node, Mtx* billboard_matrix) {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 scale;
+    Mtx* model_matrix;
+    Mtx translation_matrix;
+    Mtx scale_matrix;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_8416A050.s")
+    x = node->unk_0C.x;
+    y = node->unk_0C.y;
+    z = node->unk_0C.z;
+    scale = node->unk_08;
+    scale *= __sinf((node->unk_04 * 3.1415927f) / 10.0f);
+
+    guScale(&scale_matrix, scale, scale, scale);
+    guTranslate(&translation_matrix, x, y, z);
+    model_matrix = (Mtx *)Gfx_AllocDisplayList(sizeof(Mtx) * 1);
+    guMtxCatL(&scale_matrix, &translation_matrix, model_matrix);
+    guMtxCatL(billboard_matrix, model_matrix, model_matrix);
+
+    gSPMatrix(gfx++, model_matrix, G_MTX_PUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gDPSetPrimColor(gfx++, 0, 0, 255, 255, 255, 200);
+    gSPDisplayList(gfx++, D_84188690);
+    gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
+
+    return gfx;
+}
+
+Gfx* AuxiliaryEffect_Draw(s16 slot, Gfx* gfx) {
+    AuxiliaryEffect* effect = &((AuxiliaryEffect *)D_84187E40)[slot];
+    AuxiliaryEffectNode* node;
+    s32 i;
+    Mtx *billboard_matrix;
+    f32 float_matrix[4][4];
+    Mtx fixed_matrix;
+
+    if (effect->unk_000 == 0) {
+        return gfx;
+    }
+
+    billboard_matrix = &fixed_matrix;
+    func_80070DEC(float_matrix, D_80094908 + 100);
+    guMtxF2L(float_matrix, &fixed_matrix);
+
+    node = &effect->unk_004[0];
+    for (i = 0; i < 20; i++, node++) {
+        if (node->unk_00 == 1) {
+            gfx = AuxiliaryEffect_DrawOne(gfx, node, billboard_matrix);
+        }
+    }
+
+    return gfx;
+}
 
 void func_8416A140(void) {}
 void func_8416A140_padding(void) {}

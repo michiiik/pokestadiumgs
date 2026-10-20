@@ -70,14 +70,76 @@ Provenance covers exactly five actual replacements; four pragmas relocated
 past the moved type declarations remain unchanged, and their assembly words
 are independently checked against retail. Claims and alias checks pass.
 
+## Auxiliary drawing and constant-pool layout (2026-10-20)
+
+`func_84169F18` is now `AuxiliaryEffect_DrawOne` (312 bytes), and
+`func_8416A050` is `AuxiliaryEffect_Draw` (240 bytes). DrawOne applies a
+sine-scaled node size, translation and the supplied fixed billboard matrix,
+then emits the matrix, primitive-color and static display-list commands.
+Draw visits twenty active nodes in the selected auxiliary record. It derives
+a float matrix from the shared render-state matrix at offset 100, converts
+it to a real fixed `Mtx`, and passes that matrix to DrawOne.
+
+The allocator retains its actual `u32(s32)` interface and explicitly converts
+the returned address to `Mtx *`. The float matrix is a real `f32[4][4]` and
+the conversion destination is a fixed `Mtx`. A consumed `billboard_matrix`
+pointer fixes the float matrix's stack location while preserving retail's
+temporary register sequence; a cached active flag and node-count variants do
+not. Neither accepted body adds unused storage, fake matrix types, padding,
+forced registers, manual unrolling or binary/relocation rewrites.
+
+The module owns the 48-byte pool at ROM 0x3FC1B0..0x3FC1E0, VMA
+0x8418C920..0x8418C950. The YAML now assigns that exact range as its per-file
+`.rodata` subsegment and leaves the following shared pool at 0x3FC1E0. The
+reviewed linker keeps all earlier contributions in place and advances only
+that following pool input. Isolated baseline/migrated, known and leading-
+blank controls reproduce all eighteen extents, all 7200 retail text bytes
+and all 48 pool bytes before adoption. Scoped generated extraction preserves
+all C sources and the reviewed linker; the superseded generated source is
+archived privately. The normal layout-only ROM gate passes before probing.
+
+Both draw owners have runner acceptance and link-verified matches, followed
+by normal full-ROM gates. Each first-success callback freezes the complete
+changed translation unit and four collateral objects, and every receipt and
+external SHA-256 is rechecked before further compilation. A fresh final gate
+freezes fourteen whole objects. All thirteen collateral game fingerprints
+remain equal to the earlier lifecycle baseline despite the layout rebuild.
+
+Independent unmodified-linker verification covers original, layout-only,
+both accepted stages and named/cleanup objects, including all eighteen
+function extents, all 7200 text bytes and the exact 48-byte pool. Canonical/
+named, native/public-wrapper, twenty-leading-blank and target-layout controls
+pass. Full-ROM MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+### Update requeues
+
+`func_84168CA4`: **requeue**. The donor-shaped 924-byte candidate has an
+isolated relocation-masked hit but calls the wrong GS anchor helper; the
+full-ROM gate correctly rejects it. Retail calls `func_84109780`, whose
+existing interface accepts an address as `s32`. Correct-interface candidates
+use `(s32)&anchor` and currently produce 856-byte bodies with different
+allocation and division-check scheduling. Do not install the wrong helper,
+reinterpret a relocation mask as acceptance, or introduce an invented
+pointer prototype. Next investigate a genuinely consumed address carrier
+and its lifetime with the actual helper interface. Retail also reads a phase
+local without initializing it; this is an original bug, not permission to
+invent a phase initialization.
+
+`func_84169040`: **requeue**. GS uses a completion-triggered fifty-tick
+deadline and a twenty-tick fade, rather than the donor's per-record seventy-
+tick threshold. Real pool-base and counter initialization variants produce
+the correct 468-byte size, but allocation and prologue scheduling still
+differ. Getter return type remains the actual `u32`; signed consumed flags,
+named active-state constants and earlier base initialization do not close
+the residual. Next inspect the retained allocation/lifetime diagnostics
+before repeating that initialization family.
+
 ## Remaining owners and inherited work
 
-Seven owners remain assembly: `func_84168B00`, `func_84168C18`,
-`func_84168CA4`, `func_84169040`, `func_84169618`, `func_84169F18` and
-`func_8416A050`. The shared rodata pool begins at ROM 0x3FC1B0; constant-using
-owners need an independently verified per-file layout before C literal pools
-can replace that assembly. Do not infer layout acceptance from the lifecycle
-functions, which add no allocated non-text sections.
+Five owners remain assembly: `func_84168B00`, `func_84168C18`,
+`func_84168CA4`, `func_84169040` and `func_84169618`. Their constant-pool
+layout prerequisite is now verified; their function bodies still require
+normal runner acceptance and full-ROM verification.
 
 The existing texture loader's unused locals and the existing empty padding
 function are inherited and unresolved. They are unchanged and are not counted
