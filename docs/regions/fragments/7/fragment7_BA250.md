@@ -164,3 +164,42 @@ loop and two-word tail. Next inspect the record producers and real state
 layout before choosing a typed field-access representation; do not hand-unroll
 the copy or add artificial fields to force the frame. Earlier compile failures
 were declaration-placement conflicts, not evidence against these source forms.
+
+### Record collection follow-up
+
+Four further owners accepted natively from e11cb2c1: `func_83001A3C`
+(`Fragment7_DrawFirstRecordListPanel`, 360 bytes), `func_83001BA4`
+(`Fragment7_DrawSecondRecordListPanel`, 520 bytes), `func_83008DC0`
+(`Fragment7_SelectSavedRecord`, 452 bytes), and `func_830096B8`
+(`Fragment7_InitializeRecordCollections`, 488 bytes). Every owner passed the
+recorded runner and full US-ROM comparison. The selector requeue above is closed.
+
+The list layout is witnessed by `func_8300AA58` clearing 548 bytes and setting
+capacity 5 or 8, and by `func_8300AAD4` / `func_8300AB58` copying 68-byte
+entries after the four-byte header. Thus each list reserves eight entries;
+the first list uses only five. Those functions are in
+`src/fragments/7/fragment7_C4C10.c` and its matching assembly owners. The
+selector's typed list accesses recover its original 24-byte frame without
+an artificial base pointer, manual copy loop, or source padding.
+
+The initializer's paired blocks are 548, 7012, and 4356 bytes, from the
+clearing sizes in `func_8300AA58`, `func_8300AEEC`, and `func_8300B330`.
+Together they occupy 23,832 bytes. The initializer copies that complete region
+from state offset `0x39E48` to the snapshot at `0x34130`; `func_83009EC4`
+independently compares the same paired block sizes and complete snapshot range.
+The typed views leave preceding/intervening bytes explicitly unknown. Reusing
+the early title-result pointer and expressing repeated collection addresses
+directly lets IDO synthesize its original temporaries and 56-byte frame.
+
+The panel defaults are eight-byte rectangle objects, copied with aligned word
+loads. Table rectangles start at `D_8300C01C + index * 24 - 18` and require
+unaligned loads. Declare the default objects as rectangles directly rather
+than casting a byte/word array address. The second panel's two-instruction
+argument-preparation residual is source-line-sensitive: an ordinary one-line
+guard around its single list-draw call matches. No multi-statement line group,
+line-number pragma, instruction rewrite, or register constraint is retained.
+
+All original game section bytes, function extents, and semantic relocations
+agree in the frozen first-success objects. Cleanup, naming, and twenty-blank-line
+controls preserve that complete-object result. Seventeen target-compiler layout
+assertions check record/list/collection sizes and the used state-field offsets.

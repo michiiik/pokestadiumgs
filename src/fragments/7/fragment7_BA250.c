@@ -245,11 +245,77 @@ void Fragment7_DrawSavedRecordList(u8 *records, s32 x, s32 y, f32 weight) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83001A3C.s")
+typedef struct { s16 x, y, width, height; } Fragment7ListRect;
+extern Fragment7ListRect D_8300C0F4;
+extern Fragment7ListRect D_8300C0FC;
+extern u8 D_8300C01C[];
+extern f32 D_8300FAA8;
+extern f32 D_8300FAAC;
+extern f32 D_8300FAB0;
+extern f32 D_8300FAB4;
+extern void Fragment7_DrawSavedRecordList(u8 *records, s32 x, s32 y, f32 weight);
+extern void WidgetResources_DrawRecords(s32, s32, s32);
+extern void func_8004B2CC(s32, s32, s32, s32, s32, s32, s32, s32);
+extern void func_81801854(void *, void *, void *);
+extern f32 func_818055E0(void *, u8 *);
+extern void func_8180567C(s32, void *, void *);
+void Fragment7_DrawFirstRecordListPanel(s32 definition, void *memory, Fragment7DrawOrigin *origin) {
+    u8 *state = memory;
+    f32 weight;
+    Fragment7ListRect rect;
+
+    weight = func_818055E0((void *)definition, state);
+    WidgetResources_DrawRecords(definition, (s32)state, (s32)origin);
+    if (weight > D_8300FAA8) {
+        Fragment7_DrawSavedRecordList(state + 0x39E48, origin->x, origin->y, weight);
+    }
+    rect = D_8300C0F4;
+    if (state[70] == 1 && (state[31] == 40 || state[31] == 41)) {
+        rect = *(Fragment7ListRect *)(D_8300C01C + state[76] * 24 - 18);
+    }
+    if (weight > D_8300FAAC && rect.width > 0) {
+        func_81801854(&rect, &rect, origin);
+        func_8004B2CC(rect.x, rect.y, rect.width, rect.height, 150, 150, 90, 0);
+    }
+    func_8180567C(definition, state, origin);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83001BA4.s")
+extern void Fragment7_DrawSavedRecordList(u8 *records, s32 x, s32 y, f32 weight);
+extern void WidgetResources_DrawRecords(s32, s32, s32);
+extern void func_8004B2CC(s32, s32, s32, s32, s32, s32, s32, s32);
+extern void func_81801854(void *, void *, void *);
+extern f32 func_818055E0(void *, u8 *);
+extern void func_8180567C(s32, void *, void *);
+extern s32 func_8300AED8(void *);
+extern u8 D_8300C01C[];
+extern f32 D_8300FAB0;
+extern f32 D_8300FAB4;
+void Fragment7_DrawSecondRecordListPanel(s32 definition, void *memory, Fragment7DrawOrigin *origin) {
+    u8 *state = memory;
+    f32 weight;
+    Fragment7ListRect rect;
+
+    weight = func_818055E0((void *)definition, state);
+    WidgetResources_DrawRecords(definition, (s32)state, (s32)origin);
+    if (weight > D_8300FAB0) Fragment7_DrawSavedRecordList(state + 0x3A06C, origin->x, origin->y, weight);
+    rect = D_8300C0FC;
+    if (state[82] > 0) {
+        rect = *(Fragment7ListRect *)(D_8300C01C + state[82] * 24 - 18);
+    }
+    if (state[31] == 41 && state[70] == 4) {
+        rect = *(Fragment7ListRect *)(D_8300C01C + state[77] * 24 - 18);
+    }
+    if (state[31] == 41 && state[70] == 1 && func_8300AED8(state + 0x3A06C)) {
+        rect = *(Fragment7ListRect *)(D_8300C01C + state[77] * 24 - 18);
+    }
+    if (weight > D_8300FAB4 && rect.width > 0) {
+        func_81801854(&rect, &rect, origin);
+        func_8004B2CC(rect.x, rect.y, rect.width, rect.height, 150, 150, 90, 0);
+    }
+    func_8180567C(definition, state, origin);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1135,7 +1201,50 @@ void func_83008D18(s32 arg0, void *arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008DC0.s")
+typedef struct { u32 words[17]; } Fragment7SavedRecord;
+typedef struct {
+    u8 capacity;
+    u8 count;
+    u16 flags;
+    Fragment7SavedRecord records[8];
+} Fragment7SavedRecordList;
+typedef struct {
+    u8 unk_00000[30];
+    u8 mode;
+    u8 unk_0001F[0x39E48 - 31];
+    Fragment7SavedRecordList lists[2];
+    u8 unk_3A290[0x3FE84 - 0x3A290];
+    Fragment7SavedRecord selected_record;
+    s32 action;
+    u8 active;
+} Fragment7RecordSelectionState;
+extern void func_800226C0(s32);
+void Fragment7_SelectSavedRecord(Fragment7RecordSelectionState *state, s32 selected) {
+    if (selected == -1) {
+        state->mode = 35;
+        func_800226C0(3);
+        return;
+    }
+    if (selected >= 6) {
+        if (selected <= state->lists[1].count + 5) {
+            state->active = 1;
+            func_800226C0(144);
+            state->selected_record = state->lists[1].records[selected - 6];
+            state->action = 0x700;
+        } else {
+            func_800226C0(5);
+        }
+    } else if (selected > 0) {
+        if (selected <= state->lists[0].count) {
+            state->active = 1;
+            func_800226C0(144);
+            state->selected_record = state->lists[0].records[selected - 1];
+            state->action = 0x700;
+        } else {
+            func_800226C0(5);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1201,7 +1310,79 @@ void func_830094C8(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830096B8.s")
+typedef struct { u32 words[292]; } Fragment7TeamRecord;
+typedef struct { u8 header[4]; Fragment7TeamRecord records[6]; } Fragment7TeamRecordList;
+typedef struct { u32 words[136]; } Fragment7OtherRecord;
+typedef struct { u8 header[4]; Fragment7OtherRecord records[8]; } Fragment7OtherRecordList;
+typedef struct {
+    Fragment7SavedRecordList saved[2];
+    Fragment7TeamRecordList teams[2];
+    Fragment7OtherRecordList other[2];
+} Fragment7RecordCollections;
+typedef struct { u8 unk_00[20]; s32 flag; } Fragment7RecordParent;
+typedef struct {
+    u8 unk_00000[56];
+    Fragment7RecordParent *parent;
+    u8 controller;
+    u8 unk_0003D[0x34130 - 61];
+    Fragment7RecordCollections snapshot;
+    Fragment7RecordCollections collections;
+    u8 unk_3FB60[0x3FD70 - 0x3FB60];
+    u8 *title;
+} Fragment7RecordInitializeState;
+extern u8 D_8300F950[];
+extern u8 D_8300F954[];
+extern s32 func_8005A134(s32);
+extern void func_8005A094(s32);
+extern void func_8005A074(s32);
+extern u8 func_8005D92C(s32);
+extern u8 *func_800606D8(u8 *);
+extern u8 func_800606F4(s32);
+extern void func_8300AEEC(void *, s32, s32);
+extern void func_8300B284(void *);
+extern void func_8300AA58(void *, s32, s32);
+extern void func_8300AE40(void *);
+extern void func_8300B330(void *, s32, s32);
+extern void func_8300B8AC(void *);
+extern void func_8300112C(s32);
+void Fragment7_InitializeRecordCollections(Fragment7RecordInitializeState *state) {
+    s32 controller;
+    void *first;
+
+    controller = state->controller;
+    state->title = D_8300F950;
+    state->parent->flag = 0;
+    if (controller >= 0 && controller < 4) {
+        func_8005A134(state->controller);
+        func_8005A094(state->controller);
+        func_8005A074(state->controller);
+        if (func_8005D92C(controller) == 7 && func_800606F4(controller) > 0) {
+            state->parent->flag = 1;
+        }
+        first = func_800606D8((u8 *)(u32)controller);
+        if (first != NULL) {
+            state->title = first;
+        } else {
+            state->title = D_8300F954;
+        }
+    }
+    first = &state->collections.teams[0];
+    func_8300AEEC(first, 0, controller);
+    func_8300AEEC(&state->collections.teams[1], 1, 0);
+    func_8300B284(first);
+    func_8300B284(&state->collections.teams[1]);
+    first = &state->collections.saved[0];
+    func_8300AA58(first, 0, controller);
+    func_8300AA58(&state->collections.saved[1], 1, 0);
+    func_8300AE40(first);
+    func_8300AE40(&state->collections.saved[1]);
+    func_8300B330(&state->collections.other[0], 0, controller);
+    func_8300B330(&state->collections.other[1], 1, 0);
+    func_8300B8AC(&state->collections.other[0]);
+    func_8300B8AC(&state->collections.other[1]);
+    state->snapshot = *(Fragment7RecordCollections *)first;
+    func_8300112C((s32)state);
+}
 #endif
 
 #ifdef VERSION_US
