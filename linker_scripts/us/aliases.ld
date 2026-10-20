@@ -8,6 +8,11 @@
  * undefined_syms.ld, and the other hand-written scripts are.
  */
 Audio_ThreadEntry = Audio_ThreadMain;
+/* Fragment 4 resource lifecycle and transition owners retain their ABI labels. */
+func_81804720 = WidgetResources_Release;
+func_818048A4 = WidgetDefinitions_Initialize;
+func_81804A2C = WidgetState_AdvanceTransition;
+func_81804B74 = WidgetResources_UseTransitionWeight;
 /* func_800195C0 reads and writes this same byte in the original assembly. */
 Audio_AiHdwrBugFlag = D_8008FAA0;
 /* Preserve address-keyed rectangle calls alongside the verified narrow API. */

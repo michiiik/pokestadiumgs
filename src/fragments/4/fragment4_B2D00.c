@@ -2,9 +2,74 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804720.s")
+typedef struct {
+    u8 unk_00[24];
+    s32 comparison_key;
+    void *unk_1C;
+    void *unk_20;
+    u8 *unk_24;
+    u8 *unk_28;
+} Fragment4ResourceView;
+typedef struct {
+    void (*initialize)(void *, void *);
+    Fragment4ResourceView resources;
+    void *variants;
+} Fragment4DefinitionView;
+typedef struct {
+    Fragment4DefinitionView **definitions;
+    s32 unk_04;
+    u8 *controller;
+    u8 unk_0C[8];
+    u16 unk_14;
+    u16 unk_16;
+    u16 unk_18;
+    u16 unk_1A;
+    u8 unk_1C;
+    u8 unk_1D;
+    u8 unk_1E;
+    u8 unk_1F;
+    u8 count;
+    u8 unk_21;
+    f32 progress;
+    f32 unk_28;
+    f32 unk_2C;
+    // Status words produced by func_81804BC8.
+    s32 unk_30;
+    s32 unk_34;
+} Fragment4StateView;
+extern u8 D_800CE060[];
+extern void func_81802DC8(u8 *);
+extern void func_81802E34(u8 *);
+extern void func_81803B18(void *);
+extern void func_81802D98(void *);
+extern void func_81803C9C();
+extern f32 func_818006B4(void);
+extern u8 *func_818054D0(void *, u8);
+void WidgetResources_Release(s32 arg0) {
+    u8 *entry;
 
-extern void func_81804720(s32 arg0);
+    if (((Fragment4ResourceView *)arg0)->unk_28 != NULL) {
+        entry = ((Fragment4ResourceView *)arg0)->unk_28;
+        while (*(s16 *)entry >= 0) {
+            func_81802DC8(entry);
+            entry += 32;
+        }
+    }
+    if (((Fragment4ResourceView *)arg0)->unk_24 != NULL) {
+        entry = ((Fragment4ResourceView *)arg0)->unk_24;
+        while (*(s16 *)entry >= 0) {
+            func_81802E34(entry);
+            entry += 32;
+        }
+    }
+    if (((Fragment4ResourceView *)arg0)->unk_20 != NULL) {
+        func_81803B18(((Fragment4ResourceView *)arg0)->unk_20);
+    }
+    if (((Fragment4ResourceView *)arg0)->unk_1C != NULL) {
+        func_81802D98(((Fragment4ResourceView *)arg0)->unk_1C);
+    }
+}
+
 extern void func_8004C8C0(s32 arg0);
 void func_818047E0(s32 arg0) {
     s32 var_s0;
@@ -12,11 +77,11 @@ void func_818047E0(s32 arg0) {
 
     var_s0 = *(s32 *)((u8 *)(u32)arg0 + 0x30);
     var_a1 = arg0;
-    func_81804720(arg0 + 4);
+    WidgetResources_Release(arg0 + 4);
     if (*(s32 *)((u8 *)(u32)var_a1 + 0x30) != 0) {
         if (*(s16 *)(u8 *)(u32)var_s0 >= 0) {
             do {
-                func_81804720(*(s32 *)((u8 *)(u32)var_s0 + 4));
+                WidgetResources_Release(*(s32 *)((u8 *)(u32)var_s0 + 4));
                 var_s0 += 8;
             } while (*(s16 *)((u8 *)(u32)var_s0) >= 0);
         }
@@ -41,7 +106,23 @@ void func_81804858(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_818048A4.s")
+void WidgetDefinitions_Initialize(Fragment4DefinitionView **list, Fragment4StateView *state) {
+    s32 i;
+    u8 *resource;
+
+    while (*list != NULL) {
+        if ((*list)->initialize != NULL) {
+            (*list)->initialize(*list, state);
+        }
+        for (i = 0; i < state->count; i++) {
+            resource = func_818054D0(*list, (u8)i);
+            if (*(void **)(resource + 32) != NULL) {
+                func_81803C9C(*(void **)(resource + 32), state);
+            }
+        }
+        list++;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804954.s")
 
@@ -54,7 +135,26 @@ s32 func_81804A20(u8 *arg0) {
     return *(u16 *)(arg0 + 0x1A) == 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804A2C.s")
+s32 WidgetState_AdvanceTransition(Fragment4StateView *state, s32 duration) {
+    s32 done = 0;
+
+    state->progress += func_818006B4() / duration;
+    switch (state->unk_1A) {
+    case 1:
+    case 4:
+        done = !state->unk_34;
+        break;
+    case 2:
+    case 3:
+        done = !state->unk_30;
+        break;
+    }
+    if (done || state->progress >= 1.0f) {
+        state->progress = 1.0f;
+        return 1;
+    }
+    return 0;
+}
 
 f32 __sinf(f32 arg0, f32 arg1);
 extern f32 D_81805F98;
@@ -70,7 +170,18 @@ f32 func_81804AE8(f32 arg0) {
 }
 void func_81804AE8_padding(void) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804B74.s")
+s32 WidgetResources_UseTransitionWeight(void *arg0, void *arg1) {
+    if (((Fragment4ResourceView *)arg0)->comparison_key >= 0 &&
+        ((Fragment4ResourceView *)arg1)->comparison_key >= 0 &&
+        ((Fragment4ResourceView *)arg0)->comparison_key == ((Fragment4ResourceView *)arg1)->comparison_key) {
+        return 0;
+    }
+    if (((Fragment4ResourceView *)arg0)->comparison_key == -2 ||
+        ((Fragment4ResourceView *)arg1)->comparison_key == -2) {
+        return 0;
+    }
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804BC8.s")
 
@@ -148,7 +259,6 @@ s32 func_818055A4(void *arg0, u8 *arg1) {
 }
 
 extern u8 *func_818054D0(void *arg0, u8 arg1);
-extern s32 func_81804B74(void *arg0, void *arg1);
 f32 func_818055E0(void *arg0, u8 *arg1) {
     void *first;
     void *second;
@@ -156,7 +266,7 @@ f32 func_818055E0(void *arg0, u8 *arg1) {
 
     first = func_818054D0(arg0, arg1[0x1C]);
     second = func_818054D0(arg0, arg1[0x1D]);
-    if (func_81804B74(first, second) != 0) {
+    if (WidgetResources_UseTransitionWeight(first, second) != 0) {
         result = *(f32 *)(arg1 + 0x28);
     } else {
         result = 1.0f;
