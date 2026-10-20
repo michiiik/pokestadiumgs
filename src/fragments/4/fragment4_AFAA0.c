@@ -250,13 +250,46 @@ void func_81801F80(u8 *arg0) {
     func_8004C4B0(*(s16 *)arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801FA0.s")
+extern s32 func_8004C990(s32, s32);
+extern void *func_8004C874(s32, s32);
+extern u8 D_81805D40[];
+u8 *WidgetTexture_GetDescriptor(void *arg0) {
+    u8 *value;
+
+    if (((s16 *)arg0)[0] >= 0 && ((s16 *)arg0)[1] >= 0) {
+        value = (u8 *)func_8004C990(((s16 *)arg0)[0], ((s16 *)arg0)[1]);
+    } else {
+        value = NULL;
+    }
+    return value;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81801FE8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81802168.s")
+u8 *WidgetText_GetString(void *arg0) {
+    u8 *value;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_818021B4.s")
+    if (((s16 *)arg0)[0] >= 0 && ((s16 *)arg0)[1] >= 0) {
+        value = func_8004C874(((s16 *)arg0)[0], ((s16 *)arg0)[1]);
+    } else {
+        value = D_81805D40;
+    }
+    return value;
+}
+
+extern void *func_8004C8A0(void *, s32, s32, s32);
+extern u8 D_81805D44[];
+extern u8 D_81805FF0[];
+u8 *WidgetText_GetBufferedString(void *arg0) {
+    u8 *value;
+
+    if (((s16 *)arg0)[0] >= 0 && ((s16 *)arg0)[1] >= 0) {
+        value = func_8004C8A0(D_81805FF0, 255, ((s16 *)arg0)[0], ((s16 *)arg0)[1]);
+    } else {
+        value = D_81805D44;
+    }
+    return value;
+}
 
 extern Gfx *D_800D0510;
 void func_81802208(s32 arg0, f32 arg1) {
@@ -346,14 +379,13 @@ s32 func_81802C14(u8 *arg0) {
     return result;
 }
 
-extern u8 *func_81801FA0(void);
 extern s32 func_81802C14(u8 *);
 extern s32 func_8004D1FC(u8 *);
 extern u8 D_80094D90[];
 extern u8 D_80094DB8[];
 u8 *func_81802CA8(void *arg0, s32 arg1) {
     u8 *value;
-    value = func_81801FA0();
+    value = WidgetTexture_GetDescriptor(arg0);
     if (value != NULL) {
         func_81802438(*(s32 *)((u8 *)(u32)arg0 + 0xC));
         if (arg1 != 0) {
@@ -486,18 +518,36 @@ void func_81803B18(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803BB8.s")
+u8 *WidgetSelection_GetValuePointer(void *arg0, void *state) {
+    u8 *value;
+    s32 offset;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803BE8.s")
+    if (*(void **)arg0 != NULL && (offset = *(s32 *)((u8 *)arg0 + 8)) != 0) {
+        value = (u8 *)state + offset;
+    } else {
+        value = NULL;
+    }
+    return value;
+}
 
-extern u8 *func_81803BB8(void *, void *);
-extern s32 func_81803BE8();
+s32 WidgetSelection_GetMask(void *arg0, void *state) {
+    s32 value;
+    s32 offset;
+
+    if (*(void **)arg0 != NULL && (offset = *(s32 *)((u8 *)arg0 + 12)) != 0) {
+        value = *(s32 *)((u8 *)state + offset);
+    } else {
+        value = 0;
+    }
+    return value;
+}
+
 s32 func_81803C14(s32 arg0, s32 arg1) {
     s32 mask;
     u8 *value;
 
-    mask = func_81803BE8(arg0, arg1);
-    value = func_81803BB8((void *)arg0, (void *)arg1);
+    mask = WidgetSelection_GetMask((void *)arg0, (void *)arg1);
+    value = WidgetSelection_GetValuePointer((void *)arg0, (void *)arg1);
     if (value == 0) return 0;
     if (mask == 0) return 0;
     if (*value >= 0x21) return 0;
@@ -507,7 +557,7 @@ s32 func_81803C14(s32 arg0, s32 arg1) {
 void WidgetSelection_ResetToDefault(void *script, void *state) {
     u8 *selection;
 
-    selection = func_81803BB8(script, state);
+    selection = WidgetSelection_GetValuePointer(script, state);
     if (*(void **)script != NULL) {
         *selection = *((u8 *)script + 5);
     }
