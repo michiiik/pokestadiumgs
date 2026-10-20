@@ -531,3 +531,6 @@ func_84166270 = TrailEffectPool_Start;
 func_8416691C = TrailEffectPool_IsComplete;
 func_84166F60 = DoubleTextureTrail_InitPool;
 func_841670A8 = DoubleTextureTrail_Spawn;
+func_841674C0 = DoubleTextureTrail_Update;
+func_841677C4 = DoubleTextureTrail_UpdateAll;
+func_84167864 = DoubleTextureTrail_DrawStrips;

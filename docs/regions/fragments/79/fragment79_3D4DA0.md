@@ -148,11 +148,100 @@ provenance covers the four newly removed owners. The final normal full-ROM
 MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 All 427 source syntax checks and 76 native tool tests pass for this batch.
 
+## Double-texture update and strip draw, 2026-10-20
+
+Following PR #1329 (native source base `92f90054`), two more original owners
+pass the normal runner and sequential full-ROM gate:
+
+| Original owner | Name | Bytes |
+|---|---|---:|
+| `func_841674C0` | `DoubleTextureTrail_Update` | 772 |
+| `func_84167864` | `DoubleTextureTrail_DrawStrips` | 1224 |
+
+The updater interpolates ten nodes between secondary/tertiary owner anchors
+using the original divisor 9. Its GS state flag starts a thirty-tick deadline,
+enters phase 2 at deadline minus 15, then shrinks node radii by 1.0f with a
+0.1f floor. The real `u32` getter signature remains unchanged. The legacy
+anchor-output wrapper's existing integer-address ABI is retained explicitly;
+the new caller does not invent a conflicting prototype.
+
+A typed record parameter, paired transactionally with the existing caller,
+closes the endpoint locations without an unused local. Known/typed/blank
+controls prove that changing the caller from byte offsets to the actual
+576-byte record leaves its entire module fingerprint unchanged before any
+updater candidate is run. The already-C completion wrapper is named
+`DoubleTextureTrail_UpdateAll`; this is cleanup, not a third newly decompiled
+function. The donor's unused scalar is omitted.
+
+Strip drawing updates the GS phase-dependent alpha only on pass 0, using
+`(age - deadline + 15) * 0.07f`, and emits nine eight-quad strips on both
+passes. Initializing the two real color-metadata pointers at declaration
+reproduces their lifetimes across the phase transition. Cached byte alphas,
+ordinary nested loops and SDK macros produce the original code. No forced
+register, padding, unused local, fake call/prototype or instruction rewrite
+is added to either match.
+
+| Retained complete module | SHA256 |
+|---|---|
+| First accepted update and typed caller | `f7559ff7b8990746ae5d52ef9796b99be1b52a2c552eacf1ca67b803ffe3fbfb` |
+| First accepted strip draw | `7ccc0b00d844bde7f2cc5f20dcd24c8cd47924fdbbedb06701c9f8be3296064a` |
+| Final named module | `dc5122b62ceecca27e291827eb870a8db0be54b94dd7f4cb4fecddaf349a10b3` |
+
+The update callback freezes thirteen complete translation units; the strip
+callback freezes the changed module plus four collateral objects. Both
+reread their receipts and externally hash every snapshot before returning;
+counts and hashes are checked again before further compilation. Final naming
+passes another normal ROM gate with thirteen frozen complete modules.
+Both probe hits are relocation-controlled, so their normal sequential ROM
+gates, not masked probe scores, establish acceptance.
+
+Independent unmodified-linker proofs cover all twenty original function
+extents, 12336 text bytes and 128 pool bytes across the prior, typed-caller,
+two first-accepted and final named objects. Fresh canonical/named,
+twenty-leading-blank, public-wrapper and target-layout controls reproduce the
+complete game fingerprint. The unchanged assembly draw-all owner has two
+calls whose canonical spelling binds locally while the named spelling binds
+through the original-name alias. Only those two inspected R_MIPS_26 target
+identities are treated as equivalent; raw section bytes are identical, and
+independent retail links prove both resolve to `0x84167864`. No object or
+instruction is modified for this comparison.
+
+All twelve collateral game fingerprints are unchanged. Accepted provenance
+covers exactly the two newly removed owners; aliases preserve all three
+named entries. Full-ROM MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+All 427 source syntax checks and 76 native tool tests pass. Private campaigns
+and generated coverage remain outside the change.
+
+### Pool updater requeue
+
+`func_841665D4`: **requeue**. A padding-free 840-byte body now matches all
+208 interior instruction words exactly. The only raw differences are stack
+allocation/release: retail reserves 168 bytes, while this source reserves
+136. A consumed `height_delta` before the anchor declaration closes both the
+float-register residual and the anchor's stack location. Its steering uses
+the actual float(float) sine/cosine ABIs and single-precision 20.0f clamps.
+Do not trust the earlier drafts with missing math prototypes or double
+clamps, even though their normalized shapes look close.
+
+Eight fully consumed history-snapshot variants do not resolve the frame:
+they enlarge the body to 956-1004 bytes and frames to 176-312 bytes. Both
+authentic stock C drivers are calibrated on complete known matching objects
+and leading-blank controls. IDO 7.1 retains the two-word frame residual;
+IDO 5.3 also reserves 136 bytes and changes more instructions. Its complete
+current module differs as well, so that driver is not an installable
+substitute for this translation unit. These negatives cover only those
+source families and two C drivers, not every legal source or frontend.
+
+Next: inspect CFE/ugen stack reservation for this exact live-value source,
+distinguishing genuine retained aggregate lifetimes from unreferenced
+historical storage. Do not repeat the loop/snapshot grid or fill the 32-byte
+gap with padding. The owner remains original assembly.
+
 ## Remaining work
 
-Six original assembly owners remain in this module: `func_84165CC0`,
-`func_841665D4`, `func_84166A64`, `func_841674C0`, `func_84167864` and
-`func_84168000`. They include the node updater and draw functions and are not
+Four original assembly owners remain in this module: `func_84165CC0`,
+`func_841665D4`, `func_84166A64` and `func_84168000`.
+They include the node updater and draw functions and are not
 claimed as solved. Continue with their GS layouts rather than copying
 Stadium 1's field offsets or fifty-record name.
 
