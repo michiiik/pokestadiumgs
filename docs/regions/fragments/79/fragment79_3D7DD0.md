@@ -157,6 +157,77 @@ collateral fingerprints are unchanged. The relocation-masked probes are not
 the acceptance proof: both normal sequential full-ROM gates and the final
 named gate pass. ROM MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 
+## Trail/auxiliary translation-unit separation (2026-10-20)
+
+The combined source is now two C translation units, preserving all existing
+functions and their addresses:
+
+| Source | Text ROM range | Per-file rodata ROM range |
+| --- | --- | --- |
+| `fragment79_3D7DD0.c` | 0x3D7DD0..0x3D9410 (5696 bytes) | 0x3FC1B0..0x3FC1D0 (32 bytes) |
+| `fragment79_3D9410.c` | 0x3D9410..0x3D99F0 (1504 bytes) | 0x3FC1D0..0x3FC1E0 (16 bytes) |
+
+The auxiliary family begins at the aligned `func_84169B80` boundary, matching
+the family separation in Stadium 1's `battle_engine_357C30.c` and
+`battle_engine_3591E0.c`. Retail holds distinct pi literals at 0x8418C934 and
+0x8418C940. Compiling the full trail renderer in the combined C unit merges
+them, producing a non-text `section_layout_drift`. These observations motivate
+the split; they do not establish the historical GS source filenames.
+
+The auxiliary types and functions move into their own source; a local
+three-float vector view retains the same twelve-byte layout. The YAML records
+the exact text and rodata boundaries. The reviewed linker inserts the new
+object's text/data/rodata/bss contributions in order; it adds no explicit
+padding, binary rewrites or compiler patches. All eighteen function starts
+and extents remain unchanged. This is a layout prerequisite with **zero new
+function matches**, not an increase in decompilation coverage.
+
+Before adoption, an isolated split verifies original/blank controls and both
+new objects independently, then links their combined 7200 text bytes and
+48 pool bytes against retail. After scoped regeneration, the normal full-ROM
+gate passes and freezes both changed whole objects plus thirteen collateral
+objects before returning. Every receipt and external SHA-256 is rechecked
+before further compilation. Both objects equal their immutable isolated game
+fingerprints, and all thirteen collateral fingerprints remain unchanged.
+Native/public-wrapper, twenty-leading-blank and target-layout controls pass
+for each unit. Independent paired links of every control reproduce all
+7200 text bytes, all 48 pool bytes and all eighteen extents. ROM MD5 remains
+`1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+Retesting the retained padding-free renderer now emits the exact 32-byte
+retail trail pool, independently checked directly from its object. The
+non-text layout rejection is resolved; the frame mismatch below is not.
+Neither that probe nor the source separation replaces another assembly owner.
+
+All fifteen existing C function bodies are text-identical across the move;
+the three original assembly pragmas are unchanged. All 428 source syntax
+checks and 76 native tests pass; the clean public clone passes 77 tests with
+fourteen environment-dependent skips. Actual provenance, alias and claims
+checks pass, and generated coverage is unchanged.
+
+### Offset/draw requeues
+
+- `func_84168B00`: **requeue**. Padding-free camera-relative sources reproduce
+  the 280-byte body but reserve 104 rather than 248 bytes. They use the GS eye
+  vector at offset 168 and the actual void cross-product/normalization APIs.
+  Scalar versus grouped normal components and camera-pointer initialization
+  do not close the frame difference. Inspect the retained stack reservation
+  and meaningful vector lifetimes next; do not restore the donor's unused
+  36-word array.
+- `func_84168C18`: **requeue**. A real float matrix and real output-component
+  pointers reproduce the 140-byte body, with 104/112-byte frames versus
+  retail's 176. Array/struct matrix views and a consumed angle in degrees do
+  not close it. Inspect reservation/lifetime evidence before another family;
+  do not insert an unused matrix or scalar.
+- `func_84169618`: **requeue**. The 1384-byte padding-free renderer reserves
+  224 bytes versus retail's 272. Real world-position and texture-V
+  intermediates yield 232/240-byte frames, still unmatched. Explicit cached
+  display-list pointers change the body to 1380 bytes. The eight retained
+  variants are tested both before and after the TU split; none is accepted.
+  Read the new frame diagnostics before resuming with a materially different
+  consumed-value hypothesis. Do not reintroduce the donor's unused twelve-
+  word array or rerun these families as fresh attempts.
+
 ## Remaining owners and inherited work
 
 Three owners remain assembly: `func_84168B00`, `func_84168C18`

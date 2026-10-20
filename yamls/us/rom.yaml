@@ -1573,6 +1573,7 @@
     - [0x3D4060, c,       fragments/79/fragment79_3D4060]
     - [0x3D4DA0, c,       fragments/79/fragment79_3D4DA0]
     - [0x3D7DD0, c,       fragments/79/fragment79_3D7DD0]
+    - [0x3D9410, c,       fragments/79/fragment79_3D9410]
     - [0x3D99F0, c,       fragments/79/fragment79_3D99F0]
     - [0x3D9A00, data,    fragments/79/fragment79_data]
     - [0x3F86C0, .rodata, fragments/79/fragment79_37A6E0] # floats, jtbl_84188FA0 (+19 more)
@@ -1586,6 +1587,7 @@
     - [0x3FC0E0, .rodata, fragments/79/fragment79_3D4060] # Owner-linked trail constants, D_8418C850..D_8418C89C
     - [0x3FC130, .rodata, fragments/79/fragment79_3D4DA0] # Anchored/multi-trail constants, D_8418C8A0..D_8418C91C
     - [0x3FC1B0, .rodata,  fragments/79/fragment79_3D7DD0]
+    - [0x3FC1D0, .rodata,  fragments/79/fragment79_3D9410]
     - [0x3FC1E0, rodata]
 
   - name: fragment80
