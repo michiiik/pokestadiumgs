@@ -81,12 +81,80 @@ The final normal full-ROM comparison passes with MD5
 76 native tooling tests pass. Private experiment utilities and generated
 coverage are not included in the batch.
 
+## Pool and double-texture batch, 2026-10-20
+
+Following PR #1328 (native source base `a2569c37`), four more owners pass the
+normal runner and full-ROM gate:
+
+| Original owner | Name | Bytes |
+|---|---|---:|
+| `func_84166270` | `TrailEffectPool_Start` | 732 |
+| `func_8416691C` | `TrailEffectPool_IsComplete` | 328 |
+| `func_84166F60` | `DoubleTextureTrail_InitPool` | 328 |
+| `func_841670A8` | `DoubleTextureTrail_Spawn` | 912 |
+
+Pool start refuses new work in shutdown phase 2, selects one of the 26 free
+records, and initializes its ten samples. GS assigns the three header floats
+differently from Stadium 1; the matching source reflects those actual stores.
+Pool completion advances its global timer, schedules a 70-tick deadline,
+stops spawning once the timer exceeds deadline minus 50 and returns -1 after
+the deadline. It otherwise
+advances active records through the original assembly node updater.
+
+The pool node has acceleration at 40, previous scale at 52, previous position
+at 56 and previous velocity at 68, as read from GS start/update instructions.
+These replace the earlier opaque forty-byte data extent without changing any
+already accepted function. The double-texture family uses four 576-byte
+records, ten 40-byte nodes at offset 176, and a real halfword at offset 6
+cleared by spawn. Shared types move before their new consumers; target-layout
+assertions and fresh/blank controls prove the complete prior object unchanged.
+The existing texture loader retains its complete code and data footprint.
+
+The completion getter `func_841094EC` actually returns `u32`; its prototype
+is preserved. `func_841086F0`, `func_8410874C` and `func_8410878C` in
+`fragment79_377F80.c` initialize its backing flag to 0 or 1. A normal signed
+local consumes that state before the phase comparisons. Compared with a
+direct unsigned-return comparison, this closes one redundant constant load
+and preserves the original 328-byte body. The flag's broader interpretation
+remains unknown; it is not named as an owner-completion event.
+
+There are no fake calls/prototypes, discarded values, forced registers,
+unused stack locals, padding or manual unrolling in the four new matches.
+The source/store and pointer-lifetime experiments are bounded to the measured
+residuals. A failed declaration-visibility attempt is compiler/process
+evidence, not an accepted source or a claim of an impossible compiler shape.
+
+| Retained complete module | SHA256 |
+|---|---|
+| Accepted double-texture pair | `587a3c0df9d4445ad3920fd6fd63765d5c61528f1cb28a22c0e06c57fcace1ef` |
+| Accepted pool start | `82281c46b0b6c30e987db61c33a9029ed43ef69b9a9fbe3d8a6c4aa4d3b13ae2` |
+| Accepted pool completion | `72503682fb7fe3a5bcb674e69186b71fbdb8d5eb03c61f21b5133f6eae4e932c` |
+| Final reviewed module | `4601041b4b8c8fa1ca37cddb2617fc82ad05dcdbf785bd2eca28c76080638369` |
+
+Each of the three acceptance callbacks freezes the complete changed module
+and four collateral objects, with immediate receipt rereads/external hashes
+before returning and again before more compilation. Final naming/declaration
+cleanup passes a normal ROM gate with thirteen frozen complete modules.
+All twelve collateral game fingerprints remain unchanged. Init/spawn and
+completion are directly link-verified; pool start requires the normal
+sequential ROM gate for relocation-controlled probe words.
+
+Independent unmodified-linker proofs cover all twenty original function
+extents, all 12336 text bytes and all 128 pool bytes for the prior accepted,
+prepared, three new acceptance and final named objects. Canonical/named,
+twenty-leading-blank, native/public-wrapper and target-layout controls
+reproduce the final complete game fingerprint and retail bytes. Accepted
+provenance covers the four newly removed owners. The final normal full-ROM
+MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+All 427 source syntax checks and 76 native tool tests pass for this batch.
+
 ## Remaining work
 
-Ten original assembly owners remain in this module, including the anchored
-draw function and the other trail families' start/update/draw routines.
-They are not claimed as solved. Continue with their GS layouts rather than
-copying Stadium 1's field offsets or fifty-record name.
+Six original assembly owners remain in this module: `func_84165CC0`,
+`func_841665D4`, `func_84166A64`, `func_841674C0`, `func_84167864` and
+`func_84168000`. They include the node updater and draw functions and are not
+claimed as solved. Continue with their GS layouts rather than copying
+Stadium 1's field offsets or fifty-record name.
 
 The pre-existing `OwnerAnchoredFourStream_Update` and
 `DoubleTextureTrail_RotateVertexOffset` helpers retain inherited unused
