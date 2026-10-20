@@ -534,3 +534,4 @@ func_841670A8 = DoubleTextureTrail_Spawn;
 func_841674C0 = DoubleTextureTrail_Update;
 func_841677C4 = DoubleTextureTrail_UpdateAll;
 func_84167864 = DoubleTextureTrail_DrawStrips;
+func_84168000 = DoubleTextureTrail_DrawAll;

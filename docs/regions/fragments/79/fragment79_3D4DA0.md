@@ -237,10 +237,65 @@ distinguishing genuine retained aggregate lifetimes from unreferenced
 historical storage. Do not repeat the loop/snapshot grid or fill the 32-byte
 gap with padding. The owner remains original assembly.
 
+## Full double-texture renderer (2026-10-20)
+
+`func_84168000` is now `DoubleTextureTrail_DrawAll`: a 1332-byte C body
+followed by twelve ordinary section-alignment bytes. It allocates ninety
+vertices per active trail, builds ten nine-vertex rings, optionally draws
+the endpoint/camera-facing geometry, and renders both front- and back-culled
+texture passes. The four-record traversal, calls to the accepted texture and
+strip helpers, and Stadium 1's corresponding renderer justify the name.
+
+The GS camera getter returns a word-sized address; its eye vector is at
+offset 168. `Gfx_AllocDisplayList` also returns a word-sized address and takes
+a signed size. Both retain those real interfaces, with explicit pointer
+casts. The vertex-offset helper receives the first component of a real
+three-float vector; no alternate prototype is introduced.
+
+The final stack reservation requires independently useful source mechanisms:
+the consumed vertex-buffer address and vertex angle, plus the consumed
+texture-V coordinate declared after the address-taken vectors and camera.
+The intermediate alone fixes the static display-list pointer's spill slot;
+the declaration placement alone fixes camera/vector offsets. Their
+composition matches the 288-byte retail frame and all instructions. Explicit
+cached display-list pointer lifetimes instead alter the instruction stream
+and are not adopted. No unused locals, padding, forced registers, manual
+unrolling, instruction rewrites or relocation rewrites are added.
+
+The normal sequential ROM gate accepted the first composed candidate; its
+isolated relocation-masked result is not the acceptance proof. The first
+successful gate froze the complete object and four collateral objects before
+returning. The named gate froze thirteen complete objects; all twelve
+collateral fingerprints are unchanged. Independent unmodified-linker checks
+cover all twenty function starts/body extents, all 12336 text bytes, all
+128 rodata bytes and the natural twelve-byte tail for original, first-accepted
+and named objects. Canonical/named, native/public-wrapper, twenty-leading-
+blank and target-layout controls pass. Full-ROM MD5 remains
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. All 427 source syntax checks and 76 native
+tool tests pass. The original-address linker alias is retained.
+
+### Draw requeues
+
+`func_84165CC0` and `func_84166A64`: **requeue**. Initial padding-free draw
+sources reproduce their respective 1136- and 1276-byte bodies, but reserve
+312/360 bytes rather than retail's 376/424. These tests use real allocator
+and matrix-helper interfaces; the GS pool draw additionally takes a signed
+texture-table index and traverses 26 records. Cached display-list and vector
+array variants do not close the gaps. Investigate consumed matrix/vector
+lifetimes before another source-shape family; do not insert matrix-sized
+unused storage to fill the difference.
+
+The updater **requeue** above remains open. A passive stack observer now
+passes stock/off/on and leading-blank controls against the known module and
+both retained updater/renderer parents. It reports no late temporary spills
+for either retained parent. That observation narrows the next investigation
+to reservation and meaningful source-local lifetimes; it does not prove
+that any particular historical declaration existed.
+
 ## Remaining work
 
-Four original assembly owners remain in this module: `func_84165CC0`,
-`func_841665D4`, `func_84166A64` and `func_84168000`.
+Three original assembly owners remain in this module: `func_84165CC0`,
+`func_841665D4` and `func_84166A64`.
 They include the node updater and draw functions and are not
 claimed as solved. Continue with their GS layouts rather than copying
 Stadium 1's field offsets or fifty-record name.
