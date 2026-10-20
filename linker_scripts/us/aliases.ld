@@ -513,3 +513,7 @@ func_8005D4FC = GbSave_IncrementCrystalRecordCount;
 func_8005EF78 = GbSave_WriteGen2BoxName;
 func_8005B778 = GbSave_WriteGen1PartyPokemon;
 func_8005A174 = GbSave_ResetPortCache;
+func_8005F110 = GbSave_ResetPortState;
+func_800564BC = GbPak_SelectRamBank;
+func_80056870 = GbPak_ReadIdAndDetectRam;
+func_80056F7C = GbPak_InitializeCartridge;

@@ -2,9 +2,32 @@
 
 
 #ifdef VERSION_US
+extern void Game_ShutdownAndLoadFragment(s32, s32);
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056390.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_800564BC.s")
+extern u8 D_801283B0;
+extern u8 D_80128550[];
+extern u8 D_8012855C[];
+extern OSMesgQueue D_800CE100;
+extern s32 func_80056390(u8);
+s32 GbPak_SelectRamBank(u8 port, u8 bank) {
+    s32 result;
+    OSPfs *pfs;
+    s32 i;
+    u8 data[32];
+
+    i = 0;
+    do {
+        data[i] = bank;
+        i++;
+    } while (i < 32);
+    pfs = (OSPfs *)&D_801283B0 + port;
+    result = osGbpakReadWrite(pfs, OS_WRITE, 0x4000, data, 32);
+    if (result == 0) {
+        D_8012855C[port] = bank;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005655C.s")
 
@@ -52,14 +75,42 @@ s32 GbPak_DetectRam(s32 arg0, u8* arg1) {
     return var_s0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056870.s")
+extern u8 D_801283B0;
+extern u8 D_80128550[];
+extern u8 D_8012855C[];
+extern OSMesgQueue D_800CE100;
+extern s32 func_80056390(u8);
+extern void Game_ShutdownAndLoadFragment(s32, s32);
+extern s32 GbPak_DetectRam(s32 arg0, u8* arg1);
+s32 GbPak_ReadIdAndDetectRam(s32 port, u8 *previous_state, u8 *ram_buffer) {
+    u8 status;
+    OSGbpakId id;
+    s32 result;
+
+    result = 0;
+    if (previous_state != NULL) {
+        *previous_state = D_80128550[port];
+    }
+    if (D_80128550[port] == 1) {
+        return 1;
+    }
+    if (osGbpakReadId((OSPfs *)&D_801283B0 + port, &id, &status) != 0) {
+        Game_ShutdownAndLoadFragment(port, 1);
+    }
+    if ((status & OS_GBPAK_RSTB_STATUS) != 0 &&
+        osGbpakCheckConnector((OSPfs *)&D_801283B0 + port, &status) == 0) {
+        func_80056390((u8)port);
+        result = GbPak_DetectRam(port, ram_buffer);
+    }
+    D_80128550[port] = 1;
+    return result;
+}
 
 extern u8 D_80128550[];
-extern s32 func_80056F7C(s32);
+extern s32 GbPak_InitializeCartridge(s32);
 extern s32 func_8005D92C(s32);
 extern s32 GbSave_IdentifyFormat(s32);
 extern s32 GbTower_VerifyPakStillInserted(s32, u8 *);
-extern void Game_ShutdownAndLoadFragment(s32, s32);
 s32 GbPak_ValidateAndRefresh(s32 arg0, u8 *arg1, u8 *arg2) {
     u8 *state;
     struct {
@@ -71,7 +122,7 @@ s32 GbPak_ValidateAndRefresh(s32 arg0, u8 *arg1, u8 *arg2) {
     if (arg1 != NULL) *arg1 = D_80128550[arg0];
     state = &D_80128550[arg0];
     if (*state == 1) return 1;
-    if (func_80056F7C(arg0) != 0) {
+    if (GbPak_InitializeCartridge(arg0) != 0) {
         if (arg2 != NULL) {
             local.previous = func_8005D92C(arg0);
             if ((GbSave_IdentifyFormat(arg0) == local.previous) && (GbTower_VerifyPakStillInserted(arg0, arg2) != 0)) {
@@ -172,7 +223,27 @@ s32 GbPak_IsCartOn(s32 arg0) {
     return (sp1F & 0x80) != 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80056F7C.s")
+extern u8 D_801283B0;
+extern u8 D_80128550[];
+extern u8 D_8012855C[];
+extern OSMesgQueue D_800CE100;
+extern s32 func_80056390(u8);
+s32 GbPak_InitializeCartridge(s32 port) {
+    u8 *state = &D_80128550[port];
+    u8 status;
+    OSGbpakId id;
+
+
+    *state = 0;
+    if (osGbpakInit(&D_800CE100, (OSPfs *)((u8 *)&D_801283B0 + port * sizeof(OSPfs)), port) == 0 &&
+        osGbpakReadId((OSPfs *)((u8 *)&D_801283B0 + port * sizeof(OSPfs)), &id, &status) == 0 &&
+        (status & OS_GBPAK_RSTB_STATUS) != 0 &&
+        osGbpakCheckConnector((OSPfs *)((u8 *)&D_801283B0 + port * sizeof(OSPfs)), &status) == 0) {
+        func_80056390((u8)port);
+        *state = 1;
+    }
+    return *state == 1;
+}
 
 s32 GbTower_VerifyPakStillInserted(s32 arg0, u8 *arg1) {
     u8 status;
