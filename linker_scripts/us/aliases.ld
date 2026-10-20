@@ -581,3 +581,7 @@ func_83101C80 = Fragment6_InitializeSelectionState;
 func_83101400 = Fragment6_DrawAvailableEntryList;
 func_83101804 = Fragment6_DrawSavedEntryList;
 func_83100DBC = Fragment6_HandleAvailableListScroll;
+func_830018B0 = Fragment7_DrawSavedRecordList;
+func_83002988 = Fragment7_DrawRecordSummary;
+func_83008188 = Fragment7_DrawSelectedRecordView;
+func_8300A898 = Fragment7_RunSelectionMenu;

@@ -211,7 +211,37 @@ void func_83001788(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830018B0.s")
+typedef struct { s16 x, y; } Fragment7DrawOrigin;
+extern Gfx *D_800D0510;
+extern Gfx D_80094D90[];
+extern s32 D_8300F890[];
+extern u8 D_8300C43C[];
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800495BC(s32, s32, const char *, ...);
+extern void WidgetResources_DrawRecords(s32, s32, s32);
+extern void func_830043F0(void *, void *, void *, void *, f32, s32);
+extern void func_81800C18(s32, s32, s32, s32);
+extern void Gfx_FillRectRgb(s16, s16, s16, s16, u8, u8, u8);
+extern void func_800498C4();
+extern void func_800499EC();
+extern void func_818006FC(s32, s32, s32, f32);
+void Fragment7_DrawSavedRecordList(u8 *records, s32 x, s32 y, f32 weight) {
+    s32 i;
+
+    func_818006FC(x + 13, y + 37, 188, weight);
+    func_800498C4();
+    func_800496A4(8, 1);
+    func_8004972C(255, 255, 255, (s32)(255.0f * weight));
+    for (i = 0; i < records[1]; i++) {
+        func_800495BC(x + 23, y + 45 + i * 26, (char *)(records + 4 + i * 68));
+    }
+    func_800499EC();
+    gSPDisplayList(D_800D0510++, D_80094D90);
+    for (i = 0; i < records[0] - 1; i++) {
+        Gfx_FillRectRgb((s16)(x + 23), (s16)(y + 67 + i * 26), 172, 1, 70, 120, 70);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -393,7 +423,45 @@ void func_83002424(s32 arg0, void *arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83002988.s")
+extern void func_800495F8(s32, s32, s32, void *);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800498C4();
+extern void func_800499EC();
+extern void func_818006FC(s32, s32, s32, f32);
+extern void func_81800C18(s32, s32, s32, s32);
+extern void func_8180351C(void *);
+extern void func_81803964(void *, void *, f32, s32);
+extern f32 func_818055E0(void *, u8 *);
+extern void func_81805644(s32, s32, s32);
+extern u8 D_8300C43C[];
+extern s32 D_8300F890[];
+void Fragment7_DrawRecordSummary(void *definition, u8 *state, Fragment7DrawOrigin *origin) {
+    void *entry;
+    f32 weight;
+    s32 alpha;
+    Fragment7DrawOrigin position;
+
+    weight = func_818055E0(definition, state);
+    entry = NULL;
+    func_81805644((s32)definition, (s32)state, (s32)origin);
+    func_818006FC(origin->x + 13, origin->y + 37, 226, weight);
+    if (state[0x3D959] > 0) {
+        entry = state + 0x3D95C;
+    }
+    if (entry != NULL) {
+        func_800498C4();
+        func_8180351C(D_8300F890);
+        alpha = (s32)(255.0f * weight);
+        func_8004972C(255, 255, 255, alpha);
+        func_800495F8(origin->x + 126, origin->y + 50, D_8300F890[0], entry);
+        func_800499EC();
+        position = *origin;
+        position.x += 95;
+        position.y += 76;
+        func_81803964(D_8300C43C, &position, weight, 0);
+        func_81800C18(origin->x + 114, origin->y + 76, 5, *(u16 *)((u8 *)entry + 12));
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -935,7 +1003,29 @@ void func_8300814C(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008188.s")
+extern void WidgetResources_DrawRecords(s32, s32, s32);
+extern f32 func_818055E0(void *, u8 *);
+extern void func_830043F0(void *, void *, void *, void *, f32, s32);
+void Fragment7_DrawSelectedRecordView(void *definition, u8 *state, void *origin) {
+    f32 weight;
+    s32 index;
+    void *records;
+    void *data;
+
+    weight = func_818055E0(definition, state);
+    if (state[71] >= 4) {
+        index = state[71];
+        index += state[87];
+        records = (void *)((s32)state + index * 1168 + 0x3ABB8);
+        data = (void *)((s32)state + index * 16400 + 0x8080);
+    } else {
+        index = state[71];
+        records = (void *)((s32)state + index * 1168 + 0x39E04);
+        data = (void *)((s32)state + index * 16400 - 0x3FB0);
+    }
+    WidgetResources_DrawRecords((s32)definition, (s32)state, (s32)origin);
+    func_830043F0(state, records, data, origin, weight, 1);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1385,14 +1475,8 @@ extern void func_8300A4BC(s32, s32);
 extern void func_8300A50C();
 extern void func_8300A5B4(s32, s32);
 
-void func_8300A81C(s32 arg0, s32 arg1) {
-#ifdef CC_CHECK
-    /* The original call forwards existing argument registers without setup.
-     * Keep that call for IDO; expose its unprototyped ABI to the host checker. */
-    ((void (*)())func_8300A50C)();
-#else
-    func_8300A50C();
-#endif
+void func_8300A81C(s32 arg0, s32 arg1, s32 arg2) {
+    func_8300A50C(arg0, arg1, arg2);
     func_8300A4BC(arg0, arg1);
     func_8300A5B4(arg0, arg1);
 }
@@ -1413,5 +1497,58 @@ void func_8300A858(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300A898.s")
+extern u8 func_8005D8CC(s32);
+extern void func_80057908(u8);
+extern void func_8300A81C(s32, s32, s32);
+extern void _bzero(void *, s32);
+extern void func_8300A6B0(s32 arg0, s32 arg1);
+extern void func_8300A71C(s32 arg0, s32 arg1);
+extern s32 func_8300A754(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+extern void func_8300A858(void);
+s32 Fragment7_RunSelectionMenu(s32 definition, void *memory) {
+    u8 *state = memory;
+    s32 selected;
+    s32 running;
+    s32 first;
+    s32 resume;
+
+    resume = state[54] != 0;
+    running = 1;
+    first = 1;
+    selected = state[28];
+    func_8300A6B0(definition, (s32)state);
+    while (running) {
+        if (resume) {
+            selected = state[28];
+            resume = 0;
+            first = 0;
+        } else {
+            func_8300A858();
+            selected = func_8300A754(definition, (s32)state, first, selected);
+            first = 0;
+            _bzero(state + 28, 31);
+        }
+        if (selected >= 0) {
+            if (selected < 4) {
+                if (func_8005D8CC(selected) == 0) {
+                    func_80057908((u8)selected);
+                } else {
+                    selected = 7;
+                }
+            }
+            func_8300A81C(definition, (s32)state, selected);
+            if (*(s32 *)(state + 16) != 0) {
+                running = 0;
+            }
+        } else {
+            *(s32 *)(state + 16) = 0;
+            running = 0;
+        }
+    }
+    func_8300A71C(definition, (s32)state);
+    if (*(s32 *)(state + 16) == 0) {
+        func_8300A858();
+    }
+    return 0;
+}
 #endif
