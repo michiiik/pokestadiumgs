@@ -485,6 +485,8 @@
     - [0xAFAA0, c,       fragments/4/fragment4_AFAA0]
     - [0xB2D00, c,       fragments/4/fragment4_B2D00]
     - [0xB3F00, data,    fragments/4/fragment4_data]
+    - [0xB4580, .rodata, fragments/4/fragment4_B2D00]
+    - [0xB45B0, rodata,  fragments/4/fragment4_rodata_tail]
 
   # unk fragment
   - name: fragment5

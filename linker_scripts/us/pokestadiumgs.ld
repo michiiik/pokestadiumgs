@@ -930,6 +930,7 @@ SECTIONS
         build/src/fragments/4/fragment4_AE600.o(.rodata);
         build/src/fragments/4/fragment4_AFAA0.o(.rodata);
         build/src/fragments/4/fragment4_B2D00.o(.rodata);
+        build/asm/us/data/fragments/4/fragment4_rodata_tail.rodata.o(.rodata);
         fragment4_RODATA_END = .;
         fragment4_RODATA_SIZE = ABSOLUTE(fragment4_RODATA_END - fragment4_RODATA_START);
     }
