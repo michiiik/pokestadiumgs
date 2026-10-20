@@ -83,6 +83,9 @@ func_841639D0 = FourStreamTrail_Init;
 func_84163B4C = FourStreamTrail_Start;
 func_84163E60 = FourStreamTrail_UpdateNodeChain;
 func_84164280 = FourStreamTrail_Draw;
+func_841647D0 = OwnerLinkedFourStream_Init;
+func_84164924 = OwnerLinkedFourStream_Start;
+func_84164C28 = OwnerLinkedFourStream_UpdateNodeChain;
 
 /* Particle callback defaults: scale and RGBA fields in the shared block. */
 D_80128C58 = D_80128C54 + 0x4;
