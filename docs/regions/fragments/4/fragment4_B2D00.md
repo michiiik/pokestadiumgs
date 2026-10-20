@@ -133,41 +133,73 @@ Retail ROM MD5 remains 1561c75d11cedf356a8ddb1a4a5f9d5d.
 
 Future C candidates replacing func_81804BC8 must emit the migrated 1.2f
 constant rather than merely referencing D_81805FA0 as an external symbol.
-Similarly, replacing func_8180567C must account for the migrated first 0.99f
-constant, while its second threshold D_81805FD0 remains in the shared tail.
+The accepted selection renderer emits the migrated first 0.99f constant,
+while its second threshold D_81805FD0 remains in the shared tail.
 These are ownership/layout requirements, not permission to rewrite code bytes.
 
+### 2026-10-21: flagged reset and selection drawing accepted
+
+Two more US owners pass their normal runner/full-ROM gates, 416 original bytes:
+
+- 81805428: WidgetSelection_ResetFlaggedVariant, 76 bytes. Resolve the
+  definition's variant selected by state byte 30. If its offset-32 script is
+  present and flag bit 30 is set, reset its state-backed selection to the
+  script's default. The called helper's byte store establishes the reset name.
+- 8180567C: WidgetResources_DrawSelection, 340 bytes. Resolve the active
+  variant, obtain its transition weight, draw the script resources, then draw
+  its selected entry when the high-flag/mask condition permits. Preserve the
+  byte selected index and the existing one-based index-minus-one mask.
+
+Both high-flag residuals close with a real bitfield view of the four-byte
+script flag word at offset 16. The named fields cover reset-selection bit 30
+and hide-masked-selection bit 29; all other bits remain unnamed. Target compiler
+size assertions and initialized fixtures independently verify size 4 and word
+masks 0x40000000/0x20000000. This is matching-source evidence, not a claim to
+possess the original source. Ordinary AND tests, address-carrier changes,
+integer-width changes and extra locals did not reproduce that lowering.
+
+The renderer's remaining SP40/SP44 spill residual closes by placing both real
+boolean conditions directly in their draw calls. C argument promotion then
+owns the selected-index temporary and its correct home. No new index local,
+padding, buffer inflation, register constraint or object rewrite is needed.
+The migrated first 0.99f constant differs from the ASM symbol only in its
+relocation spelling; the sequential full-ROM gate establishes acceptance.
+
+The accepted helper at 81803C9C is now WidgetSelection_ResetToDefault with its
+actual script/state pointer interface. It calls func_81803BB8(script, state)
+and copies the script's default byte at offset 5 to the returned selection
+location. Its old zero-argument call and an existing empty branch are removed
+together. Removing only the empty branch changes code generation; explicit
+arguments plus that removal, followed by the readable source form and a
+twenty-blank control, preserve the entire helper TU. The sibling call in
+func_81803C14 also uses the actual pointer prototype.
+`//@src/fragments/4/fragment4_AFAA0.c`
+
+Fragment 7's func_83006308 explicitly forwards both real words to the flagged
+reset. Known/explicit/twenty-blank whole-TU controls prove this correction
+byte-inert before installation. Address-keyed aliases preserve assembly and
+cross-file callers for all three semantic names.
+`//@src/fragments/7/fragment7_BA250.c`
+
+Each first successful owner gate freezes the complete changed TU, four
+collateral C units and both data inputs before returning. Receipts are reread
+and all seven artifacts externally hashed immediately afterward. Fresh named
+and twenty-blank controls preserve every game section, function extent and
+resolved relocation target in all three changed C units. The main TU retains
+24 function extents, 4608 text bytes and 48 rodata bytes. The comparison resolves
+equivalent relocation fields; no production object is modified by it.
+
+The final named-source normal gate seals exact source/symbol/alias/layout
+inputs and freezes eleven complete objects before returning, including all
+three changed C units. Its main object SHA256 is
+3c5a171d8a3fa9ab797ecd7b09d3575dcb153b0539182c7f46ae26266b98ad7b;
+main source SHA256 is
+e002615108290992f9542a04e22b0ba5cf892a71c4c877db9614113507c09653.
+Retail ROM MD5: 1561c75d11cedf356a8ddb1a4a5f9d5d.
+No new padding, instruction/relocation rewrite, dummy local, private experiment
+helper or coverage change is part of this batch.
+
 ### Remaining requeues
-
-81805428 remains assembly. Best result is 76 bytes,
-with 17/19 instruction words exact: the bit-30 test's shift and branch use t8
-instead of retail t9. Byte/member views, signed/unsigned masks, explicit shifts,
-comparison forms and real flag carriers do not close the tie. Fifteen complete
-stock/blank/off/on observer controls pass on the known TU and two exact retained
-parents. UGEN emits an AND-immediate into t8; the final assembler lowers this
-to the observed shift/sign branch. Next: trace that lowering's input/temporary
-choice, rather than repeat declaration or mask grids. Further direct-resource
-guards, bit extraction, 64-bit masks and same-width int/long domains do not
-close the tie. Fifteen additional stock/blank/off/on complete-object controls
-calibrate the assembler's existing peephole diagnostic, but that log does not
-identify the required AND-to-sign-test lowering decision. Do not interpret
-its INST ordinals as final object offsets. Twelve stock 7.1/5.3 controls show
-the same refresh residual under both; 5.3 also changes already-matching
-neighbors, so no compiler configuration change is justified.
-Any accepted two-argument
-interface must also fix fragment 7's func_83006308, which currently omits its
-second actual argument in C; prove that caller cleanup whole-TU byte-inert.
-
-8180567C remains assembly. Capturing its actual byte selection result as u8
-reproduces the 72-byte frame without padding. Its 340-byte variant is raw
-0.8824: the first 54 words match, followed by a high-flag temporary sequence
-and selected-index spill at SP40 versus retail SP44. The 344-byte explicitly
-masked-index variant is raw 0.8953 but has an extra ANDI. Both forms are retained
-privately. Distinct condition locals, real script/flag carriers, inline call
-conditions and same-width integer domains do not close the residual. Fifteen
-independent frame-observer controls precede that interpretation. Next: trace
-the byte result's promoted stack home and the shared high-flag lowering;
-do not add unused locals or enlarge a buffer to force a frame.
 
 81804FD0 is now layout-ready but remains assembly after sixteen source
 candidates. The best 816-byte body is raw 0.7961, with a 112-byte frame versus

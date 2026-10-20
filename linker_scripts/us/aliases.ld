@@ -17,6 +17,10 @@ func_81804B74 = WidgetResources_UseTransitionWeight;
 func_81804954 = WidgetState_Initialize;
 func_81805308 = WidgetDefinitions_Draw;
 func_818057D0 = WidgetResources_DrawRecords;
+/* Selection flags, rendering and the explicit state-aware reset interface. */
+func_81803C9C = WidgetSelection_ResetToDefault;
+func_81805428 = WidgetSelection_ResetFlaggedVariant;
+func_8180567C = WidgetResources_DrawSelection;
 /* func_800195C0 reads and writes this same byte in the original assembly. */
 Audio_AiHdwrBugFlag = D_8008FAA0;
 /* Preserve address-keyed rectangle calls alongside the verified narrow API. */
