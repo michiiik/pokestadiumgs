@@ -427,6 +427,8 @@ SECTIONS
         build/src/4F800.o(.data);
         _517E0 = .;
         build/src/517E0.o(.data);
+        _85DA0_data = .;
+        build/asm/us/data/85DA0.data.o(.data);
         _56F90 = .;
         build/src/56F90.o(.data);
         _585D0 = .;
@@ -491,8 +493,8 @@ SECTIONS
         build/src/73C80.o(.data);
         _74020 = .;
         build/src/74020.o(.data);
-        _85DA0_data = .;
-        build/asm/us/data/85DA0.data.o(.data);
+        _97EE0_data = .;
+        build/asm/us/data/97EE0.data.o(.data);
         build/lib/libultra.a:exceptasm.o(.data);
         build/lib/libultra.a:thread.o(.data);
         build/lib/libultra.a:controller.o(.data);

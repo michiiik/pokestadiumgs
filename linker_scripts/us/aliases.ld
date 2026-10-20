@@ -521,3 +521,5 @@ func_800574E0 = GbPak_ReadClock;
 func_80057640 = GbPak_WriteClock;
 func_80056390 = GbPak_EnableRamAccess;
 func_80056C98 = GbPak_InitializePorts;
+func_8005655C = GbPak_ReadWriteRam;
+func_8005777C = GbPak_PollConnection;
