@@ -79,6 +79,10 @@ func_8412B51C = BattleAnim_Table_84185F10_015;
 func_8412F208 = BattleAnim_Table_84186004_009;
 func_80037E9C = GeoNode_CreateContainer;
 func_80032600 = GbAudio_RenderPulse2;
+func_841639D0 = FourStreamTrail_Init;
+func_84163B4C = FourStreamTrail_Start;
+func_84163E60 = FourStreamTrail_UpdateNodeChain;
+func_84164280 = FourStreamTrail_Draw;
 
 /* Particle callback defaults: scale and RGBA fields in the shared block. */
 D_80128C58 = D_80128C54 + 0x4;
