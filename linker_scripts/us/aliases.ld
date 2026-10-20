@@ -585,3 +585,7 @@ func_830018B0 = Fragment7_DrawSavedRecordList;
 func_83002988 = Fragment7_DrawRecordSummary;
 func_83008188 = Fragment7_DrawSelectedRecordView;
 func_8300A898 = Fragment7_RunSelectionMenu;
+func_83001A3C = Fragment7_DrawFirstRecordListPanel;
+func_83001BA4 = Fragment7_DrawSecondRecordListPanel;
+func_83008DC0 = Fragment7_SelectSavedRecord;
+func_830096B8 = Fragment7_InitializeRecordCollections;
