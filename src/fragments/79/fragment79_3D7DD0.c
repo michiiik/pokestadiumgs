@@ -190,9 +190,103 @@ void BattleAnim_SixSlotTrail_Spawn(s16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 a
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84168C18.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84168CA4.s")
+extern void func_84109780(s32);
+extern f32 __sinf(f32);
+void BattleAnim_SixSlotTrail_UpdateSlot(S1_unk_D_843C3508* trail) {
+    S1_unk_D_843C3508_0A4* node;
+    s32 phase; //!bug Retail reads this phase local without initializing it.
+    s32 i;
+    S1_Vec3f anchor;
+    S1_Vec3f *anchor_pointer;
+    f32 vertical_modulation;
+    f32 depth_offset;
+    f32 vertical_offset;
+    s32 depth_period;
+    s32 modulation_period;
+    s32 modulation_shift;
+    s32 depth_shift;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84169040.s")
+    anchor_pointer = &anchor;
+    node = &trail->unk_0A4[0];
+    for (i = 0; i < 20; i++, node++) {
+        if (node->unk_00 > 0.0) {
+            modulation_shift = (guRandom() % 20) + 2;
+            modulation_period = (guRandom() % 10) + 4;
+            depth_shift = (guRandom() % 20) + 2;
+            depth_period = (guRandom() % 10) + 4;
+
+            vertical_modulation = __sinf((((phase + modulation_shift) % modulation_period) * 6.2831854820251465) / modulation_period);
+            vertical_offset =
+                __sinf((((phase + depth_shift) % (depth_period + 20)) * 6.2831854820251465) / (depth_period + 20)) * (10.0 * vertical_modulation);
+            depth_offset = __sinf((((phase + depth_shift) % depth_period) * 6.2831854820251465) / depth_period) * 10.0;
+            func_84109780((s32)anchor_pointer);
+            node->unk_0C.x = anchor.x;
+            node->unk_0C.y = anchor.y + vertical_offset;
+            node->unk_0C.z = anchor.z + depth_offset;
+            node->unk_00 -= 1.0;
+        } else {
+            node->unk_0C.x += node->unk_18.x;
+            node->unk_0C.y += node->unk_18.y;
+            node->unk_0C.z += node->unk_18.z;
+            node->unk_08 += trail->unk_084;
+            node->unk_04 += 3.0f;
+            if (trail->unk_080 < node->unk_04) {
+                node->unk_04 = trail->unk_080;
+            }
+        }
+    }
+}
+
+extern s16 D_841A4DC0;
+extern u32 func_841094EC(void);
+s32 BattleAnim_SixSlotTrail_UpdateAll(void) {
+    f32 fade_fraction;
+    s32 i;
+    s32 active_count;
+    S1_unk_D_843C3508 *trail;
+    s32 state_flag;
+
+    trail = (S1_unk_D_843C3508 *)(D_84187DC0 + 2304);
+    D_841A4DC2++;
+    state_flag = func_841094EC();
+    if (state_flag == 1 && D_841A4DC4 == 0) {
+        D_841A4DC4 = 1;
+        D_841A4DC0 = D_841A4DC2 + 50;
+    }
+    active_count = 0;
+    for (i = 0; i < 6; i++, trail++) {
+        if (trail->unk_000 == 1) {
+            trail->unk_004++;
+            if (trail->unk_006 < trail->unk_004) {
+                trail->unk_000 = 0;
+            } else {
+                BattleAnim_SixSlotTrail_UpdateSlot(trail);
+                active_count++;
+            }
+            if (D_841A4DC4 == 1) {
+                if (D_841A4DC0 < D_841A4DC2) {
+                    return -1;
+                }
+                if (D_841A4DC0 - 20 < D_841A4DC2) {
+                    s16 fade_tick = D_841A4DC2 - D_841A4DC0 + 20;
+                    fade_fraction = fade_tick * 0.05f;
+                    trail->unk_014 = 1.0f - fade_fraction;
+                    trail->unk_018 = 1.0f - fade_fraction;
+                    if (fade_fraction > 1.0f) {
+                        trail->unk_014 = 0.0f;
+                    }
+                    if (trail->unk_018 < 0.0f) {
+                        trail->unk_018 = 0.0f;
+                    }
+                }
+            }
+        }
+    }
+    if (active_count > 0) {
+        return 0;
+    }
+    return -1;
+}
 
 typedef struct {
     u8 pad[0x88];
@@ -305,7 +399,6 @@ void AuxiliaryEffect_Update(s16 arg0) {
     }
 }
 
-extern f32 __sinf(f32);
 extern u32 Gfx_AllocDisplayList(s32);
 extern Gfx D_84188690[];
 extern u8 *D_80094908;
