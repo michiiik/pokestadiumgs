@@ -527,3 +527,7 @@ func_84165510 = OwnerAnchoredFourStream_Init;
 func_84165670 = OwnerAnchoredFourStream_Start;
 func_841659A0 = OwnerAnchoredFourStream_UpdateNodeChain;
 func_84166130 = TrailEffectPool_Init;
+func_84166270 = TrailEffectPool_Start;
+func_8416691C = TrailEffectPool_IsComplete;
+func_84166F60 = DoubleTextureTrail_InitPool;
+func_841670A8 = DoubleTextureTrail_Spawn;
