@@ -1585,7 +1585,8 @@
     - [0x3FC0A0, .rodata, fragments/79/fragment79_3D3260] # Trail constants, D_8418C810..D_8418C840
     - [0x3FC0E0, .rodata, fragments/79/fragment79_3D4060] # Owner-linked trail constants, D_8418C850..D_8418C89C
     - [0x3FC130, .rodata, fragments/79/fragment79_3D4DA0] # Anchored/multi-trail constants, D_8418C8A0..D_8418C91C
-    - [0x3FC1B0, rodata]
+    - [0x3FC1B0, .rodata,  fragments/79/fragment79_3D7DD0]
+    - [0x3FC1E0, rodata]
 
   - name: fragment80
     type: code

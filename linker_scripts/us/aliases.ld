@@ -540,3 +540,5 @@ func_84168680 = BattleAnim_SixSlotTrail_Spawn;
 func_84169BA8 = AuxiliaryEffect_Alloc;
 func_84169C74 = AuxiliaryEffect_Spawn;
 func_84169DBC = AuxiliaryEffect_Update;
+func_84169F18 = AuxiliaryEffect_DrawOne;
+func_8416A050 = AuxiliaryEffect_Draw;
