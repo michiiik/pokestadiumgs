@@ -657,7 +657,7 @@ extern f32 D_81805F68;
 extern f32 D_81805F6C;
 extern f32 D_81805F70;
 extern f32 D_81805F74;
-f32 func_81803CD4(f32 arg0) {
+f32 WidgetSelection_WrapAngle(f32 arg0) {
     f32 bound;
     f32 step;
     bound = D_81805F68;
@@ -677,10 +677,9 @@ f32 func_81803CD4(f32 arg0) {
     return arg0;
 }
 
-extern f32 func_81803CD4(f32);
 
-void func_81803D44(f32 arg0, f32 arg1) {
-    func_81803CD4(func_81803CD4(arg1) - func_81803CD4(arg0));
+f32 WidgetSelection_AngleDifference(f32 from, f32 to) {
+    return WidgetSelection_WrapAngle(WidgetSelection_WrapAngle(to) - WidgetSelection_WrapAngle(from));
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803D80.s")
@@ -689,5 +688,31 @@ void func_81803D44(f32 arg0, f32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_818042E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81804534.s")
+extern void Ui_DrawAnimatedTextureMarker(s16, s16);
+extern void func_8004AF18(s32, s32);
+extern void func_8004B314(s32, s32, s32, s32);
+extern void func_8004B2CC(s32, s32, s32, s32, u8, u8, u8, s32);
+void WidgetSelection_DrawMarker(u8 *script, void *origin, s32 selected, f32 weight, s32 active) {
+    Rect818017A8 rect;
+
+    if (*(void **)script != NULL) {
+        rect = *(Rect818017A8 *)(*(u8 **)script + selected * 24 - 18);
+        func_81801854((u8 *)&rect, (u8 *)&rect, origin);
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        gDPSetEnvColor(D_800D0510++, 255, 255, 255, 255.0f * weight);
+        if (*(u32 *)(script + 16) >> 31) {
+            if (active) {
+                Ui_DrawAnimatedTextureMarker(rect.x, rect.y);
+            } else {
+                func_8004AF18(rect.x, rect.y);
+            }
+        } else {
+            if (active) {
+                func_8004B314(rect.x, rect.y, rect.w, rect.h);
+            } else {
+                func_8004B2CC(rect.x, rect.y, rect.w, rect.h, 150, 150, 90, 0);
+            }
+        }
+    }
+}
 #endif

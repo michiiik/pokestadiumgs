@@ -197,3 +197,73 @@ Retail ROM MD5: 1561c75d11cedf356a8ddb1a4a5f9d5d.
 No instruction/relocation rewrite, forced register, new padding, dummy local,
 private helper, coverage update or layout change is included. The remaining
 style-blending and selection/input owners are separate decompilation work.
+
+## 2026-10-21: selection marker accepted; angle return contract corrected
+
+81804534 is now WidgetSelection_DrawMarker. Its first ordinary candidate
+passes the recorded native runner, link-shape verification and normal full-ROM
+gate. It copies the eight-byte rectangle at entry +6 in a 24-byte selection
+record, adds the supplied origin, emits the standard setup display list and
+white environment color with opacity 255.0f * weight, then chooses the marker
+from flag bit 31. Texture markers are static or animated; rectangular markers
+use the active highlight or the inactive 150/150/90 border. Existing renderer
+definitions and WidgetResources_DrawSelection establish these roles and the
+actual five-argument pointer/pointer/index/float/active interface.
+
+The retail owner span is 492 bytes. Compiled C occupies 484 bytes, followed by
+the same eight zero bytes from natural final section alignment. No padding
+pragma, helper, local or special alignment directive was added. Complete game
+sections, all function starts and semantic relocation targets/addends remain
+identical; only this final function's ELF size excludes the alignment tail.
+The gate preserves the whole-ROM checksum, not just an object text score.
+
+The first successful comparison freezes the complete changed TU, four
+collateral C units, the direct resource and fragment 7 callers, and both data
+inputs before returning. Both receipts are reread and all nine retained
+objects independently hashed before any later game compilation. Five further
+whole-TU controls cover known source, corrected float return, cleaned semantic
+names, twenty leading blank lines, and target rectangle offsets/size. They
+preserve every complete game section, the accepted function extents and all
+resolved relocation targets. Rectangle size is eight, with x/y/w/h at 0/2/4/6.
+
+Existing 81803CD4 is named WidgetSelection_WrapAngle. Existing 81803D44 is
+named WidgetSelection_AngleDifference and now explicitly returns its actual
+f32 result: wrap(wrap(to) - wrap(from)). The assembly navigation caller reads
+that result from f0. Its previous void spelling hid a real return contract;
+the corrected definition is whole-TU byte-inert, not a new decompiled owner.
+Three compatibility aliases preserve old address-keyed references. Unused
+probe-only types and redundant declarations are removed after acceptance.
+
+The final named-source normal gate seals source/symbol/alias/layout inputs
+and freezes eleven complete objects before returning. Receipts are reread
+and every object independently hashed before later compilation. Final main
+object SHA256:
+d273fca7040cb95641081c1eb7a79d11f92115d24f7cea92d6c083cf64c668f5.
+Final main source SHA256:
+41f7dd8a621e06b003f8e975dd6d6a151933482893c6c3bdad8cf9fb5fed8b25.
+Retail ROM MD5: 1561c75d11cedf356a8ddb1a4a5f9d5d. No instruction/relocation
+rewrite, forced register, dummy local, new padding, layout or coverage change
+is part of this batch; private experiment helpers are not published.
+
+requeue: 81802754 remains assembly-backed. Its natural eight-channel blend
+has correct 1112-byte size and 0x40 frame, with 276/278 instruction words
+matching; only the final output-pointer increment and FPCSR restore are
+swapped at offsets 936/940. Independent whole-TU audit verifies all other game
+bytes, extents and resolved relocations. Stock -keep captures, known/raw/final
+and twenty-blank controls locate restore-before-store/increment in UGEN output.
+The driver's normal verbose recipe already uses g0; an explicit g0 option
+therefore did not test a different debug baseline. Genuine stock 5.3 and 7.1
+retain the same residual. A recorded atomic byte-pointer prototype transaction
+with valid initializer lifetimes also leaves that residual. No observer or
+instruction patch was used to turn the near match into an acceptance. Next
+investigate compiler-phase ordering on this retained parent or an authentic
+source witness; do not repeat flat-loop casts, counter widths, cursor loops,
+storage views, nested RGBA loops or initializer grids without new evidence.
+
+requeue: 818042E4 remains assembly-backed. Its two texture/text passes and
+selected-last behavior have an ordinary 588-byte parent versus target 592,
+with an initial s0/s1 carrier swap. Moving the shared text-index reset before
+the selected texture draw recovers 592 bytes but leaves a missing selected
+index copy and extra second-loop strength reduction. Separate pass counters
+regress to a 0x58 frame. Next investigate the real selection/index carrier
+lifetimes and loop roles; no forced registers or dummy locals are installed.
