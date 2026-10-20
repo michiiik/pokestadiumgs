@@ -32,6 +32,33 @@ setup-address interface used by `func_831020D0`.
 
 ## Verification
 
+`Fragment6_DrawSavedEntryList` (`func_83101804`, 768 bytes) draws the saved
+entries populated by `func_83100584` in this file. That producer gives
+state+204 and capacity eight to `func_80062390`, then stores its count at
+state+748. Each entry occupies 68 bytes. The renderer draws those strings at
+origin+(59,39+26*row), highlights the one-based selection byte at state+63,
+and rechecks selection after each string draw before restoring white.
+
+A separately consumed nonempty flag selects texture/text style before the
+text loop. Both loops use ordinary row ordinals: entries start at zero, and
+the seven separator lines use rows one through seven. The compiler derives
+the pixel induction and separator termination value 208. Reusing one ordinal
+between the loops avoids an extra colored coordinate without dummy uses or
+manual pixel-counter management. Weight remains at sp+88 and cached floating
+opacity at sp+76 in the 104-byte frame. Text alpha is signed integer
+255*weight; line alpha uses the actual byte-color rectangle interface.
+
+The saved-entry prefix describes only verified fields and unknown byte ranges,
+not the entire 756-byte state. Target-compiler layout controls verify selection
+offset 63, entry offset 204, count offset 748, row size 68, and capacity eight.
+SDK display-list setup and compiler-generated unsigned float conversion remain
+ordinary C. The recorded sequential full-ROM gate and named-source final gate
+are byte-identical to the US ROM. Existing fragment-4 alias spellings leave
+the runner's link-shape diagnostic false; independent canonical-name comparison
+verifies all game bytes, 39 function extents, and semantic relocations. Frozen
+first-success artifacts and five whole-TU cleanup/name/blank/layout controls
+cover the accepted source.
+
 `Fragment6_DrawAvailableEntryList` (`func_83101400`, 788 bytes) draws ten
 26-pixel-spaced rows from the available-entry mapping initialized by
 `func_831000FC` in `src/fragments/6/fragment6_code.c`. That producer writes
@@ -82,14 +109,6 @@ locals, manufactured padding, or hand-unrolled loops are used by these owners.
   selection, scroll, button, and active-state values did not fix it. Investigate
   genuine source lifetimes; do not copy unrelated callbacks' unused result arrays.
 - `func_831001A8`: longer selection/state lookup; not probed in this batch.
-- `func_83101804`: requeue. Eighty recorded variants retain a best 768-byte,
-  104-byte-frame candidate with 174/192 positional words exact, correct float
-  spill homes, and an eighteen-word register-only residual. Derived text Y
-  from the real ordinal fixed the cached-opacity home. Pixel-carrier and
-  separator-bound variants did not improve it. A calibrated local search's
-  lower scores required an unnecessary boolean-copy variable and were
-  rejected. Continue genuine availability/count and live-range hypotheses;
-  no candidate has been accepted for this owner.
 - `func_8310065C`: layout prerequisite. Its `jtbl_83103998` remains outside
   the owner. Migrate the table and gate the still-assembly layout before
   attempting a C switch.
