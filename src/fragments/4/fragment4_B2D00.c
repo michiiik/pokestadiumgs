@@ -2,6 +2,14 @@
 
 
 #ifdef VERSION_US
+// Named bits in the selection script's flag word at offset 16.
+typedef struct {
+    unsigned int : 1;
+    unsigned int reset_selection : 1;
+    unsigned int hide_masked_selection : 1;
+    unsigned int : 29;
+} Fragment4SelectionFlags;
+
 typedef struct {
     u8 unk_00[24];
     s32 comparison_key;
@@ -42,7 +50,7 @@ extern void func_81802DC8(u8 *);
 extern void func_81802E34(u8 *);
 extern void func_81803B18(void *);
 extern void func_81802D98(void *);
-extern void func_81803C9C();
+extern void WidgetSelection_ResetToDefault(void *, void *);
 extern f32 func_818006B4(void);
 extern u8 *func_818054D0(void *, u8);
 void WidgetResources_Release(s32 arg0) {
@@ -117,7 +125,7 @@ void WidgetDefinitions_Initialize(Fragment4DefinitionView **list, Fragment4State
         for (i = 0; i < state->count; i++) {
             resource = func_818054D0(*list, (u8)i);
             if (*(void **)(resource + 32) != NULL) {
-                func_81803C9C(*(void **)(resource + 32), state);
+                WidgetSelection_ResetToDefault(*(void **)(resource + 32), state);
             }
         }
         list++;
@@ -252,9 +260,22 @@ void WidgetDefinitions_Draw(Fragment4StateView *state) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81805428.s")
+extern void func_818042E4(void *, void *, void *, f32, s32);
+extern void func_81804534(void *, void *, s32, f32, s32);
+extern s32 func_81803BE8(void *, void *);
+extern u8 *func_81803BB8(void *, void *);
+extern f32 D_81805FD0;
+void WidgetSelection_ResetFlaggedVariant(s32 arg0, s32 arg1) {
+    u8 *resource;
+    void *script;
 
-extern u8 *func_818054D0(void *arg0, u8 arg1);
+    resource = func_818054D0((void *)arg0, ((Fragment4StateView *)arg1)->unk_1E);
+    script = *(void **)(resource + 32);
+    if (script != NULL && ((Fragment4SelectionFlags *)((u8 *)script + 16))->reset_selection != 0) {
+        WidgetSelection_ResetToDefault(*(void **)(resource + 32), (void *)arg1);
+    }
+}
+
 extern void func_81801CB8(void *arg0, void *arg1, void *arg2, s32 arg3);
 void func_81805474(void *arg0, u8 *arg1, void *arg2) {
     void *first_offset;
@@ -321,7 +342,6 @@ s32 func_818055A4(void *arg0, u8 *arg1) {
     return var_a0;
 }
 
-extern u8 *func_818054D0(void *arg0, u8 arg1);
 f32 func_818055E0(void *arg0, u8 *arg1) {
     void *first;
     void *second;
@@ -337,15 +357,34 @@ f32 func_818055E0(void *arg0, u8 *arg1) {
     return result;
 }
 
-extern void func_8180567C(s32, s32, s32);
+extern void WidgetResources_DrawSelection(s32, s32, s32);
 extern void WidgetResources_DrawRecords(s32, s32, s32);
 
 void func_81805644(s32 arg0, s32 arg1, s32 arg2) {
     WidgetResources_DrawRecords(arg0, arg1, arg2);
-    func_8180567C(arg0, arg1, arg2);
+    WidgetResources_DrawSelection(arg0, arg1, arg2);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_8180567C.s")
+void WidgetResources_DrawSelection(s32 arg0, s32 arg1, s32 arg2) {
+    Fragment4ResourceView *resource;
+    f32 weight;
+    u32 mask;
+    u8 value;
+
+    resource = (Fragment4ResourceView *)func_818054D0((void *)arg0, ((Fragment4StateView *)arg1)->unk_1F);
+    weight = func_818055E0((void *)arg0, (u8 *)arg1);
+    if (resource->unk_20 != NULL) {
+        func_818042E4(resource->unk_20, (void *)arg2, (void *)arg1, weight, resource->comparison_key != -2 && weight > 0.99f);
+        if (*(s32 *)resource->unk_20 != 0 && weight > D_81805FD0) {
+            mask = func_81803BE8(resource->unk_20, (void *)arg1);
+            value = *func_81803BB8(resource->unk_20, (void *)arg1);
+            if (((Fragment4SelectionFlags *)((u8 *)resource->unk_20 + 16))->hide_masked_selection == 0 ||
+                (mask & (1U << (value - 1))) == 0) {
+                func_81804534(resource->unk_20, (void *)arg2, value, weight, resource->comparison_key != -2 && func_81804A20((u8 *)arg1) != 0);
+            }
+        }
+    }
+}
 
 extern void func_81802EA0(void *, s32, s32, s32, s32);
 extern void func_81801E3C(u8 *, u8 *);

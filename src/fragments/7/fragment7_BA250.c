@@ -554,10 +554,10 @@ void func_830042F0(s32 arg0, void *arg1, u8 *arg2) {
 #endif
 
 #ifdef VERSION_US
-extern void func_81805428(s32);
+extern void WidgetSelection_ResetFlaggedVariant(s32, s32);
 extern void func_8300112C(s32);
 void func_83006308(s32 arg0, s32 arg1) {
-    func_81805428(arg0);
+    WidgetSelection_ResetFlaggedVariant(arg0, arg1);
     func_8300112C(arg1);
 }
 #endif

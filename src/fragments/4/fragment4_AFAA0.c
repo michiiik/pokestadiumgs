@@ -490,31 +490,27 @@ void func_81803B18(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803BE8.s")
 
-extern u8 *func_81803BB8();
+extern u8 *func_81803BB8(void *, void *);
 extern s32 func_81803BE8();
 s32 func_81803C14(s32 arg0, s32 arg1) {
     s32 mask;
     u8 *value;
 
     mask = func_81803BE8(arg0, arg1);
-    value = func_81803BB8(arg0, arg1);
+    value = func_81803BB8((void *)arg0, (void *)arg1);
     if (value == 0) return 0;
     if (mask == 0) return 0;
     if (*value >= 0x21) return 0;
     return ((1 << (*value + 0x1F)) & mask) != 0;
 }
 
-void func_81803C9C(void *arg0)
-{
-  u8 *temp_v0;
-  temp_v0 = func_81803BB8();
-  if ((*((s32 *) (((u8 *) arg0) + 0))) != 0)
-  {
-    *temp_v0 = *((u8 *) (((u8 *) arg0) + 5));
-    if (arg0)
-    {
+void WidgetSelection_ResetToDefault(void *script, void *state) {
+    u8 *selection;
+
+    selection = func_81803BB8(script, state);
+    if (*(void **)script != NULL) {
+        *selection = *((u8 *)script + 5);
     }
-  }
 }
 
 extern f32 D_81805F68;
