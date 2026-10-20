@@ -2,24 +2,199 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D4DA0/func_84165510.s")
+// Four 0x41C-byte streams, each retaining fifteen current/previous samples.
+typedef struct { f32 x, y, z; } AnchorTrailVec3f;
+typedef struct {
+    u8 alpha;
+    f32 scale;
+    f32 angle;
+    AnchorTrailVec3f position;
+    AnchorTrailVec3f velocity;
+    f32 previous_scale;
+    f32 previous_angle;
+    AnchorTrailVec3f previous_position;
+    AnchorTrailVec3f previous_velocity;
+} AnchorTrailSample;
+typedef struct {
+    s16 active, age, lifetime, direction;
+    u8 color[3];
+    f32 scale_limit;
+    f32 angle_step;
+    Vtx *vertices;
+    u8 *particle;
+    AnchorTrailSample samples[15];
+    f32 marker_scale;
+} AnchorTrailStream;
+// GS adds a live scalar at 0x0C before the pool node's position.
+//@src/fragments/79/fragment79_3C60B0.c
+typedef struct {
+    u8 alpha;
+    f32 scale;
+    f32 angle;
+    f32 unk0C;
+    AnchorTrailVec3f position;
+    AnchorTrailVec3f velocity;
+    u8 unk28[40];
+} TrailPoolSample;
+typedef struct {
+    s16 active, age, unk004, unk006, unk008;
+    u8 color[3];
+    f32 unk010, unk014, unk018;
+    u8 unk01C[4];
+    Vtx *vertices;
+    AnchorTrailVec3f unk024;
+    u8 unk030[16];
+    TrailPoolSample samples[10];
+} TrailPoolRecord;
+extern u8 *D_84187BD0;
+extern TrailPoolRecord D_8419F070[];
+extern s16 D_841A4DB4, D_841A4DB2;
+extern s32 BattleAnim_GetSecondaryOwnerSpecies(void);
+extern u8 *func_84109B88(AnchorTrailVec3f, u8);
+extern void func_84109BA4(u8 *, AnchorTrailVec3f);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D4DA0/func_84165670.s")
+extern u8 * D_84187BD0;
+void OwnerAnchoredFourStream_Init(void) {
+    s32 i;
+    s32 j;
+    AnchorTrailStream* var_v0 = (AnchorTrailStream *)D_84187BD0;
+    AnchorTrailSample* var_a0;
 
-extern f64 D_8418C8B0;
-extern f64 D_8418C8B8;
+    for (i = 0; i < 4; i++, var_v0++) {
+        var_v0->active = 0;
+        var_v0->age = 0;
+        var_v0->lifetime = 0;
+        var_v0->marker_scale = 0.16f;
+
+        var_a0 = &var_v0->samples[0];
+        for (j = 0; j < 15; j++, var_a0++) {
+            var_a0->alpha = 0;
+            var_a0->scale = 1.0f;
+            var_a0->angle = 0.0f;
+            var_a0->position.x = 0.0f;
+            var_a0->position.y = 0.0f;
+            var_a0->position.z = 0.0f;
+            var_a0->velocity.x = 0.0f;
+            var_a0->velocity.y = 0.0f;
+            var_a0->velocity.z = 0.0f;
+        }
+    }
+}
+
+void OwnerAnchoredFourStream_Start(f32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, u8 arg6, u8 arg7, u8 arg8, u8 arg9,
+                   f32 argA, f32 argB, f32 argC, s16 argD) {
+    s32 i;
+    s32 j;
+    AnchorTrailStream* var_v1;
+    AnchorTrailSample* var_s0;
+    AnchorTrailVec3f sp64;
+    AnchorTrailVec3f sp58;
+
+    sp64.x = arg0;
+    sp64.y = arg1;
+    sp64.z = arg2;
+    sp58.x = arg3;
+    sp58.y = arg4;
+    sp58.z = arg5;
+
+    var_v1 = (AnchorTrailStream *)D_84187BD0;
+    for (i = 0; i < 4; i++, var_v1++) {
+        if (var_v1->active == 0) {
+            var_v1->active = 1;
+            var_v1->age = 0;
+            var_v1->lifetime = argD;
+            var_v1->color[0] = arg6;
+            var_v1->color[1] = arg7;
+            var_v1->color[2] = arg8;
+            var_v1->angle_step = argA;
+
+            if (BattleAnim_GetSecondaryOwnerSpecies() == 0xD) {
+                var_v1->marker_scale = 0.08f;
+                var_v1->scale_limit = argC * 0.5f;
+            } else {
+                var_v1->marker_scale = 0.16f;
+                var_v1->scale_limit = argC;
+            }
+
+            var_v1->particle = func_84109B88(sp64, 2);
+            if (arg3 < 0.0) {
+                var_v1->direction = -1;
+            } else {
+                var_v1->direction = 1;
+            }
+
+            var_s0 = &var_v1->samples[0];
+            for (j = 0; j < 15; j++, var_s0++) {
+                var_s0->alpha = (arg9 * (0xE - j)) / 15;
+                var_s0->scale = argB;
+                var_s0->angle = ((guRandom() % 120) * 6.2831855f) / 120.0;
+                var_s0->position = sp64;
+                var_s0->velocity = sp58;
+            }
+            break;
+        }
+    }
+}
+
 void OwnerAnchoredFourStream_Update(f32 arg0, f32 *arg1, f32 arg2) {
-    UNUSED f32 pad[16];
+    UNUSED f32 pad[16]; // FAKE: inherited unused matrix-sized storage.
     f32 sp30[4][4];
-    UNUSED s32 pad2[2];
-    guRotateF(sp30, (arg0 * D_8418C8B0) / D_8418C8B8, 1.0f, 0.0f, 0.0f);
+    UNUSED s32 pad2[2]; // FAKE: inherited unused local; cleanup remains unresolved.
+    guRotateF(sp30, (arg0 * 360.0) / 6.2831854820251465, 1.0f, 0.0f, 0.0f);
     guMtxXFMF(sp30, 0.0f, 0.0f, arg2, &arg1[0], &arg1[1], &arg1[2]);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D4DA0/func_841659A0.s")
+void OwnerAnchoredFourStream_UpdateNodeChain(u8 *data) {
+    AnchorTrailStream *arg0 = (AnchorTrailStream *)data;
+    s32 i;
+    AnchorTrailSample* var_s0 = &arg0->samples[0];
 
-extern u8 *D_84187BD0;
-extern void func_841659A0(u8 *);
+    for (i = 0; i < 15; i++, var_s0++) {
+        if (i == 0) {
+            var_s0->previous_scale = var_s0->scale;
+            var_s0->previous_angle = var_s0->angle;
+
+            var_s0->previous_position = var_s0->position;
+            var_s0->previous_velocity = var_s0->velocity;
+
+            var_s0->position.x += var_s0->velocity.x;
+            var_s0->position.y += var_s0->velocity.y;
+            var_s0->position.z += var_s0->velocity.z;
+
+            var_s0->angle += arg0->angle_step;
+            if (arg0->direction > 0) {
+                var_s0->velocity.x += 0.4;
+                if (var_s0->velocity.x > 20.0) {
+                    var_s0->velocity.x = 20.0f;
+                }
+            } else {
+                var_s0->velocity.x -= 0.4;
+                if (var_s0->velocity.x < -20.0) {
+                    var_s0->velocity.x = -20.0f;
+                }
+            }
+
+            func_84109BA4(arg0->particle, var_s0->position);
+
+            var_s0->scale += 2.0;
+            if (arg0->scale_limit < var_s0->scale) {
+                var_s0->scale = arg0->scale_limit;
+            }
+        } else {
+            var_s0->previous_scale = var_s0->scale;
+            var_s0->previous_angle = var_s0->angle;
+
+            var_s0->previous_position = var_s0->position;
+            var_s0->previous_velocity = var_s0->velocity;
+
+            var_s0->position = var_s0[-1].previous_position;
+            var_s0->angle = var_s0[-1].previous_angle;
+            var_s0->velocity = var_s0[-1].previous_velocity;
+            var_s0->scale = var_s0[-1].previous_scale;
+        }
+    }
+}
+
 s32 func_84165C2C(void) {
     u8 *ptr = D_84187BD0;
     s32 i = 0;
@@ -29,7 +204,7 @@ s32 func_84165C2C(void) {
             if (*(s16 *)(ptr + 4) < *(s16 *)(ptr + 2)) {
                 *(s16 *)ptr = 0;
             } else {
-                func_841659A0(ptr);
+                OwnerAnchoredFourStream_UpdateNodeChain(ptr);
             }
         }
         i++;
@@ -40,15 +215,43 @@ s32 func_84165C2C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D4DA0/func_84165CC0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D4DA0/func_84166130.s")
+// Unlike Stadium 1's fifty-record pool, GS initializes twenty-six records.
+void TrailEffectPool_Init(void) {
+    TrailPoolRecord* var_v0 = &D_8419F070[0];
+    TrailPoolSample* var_a0;
+    s32 i;
+    s32 j;
+
+    D_841A4DB4 = 0;
+    D_841A4DB2 = 0;
+
+    for (i = 0; i < 26; i++, var_v0++) {
+        var_v0->active = 0;
+        var_v0->unk004 = 0;
+        var_v0->unk006 = 0;
+
+        var_a0 = &var_v0->samples[0];
+
+        for (j = 0; j < 10; j++, var_a0++) {
+            var_a0->alpha = 0;
+            var_a0->scale = 1.0f;
+            var_a0->angle = 0.0f;
+
+            var_a0->position.x = 0.0f;
+            var_a0->position.y = 0.0f;
+            var_a0->position.z = 0.0f;
+            var_a0->velocity.x = 0.0f;
+            var_a0->velocity.y = 0.0f;
+            var_a0->velocity.z = 0.0f;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D4DA0/func_84166270.s")
 
-extern f64 D_8418C8E8;
-extern f64 D_8418C8F0;
 void func_8416654C(f32 arg0, f32 *arg1, f32 arg2) {
     f32 sp30[4][4];
-    f32 angle = (arg0 * D_8418C8E8) / D_8418C8F0;
+    f32 angle = (arg0 * 360.0) / 6.2831854820251465;
     guRotateRPYF(sp30, 90.0f, angle, angle);
     guMtxXFMF(sp30, 0.0f, 0.0f, arg2, &arg1[0], &arg1[1], &arg1[2]);
 }
@@ -63,12 +266,11 @@ void func_8416654C(f32 arg0, f32 *arg1, f32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D4DA0/func_841670A8.s")
 
-extern f32 D_8418C910;
 void DoubleTextureTrail_RotateVertexOffset(f32 arg0, f32 *arg1, f32 arg2) {
-    UNUSED f32 pad[16];
+    UNUSED f32 pad[16]; // FAKE: inherited unused matrix-sized storage.
     f32 sp30[4][4];
-    UNUSED s32 pad2[2];
-    guRotateF(sp30, (360.0f * arg0) / D_8418C910, 1.0f, 0.0f, 0.0f);
+    UNUSED s32 pad2[2]; // FAKE: inherited unused local; cleanup remains unresolved.
+    guRotateF(sp30, (360.0f * arg0) / 6.2831855f, 1.0f, 0.0f, 0.0f);
     guMtxXFMF(sp30, 0.0f, 0.0f, arg2, &arg1[0], &arg1[1], &arg1[2]);
 }
 

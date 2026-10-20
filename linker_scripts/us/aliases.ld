@@ -523,3 +523,7 @@ func_80056C98 = GbPak_InitializePorts;
 func_8005655C = GbPak_ReadWriteRam;
 func_8005777C = GbPak_PollConnection;
 func_80002178 = Memmap_SetSegments;
+func_84165510 = OwnerAnchoredFourStream_Init;
+func_84165670 = OwnerAnchoredFourStream_Start;
+func_841659A0 = OwnerAnchoredFourStream_UpdateNodeChain;
+func_84166130 = TrailEffectPool_Init;
