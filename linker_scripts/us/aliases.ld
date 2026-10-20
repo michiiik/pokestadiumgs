@@ -523,3 +523,4 @@ func_80056390 = GbPak_EnableRamAccess;
 func_80056C98 = GbPak_InitializePorts;
 func_8005655C = GbPak_ReadWriteRam;
 func_8005777C = GbPak_PollConnection;
+func_80002178 = Memmap_SetSegments;

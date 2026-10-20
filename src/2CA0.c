@@ -26,8 +26,6 @@ s32 Memmap_GetSegmentVaddrMask(s32 arg0, s32 arg1) {
 
 extern u8 D_800CC5B0[]; void Memmap_ClearSegmentMemmap(s32 index) { *(s32 *)(D_800CC5B0 + index * 8) = 0; *(s32 *)(D_800CC5B0 + index * 8 + 4) = 0; }
 
-#pragma REWRITE_FUNCTION_WORD(func_80002178, 0x4C, 0xAE380000, 0xAE780000)
-
 extern u8 D_800CC5B0[];
 extern u8 D_800CC630[];
 typedef struct SegmentEntry2CA0 {
@@ -35,26 +33,17 @@ typedef struct SegmentEntry2CA0 {
     u32 size;
 } SegmentEntry2CA0;
 
-void func_80002178(Gfx **gdl_p)
-{
-  SegmentEntry2CA0 *ptr;
-  Gfx *gdl;
-  s32 seg;
-  gdl = *gdl_p;
- ptr = (SegmentEntry2CA0 *) D_800CC5B0; seg = 0; do { Gfx *cmd = gdl; void *base; u32 paddr;
-    cmd->words.w0 = 0xDB060000 | (seg & 0xFFFF);
-    base = ptr->base;
-    gdl++;
-    paddr = osVirtualToPhysical(base);
-    ptr++;
-    seg = seg + 4;
-    if (!gdl)
-    {
+void Memmap_SetSegments(Gfx **gdl_p) {
+    SegmentEntry2CA0 *entry;
+    Gfx *gdl;
+    u32 segment;
+
+    gdl = *gdl_p;
+    entry = (SegmentEntry2CA0 *)D_800CC5B0;
+    for (segment = 0; segment < 16; segment++) {
+        gSPSegment(gdl++, segment, osVirtualToPhysical(entry[segment].base));
     }
-    cmd->words.w1 = paddr;
-  }
-  while (ptr != ((SegmentEntry2CA0 *) D_800CC630));
-  *gdl_p = gdl;
+    *gdl_p = gdl;
 }
 
 extern u32 Memmap_GetFragmentVaddr(u32);
