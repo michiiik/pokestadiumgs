@@ -575,3 +575,4 @@ func_81803964 = WidgetTexture_DrawRecord;
 func_81803CD4 = WidgetSelection_WrapAngle;
 func_81803D44 = WidgetSelection_AngleDifference;
 func_81804534 = WidgetSelection_DrawMarker;
+func_81802EA0 = WidgetFrame_DrawNineSlice;

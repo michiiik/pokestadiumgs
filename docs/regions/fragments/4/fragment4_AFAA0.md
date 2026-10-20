@@ -267,3 +267,64 @@ the selected texture draw recovers 592 bytes but leaves a missing selected
 index copy and extra second-loop strength reduction. Separate pass counters
 regress to a 0x58 frame. Next investigate the real selection/index carrier
 lifetimes and loop roles; no forced registers or dummy locals are installed.
+
+## 2026-10-21: nine-slice frame drawing accepted
+
+81802EA0 is WidgetFrame_DrawNineSlice, 1660 bytes with a 104-byte frame.
+The recorded native runner accepts the ordinary C body through the default
+host syntax check and full US ROM comparison. The complete containing unit
+retains every game byte, all 74 function extents, section layout, and resolved
+relocation target/addend. No instruction, relocation, or schedule rewrite,
+new padding, forced register, dummy local, or hand-unrolled loop is involved.
+
+The drawing sequence establishes the name: four separate corner quads,
+four edge quads, then a textured center or RGB/RGBA rectangle fill. A missing
+center texture selects the color path; negative center source dimensions
+select the texture setup mode and a scale of one for that axis. The corner
+scales use the stored signed value divided by 32. These eight border draws
+have distinct positions, dimensions, and texture coordinates; they are not
+an artificially expanded iteration.
+
+WidgetFrameNineSlicePrefix describes only the 72 drawing bytes. Its border
+insets start at 4, style pointer at 12, four eight-byte corner descriptors at
+16, center texture IDs at 48, center insets at 52, center style at 60, and
+source dimensions at 68/70. WidgetResources_DrawRecords passes this resource
+and the destination rectangle, then applies a separate content-inset record
+at resource+72. The prefix does not claim that the entire resource ends there.
+//@src/fragments/4/fragment4_B2D00.c
+
+The matching source keeps the real resource parameter and inset pointers,
+evaluates corner scales as draw arguments, and lets common extent expressions
+be shared by the compiler. Named scale/extent snapshots in the initial draft
+changed evaluation order or enlarged the frame. Five complete-TU controls
+(accepted, cleaned prefix, named, twenty blank lines, and target layout)
+preserve all bytes and relocations. First-success receipts freeze the main
+unit, four collateral C units, both data objects, and two direct callers;
+all nine objects are reread and externally hashed before further compilation.
+The compatibility alias retains the old address-keyed name for existing
+callers. Private drafting/probing helpers are excluded from the change.
+
+requeue: 81803D80 now has a reviewed 776-byte, 176-byte-frame navigation
+parent with 175/194 exact instruction words. Its remaining 19 words are
+register choices; all other game bytes, function extents, and semantic
+relocations agree. Correct point/direction-table/spill homes and instruction
+order are verified. Traversal must retain the last valid selection when the
+next neighbor is zero; proposed substitutions of that zero terminal neighbor
+for the retained selection were rejected on source review. Next investigate
+the actual current-selection/candidate-point/best-selection live ranges,
+not additional stack padding or register forcing. This owner remains ASM.
+
+Final named-source verification repeats the normal full-ROM gate, seals the
+source/symbol/alias/layout inputs, and freezes eleven complete objects before
+returning. All eleven hashes are reread and checked externally before further
+game compilation. Source SHA256:
+1d4485ba2f753f484c43c0e2cf63ef049179b662d684b5690c9cff2e12b5ce98.
+Complete main-object SHA256:
+086e635532283c3524adfc289ee9359f1b1c1daa9065ebcac5868ac0038cfb51.
+US ROM MD5: 1561c75d11cedf356a8ddb1a4a5f9d5d.
+All-source host syntax checks pass with existing warnings; all 76 native
+regression tests pass. Coverage and layout files are unchanged.
+The RGB/RGBA declarations use the actual helpers' u8 color parameters;
+five additional interface/layout/blank controls prove that correction
+byte-inert before the final gate.
+//@src/44E70.c
