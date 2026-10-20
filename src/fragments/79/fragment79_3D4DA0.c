@@ -733,5 +733,110 @@ Gfx* DoubleTextureTrail_LoadTextures(Gfx* arg0, S1_DoubleTextureTrail* arg1) {
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D4DA0/func_84168000.s")
+typedef struct {
+    u8 unk_00[168];
+    S1_Vec3f eye;
+} TrailCameraView;
+extern u32 func_841094A4(void);
+extern s32 func_800711B0(void);
+extern Gfx D_84187D48[];
+extern Gfx *func_84163380(Gfx *, S1_Vec3f *, S1_Vec3f *, S1_Vec3f *, f32, u8, u8, u8, u8);
+extern void Gfx_SetCombineMode(Gfx *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+extern u32 Gfx_AllocDisplayList(s32);
+// Builds ten nine-vertex rings, then draws front- and back-culled texture passes.
+Gfx* DoubleTextureTrail_DrawAll(Gfx* gfx) {
+    s32 i;
+    s32 j;
+    s32 k;
+    S1_DoubleTextureTrail* trail;
+    S1_unk_D_843C2C00_0B0* node;
+    S1_Vec3f vertex_offset;
+    S1_Vec3f first_position;
+    S1_Vec3f last_position;
+    S1_Vec3f camera_eye;
+    TrailCameraView* camera;
+    s32 texture_v;
+    Vtx* vertex;
+    u32 vertex_buffer_address;
+    f32 vertex_angle;
+
+    camera = (TrailCameraView *)func_841094A4();
+    trail = (S1_DoubleTextureTrail *)D_84187D40;
+
+    for (i = 0; i < 4; i++, trail++) {
+        if (trail->unk_000 == 1) {
+            if (func_800711B0() == 0) {
+                trail->unk_064.unk_00 += trail->unk_064.unk_04;
+                trail->unk_064.unk_02 += trail->unk_064.unk_06;
+                trail->unk_070.unk_00 += trail->unk_070.unk_04;
+                trail->unk_070.unk_02 += trail->unk_070.unk_06;
+            }
+
+            node = &trail->unk_0B0[0];
+
+            vertex_buffer_address = Gfx_AllocDisplayList(sizeof(Vtx) * 90);
+            trail->unk_018 = (Vtx *)vertex_buffer_address;
+
+            vertex = trail->unk_018;
+            for (j = 0; j < 10; j++, node++) {
+                texture_v = (j * 0x400) / 10;
+                for (k = 0; k < 9; k++) {
+                    vertex_angle = node->unk_0C + ((2.0f * (k % 8) * 3.1415927f) / 8);
+                    DoubleTextureTrail_RotateVertexOffset(vertex_angle, &vertex_offset.x, node->unk_08);
+                    vertex->v.ob[0] = node->unk_10.x + vertex_offset.x;
+                    vertex->v.ob[1] = node->unk_10.y + vertex_offset.y;
+                    vertex->v.ob[2] = node->unk_10.z + vertex_offset.z;
+
+                    vertex->v.tc[0] = (k * 0x400) / 8;
+                    vertex->v.tc[1] = texture_v;
+
+                    vertex->v.cn[0] = 0;
+                    vertex->v.cn[1] = 0;
+                    vertex->v.cn[2] = 0;
+                    vertex->v.cn[3] = 0;
+
+                    vertex++;
+                }
+            }
+
+            if ((trail->unk_086.r | trail->unk_086.g | trail->unk_086.b | trail->unk_086.a) != 0) {
+                last_position = trail->unk_0B0[9].unk_10;
+                first_position = trail->unk_0B0[0].unk_10;
+                camera_eye.x = camera->eye.x;
+                camera_eye.y = camera->eye.y;
+                camera_eye.z = camera->eye.z;
+                gfx = func_84163380(gfx, &first_position, &last_position, &camera_eye, 20.0f, trail->unk_086.r, trail->unk_086.g,
+                                     trail->unk_086.b, trail->unk_086.a * trail->unk_08C);
+            }
+
+            gSPDisplayList(gfx++, D_84187D48);
+
+            Gfx_SetCombineMode(
+                gfx++, trail->unk_024.unk_00, trail->unk_024.unk_04, trail->unk_024.unk_08, trail->unk_024.unk_0C,
+                trail->unk_024.unk_10, trail->unk_024.unk_14, trail->unk_024.unk_18, trail->unk_024.unk_1C,
+                trail->unk_044.unk_00, trail->unk_044.unk_04, trail->unk_044.unk_08, trail->unk_044.unk_0C,
+                trail->unk_044.unk_10, trail->unk_044.unk_14, trail->unk_044.unk_18, trail->unk_044.unk_1C);
+
+            gfx = DoubleTextureTrail_LoadTextures(gfx, trail);
+
+            gDPSetPrimColor(gfx++, 0, trail->unk_07C.unk_04, trail->unk_07C.unk_00.r, trail->unk_07C.unk_00.g,
+                            trail->unk_07C.unk_00.b, trail->unk_07C.unk_00.a);
+            gDPSetEnvColor(gfx++, trail->unk_081.unk_00.r, trail->unk_081.unk_00.g, trail->unk_081.unk_00.b,
+                           trail->unk_081.unk_00.a);
+            gSPClearGeometryMode(gfx++, G_CULL_BOTH);
+            gSPSetGeometryMode(gfx++, G_CULL_FRONT);
+            gDPPipeSync(gfx++);
+
+            gfx = DoubleTextureTrail_DrawStrips(gfx, trail, i, 0);
+
+            gSPClearGeometryMode(gfx++, G_CULL_BOTH);
+            gSPSetGeometryMode(gfx++, G_CULL_BACK);
+            gDPPipeSync(gfx++);
+
+            gfx = DoubleTextureTrail_DrawStrips(gfx, trail, i, 1);
+        }
+    }
+
+    return gfx;
+}
 #endif
