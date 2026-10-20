@@ -140,3 +140,60 @@ Four address-keyed aliases preserve other callers. No instruction/relocation
 rewrite, forced register, new padding, private helper, coverage update or
 layout change is included. Texture drawing and other remaining owners in this
 file are not claimed as solved by this text batch.
+
+## 2026-10-21: texture colors, geometry and viewport tiling accepted
+
+Three more US owners pass the normal recorded runner and full-ROM gate,
+1136 original bytes:
+
+- 818024B0: WidgetTexture_SetWeightedColors, 480 bytes. Emit standard
+  gDPSetPrimColor/gDPSetEnvColor commands from the style's two RGBA byte
+  groups, multiplying their alpha components by the actual floating weight.
+  The SDK macros reproduce the unsigned float conversions and channel masks;
+  no instruction-level conversion implementation is needed.
+- 81803964: WidgetTexture_DrawRecord, 272 bytes. Resolve the descriptor,
+  copy the two real eight-byte rectangles from record offsets 4/12, add the
+  origin, fill default extents from texture dimensions and apply the selected
+  style pointer at offset 20 + variant*4. Sizes up to 4096 use the existing
+  scaled rectangle path; larger textures use func_8004D19C's alternate path.
+- 81801FE8: WidgetTexture_TileViewport, 384 bytes. Resolve the descriptor,
+  configure the existing display-list/render mode and RGB environment color,
+  then draw nested tiles using the live viewport limits. Increment x/y by the
+  descriptor width/height and emit the original finishing display list. Byte
+  RGB parameters reproduce the incoming mask and stack-byte loads; word
+  parameters instead produced an extra instruction.
+
+The existing C wrapper at 81802BAC is now WidgetTexture_ApplyStyle and is not
+counted as a newly decompiled owner. Its real interface is a style pointer and
+floating weight; its render-mode/combiner/style-list calls establish the apply
+name. The direct caller in func_81802CA8 now passes the actual style pointer
+and 1.0f rather than an integer encoding of that float. Known, typed and
+twenty-blank whole-TU controls prove this correction byte-inert before probes.
+
+The texture record retains its real width/height values and both rectangles.
+Declaration order places destination at SP+56, source at SP+48 and the width
+home at SP+40. No unused storage or inflated array is added. Target compiler
+assertions verify rectangle size eight and signed-halfword offsets 0/2/4/6;
+the ordinary structure copies reproduce the original unaligned word loads.
+
+Each of the three accepted batches' first successful comparisons freezes the
+entire changed TU, the direct resource and fragment 7 caller units, four
+collateral C units and both data inputs before returning. Receipts are reread
+and all nine objects independently hashed immediately afterward. All three
+retained main objects have the original full-game fingerprint. Known,
+cleaned/named, twenty-blank and layout controls preserve all game bytes modulo
+separately verified equivalent relocation fields, all 74 function extents and
+resolved relocation targets. Text remains 12896 bytes. Redundant synthesized
+prototypes are removed after acceptance; four address-keyed aliases preserve
+other C and assembly callers.
+
+The final named-source gate seals source/symbol/alias/layout inputs and freezes
+eleven complete objects before returning. All artifacts are externally hashed
+before further compilation. Main object SHA256:
+f1a158901a8aaeb0efa8f358ce27bff44dc26bca240a78d154582c67eddf7975.
+Main source SHA256:
+998a623881c5ff250c7ffc63f53cf6250a4bf811302b87db1f0e730fa85facd5.
+Retail ROM MD5: 1561c75d11cedf356a8ddb1a4a5f9d5d.
+No instruction/relocation rewrite, forced register, new padding, dummy local,
+private helper, coverage update or layout change is included. The remaining
+style-blending and selection/input owners are separate decompilation work.

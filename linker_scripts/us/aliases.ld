@@ -568,3 +568,7 @@ func_81803558 = WidgetText_DrawRecord;
 func_81803668 = WidgetText_DrawRecordList;
 func_818036D8 = WidgetText_DrawRecordWithSetup;
 func_81803720 = WidgetText_DrawRecordListWithSetup;
+func_81801FE8 = WidgetTexture_TileViewport;
+func_818024B0 = WidgetTexture_SetWeightedColors;
+func_81802BAC = WidgetTexture_ApplyStyle;
+func_81803964 = WidgetTexture_DrawRecord;
