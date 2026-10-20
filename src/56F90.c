@@ -260,7 +260,7 @@ s32 GbTower_VerifyPakStillInserted(s32 arg0, u8 *arg1) {
 }
 
 extern u8 D_80128555;
-extern s32 func_8005655C(u8, s32, s32, u8 *, s32);
+extern s32 func_8005655C(u8, u16, s32, u8 *, s32);
 s32 GbPak_ReadCommand(s32 arg0, u8 *arg1, s32 arg2, s32 arg3) {
     s32 result;
     result = 1;
@@ -303,10 +303,13 @@ void func_80057294(u8 arg0, OSGbpakId *arg1, u8 *arg2) {
     osGbpakReadId((arg0 * 0x68) + &D_801283B0, arg1, arg2);
 }
 
-void func_800572D8(u8 arg0) {
-    u8 data[0x28];
-    HAL_Memset((char *)&data[8], 0xA, 0x20);
-    func_80057210(arg0, &data[8], 0, 0x20);
+s32 func_800572D8(u8 arg0) {
+    u8 data[32];
+    s32 result;
+
+    HAL_Memset((char *)data, 10, 32);
+    result = func_80057210(arg0, data, 0, 32);
+    return result;
 }
 
 s32 func_80057318(u8 arg0) {
@@ -328,6 +331,7 @@ s32 func_80057318(u8 arg0) {
     if (result != 0) {
         return result;
     }
+    //!bug: The successful path reaches the end without a C return.
 }
 
 s32 func_800573C4(u8 arg0, u8 *arg1, u8 arg2) {
@@ -362,9 +366,81 @@ s32 func_80057450(u8 arg0, u8 arg1, u8 arg2) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_800574E0.s")
+s32 GbPak_ReadClock(u8 port, u16 *days, u8 *hours, u8 *minutes, u8 *seconds) {
+    u8 low;
+    u8 high;
+    s32 result;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_80057640.s")
+    result = func_800572D8(port);
+    if (result != 0) {
+        return result;
+    }
+    result = func_80057318(port);
+    if (result != 0) {
+        return result;
+    }
+    result = func_800573C4(port, seconds, 8);
+    if (result != 0) {
+        return result;
+    }
+    *seconds &= 0x3F;
+    result = func_800573C4(port, minutes, 9);
+    if (result != 0) {
+        return result;
+    }
+    *minutes &= 0x3F;
+    result = func_800573C4(port, hours, 10);
+    if (result != 0) {
+        return result;
+    }
+    *hours &= 0x3F;
+    result = func_800573C4(port, &high, 12);
+    if (result != 0) {
+        return result;
+    }
+    result = func_800573C4(port, &low, 11);
+    if (result != 0) {
+        return result;
+    }
+    *days = (high << 8) | low;
+    *days %= 140;
+    D_8012855C[port] = 0xFF;
+    return result;
+}
+
+s32 GbPak_WriteClock(u8 port, u16 days, u8 hours, u8 minutes, u8 seconds) {
+    s32 result;
+    s32 day_value;
+
+    result = func_800572D8(port);
+    if (result != 0) {
+        return result;
+    }
+    result = func_80057450(port, seconds & 0x3F, 8);
+    if (result != 0) {
+        return result;
+    }
+    minutes &= 0x3F;
+    result = func_80057450(port, minutes, 9);
+    if (result != 0) {
+        return result;
+    }
+    result = func_80057450(port, hours & 0x1F, 10);
+    if (result != 0) {
+        return result;
+    }
+    day_value = days;
+    result = func_80057450(port, day_value & 0xFF, 11);
+    if (result != 0) {
+        return result;
+    }
+    result = func_80057450(port, (day_value >> 8) & 1, 12);
+    if (result != 0) {
+        return result;
+    }
+    D_8012855C[port] = 0xFF;
+    return result;
+}
 
 u8 GbTower_SetPollMask(u8 arg0) {
     u8 old = D_80128557;

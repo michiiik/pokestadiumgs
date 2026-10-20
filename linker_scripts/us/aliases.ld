@@ -517,3 +517,5 @@ func_8005F110 = GbSave_ResetPortState;
 func_800564BC = GbPak_SelectRamBank;
 func_80056870 = GbPak_ReadIdAndDetectRam;
 func_80056F7C = GbPak_InitializeCartridge;
+func_800574E0 = GbPak_ReadClock;
+func_80057640 = GbPak_WriteClock;
