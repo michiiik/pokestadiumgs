@@ -362,7 +362,7 @@ extern void func_81801854(void *, void *, void *);
 extern void func_8004B2CC(s32, s32, s32, s32, s32, s32, s32, s32);
 extern f32 D_8300FAB8;
 extern f32 D_8300FABC;
-extern f32 func_818055E0();
+extern f32 func_818055E0(void *, u8 *);
 extern void func_8180567C(s32, void *, void *);
 extern void func_818057D0(s32, void *, void *);
 void func_83002424(s32 arg0, void *arg1, void *arg2) {
@@ -370,7 +370,7 @@ void func_83002424(s32 arg0, void *arg1, void *arg2) {
     s32 pad;
     Rect02424 rect;
     f32 alpha;
-    alpha = func_818055E0();
+    alpha = func_818055E0((void *)arg0, (u8 *)arg1);
     func_818057D0(arg0, state, arg2);
     func_818006FC(((s16 *)arg2)[0] + 0xD, ((s16 *)arg2)[1] + 0x25, 0xE2, alpha);
     if (alpha > D_8300FAB8) {
@@ -572,13 +572,12 @@ void func_83006308(s32 arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_818042E4(s32 *, s32, s32, f32, s32);
-f32 func_818055E0();
 extern void func_83006798(s32, s32, s32);
 extern u8 D_8300D4B4;
 void func_83006AF0(s32 arg0, s32 arg1, s32 arg2) {
     f32 sp24;
 
-    sp24 = func_818055E0();
+    sp24 = func_818055E0((void *)arg0, (u8 *)arg1);
     func_83006798(arg0, arg1, arg2);
     func_818042E4(&D_8300D4B4, arg2, arg1, sp24, 0);
 }
@@ -632,17 +631,16 @@ void func_83006F30(s32 arg0, void *arg1, u8 *arg2) {
 #endif
 
 #ifdef VERSION_US
-extern f32 func_818055E0(void);
 extern void func_81805644(s32, s32, s32);
-extern void func_818036D8(s32, s32, s32, s32);
+extern void WidgetText_DrawRecordWithSetup(void *, void *, f32, s32);
 extern u8 D_8300D908[];
 void func_83006FDC(s32 arg0, s32 arg1, s32 arg2) {
     s32 pad;
     f32 temp_fv0;
 
-    temp_fv0 = func_818055E0();
+    temp_fv0 = func_818055E0((void *)arg0, (u8 *)arg1);
     func_81805644(arg0, arg1, arg2);
-    func_818036D8((s32)(D_8300D908 + ((*(u8 *)((u8 *)(u32)arg1 + 0x3D) << 5) - 0x20)), arg2, *(s32 *)&temp_fv0, 0);
+    WidgetText_DrawRecordWithSetup(D_8300D908 + ((*(u8 *)((u8 *)(u32)arg1 + 0x3D) << 5) - 0x20), (void *)arg2, temp_fv0, 0);
 }
 #endif
 
@@ -680,13 +678,12 @@ void func_83007044(void *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern u8 D_8300DBE4[];
-extern void func_818036D8(s32, s32, s32, s32);
 extern void func_81805644(s32, s32, s32);
 void func_83007100(s32 arg0, void *arg1, void *arg2) {
     void *state = arg1;
     func_81805644(arg0, (s32)arg1, (s32)arg2);
     if (((u8 *)state)[0x3D] > 0 && ((u8 *)state)[0x3D] < 5) {
-        func_818036D8((u8 *)D_8300DBE4 + ((((u8 *)state)[0x3D] << 5) - 0x20), (s32)arg2, *(s32 *)((u8 *)state + 0x28), 0);
+        WidgetText_DrawRecordWithSetup((u8 *)D_8300DBE4 + ((((u8 *)state)[0x3D] << 5) - 0x20), arg2, *(f32 *)((u8 *)state + 0x28), 0);
     }
 }
 #endif
@@ -843,12 +840,11 @@ void func_83007BE4(void *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_800498C4();
 extern void func_800499EC();
-f32 func_818055E0();
 extern void func_818057D0(s32, void *, void *);
 void func_83007C5C(s32 arg0, void *arg1, void *arg2) {
     f32 sp1C;
 
-    sp1C = func_818055E0();
+    sp1C = func_818055E0((void *)arg0, (u8 *)arg1);
     func_818057D0(arg0, arg1, arg2);
     func_800498C4();
     func_800496A4(8, 1);
@@ -925,9 +921,8 @@ void func_83008070(void *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_830034C8(void *, void *, void *, f32);
-extern f32 func_818055E0();
 extern void func_818057D0(s32, void *, void *);
-void func_830080AC(s32 arg0, void *arg1, void *arg2) { struct Locals { void *ptr; u32 pad; f32 value; }; struct Locals local; void *base = arg1; u8 index; local.value = func_818055E0(); index = *((u8 *)base + 0x48); if (index >= 2) local.ptr = (u8 *)base + index * 0x220 + 0x3E620; else local.ptr = (u8 *)base + 0x3D95C; func_818057D0(arg0, base, arg2); func_830034C8(base, local.ptr, arg2, local.value); }
+void func_830080AC(s32 arg0, void *arg1, void *arg2) { struct Locals { void *ptr; u32 pad; f32 value; }; struct Locals local; void *base = arg1; u8 index; local.value = func_818055E0((void *)arg0, (u8 *)arg1); index = *((u8 *)base + 0x48); if (index >= 2) local.ptr = (u8 *)base + index * 0x220 + 0x3E620; else local.ptr = (u8 *)base + 0x3D95C; func_818057D0(arg0, base, arg2); func_830034C8(base, local.ptr, arg2, local.value); }
 #endif
 
 #ifdef VERSION_US
@@ -1026,7 +1021,6 @@ void func_83008960(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern f32 func_818055E0(void);
 extern void func_818057D0(s32, void *, void *);
 extern void func_8180567C(s32, void *, void *);
 extern void func_81803964(void *, void *, f32, s32);
@@ -1036,7 +1030,7 @@ void func_83008D18(s32 arg0, void *arg1, void *arg2) {
     s32 pad;
     f32 temp_fv0;
 
-    temp_fv0 = func_818055E0();
+    temp_fv0 = func_818055E0((void *)arg0, (u8 *)arg1);
     func_818057D0(arg0, arg1, arg2);
     func_8180567C(arg0, arg1, arg2);
     if (*(u8 *)((u8 *)arg1 + 0x3E) == 2) {

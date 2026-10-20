@@ -448,16 +448,55 @@ void func_8180351C(void *arg0) {
     func_800496A4((s32) (*(s8 *)((u8 *)(arg0) + (4))), (*(s8 *)((u8 *)(arg0) + (5))) + 2);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803558.s")
+typedef struct {
+    s16 archive;
+    s16 entry;
+    s16 x;
+    s16 y;
+    u8 text_settings[8];
+    s32 blend;
+    void *styles[3];
+} Fragment4TextRecordView;
+extern void func_81802754(void *, void *, f32);
+extern void func_800495F8(s32, s32, s32, const char *, ...);
+void WidgetText_DrawRecord(void *arg0, void *arg1, f32 weight, s32 variant) {
+    Fragment4TextRecordView *record = arg0;
+    u8 *text;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803668.s")
+    if (record->blend != 0) {
+        func_81802754(record->styles[(variant + 2) % 3], record->styles[(variant + 1) % 3], weight);
+    } else {
+        func_81802690(record->styles[variant], weight);
+    }
+    func_8180351C(record->text_settings);
+    text = WidgetText_GetBufferedString(record);
+    func_800495F8(((s16 *)arg1)[0] + record->x, ((s16 *)arg1)[1] + record->y,
+                 *(s32 *)record->text_settings, (const char *)text);
+}
 
-extern void func_800498C4();
-extern void func_81803558(s32, s32, s32, s32);
-extern void func_800499EC();
-void func_818036D8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) { func_800498C4(); func_81803558(arg0, arg1, arg2, arg3); func_800499EC(); }
+void WidgetText_DrawRecordList(u8 *record, void *origin, f32 weight, s32 variant) {
+    while (*(s16 *)record >= 0) {
+        WidgetText_DrawRecord(record, origin, weight, variant);
+        record += 32;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_AFAA0/func_81803720.s")
+extern void func_800498C4(void);
+extern void func_800499EC(void);
+void WidgetText_DrawRecordWithSetup(void *record, void *origin, f32 weight, s32 variant) {
+    func_800498C4();
+    WidgetText_DrawRecord(record, origin, weight, variant);
+    func_800499EC();
+}
+
+void WidgetText_DrawRecordListWithSetup(u8 *record, void *origin, f32 weight, s32 variant) {
+    func_800498C4();
+    while (*(s16 *)record >= 0) {
+        WidgetText_DrawRecordWithSetup(record, origin, weight, variant);
+        record += 32;
+    }
+    func_800499EC();
+}
 
 void func_818037A0(u8 *arg0, u8 *arg1, s32 arg2, s32 arg3) {
     if (*(s16 *)(arg0 + 4) <= 0) *(s16 *)(arg0 + 4) = (s16)arg2;

@@ -564,3 +564,7 @@ func_81802168 = WidgetText_GetString;
 func_818021B4 = WidgetText_GetBufferedString;
 func_81803BB8 = WidgetSelection_GetValuePointer;
 func_81803BE8 = WidgetSelection_GetMask;
+func_81803558 = WidgetText_DrawRecord;
+func_81803668 = WidgetText_DrawRecordList;
+func_818036D8 = WidgetText_DrawRecordWithSetup;
+func_81803720 = WidgetText_DrawRecordListWithSetup;
