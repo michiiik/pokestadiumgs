@@ -563,27 +563,158 @@ void DoubleTextureTrail_RotateVertexOffset(f32 arg0, f32 *arg1, f32 arg2) {
     guMtxXFMF(sp30, 0.0f, 0.0f, arg2, &arg1[0], &arg1[1], &arg1[2]);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D4DA0/func_841674C0.s")
+extern void func_841098FC(AnchorTrailVec3f *);
+extern void func_84109780(s32);
+extern u32 func_841094EC(void);
+// Blend the ten samples between owner anchors, then shrink them in phase 2.
+//@src/fragments/79/fragment79_377F80.c
+void DoubleTextureTrail_Update(S1_DoubleTextureTrail *arg0) {
+    S1_unk_D_843C2C00_0B0* var_v0;
+    s32 i;
+    s32 state_flag;
+    AnchorTrailVec3f sp58;
+    AnchorTrailVec3f sp4C;
+    f32 temp_fa0;
+    f32 temp_fa1;
+    f32 var_fv0;
+    f32 var_fv1;
 
-extern void func_841674C0(u8 *);
-s32 func_841677C4(void) {
-    u8 *ptr = D_84187D40;
+    func_84109780((s32)&sp58);
+    func_841098FC(&sp4C);
+    if (sp4C.y > 200.0f) {
+        sp4C.y = 200.0f;
+    }
+
+    state_flag = func_841094EC();
+    if (state_flag == 1 && arg0->unk_006 == 0) {
+        arg0->unk_006 = 1;
+        arg0->unk_094 = arg0->unk_002 + 30;
+    } else if (arg0->unk_006 == 1) {
+        if (arg0->unk_002 >= arg0->unk_094 - 15) {
+            arg0->unk_006 = 2;
+        }
+    }
+
+    var_v0 = &arg0->unk_0B0[0];
+    for (i = 0; i < 10; i++, var_v0++) {
+        if (arg0->unk_002 < arg0->unk_004) {
+            temp_fa1 = ((f32)arg0->unk_002 * i) / 9.0f;
+            var_fv0 = arg0->unk_004 - 1;
+            var_fv1 = temp_fa1 / var_fv0;
+            temp_fa0 = 1.0f - var_fv1;
+        } else {
+            temp_fa1 = i;
+
+            var_fv1 = temp_fa1 / 9.0f;
+            temp_fa0 = 1.0f - var_fv1;
+        }
+
+        var_v0->unk_10.x = (sp58.x * temp_fa0) + (sp4C.x * var_fv1);
+        var_v0->unk_10.y = (sp58.y * temp_fa0) + (sp4C.y * var_fv1);
+        var_v0->unk_10.z = (sp58.z * temp_fa0) + (sp4C.z * var_fv1);
+
+        var_v0->unk_0C += arg0->unk_00C;
+
+        if (arg0->unk_006 == 2) {
+            var_v0->unk_08 -= 1.0f;
+            if (var_v0->unk_08 < 0.1f) {
+                var_v0->unk_08 = 0.1f;
+            }
+        } else if (i == 0) {
+            var_v0->unk_08 = 1.0f;
+        } else if (i == 9) {
+            if (arg0->unk_002 < 5) {
+                var_v0->unk_08 = 1.0f;
+            } else {
+                var_v0->unk_08 += 0.5f;
+                if (arg0->unk_008 * 1.0f < var_v0->unk_08) {
+                    var_v0->unk_08 = arg0->unk_008 * 1.0f;
+                }
+            }
+        } else if (i == 1) {
+            var_v0->unk_08 += arg0->unk_010;
+            if (arg0->unk_008 * 0.5f < var_v0->unk_08) {
+                var_v0->unk_08 = arg0->unk_008 * 0.5f;
+            }
+        } else if (i == 2) {
+            var_v0->unk_08 += arg0->unk_010;
+            if (arg0->unk_008 * 0.75f < var_v0->unk_08) {
+                var_v0->unk_08 = arg0->unk_008 * 0.75f;
+            }
+        } else {
+            var_v0->unk_08 += arg0->unk_010;
+            if (arg0->unk_008 * 1.0f < var_v0->unk_08) {
+                var_v0->unk_08 = arg0->unk_008 * 1.0f;
+            }
+        }
+    }
+}
+
+s32 DoubleTextureTrail_UpdateAll(void) {
+    S1_DoubleTextureTrail *stream = (S1_DoubleTextureTrail *)D_84187D40;
     s32 i = 0;
-    if (*(s16 *)(ptr + 6) == 2 && *(s16 *)(ptr + 0x94) < *(s16 *)(ptr + 2)) {
+    if (stream->unk_006 == 2 && stream->unk_094 < stream->unk_002) {
         return -1;
     }
     do {
-        if (*(s16 *)ptr == 1) {
-            *(s16 *)(ptr + 2) = *(s16 *)(ptr + 2) + 1;
-            func_841674C0(ptr);
+        if (stream->unk_000 == 1) {
+            stream->unk_002 = stream->unk_002 + 1;
+            DoubleTextureTrail_Update(stream);
         }
         i++;
-        ptr += 0x240;
+        stream++;
     } while (i != 4);
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D4DA0/func_84167864.s")
+extern u32 func_841094E0(void);
+// Pass 0 updates alpha; both passes draw nine strips of eight quads each.
+Gfx* DoubleTextureTrail_DrawStrips(Gfx* arg0, S1_DoubleTextureTrail* arg1, s16 arg2, s16 arg3) {
+    s32 i;
+    s32 j;
+    Vtx* sp44;
+    S1_unk_D_84389CE0* temp_v0 = &arg1->unk_081;
+    S1_unk_D_84389CE0* temp_v1 = &arg1->unk_07C;
+    u8 a1;
+    u8 a2;
+    s16 tmp;
+
+    if (arg3 == 0) {
+        if (func_841094E0() == 1) {
+            if (arg1->unk_094 >= arg1->unk_002) {
+                arg1->unk_002 = arg1->unk_094 + 1;
+            }
+        }
+        if (arg1->unk_006 == 2) {
+            tmp = arg1->unk_002 - arg1->unk_094 + 15;
+            arg1->unk_08C = 1.0f - tmp * 0.07f;
+            arg1->unk_090 = 1.0f - tmp * 0.07f;
+            if (tmp * 0.07f > 1.0f) {
+                arg1->unk_08C = 0.0f;
+            }
+            if (arg1->unk_090 < 0.0f) {
+                arg1->unk_090 = 0.0f;
+            }
+        }
+    }
+
+    a1 = temp_v1->unk_00.a * arg1->unk_08C;
+    a2 = temp_v0->unk_00.a * arg1->unk_090;
+
+    gDPSetPrimColor(arg0++, 0, temp_v1->unk_04, temp_v1->unk_00.r, temp_v1->unk_00.g, temp_v1->unk_00.b, a1);
+    gDPSetEnvColor(arg0++, temp_v0->unk_00.r, temp_v0->unk_00.g, temp_v0->unk_00.b, a2);
+
+    sp44 = arg1->unk_018;
+    for (i = 0; i < 9; i++) {
+        gSPVertex(arg0++, sp44, 18, 0);
+        for (j = 0; j < 8; j++) {
+            gSP2Triangles(arg0++, j, j + 9, j + 1, 0, j + 9, j + 10, j + 1, 0);
+        }
+        sp44 += 9;
+    }
+
+    return arg0;
+}
 
 extern u8* D_8418CA20[256];
 Gfx* DoubleTextureTrail_LoadTextures(Gfx* arg0, S1_DoubleTextureTrail* arg1) {
