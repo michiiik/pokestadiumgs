@@ -267,11 +267,16 @@ void func_84109B1C(s32 arg0) {
     func_84109A18(D_84190194, arg0);
 }
 
-void func_84109B88(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+typedef struct { f32 x, y, z; } ParticleStubPosition;
+
+// OwnerLinkedFourStream_Start passes position by value and consumes a particle handle.
+//@src/fragments/79/fragment79_3D4060.c
+//!bug Retail stub falls through without defining its return value.
+u8 *func_84109B88(ParticleStubPosition position, u8 kind) {
 }
 
 void func_84109B9C(u8 *arg0) {}
 
-void func_84109BA4(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+void func_84109BA4(u8 *particle, ParticleStubPosition position) {
 }
 #endif
