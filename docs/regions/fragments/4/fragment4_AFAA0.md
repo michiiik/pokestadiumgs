@@ -73,7 +73,70 @@ Retail ROM MD5: 1561c75d11cedf356a8ddb1a4a5f9d5d.
 No new padding, dummy local, forced register, instruction/relocation rewrite,
 private experiment helper, coverage update or layout change is included.
 
-Remaining drawing owners are separate work. In particular, func_81803558's
-earlier requeue requires its actual floating third argument and a corresponding
-caller-interface correction before resuming the recorded near match; the
-five-function accessor batch does not resolve that prerequisite.
+The text-drawing requeue and its float-interface prerequisite are resolved by
+the following batch. Other drawing owners remain separate work.
+
+## 2026-10-21: text record drawing and traversal accepted
+
+Three more US owners pass the normal recorded runner and full-ROM gate,
+512 original bytes:
+
+- 81803558: WidgetText_DrawRecord, 272 bytes. Select the current style or
+  blend the two neighboring styles modulo three, configure text drawing,
+  resolve the buffered archive string, then draw at the origin plus the
+  record's signed x/y offsets. The existing text resolver and func_800495F8's
+  formatted-text implementation establish the text-drawing role.
+- 81803668: WidgetText_DrawRecordList, 112 bytes. Walk 32-byte records until
+  their first signed halfword is negative, forwarding the origin, floating
+  weight and variant to each record draw.
+- 81803720: WidgetText_DrawRecordListWithSetup, 128 bytes. Preserve the
+  original enclosing setup/finish calls and invoke the per-record setup
+  wrapper for each nonnegative record. Using the iterator parameter directly
+  reproduces the saved-register ownership; separate iterator aliases did not.
+
+The existing C wrapper at 818036D8 is now WidgetText_DrawRecordWithSetup. Its
+actual interface is two pointers, a floating weight and an integer variant;
+it is not counted as a newly decompiled owner. func_800498C4 resets the text
+rendering context and func_800499EC processes its buffered primitives.
+//@src/47580.c
+
+The record view is exactly 32 bytes. Target-compiler assertions verify signed
+x/y offsets at 4/6, the eight-byte settings prefix at 8, the mode word at 16,
+and the three style pointers at 20. The mode word is only tested for nonzero,
+so it is represented as an integer flag, not a dereferenced pointer. This
+type-only view introduces no stored object or data-layout change.
+
+Whole-TU controls prove the full pointer/float wrapper interface byte-inert
+before new candidates are tried. Fragment 7's two direct wrapper callers now
+pass actual float expressions rather than word-punned float bits. All six
+weight lookups in that TU explicitly pass their incoming definition/state
+addresses through the real full prototype. These interface changes and the
+later prototype deduplication preserve every game byte in the entire caller
+TU. A separate negative control removing a pre-existing unused local changed
+that object and was not installed; no new padding or dummy local is added.
+//@src/fragments/7/fragment7_BA250.c
+
+Each of the two accepted batches' first successful comparisons freezes both
+changed C units, the direct neighboring resource unit, four collateral C
+units and both data inputs before returning. Receipts are reread and all nine
+objects independently hashed immediately afterward. Both retained main units
+have the original full-game fingerprint. Known, cleaned/named and twenty-blank
+controls pass for both changed TUs; four further word-mode/layout cleanup
+controls also pass. The main unit retains all 74 function extents and 12896
+text bytes, with identical resolved relocation targets. Comparison-only
+relocation normalization never edits a production object.
+
+The final named-source gate seals both changed source files and the
+symbol/alias/layout inputs, then freezes eleven complete objects before
+returning. All artifacts are externally hashed before further compilation.
+Main object SHA256:
+6b162a5ac0340402bbf333404f0d7be2e37b119c3f4bdc99d2d8befbff5ed787.
+Main source SHA256:
+a8d47bea8e7c2e9bb3e2a871800fbbc69730dd428454c5b799fe0cfdb8566994.
+Fragment 7 source SHA256:
+1d8a7cc6dc47eb63078df849a48da28710e92b2ef06ee0b4e41506d0ab2eef86.
+Retail ROM MD5: 1561c75d11cedf356a8ddb1a4a5f9d5d.
+Four address-keyed aliases preserve other callers. No instruction/relocation
+rewrite, forced register, new padding, private helper, coverage update or
+layout change is included. Texture drawing and other remaining owners in this
+file are not claimed as solved by this text batch.
