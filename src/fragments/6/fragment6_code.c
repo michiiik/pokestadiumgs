@@ -472,7 +472,45 @@ s32 func_83101764(void *arg0, u8 *arg1) {
     return 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/6/fragment6_code/func_83101804.s")
+typedef struct {
+    u8 unk_00[63];
+    u8 selected;
+    u8 unk_40[140];
+    char entries[8][68];
+    u8 count;
+} Fragment6SavedEntryListPrefix;
+extern u8 D_831034C4[], D_83103504[];
+void Fragment6_DrawSavedEntryList(void *definition, u8 *state, s16 *origin) {
+    Fragment6SavedEntryListPrefix *list = (Fragment6SavedEntryListPrefix *)state;
+    s32 has_entries;
+    s32 i;
+    f32 weight;
+
+    has_entries = list->count > 0;
+    weight = func_818055E0(definition, state);
+    WidgetResources_DrawRecords((s32)definition, (s32)state, (s32)origin);
+    WidgetTexture_DrawRecord(D_831034C4, (u8 *)origin, weight, has_entries ? 0 : 2);
+    WidgetText_DrawRecordWithSetup(D_83103504, origin, weight, has_entries ? 0 : 2);
+    func_800498C4();
+    func_800496A4(8, 1);
+    func_8004972C(255, 255, 255, (s32)(255.0f * weight));
+    for (i = 0; i < list->count; i++) {
+        if (i + 1 == list->selected) {
+            func_8004972C(255, 255, 0, (s32)(255.0f * weight));
+        }
+        func_800495BC(origin[0] + 59, origin[1] + i * 26 + 39, list->entries[i]);
+        if (i + 1 == list->selected) {
+            func_8004972C(255, 255, 255, (s32)(255.0f * weight));
+        }
+    }
+    func_800499EC();
+    gSPDisplayList(D_800D0510++, D_80094DB8);
+    for (i = 1; i != 8; i++) {
+        Gfx_FillRectRgba((s16)(origin[0] + 49), (s16)(origin[1] + i * 26 + 35), 172, 1, 70, 120, 70, (u8)(255.0f * weight));
+    }
+    Gfx_FillRectRgba((s16)(origin[0] + 15), (s16)(origin[1] + 35), 206, 1, 70, 120, 70, (u8)(255.0f * weight));
+    WidgetResources_DrawSelection((s32)definition, (s32)state, (s32)origin);
+}
 
 extern u8 *func_818054D0(void *arg0, u8 arg1);
 extern void func_81801CB8(void *arg0, void *arg1, void *arg2, s32 arg3);

@@ -579,3 +579,4 @@ func_81802EA0 = WidgetFrame_DrawNineSlice;
 func_83101244 = Fragment6_DrawSelectionControls;
 func_83101C80 = Fragment6_InitializeSelectionState;
 func_83101400 = Fragment6_DrawAvailableEntryList;
+func_83101804 = Fragment6_DrawSavedEntryList;
