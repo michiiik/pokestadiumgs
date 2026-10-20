@@ -925,7 +925,7 @@ void func_80062978(void *record, s32 mode) {
 }
 
 extern void func_80062978(void *, s32);
-void func_80062BD4(void *arg0, s32 arg1, void *arg2) {
+void func_80062BD4(void *arg0, s32 arg1, s32 arg2) {
     Pokemon_ValidateSpeciesForGbPort(arg0, arg1);
     Pokemon_ValidateMovesForGbPort(arg0, arg1);
     func_80062978(arg0, arg2);

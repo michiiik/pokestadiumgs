@@ -7,7 +7,10 @@
 typedef struct {
     u32 flags;
     u8 version;
-    u8 unk_05[75];
+    u8 state;
+    u8 unk_06[66];
+    u8 unk_48;
+    u8 unk_49[7];
     u16 trainer_id;
     u8 trainer_name[12];
     u8 reserved_5E[2];
@@ -722,7 +725,36 @@ s32 func_8005A134(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005A174.s")
+extern void GbSave_ResetPortCache(u8);
+extern s32 D_80128730[];
+extern u8 D_80128740[];
+extern u8 D_80128744[];
+extern s32 D_80128748;
+extern u8 D_8012874D;
+extern u8 D_80128575[];
+extern void _bzero(s32, s32);
+extern u8 D_80128570[];
+void GbSave_ResetPortCache(u8 port) {
+    GbSavePortView *record;
+    s64 *identity;
+
+    record = &((GbSavePortView *)D_80128570)[port];
+    identity = (s64 *)((u8 *)record + 80);
+    record->flags = 0x80000000;
+    record->save_data = NULL;
+    *(u32 *)record->unk_64 = 0;
+    *(u32 *)(record->unk_64 + 4) = 0;
+    *(u32 *)(record->unk_64 + 8) = 0;
+    record->state = 1;
+    record->version = 0;
+    record->unk_48 = 0;
+    identity[0] = 0;
+    identity[1] = 0;
+    D_80128730[port] = 0;
+    D_80128740[port] = 0;
+    D_80128744[port] = 0;
+    _bzero((s32)((u8 *)record + 73), 7);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1059,7 +1091,26 @@ void func_8005B6F0(u8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005B778.s")
+typedef struct {
+    u8 count;
+    u8 species[7];
+    u8 pokemon[6][44];
+    GbSaveBoxName trainer_names[6];
+    GbSaveBoxName nicknames[6];
+} GbSaveGen1PartyView;
+extern void func_8006162C(u8 *, u8 *);
+extern u8 *func_80060DDC(u8 *, s8 *);
+extern u8 D_80128570[];
+void GbSave_WriteGen1PartyPokemon(u8 *mon, s32 port, s32 slot) {
+    u8 *base = ((GbSavePortView *)D_80128570)[port].save_data;
+    GbSaveGen1PartyView *party;
+
+    party = (GbSaveGen1PartyView *)(base + 2476);
+    func_8006162C(party->pokemon[slot], mon);
+    bcopy(mon + 76, party->trainer_names[slot], 11);
+    func_80060DDC(party->nicknames[slot], (s8 *)(mon + 52));
+    party->species[slot] = party->pokemon[slot][0];
+}
 #endif
 
 #ifdef VERSION_US
@@ -1099,7 +1150,7 @@ void func_8005B924(u8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8005B778(u8 *arg0, s32 arg1, s32 arg2);
+extern void GbSave_WriteGen1PartyPokemon(u8 *arg0, s32 arg1, s32 arg2);
 extern u8 func_8005D92C(s32 index);
 
 void func_8005BA00(u8 *arg0, s32 arg1, s32 arg2) {
@@ -1108,7 +1159,7 @@ void func_8005BA00(u8 *arg0, s32 arg1, s32 arg2) {
         case 2:
         case 3:
         case 4:
-            func_8005B778(arg0, arg1, arg2);
+            GbSave_WriteGen1PartyPokemon(arg0, arg1, arg2);
             break;
         case 5:
         case 6:
@@ -1123,7 +1174,7 @@ void func_8005BA00(u8 *arg0, s32 arg1, s32 arg2) {
 
 #ifdef VERSION_US
 extern void func_80060FF8(u8 *, u8 *);
-extern void func_80062BD4(void *, s32, void *);
+extern void func_80062BD4(void *, s32, s32);
 extern void *func_8004B7A4(s32);
 extern s32 HAL_Strcmp(const s8 *, const s8 *);
 extern s32 func_8005B1C4(s32 arg0, s32 arg1);
@@ -1134,7 +1185,7 @@ void GbSave_ReadGen1BoxPokemon(u8 *mon, s32 port, s32 box, s32 slot) {
 
     if (base != 0) {
         func_80060FF8(mon, base->pokemon[slot]);
-        func_80062BD4(mon, port, (void *)2);
+        func_80062BD4(mon, port, 2);
         bcopy(base->trainer_names[slot], mon + 76, 11);
         func_8005B314(mon + 52, base->nicknames[slot], (u8 *)func_8004B7A4(mon[0]));
         func_8005B314(mon + 64, base->trainer_names[slot], ((GbSavePortView *)D_80128570)[port].trainer_name);
@@ -1150,7 +1201,7 @@ void GbSave_ReadGen1BoxPokemon(u8 *mon, s32 port, s32 box, s32 slot) {
 
 #ifdef VERSION_US
 extern void func_80061124(u8 *, u8 *);
-extern void func_80062BD4(void *, s32, void *);
+extern void func_80062BD4(void *, s32, s32);
 extern void *func_8004B7A4(s32);
 extern u8 * GbSave_GetGen2BoxBuffer(s32 index, s32 box);
 extern void func_8005B314(u8 *arg0, const u8 *arg1, const u8 *arg2);
@@ -2857,39 +2908,30 @@ s32 GbSave_WriteGen2BoxName(s32 port, s32 box, void *text) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8005A174(s32, s32 *);
+extern void GbSave_ResetPortCache(u8);
 extern s32 D_80128748;
 extern u8 D_8012874C;
 extern u8 D_8012874D;
-void func_8005F04C(s32 arg0) {
-    s32 *home = &arg0;
-    s32 index;
-    s32 mask;
-    do {
-        index = (*home) & 0xFF;
-    } while (0);
-    mask = ~(1 << index);
+void func_8005F04C(u8 port) {
+    u32 mask = ~(1 << port);
+
     D_8012874C &= mask;
     D_8012874D &= mask;
     D_80128748 &= mask;
-    func_8005A174(index, &D_8012874D);
+    GbSave_ResetPortCache(port);
 }
 #endif
 
 #ifdef VERSION_US
 extern u8 D_8012874D;
 extern s32 D_80128748;
-extern void func_8005A174(s32, s32 *);
-void func_8005F0B8(s32 arg0) {
-    s32 *arg0p;
-    s32 temp_a0;
-    s32 temp_v0;
-    arg0p = &arg0;
-    temp_a0 = *arg0p & 0xFF;
-    temp_v0 = ~(1 << temp_a0);
-    D_8012874D &= temp_v0;
-    D_80128748 &= temp_v0;
-    func_8005A174(temp_a0, &D_80128748);
+extern void GbSave_ResetPortCache(u8);
+void func_8005F0B8(u8 port) {
+    u32 mask = ~(1 << port);
+
+    D_8012874D &= mask;
+    D_80128748 &= mask;
+    GbSave_ResetPortCache(port);
 }
 #endif
 
