@@ -131,7 +131,7 @@ Unchanged C source SHA256:
 ef0bd5654db32ab74f63567641463c4a829937ebe525c916ea359cc504b7dd08.
 Retail ROM MD5 remains 1561c75d11cedf356a8ddb1a4a5f9d5d.
 
-Future C candidates replacing func_81804BC8 must emit the migrated 1.2f
+The accepted transition-status implementation emits the migrated 1.2f
 constant rather than merely referencing D_81805FA0 as an external symbol.
 The accepted selection renderer emits the migrated first 0.99f constant,
 while its second threshold D_81805FD0 remains in the shared tail.
@@ -250,13 +250,53 @@ Retail ROM MD5: 1561c75d11cedf356a8ddb1a4a5f9d5d.
 No padding, dummy local, instruction/relocation rewrite, private diagnostic
 helper or coverage change is part of this batch.
 
-### Remaining requeue
+### 2026-10-21: transition status accepted; no remaining GLOBAL_ASM owners
 
-81804BC8 remains assembly after eight rectangle/status candidates. The best
-1040-byte body has raw similarity 0.3077, a 152-byte frame versus retail 160,
-and eight extra text bytes. All candidates preserve the two actual endpoint
-rectangles, containment/separation tests, area comparisons, integer status
-results and packed sound flags. Union versus word/byte flag access and local
-state/rectangle declaration order do not solve the allocation. Next: compare
-endpoint/result lifetimes and the original saved-register set, while honoring
-the newly migrated 1.2f constant's ownership.
+81804BC8 is now WidgetState_RefreshTransitionStatus, 1032 original bytes.
+For each definition, its bounds callback computes the endpoint rectangles at
+weights zero and one. The function checks viewport containment/separation,
+compares endpoint areas and resource keys, accumulates entry/exit/size flags,
+emits the corresponding effects through func_800226C0, then restores the
+saved transition weight and writes both integer status words. Those status
+words are consumed by WidgetState_AdvanceTransition; WidgetState_Update
+invokes this refresh after activating a newly requested variant. These
+producer/consumer relationships establish the status-refresh name.
+
+Eight one-bit fields describe the actual high byte of the four-byte flag
+word. A direct structure and direct field assignments reproduce the retail
+byte updates and word-based high-bit tests. A nested union retains an extra
+address register and does not reproduce that lowering. The initial value is
+copied from the existing D_81805C50 word; its extern type introduces no stored
+object or data-layout change. Target-compiler sizeof assertions and eight
+independent initializers verify size four and masks 0x80000000 through
+0x01000000. The migrated 1.2f literal is emitted by this owner.
+
+The source declares its three actual eight-byte rectangles and existing
+scalar locals in the order that reproduces the 160-byte frame. Screen bounds
+occupy SP+152, start bounds SP+124 and end bounds SP+116. Height-times-width
+operand order reproduces the area load sequence. The definition iterator is
+loaded before copying the initial flag word, allowing its store to occupy
+the rectangle-helper call's delay slot. These are ordinary source-level
+declarations, expressions and assignments; no local is added just to reserve
+storage or force a register.
+
+The recorded normal runner accepts the implementation through the full-ROM
+gate. Its first successful comparison freezes the entire changed TU, four
+collateral C units and both data inputs before returning; all seven artifacts
+are independently hashed immediately afterward. Known, cleaned/named and
+twenty-blank whole-TU controls preserve all game bytes modulo independently
+verified equivalent relocation fields, all function extents and resolved
+relocation targets. The unit retains 24 function extents, 4608 text bytes and
+48 rodata bytes. Unused probe declarations are removed after acceptance.
+
+The final named-source gate seals source/symbol/alias/layout inputs and freezes
+eleven complete objects before returning. Receipts are reread and all objects
+externally hashed before further game compilation. Main object SHA256:
+43710c992822baf527ea38c0942adc3271ed529e5a0b4e6fa049ade4975d6d00.
+Main source SHA256:
+007ac0ce8fbe61732cab2c14853df69aaf8e852be42f03790d00dfff089c8a55.
+Retail ROM MD5: 1561c75d11cedf356a8ddb1a4a5f9d5d.
+The address-keyed alias preserves existing references. No new padding, dummy
+local, forced register, instruction/relocation rewrite, private helper or
+coverage change is included. This source file has no GLOBAL_ASM owners left;
+this result does not imply completion of other fragment 4 files or the ROM.

@@ -41,7 +41,7 @@ typedef struct {
     f32 progress;
     f32 unk_28;
     f32 unk_2C;
-    // Status words produced by func_81804BC8.
+    // Status words produced by WidgetState_RefreshTransitionStatus.
     s32 unk_30;
     s32 unk_34;
 } Fragment4StateView;
@@ -211,7 +211,124 @@ s32 WidgetResources_UseTransitionWeight(void *arg0, void *arg1) {
     return 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804BC8.s")
+typedef struct {
+    u8 unk_00[12];
+    void (*bounds)(void *, void *, s16 *);
+} Fragment4BoundsResourceView;
+extern u8 *D_81805930;
+extern u8 D_81805F90[];
+extern void func_81801A28(u8 *, u8 *, u8 *);
+extern s32 func_81801BC0(u8 *, u8 *);
+extern s32 func_81801C30(u8 *, u8 *);
+extern s32 func_81801E70(u8 *, u8 *);
+extern void func_800226C0(s32);
+typedef struct {
+    unsigned int enter_left : 1;
+    unsigned int enter_right : 1;
+    unsigned int enter_other : 1;
+    unsigned int leave_left : 1;
+    unsigned int leave_right : 1;
+    unsigned int leave_other : 1;
+    unsigned int grow : 1;
+    unsigned int shrink : 1;
+    unsigned int : 24;
+} Fragment4TransitionFlags;
+extern Fragment4TransitionFlags D_81805C50;
+void WidgetState_RefreshTransitionStatus(void *arg0) {
+    s16 screen[4];
+    s32 changed = 0;
+    s32 weighted = 0;
+    f32 saved_weight;
+    Fragment4StateView *state = arg0;
+    Fragment4TransitionFlags flags;
+    s16 start_rect[4];
+    s16 end_rect[4];
+    Fragment4DefinitionView **list;
+    Fragment4BoundsResourceView *resource;
+    void *previous;
+    s32 end_area;
+    s32 start_area;
+    s32 end_contained;
+    s32 start_contained;
+
+    saved_weight = state->unk_2C;
+    list = state->definitions;
+    flags = D_81805C50;
+    func_81801A28((u8 *)screen, D_81805930, D_81805F90);
+    while (*list != NULL) {
+        resource = (Fragment4BoundsResourceView *)func_818054D0(*list, state->unk_1F);
+        state->unk_2C = 0.0f;
+        resource->bounds(*list, state, start_rect);
+        state->unk_2C = 1.0f;
+        resource->bounds(*list, state, end_rect);
+        state->unk_2C = saved_weight;
+        end_contained = func_81801BC0((u8 *)screen, (u8 *)end_rect);
+        start_contained = func_81801BC0((u8 *)screen, (u8 *)start_rect);
+        end_area = end_rect[3] * end_rect[2];
+        start_area = start_rect[3] * start_rect[2];
+        if (!changed) {
+            changed = !func_81801E70((u8 *)start_rect, (u8 *)end_rect) && (end_area > 0 || start_area > 0);
+        }
+        if (!weighted) {
+            previous = func_818054D0(*list, state->unk_1D);
+            resource = (Fragment4BoundsResourceView *)func_818054D0(*list, state->unk_1C);
+            weighted = WidgetResources_UseTransitionWeight(previous, resource);
+        }
+        if (end_contained && end_area > 0 && func_81801C30((u8 *)start_rect, (u8 *)screen)) {
+            if (start_rect[0] + start_rect[2] < screen[0]) {
+                flags.enter_left = 1;
+            } else if (screen[0] + screen[2] < start_rect[0]) {
+                flags.enter_right = 1;
+            } else {
+                flags.enter_other = 1;
+            }
+        }
+        if (start_contained && start_area > 0 && func_81801C30((u8 *)end_rect, (u8 *)screen)) {
+            if (end_rect[0] + end_rect[2] < screen[0]) {
+                flags.leave_left = 1;
+            } else if (screen[0] + screen[2] < end_rect[0]) {
+                flags.leave_right = 1;
+            } else {
+                flags.leave_other = 1;
+            }
+        }
+        if (end_contained && start_contained && (start_area > 0 || end_area > 0)) {
+            if ((f32)start_area * 1.2f < (f32)end_area) {
+                flags.grow = 1;
+            } else if ((f32)end_area * 1.2f < (f32)start_area) {
+                flags.shrink = 1;
+            }
+        }
+        list++;
+    }
+    if (flags.enter_left != 0) {
+        func_800226C0(165);
+    }
+    if (flags.enter_right != 0) {
+        func_800226C0(166);
+    }
+    if (flags.enter_other != 0) {
+        func_800226C0(169);
+    }
+    if (flags.leave_left != 0) {
+        func_800226C0(167);
+    }
+    if (flags.leave_right != 0) {
+        func_800226C0(168);
+    }
+    if (flags.leave_other != 0) {
+        func_800226C0(170);
+    }
+    if (flags.grow != 0) {
+        func_800226C0(172);
+    }
+    if (flags.shrink != 0) {
+        func_800226C0(171);
+    }
+    state->unk_2C = saved_weight;
+    state->unk_34 = weighted;
+    state->unk_30 = changed;
+}
 
 typedef struct {
     void (*activate)(void *, void *);
@@ -221,7 +338,6 @@ typedef struct {
 } Fragment4UpdateResourceView;
 extern void func_81600954(void *);
 extern void func_81600A34(void *, void *, s32, s32, s32, s32, s32);
-extern void func_81804BC8(void *);
 void WidgetState_Update(Fragment4StateView *state) {
     s32 done = 0;
     s32 result;
@@ -324,7 +440,7 @@ void WidgetState_Update(Fragment4StateView *state) {
             }
             activation_list++;
         }
-        func_81804BC8(state);
+        WidgetState_RefreshTransitionStatus(state);
     }
 }
 
