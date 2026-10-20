@@ -557,3 +557,4 @@ func_84169F18 = AuxiliaryEffect_DrawOne;
 func_8416A050 = AuxiliaryEffect_Draw;
 func_84168CA4 = BattleAnim_SixSlotTrail_UpdateSlot;
 func_84169040 = BattleAnim_SixSlotTrail_UpdateAll;
+func_81804FD0 = WidgetState_Update;

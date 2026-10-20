@@ -213,7 +213,120 @@ s32 WidgetResources_UseTransitionWeight(void *arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804BC8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/4/fragment4_B2D00/func_81804FD0.s")
+typedef struct {
+    void (*activate)(void *, void *);
+    s32 (*update)(void *, void *);
+    void (*draw)(void *, void *, s16 *);
+    void (*bounds)(void *, void *, s16 *);
+} Fragment4UpdateResourceView;
+extern void func_81600954(void *);
+extern void func_81600A34(void *, void *, s32, s32, s32, s32, s32);
+extern void func_81804BC8(void *);
+void WidgetState_Update(Fragment4StateView *state) {
+    s32 done = 0;
+    s32 result;
+    s32 context;
+    Fragment4DefinitionView **list;
+    s16 rect[4];
+    Fragment4DefinitionView **activation_list;
+    Fragment4UpdateResourceView *resource;
+    Fragment4UpdateResourceView *activation;
+    s32 next;
+    u8 previous_variant;
+
+    *(f32 *)state->unk_0C = *(s16 *)(state->controller + 2);
+    *(f32 *)(state->unk_0C + 4) = *(s16 *)(state->controller + 4);
+    state->unk_14 = *(u16 *)(state->controller + 8);
+    state->unk_16 = *(u16 *)(state->controller + 12);
+    state->unk_18 = *(u16 *)(state->controller + 6);
+    switch (state->unk_1A) {
+    case 0:
+        if (state->unk_1C != state->unk_1D) {
+            done = 1;
+        }
+        break;
+    case 1:
+        done = WidgetState_AdvanceTransition(state, 12);
+        break;
+    case 2:
+        done = WidgetState_AdvanceTransition(state, 16);
+        break;
+    case 3:
+        done = WidgetState_AdvanceTransition(state, 16);
+        break;
+    case 4:
+        done = WidgetState_AdvanceTransition(state, 12);
+        break;
+    }
+    if (done) {
+        next = state->unk_1A + 1;
+        if (next >= 5) {
+            next = 0;
+            state->unk_1C = state->unk_1D;
+        }
+        state->unk_1A = next;
+        state->progress = 0.0f;
+    }
+    switch (state->unk_1A) {
+    case 0:
+        state->unk_28 = 1.0f;
+        state->unk_2C = 0.0f;
+        state->unk_1F = state->unk_1C;
+        break;
+    case 1:
+        state->unk_28 = 1.0f - state->progress;
+        state->unk_2C = 0;
+        state->unk_1F = state->unk_1C;
+        break;
+    case 2:
+        state->unk_28 = 0.0f;
+        state->unk_2C = state->progress * 0.5f;
+        state->unk_1F = state->unk_1C;
+        break;
+    case 3:
+        state->unk_28 = 0.0f;
+        state->unk_2C = state->progress * 0.5f + 0.5f;
+        state->unk_1F = state->unk_1D;
+        break;
+    case 4:
+        state->unk_28 = state->progress;
+        state->unk_2C = 1.0f;
+        state->unk_1F = state->unk_1D;
+        break;
+    }
+    state->unk_2C = func_81804AE8(state->unk_2C);
+    context = state->unk_04;
+    list = state->definitions;
+    if (context != 0) {
+        func_81600954((void *)context);
+    }
+    while (*list != NULL) {
+        result = 0;
+        resource = (Fragment4UpdateResourceView *)func_818054D0(*list, state->unk_1F);
+        if (resource->update != NULL) {
+            result = resource->update(*list, state);
+        }
+        resource->bounds(*list, state, rect);
+        if (context != 0) {
+            func_81600A34((void *)context, *list, result, rect[0], rect[1], rect[2], rect[3]);
+        }
+        list++;
+    }
+    previous_variant = state->unk_1D;
+    if (state->unk_1E != previous_variant) {
+        state->unk_21 = previous_variant;
+        state->unk_1D = state->unk_1E;
+        activation_list = state->definitions;
+        while (*activation_list != NULL) {
+            activation = (Fragment4UpdateResourceView *)func_818054D0(*activation_list, state->unk_1E);
+            if (activation->activate != NULL) {
+                activation->activate(*activation_list, state);
+            }
+            activation_list++;
+        }
+        func_81804BC8(state);
+    }
+}
 
 extern void func_81801420(void);
 extern void func_81800A90(void);
