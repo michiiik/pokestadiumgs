@@ -1,5 +1,9 @@
 #include "global.h"
 
+#ifdef VERSION_US
+extern s32 GbTower_CheckPakRemoved(s32, u8);
+#endif
+
 
 #ifdef VERSION_US
 // func_8005D964 refreshes this identity and clears the two bytes at 0x5E.
@@ -2248,8 +2252,8 @@ void func_8005D610(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8005C7D0(s32, s32, s32);
-extern void func_8005C8D8(s32, s32, s32);
+extern void func_8005C7D0(u8 *, s32, s32);
+extern void func_8005C8D8(u8 *, s32, s32);
 extern void func_8005B6F0(u8 *arg0, s32 arg1, s32 arg2);
 extern void func_8005BCF0(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 extern void func_8005C22C(s32 arg0, s32 arg1, s32 arg2);
@@ -2273,10 +2277,10 @@ s32 GbSave_ReadRecord(s32 selector, s32 port, s32 box, s32 slot, s32 output) {
             func_8005C614(output, port);
             break;
         case 36:
-            func_8005C7D0(output, port, slot);
+            func_8005C7D0((u8 *)output, port, slot);
             break;
         case 37:
-            func_8005C8D8(output, port, slot);
+            func_8005C8D8((u8 *)output, port, slot);
             break;
         case 38:
         case 39:
@@ -2936,7 +2940,19 @@ void func_8005F0B8(u8 port) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/585D0/func_8005F110.s")
+extern s32 D_80128748;
+extern u8 D_8012874D;
+extern u8 D_80128575[];
+extern void GbSave_ResetPortCache(u8 port);
+extern u8 D_80128570[];
+void GbSave_ResetPortState(u8 port) {
+    D_80128748 &= ~(1U << port);
+    GbSave_ResetPortCache(port);
+    if ((D_8012874D & (1U << port)) == 0) {
+        return;
+    }
+    ((GbSavePortView *)D_80128570)[port].state = 2;
+}
 #endif
 
 #ifdef VERSION_US
