@@ -2,6 +2,7 @@
 
 
 #ifdef VERSION_US
+
 extern void Game_ShutdownAndLoadFragment(s32, s32);
 extern u8 D_801283B0;
 extern u8 D_8012855C[];
@@ -65,7 +66,54 @@ s32 GbPak_SelectRamBank(u8 port, u8 bank) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005655C.s")
+extern u8 D_801283B0;
+extern u8 D_8012855C[];
+s32 GbPak_ReadWriteRam(u8 port, u16 flags, s32 address, u8 *buffer, s32 size) {
+    s32 result;
+    s32 end;
+    u8 bank;
+    u8 status;
+
+    if ((result = osGbpakGetStatus((OSPfs *)&D_801283B0 + port, &status)) != 0) {
+        return result;
+    }
+    bank = (u32)address >> 13;
+    if (bank != D_8012855C[port]) {
+        result = GbPak_SelectRamBank(port, bank);
+        if (result != 0) {
+            return result;
+        }
+    }
+    address &= 0x1FFF;
+    end = address + size;
+    while (1) {
+        if (end > 0x2000) {
+            end -= 0x2000;
+            result = osGbpakReadWrite((OSPfs *)&D_801283B0 + port, flags, address + 0xA000, buffer, 0x2000 - address);
+            if (result != 0) {
+                break;
+            }
+            buffer += 0x2000 - address;
+            bank++;
+            result = GbPak_SelectRamBank(port, bank);
+            if (result != 0) {
+                break;
+            }
+            size = end;
+            address = 0;
+        } else {
+            result = osGbpakReadWrite((OSPfs *)&D_801283B0 + port, flags, address + 0xA000, buffer, size);
+            break;
+        }
+    }
+    if (result == 0) {
+        result = osGbpakGetStatus((OSPfs *)&D_801283B0 + port, &status);
+    }
+    if (result == 0 && (status & OS_GBPAK_POWER) == 0) {
+        result = PFS_ERR_CONTRFAIL;
+    }
+    return result;
+}
 
 extern u8 D_801283B0;
 extern s32 GbPak_ReadCommand();
@@ -351,12 +399,11 @@ s32 GbTower_VerifyPakStillInserted(s32 arg0, u8 *arg1) {
 }
 
 extern u8 D_80128555;
-extern s32 func_8005655C(u8, u16, s32, u8 *, s32);
 s32 GbPak_ReadCommand(s32 arg0, u8 *arg1, s32 arg2, s32 arg3) {
     s32 result;
     result = 1;
     if (D_80128555 & (1 << arg0)) {
-        result = func_8005655C(arg0, 0, arg2, arg1, arg3);
+        result = GbPak_ReadWriteRam(arg0, 0, arg2, arg1, arg3);
     }
     return result;
 }
@@ -365,7 +412,7 @@ s32 GbPak_WriteCommand(s32 arg0, u8 *arg1, s32 arg2, s32 arg3) {
     s32 result;
     result = 1;
     if (D_80128555 & (1 << arg0)) {
-        result = func_8005655C(arg0, 1, arg2, arg1, arg3);
+        result = GbPak_ReadWriteRam(arg0, 1, arg2, arg1, arg3);
     }
     return result;
 }
@@ -539,7 +586,41 @@ u8 GbTower_SetPollMask(u8 arg0) {
     return old;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/56F90/func_8005777C.s")
+extern u8 D_80128560[];
+extern u8 D_80128554;
+extern u8 D_80128555;
+extern u8 D_80128557;
+extern u8 D_80128558;
+extern u8 D_801283B0;
+extern void func_8005F04C(u8);
+extern void func_8005F0B8(u8);
+extern void GbSave_ResetPortState(u8);
+extern void Game_ShutdownAndLoadFragment(s32, s32);
+void GbPak_PollConnection(void) {
+    static s32 s_poll_port = 0;
+    u8 status = 0;
+
+    if (D_80128557 & (1 << s_poll_port)) {
+        if (osGbpakGetStatus((OSPfs *)&D_801283B0 + s_poll_port, &status) == 0) {
+            D_80128560[s_poll_port] = 0;
+        } else if (++D_80128560[s_poll_port] == 3) {
+            if (D_80128558 & (1 << s_poll_port)) {
+                Game_ShutdownAndLoadFragment(s_poll_port, 1);
+            } else {
+                D_80128557 &= ~(1 << s_poll_port);
+                D_80128558 &= ~(1 << s_poll_port);
+                D_80128555 &= ~(1 << s_poll_port);
+                if ((status & OS_GBPAK_GBCART_PULL) == 0) {
+                    D_80128554 &= ~(1 << s_poll_port);
+                    func_8005F04C((u8)s_poll_port);
+                }
+                func_8005F0B8((u8)s_poll_port);
+                GbSave_ResetPortState((u8)s_poll_port);
+            }
+        }
+    }
+    s_poll_port = (s_poll_port + 1) & 3;
+}
 
 void func_80057908(u8 arg0) {
     if (D_80128555 & (1 << arg0)) {
