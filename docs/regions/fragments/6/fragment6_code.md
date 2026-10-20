@@ -32,6 +32,23 @@ setup-address interface used by `func_831020D0`.
 
 ## Verification
 
+`Fragment6_HandleAvailableListScroll` (`func_83100DBC`, 220 bytes) handles
+scrolling at the visible list edges while the widget is active. Selection
+below two and input mask 0x800 scroll upward if the offset is positive;
+selection at least ten and mask 0x400 scroll downward while offset+10 does
+not exceed the available-entry count. Each successful move plays sound 1
+and returns handled. Other input delegates to `func_81805524`.
+
+Selection and scroll are actual consumed locals declared before the handled
+result, giving the target 48-byte frame and result home sp+36. The complete
+upward condition includes positive scroll; this keeps selection live through
+the scroll test for the downward eligibility check. Earlier nested conditions
+and different local declaration order produced the wrong branch/register
+shape or a 40-byte frame. No unused result record or frame padding is used.
+The runner reports link-verified acceptance and the full US ROM comparison
+passes. Frozen first-success objects and five whole-TU cleanup/name/blank
+controls preserve every game byte, all 39 extents, and semantic relocations.
+
 `Fragment6_DrawSavedEntryList` (`func_83101804`, 768 bytes) draws the saved
 entries populated by `func_83100584` in this file. That producer gives
 state+204 and capacity eight to `func_80062390`, then stores its count at
@@ -103,11 +120,6 @@ locals, manufactured padding, or hand-unrolled loops are used by these owners.
 
 ## Remaining owners
 
-- `func_83100DBC`: requeue. Sixteen source variants preserve or worsen the
-  scroll handler. The best is 220 bytes but has a 40-byte frame instead of the
-  target's 48-byte frame, plus operand/scheduling differences. Named live
-  selection, scroll, button, and active-state values did not fix it. Investigate
-  genuine source lifetimes; do not copy unrelated callbacks' unused result arrays.
 - `func_831001A8`: longer selection/state lookup; not probed in this batch.
 - `func_8310065C`: layout prerequisite. Its `jtbl_83103998` remains outside
   the owner. Migrate the table and gate the still-assembly layout before
