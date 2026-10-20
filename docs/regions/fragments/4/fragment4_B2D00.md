@@ -199,17 +199,58 @@ Retail ROM MD5: 1561c75d11cedf356a8ddb1a4a5f9d5d.
 No new padding, instruction/relocation rewrite, dummy local, private experiment
 helper or coverage change is part of this batch.
 
-### Remaining requeues
+### 2026-10-21: widget state update accepted
 
-81804FD0 is now layout-ready but remains assembly after sixteen source
-candidates. The best 816-byte body is raw 0.7961, with a 112-byte frame versus
-retail 120 and an 824-byte original extent. Both five-case switches compile
-with their owned tables; array versus four-halfword structure, direct versus
-locally viewed state, and real old/new variant captures do not close the frame
-difference. A narrow next-phase local worsens it. The existing context helpers
-func_81600954 and func_81600A34 take actual pointer arguments; the retained
-follow-up declarations/calls reflect that interface. Next: trace real stack
-homes and input-to-state float-field lowering, keeping both switch case maps.
+81804FD0 is now WidgetState_Update, 824 original bytes. It copies the selected
+controller's axes and button words into the widget state, advances one of five
+transition phases, derives the draw weights and active variant, runs each
+definition's update/bounds callbacks, and submits their results to the optional
+context. When the requested variant changes, it activates each new resource
+and recomputes transition bounds/status through func_81804BC8. These operations
+establish the update name; an address-keyed alias preserves existing callers.
+
+The final source uses ordinary control flow and actual locals:
+
+- Case 0 sets the existing completion flag inside an explicit conditional,
+  rather than assigning a boolean comparison. This restores one instruction.
+- Case 1 assigns integer zero to the float weight; the other zero assignments
+  remain float literals. That source distinction restores the separate zero
+  materialization and downstream float-register sequence. Changing all zeros
+  together does not reproduce it.
+- Update and activation traversals have their own iterator/resource locals.
+  This reproduces the saved-register ownership and 120-byte frame. Caching the
+  activation callback itself instead removes two required instructions.
+- The actual four-halfword bounds array is declared after the update iterator
+  and before the activation iterator. This puts it at SP+96 without adding or
+  inflating storage. Root-first and root-last declarations put the same
+  eight-byte object at SP+112 and SP+76 respectively. Equal comparison scores
+  for those placements did not mean their stack offsets were equal.
+
+Passive observer controls pass for stock, stock-plus-blank, observer-off,
+observer-on and observer-plus-blank builds of a known unit and each retained
+parent before interpreting frame events. The final candidate differs at the
+two jump-table relocation fields only; the normal sequential full-ROM gate,
+not normalized similarity or an isolated link-verified claim, accepts it.
+
+The first successful gate freezes the entire changed TU, four collateral C
+units and both data inputs before returning. All seven retained objects are
+independently hashed immediately afterward. Known, cleaned/named and
+twenty-blank whole-TU controls preserve every game byte modulo separately
+verified equivalent relocation fields, every function extent and resolved
+relocation target. All 24 function extents, 4608 text bytes and 48 rodata bytes
+remain intact. Unused experimental declarations are removed after acceptance.
+
+The final clean named-source gate seals source/symbol/alias/layout inputs and
+freezes eleven complete objects before returning. All receipts are reread and
+externally hashed before further compilation. Main object SHA256:
+19b4857a78929e9c5ce6bc5df41949081b199febd851a56f4de431e2529ac057.
+Main source SHA256:
+4c74ea036d043f2e663210de779f9b57269eb37ce15fd37616e0a0f310935264.
+Retail ROM MD5: 1561c75d11cedf356a8ddb1a4a5f9d5d.
+No padding, dummy local, instruction/relocation rewrite, private diagnostic
+helper or coverage change is part of this batch.
+
+### Remaining requeue
 
 81804BC8 remains assembly after eight rectangle/status candidates. The best
 1040-byte body has raw similarity 0.3077, a 152-byte frame versus retail 160,
