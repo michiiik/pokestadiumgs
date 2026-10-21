@@ -606,3 +606,5 @@ func_83007568 = Fragment7_HandleTeamActions;
 func_83007788 = Fragment7_BuildControllerTeam;
 func_830078E4 = Fragment7_HandleTeamPartActions;
 func_83008494 = Fragment7_HandleRecordActions;
+func_83000AA4 = Fragment7_ClassifyHeldItem;
+func_830013A8 = Fragment7_DrawModeHeader;

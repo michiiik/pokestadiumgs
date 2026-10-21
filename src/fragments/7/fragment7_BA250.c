@@ -1,5 +1,10 @@
 #include "global.h"
 
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/D_8300F950.s")
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/D_8300F954.s")
+#endif
+
 
 #ifdef VERSION_US
 void func_83000020(s32 arg0) { struct State { u8 pad[0x4E038]; u8 f0; u8 f1; u8 pad2[2]; f32 f2; }; struct State *p0 = (struct State *)(u32)arg0; struct State *p1 = (struct State *)(u32)arg0; p0->f1 = 0; p1->f0 = p1->f1; p0->f2 = 0.0f; }
@@ -61,13 +66,44 @@ void func_830009D8(s32 arg0, void *arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83000AA4.s")
+extern u8 func_80063660(u8);
+s32 Fragment7_ClassifyHeldItem(u8 item) {
+    u8 effect;
+    switch (item) {
+    case 146:
+    case 152:
+        return 3;
+    case 30:
+    case 35:
+    case 105:
+    case 118:
+    case 163:
+        return 5;
+    case 78:
+    case 79:
+    case 80:
+    case 83:
+    case 84:
+    case 173:
+        return 1;
+    case 91:
+    case 94:
+    case 106:
+        return 0;
+    default:
+        effect = func_80063660(item);
+        if (effect == 0) return 0;
+        if (effect >= 50 && effect < 67) return 4;
+        if (effect < 17) return 2;
+        return 3;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-extern s32 func_83000AA4(u8);
+extern s32 Fragment7_ClassifyHeldItem(u8);
 s32 func_83000BC0(u8 arg0, u8 arg1) {
-    s32 result = func_83000AA4(arg0);
+    s32 result = Fragment7_ClassifyHeldItem(arg0);
     u8 value = result;
     if (result < 5) return value != 0;
     if (arg1 == 0x19 && arg0 == 0xA3) return 1;
@@ -304,7 +340,101 @@ void func_8300136C(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830013A8.s")
+typedef struct {
+    s16 archive;
+    s16 entry;
+    s16 x;
+    s16 y;
+    u8 text_settings[8];
+    s32 blend;
+    void *styles[3];
+} Fragment7TextRecord;
+typedef struct { s16 x, y; } Fragment7DrawOrigin;
+extern Fragment7TextRecord D_8300BEBC;
+extern u8 D_8300BE3C[], D_8300BE5C[], D_8300BE7C[], D_8300BE9C[];
+extern Gfx D_80094E38[];
+extern Gfx *D_800D0510;
+extern f32 func_818055E0(void *, u8 *);
+extern void WidgetTexture_DrawRecord(u8 *, u8 *, f32, s32);
+extern void WidgetText_DrawRecordWithSetup(void *, void *, f32, s32);
+extern void func_81800020(f32, f32, f32, f32, s32, s32, f32, f32);
+void Fragment7_DrawModeHeader(s32 definition, u8 *state, Fragment7DrawOrigin *origin) {
+    Gfx *command;
+    f32 weight;
+    Fragment7TextRecord record;
+    weight = func_818055E0((void *)definition, state);
+    record = D_8300BEBC;
+    switch (state[31]) {
+    case 9:
+        record.entry = 60;
+        break;
+    case 2:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+        record.entry = state[62] < 2 ? 23 : 24;
+        break;
+    case 3:
+    case 16:
+    case 17:
+    case 18:
+    case 19:
+        record.entry = state[63] < 2 ? 28 : 29;
+        break;
+    case 6:
+        if (state[61] == 1) {
+            record.entry = state[62] < 2 ? 23 : 24;
+        } else {
+            record.entry = state[63] < 2 ? 28 : 29;
+        }
+        break;
+    case 20:
+    case 21:
+    case 22:
+    case 23:
+    case 24:
+    case 25:
+    case 26:
+    case 27:
+        record.entry = 30;
+        break;
+    case 28:
+    case 29:
+    case 30:
+    case 31:
+    case 32:
+    case 33:
+    case 34:
+        record.entry = 31;
+        break;
+    case 35:
+    case 36:
+    case 37:
+    case 38:
+    case 39:
+    case 40:
+    case 41:
+    case 42:
+        record.entry = 32;
+        break;
+    case 0:
+    case 1:
+        break;
+    }
+    WidgetTexture_DrawRecord(D_8300BE3C, (u8 *)origin, 1.0f, 0);
+    WidgetTexture_DrawRecord(D_8300BE5C, (u8 *)origin, 1.0f, 0);
+    command = D_800D0510++;
+    gSPDisplayList(command, D_80094E38);
+    gDPSetEnvColor(D_800D0510++, 0, 0, 0, 80);
+    func_81800020(origin->x + 158, origin->y + 6, 379.0f, 44.0f, 0, 0, 0.0f, 1.0f);
+    gDPSetRenderMode(D_800D0510++, 0x0F0A7008, 0);
+    gDPSetEnvColor(D_800D0510++, 255, 255, 255, 255);
+    func_81800020(origin->x + 152, origin->y, 379.0f, 44.0f, 0, 0, 0.0f, 1.0f);
+    WidgetTexture_DrawRecord(D_8300BE7C, (u8 *)origin, 1.0f, 0);
+    WidgetTexture_DrawRecord(D_8300BE9C, (u8 *)origin, 1.0f, 0);
+    WidgetText_DrawRecordWithSetup(&record, origin, weight, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -358,8 +488,6 @@ void func_83001788(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-typedef struct { s16 x, y; } Fragment7DrawOrigin;
-extern Gfx *D_800D0510;
 extern Gfx D_80094D90[];
 extern s32 D_8300F890[];
 extern u8 D_8300C43C[];
@@ -396,14 +524,9 @@ typedef struct { s16 x, y, width, height; } Fragment7ListRect;
 extern Fragment7ListRect D_8300C0F4;
 extern Fragment7ListRect D_8300C0FC;
 extern u8 D_8300C01C[];
-extern f32 D_8300FAA8;
-extern f32 D_8300FAAC;
-extern f32 D_8300FAB0;
-extern f32 D_8300FAB4;
 extern void Fragment7_DrawSavedRecordList(u8 *records, s32 x, s32 y, f32 weight);
 extern void func_8004B2CC(s32, s32, s32, s32, s32, s32, s32, s32);
 extern void func_81801854(void *, void *, void *);
-extern f32 func_818055E0(void *, u8 *);
 extern void func_8180567C(s32, void *, void *);
 void Fragment7_DrawFirstRecordListPanel(s32 definition, void *memory, Fragment7DrawOrigin *origin) {
     u8 *state = memory;
@@ -412,14 +535,14 @@ void Fragment7_DrawFirstRecordListPanel(s32 definition, void *memory, Fragment7D
 
     weight = func_818055E0((void *)definition, state);
     WidgetResources_DrawRecords(definition, (s32)state, (s32)origin);
-    if (weight > D_8300FAA8) {
+    if (weight > 0.01f) {
         Fragment7_DrawSavedRecordList(state + 0x39E48, origin->x, origin->y, weight);
     }
     rect = D_8300C0F4;
     if (state[70] == 1 && (state[31] == 40 || state[31] == 41)) {
         rect = *(Fragment7ListRect *)(D_8300C01C + state[76] * 24 - 18);
     }
-    if (weight > D_8300FAAC && rect.width > 0) {
+    if (weight > 0.99f && rect.width > 0) {
         func_81801854(&rect, &rect, origin);
         func_8004B2CC(rect.x, rect.y, rect.width, rect.height, 150, 150, 90, 0);
     }
@@ -435,7 +558,7 @@ void Fragment7_DrawSecondRecordListPanel(s32 definition, void *memory, Fragment7
 
     weight = func_818055E0((void *)definition, state);
     WidgetResources_DrawRecords(definition, (s32)state, (s32)origin);
-    if (weight > D_8300FAB0) Fragment7_DrawSavedRecordList(state + 0x3A06C, origin->x, origin->y, weight);
+    if (weight > 0.01f) Fragment7_DrawSavedRecordList(state + 0x3A06C, origin->x, origin->y, weight);
     rect = D_8300C0FC;
     if (state[82] > 0) {
         rect = *(Fragment7ListRect *)(D_8300C01C + state[82] * 24 - 18);
@@ -446,7 +569,7 @@ void Fragment7_DrawSecondRecordListPanel(s32 definition, void *memory, Fragment7
     if (state[31] == 41 && state[70] == 1 && func_8300AED8(state + 0x3A06C)) {
         rect = *(Fragment7ListRect *)(D_8300C01C + state[77] * 24 - 18);
     }
-    if (weight > D_8300FAB4 && rect.width > 0) {
+    if (weight > 0.99f && rect.width > 0) {
         func_81801854(&rect, &rect, origin);
         func_8004B2CC(rect.x, rect.y, rect.width, rect.height, 150, 150, 90, 0);
     }
@@ -617,8 +740,6 @@ typedef struct Rect02424 { s16 x, y, w, h; } Rect02424;
 extern Rect02424 D_8300C3EC;
 extern u8 D_8300C29C[];
 extern void func_830020CC(void *, f32, s32, s32, f32);
-extern f32 D_8300FAB8;
-extern f32 D_8300FABC;
 extern void func_818057D0(s32, void *, void *);
 void func_83002424(s32 arg0, void *arg1, void *arg2) {
     void *state = arg1;
@@ -628,14 +749,14 @@ void func_83002424(s32 arg0, void *arg1, void *arg2) {
     alpha = func_818055E0((void *)arg0, (u8 *)arg1);
     func_818057D0(arg0, state, arg2);
     func_818006FC(((s16 *)arg2)[0] + 0xD, ((s16 *)arg2)[1] + 0x25, 0xE2, alpha);
-    if (alpha > D_8300FAB8) {
+    if (alpha > 0.01f) {
         func_830020CC((u8 *)state + 0x3A290, 0.0f, ((s16 *)arg2)[0], ((s16 *)arg2)[1], alpha);
     }
     rect = D_8300C3EC;
     if (((u8 *)state)[0x46] == 1 && (((u8 *)state)[0x1F] == 0x19 || ((u8 *)state)[0x1F] == 0x1A)) {
         rect = *(Rect02424 *)(D_8300C29C + ((u8 *)state)[0x4A] * 0x18 - 0x12);
     }
-    if (alpha > D_8300FABC && rect.w > 0) {
+    if (alpha > 0.99f && rect.w > 0) {
         func_81801854(&rect, &rect, arg2);
         func_8004B2CC(rect.x, rect.y, rect.w, rect.h, 0x96, 0x96, 0x5A, 0);
     }
@@ -950,7 +1071,6 @@ void func_83006F30(s32 arg0, void *arg1, u8 *arg2) {
 #endif
 
 #ifdef VERSION_US
-extern void WidgetText_DrawRecordWithSetup(void *, void *, f32, s32);
 extern u8 D_8300D908[];
 void func_83006FDC(s32 arg0, s32 arg1, s32 arg2) {
     s32 pad;
@@ -1347,7 +1467,6 @@ extern u8 D_8300EA34[];
 extern u8 D_8300EA54[];
 extern void func_800503A4(void *);
 extern void func_818017A8(void);
-extern void WidgetTexture_DrawRecord(u8 *, u8 *, f32, s32);
 extern u16 D_8300F7BE[][2];
 void Fragment7_DrawSlidingRecordPanel(s32 definition, void *memory, void *origin) {
     Fragment7PanelPositionState *state = memory;
@@ -1568,18 +1687,9 @@ void func_83008700(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-typedef struct {
-    s16 archive;
-    s16 entry;
-    s16 x;
-    s16 y;
-    u8 text_settings[8];
-    s32 blend;
-    void *styles[3];
-} Fragment7StatusTextRecord;
-extern Fragment7StatusTextRecord D_8300EE88;
+extern Fragment7TextRecord D_8300EE88;
 void Fragment7_DrawRecordStatus(s32 definition, void *memory, void *origin) {
-    Fragment7StatusTextRecord record;
+    Fragment7TextRecord record;
     Fragment7NavigationState *state = memory;
     f32 weight;
 
@@ -1845,7 +1955,6 @@ typedef struct {
     u8 header0;
     u8 count;
 } Fragment7ListIndicatorState;
-extern Gfx D_80094E38[];
 extern u8 D_8300F360[];
 extern u8 D_8300F380[];
 extern void WidgetResources_DrawSelection(s32, s32, s32);

@@ -577,3 +577,90 @@ then re-split with the pinned tool and full-ROM-gate the still-assembly
 owners before sending C switch candidates. Extending the existing per-file
 subsegment must not create a second overlapping `.rodata` output for this
 source or drop constants used by already accepted functions.
+
+### Profile fallback: calibrated temporary-allocation handoff
+
+`func_83008290`: requeue. A passive UGEN observer passed ten complete-game-
+object controls: known source and one exact retained 516-byte parent, each
+under stock, stock plus twenty blank lines, observer off, observer on, and
+observer on plus twenty blank lines. The actual procedure mapping is 110 for
+the known record-action callback and 108 for this retained profile parent;
+these numbers are not reusable for another input without recalibration.
+
+Decoded operands and blank-control events map emission 129 to the trainer-ID
+clear at object offset 480, emission 131 to the split address materialization
+at offsets 476/484, emission 132 to the byte load at 488, and emission 133 to
+the byte store at 492. Emission ordinal is therefore not an object-word index.
+The address consumes temporary register 25. Its release leaves register 15 at
+the queue head, followed by register 24; the load consumes 15 (`t7`), whereas
+ground truth uses 24 (`t8`). This is measured temporary-allocation evidence,
+not an inference from a normalized score.
+
+Eight new natural fallback-topology candidates did not close it. Reversing
+the byte/ID writes or initializing a consumed byte before the ID write moves
+the ID store and leaves four differing words. A consumed initialized byte
+after the ID write preserves the original schedule but colors the byte into
+`v0`, still leaving two differing words. Separately initialized native-address
+pointer views retain the original `t7` pair. Ordinary one-byte `memcpy`/`bcopy`
+with native resource-address views retain a real call and grow to 520 bytes.
+No candidate was installed; all of the earlier aggregate-copy words remain
+matched. Next trace a source topology that changes a real allocation/free
+boundary while preserving the fallback store order; do not rotate the free
+list with identity operations or invented one-byte aggregate types.
+
+Earlier jump-table planning also needs the actual aligned cut: the first
+table starts at `0xC9B88`, not a 16-byte boundary. Widening to `0xC9B80` includes
+the two zero-valued title resources `D_8300F950`/`D_8300F954`, referenced by an
+already accepted later callback. Their ownership and the already accepted
+float-resource references must survive any re-split; do not simply move the
+subsegment to the unaligned table start.
+
+### Earlier tables: held-item classification and mode header
+
+Two owners accepted natively from `ec16bcd`, totaling 1072 bytes:
+
+- `func_83000AA4` / `Fragment7_ClassifyHeldItem` (284 bytes) returns a held-item
+  category using the item's effect byte from `func_80063660`, with special
+  item groups in the original jump table. The name is supported by consumer
+  `func_83000BC0`: category 5 requires item/species pairs including Light Ball
+  with Pikachu (item 163, species 25), Lucky Punch with Chansey (30, 113),
+  Thick Club with Cubone/Marowak (118, 104/105), Stick with Farfetch'd (105,
+  83), and Metal Powder with Ditto (35, 132). The effect is an ordinary `u8`;
+  retaining an extra wider result changes its masking and branch shape.
+- `func_830013A8` / `Fragment7_DrawModeHeader` (788 bytes) copies the actual
+  32-byte text descriptor, selects its entry by state byte 31 and bank bytes
+  61--63, draws four texture records and the two offset background rectangles,
+  then draws the selected text with the saved weight. Explicit no-op cases
+  0/1 preserve the original zero-based table. A real display-list cursor,
+  consumed by `gSPDisplayList`, declared before the weight and text descriptor,
+  gives the original 104-byte frame, record at `64(sp)`, and weight at
+  `96(sp)`. Direct macro postincrement gives the same non-stack instructions
+  but a 96-byte frame and weight at `60(sp)`; no padding or dummy local is
+  involved in the accepted source.
+
+The earlier layout prerequisites above are closed. The existing per-file
+rodata window now begins at ROM `0xC9B80`, covering the two original title
+resources, both early tables, the intervening floating constants, and the
+already migrated later tables through `0xC9EF0`. The title resources remain
+ordinary data-only assembly includes, with no text section or function code.
+The six constants used by accepted list-panel callbacks are ordinary
+`0.01f`/`0.99f` literals, emitted at their original pool positions. No symbol
+address override, additional rodata output, or linker-script edit is needed.
+
+Before adoption, the pinned splitter's isolated baseline reproduced the
+known whole object. The migrated layout and its twenty-blank-line control
+then linked all 43456 original text bytes and 880 rodata bytes directly to
+the corresponding US-ROM ranges, with every function extent unchanged.
+After a normal re-split, the still-assembly switch owners passed the full-ROM
+gate before C probes began. The first classifier generator omitted the
+out-of-table item-173 case; the repaired batch included it. This was a
+generator defect, not evidence about the compiler or an accepted program.
+
+Each new owner's first successful gate froze the complete changed object,
+four distinct collateral objects, source, ROM, ELF, and linker output;
+external SHA-256 checks completed before another compile. Both frozen
+objects, extern deduplication, shared text/origin layouts, naming, and
+twenty-blank-line controls preserve all original game section bytes,
+function extents, and semantic relocation targets. All nine target-compiler
+layout assertions passed. The linked US ROM remains byte-identical, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`.

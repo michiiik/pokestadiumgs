@@ -521,7 +521,7 @@
     - [0xBA250, c,       fragments/7/fragment7_BA250]
     - [0xC4C10, c,       fragments/7/fragment7_C4C10]
     - [0xC5BD0, data,    fragments/7/fragment7_data]
-    - [0xC9D30, .rodata, fragments/7/fragment7_BA250] # jtbl_8300FB00 through jtbl_8300FC30, D_8300FBA4
+    - [0xC9B80, .rodata, fragments/7/fragment7_BA250] # Empty titles, jtbl_8300F958 through jtbl_8300FC30, float constants
     - [0xC9EF0, rodata]
 
   # unk fragment
