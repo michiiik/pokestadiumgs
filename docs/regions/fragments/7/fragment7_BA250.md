@@ -361,3 +361,73 @@ but keep a biased base live across callbacks and add spills. This is not a
 compiler-impossibility claim. Next isolate address-identity/rematerialization
 at a calibrated frontend/backend boundary rather than adding a fixed bias or
 replaying the failed carrier families.
+
+### Collection compatibility and team visual resources
+
+Two owners accepted natively from `2417016b`, totaling 688 bytes:
+
+- `func_83000CB4` / `Fragment7_RefreshCollectionCompatibility` (388 bytes):
+  checks four records at `0x3FD74` and the saved records at `0x3A070`, with
+  68-byte strides. Results go to the word arrays at `0x3FED0` and `0x3FEE0`;
+  unused saved slots through index 7 are cleared. The saved count is byte
+  `0x3A06D`. Each record is checked against the six 88-byte entries at
+  `0x3FB60` and, when supplied, the other deck's entries at byte 16.
+  `func_83000274` clears eight bytes, stores the checked-record pointer at
+  byte 0, and writes the reason/masks at bytes 4 through 7. Its actual
+  eight-byte result object and normal indexed loops reproduce the original
+  88-byte frame, including the result at `76(sp)`. A four-byte scalar scratch
+  object is insufficient. Making the helper's three-argument integer-return
+  prototype visible before `func_830009D8` is whole-object byte-inert.
+- `func_83001000` / `Fragment7_LoadTeamVisualResources` (300 bytes): traverses
+  two 7012-byte banks, up to six rows per bank, and two parts per row. Each
+  row is 1168 bytes; its two 476-byte parts select resource/index bytes at
+  offsets 11/12. An ordinary pointer to the row's parts, used by the inner
+  loop, gives IDO the original source-address lifetime. The destination
+  slots are 8200 bytes each and their resource content begins at byte 96.
+  `func_8004E0F0` loads an 8200-byte resource chunk into that destination;
+  see `src/4CC20.c`. No manually unrolled loops are needed.
+
+Each acceptance passed the recorded runner and full US-ROM comparison, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`, with an immediate externally hashed
+full-TU/four-distinct-collateral-object freeze. Declaration cleanup, the
+concrete visual-state parameter, naming, twenty-blank-line controls, and 21
+target-compiler layout assertions preserve all original game section bytes,
+function extents, and semantic relocations.
+
+`func_8300112C`: requeue. The real stream records are 88 bytes, not the old
+64-byte draft buffer. Ordinary aggregate assignment, a six-entry limit, and
+3200-byte output slots now reach the original 576 bytes and 168-byte frame.
+Controller home is `156(sp)`. Best raw similarity is 0.9931: only the two
+adjacent instructions at offsets 404/408 (`subu t9,t9,s3` and
+`ori at,at,0xFB60`) are reversed. The retained parent is candidate 3 of
+`native-f7-deck-controller-home-batch`; typed-state candidate 0 of
+`native-f7-deck-typed-range-batch-v2` reaches the same frontier. A calibrated
+native permuter reproduced all 144 masked parent words and relocation
+topology, then reached zero only with a multi-statement line group spanning
+the clearing loop and output setup. That proposal was not installed.
+Normal iterator-preparation orders, scoped initializers, real-size expression
+forms, clear-loop spellings, and cursor-loop/guard variants did not close the
+residual. Some alternate cursor loops regress to 584--600 bytes or a 160-byte
+frame. Next isolate source-line assignment at the assembler scheduling
+boundary using the retained exact parent and blank-line controls; do not
+add register constraints, rewrite instructions, or replay the old 64-byte
+buffer/manual-copy families. Early prototype-placement failures are context
+diagnostics, not evidence against the record-layout hypothesis.
+
+`func_83008290`: requeue update. An integer native-address view of
+`D_8300F924` now restores its explicit high/low address materialization and
+the original 516-byte size. All instructions except the final fallback
+byte load/store agree: target uses `t8`, candidate `t7`, raw 0.9845.
+The calibrated 129-word native permuter proposal adds an identity index and
+redundant byte mask, so it was rejected as source. Readable consumed name
+buffer/value carriers do not close that temporary allocation. Next inspect
+UGEN allocation/free events on that exact retained parent; preserve the
+already verified six-entry aggregate loop and real callee signatures.
+
+`func_83007788`: requeue. Eight new typed export candidates use the actual
+88-to-60-byte `func_80051864` conversion and a real 12-byte name buffer,
+but produce 376--380 rather than 348 bytes; best raw 0.5579. The original
+counts occupied entries before conversion and stops after six. Next isolate
+the count-loop topology and controller lifetime, checking the caller
+`func_830078E4` before making any interface change. Its visible call prepares
+only two arguments. No candidate was installed.
