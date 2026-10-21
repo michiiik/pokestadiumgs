@@ -711,3 +711,5 @@ func_84162DE8 = TexturedRibbonSheet_Draw;
 func_84155820 = BattleMoveState_RefreshSelectedStats;
 func_84155DB4 = BattleMoveState_FindStrongestMove;
 func_84155CB8 = BattleMoveState_UpdateMoveSlot;
+func_84155AC4 = BattleMoveState_RecordMoveAgainstSlot;
+func_841562BC = BattleMoveState_CopyPartyStatToRecord;
