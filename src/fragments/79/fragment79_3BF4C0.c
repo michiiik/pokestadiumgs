@@ -2,6 +2,19 @@
 
 
 #ifdef VERSION_US
+typedef struct {
+    u8 flags;
+    u8 unk_01[7];
+    u8 selected[2];
+    u8 unk_0A[42];
+    u32 score[2];
+} BattlePlanScoreHeader;
+
+typedef struct {
+    u8 unk_00[13];
+    u8 stages[7];
+} BattlePlanStageRecord;
+
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_8414FC30.s")
 
 extern void func_8414A180(u8 *, u8, u8);
@@ -723,9 +736,61 @@ void BattlePlan_AddConditionCountBonus(u8 *state, u8 side) {
     *(u8 *)(u32)base |= 2;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841537FC.s")
+extern u8 *func_84154B0C(void);
+extern u8 func_8414A2B8(void);
+extern u8 func_84148C74(u8);
+extern u8 func_80062D98(u8);
+extern s32 BattleRecord_HasPoweredMoveOfType(u8 *, u8);
+extern s32 BattleRecord_HasMove(u8 *, u8);
+void BattlePlan_AddRainDanceBonus(u8 *plan, u8 side) {
+    u8 *own;
+    BattlePlanScoreHeader *base;
+    s32 amount;
+    u8 *table;
+    own = func_84154B64(side);
+    base = (void *)(plan + 4);
+    if (func_84154B0C()[408] != 1) {
+        base->selected[side] = 0xFF;
+        table = func_8414A3A0(side);
+        amount = table[43] * func_8414A2B8();
+        if (BattleRecord_HasPoweredMoveOfType(own, 21) != 0) {
+            base->score[side] += amount;
+        }
+        if (func_80062D98(func_84148C74((1 - (u32)side) & 0xFF)) == 20) {
+            base->score[side] += amount;
+        }
+        if (BattleRecord_HasMove(own, 87) != 0) {
+            base->score[side] += amount;
+        }
+        base->score[side] += amount / 2;
+        base->flags |= 2;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153930.s")
+void BattlePlan_AddSunnyDayBonus(u8 *plan, u8 side) {
+    u8 *own;
+    BattlePlanScoreHeader *base;
+    s32 amount;
+    u8 *table;
+    own = func_84154B64(side);
+    base = (void *)(plan + 4);
+    if (func_84154B0C()[408] != 2) {
+        base->selected[side] = 0xFF;
+        table = func_8414A3A0(side);
+        amount = table[42] * func_8414A2B8();
+        if (BattleRecord_HasPoweredMoveOfType(own, 20) != 0) {
+            base->score[side] += amount;
+        }
+        if (func_80062D98(func_84148C74((1 - (u32)side) & 0xFF)) == 21) {
+            base->score[side] += amount;
+        }
+        if (BattleRecord_HasMove(own, 76) != 0) {
+            base->score[side] += amount;
+        }
+        base->score[side] += amount / 2;
+        base->flags |= 2;
+    }
+}
 
 extern void func_84150B14(void *, u8, s32, s32, s32, s32);
 extern u8 *func_84154B64(u8);
@@ -743,7 +808,22 @@ void func_84153A64(void *arg0, u8 arg1)
   }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153B10.s")
+s32 BattlePlan_HasUnfavorableStages(u8 *plan, u8 side) {
+    s32 i;
+    BattlePlanStageRecord *own;
+    BattlePlanStageRecord *other;
+    own = (void *)func_84154B64(side);
+    other = (void *)func_84154B64((1 - (u32)side) & 0xFF);
+    for (i = 0; i < 7; i++) {
+        if (own->stages[i] < 7) {
+            return 1;
+        }
+        if (other->stages[i] > 7) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153CB8.s")
 

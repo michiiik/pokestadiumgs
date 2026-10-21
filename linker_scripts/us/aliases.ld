@@ -723,3 +723,6 @@ func_84152E10 = BattlePlan_AddHitObstacleBonus;
 func_84151F9C = BattlePlan_AddLeechSeedBonus;
 func_8415252C = BattlePlan_AddHealBellBonus;
 func_84152EE8 = BattlePlan_AddPerishSongBonus;
+func_841537FC = BattlePlan_AddRainDanceBonus;
+func_84153930 = BattlePlan_AddSunnyDayBonus;
+func_84153B10 = BattlePlan_HasUnfavorableStages;
