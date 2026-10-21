@@ -665,3 +665,6 @@ func_84156CCC = BattleAnim_StartEffect19Radial20_EmitVariantD;
 func_8415782C = BattleAnim_StartEffect98Radial20_EmitVariantD;
 func_84157ADC = BattleAnim_StartEffect11Trail50Alt_Update;
 func_84157CDC = BattleAnim_StartEffect57Trail50_Update;
+func_84157128 = BattleAnim_StartEffect7TexturedRibbonSheet_Emit;
+func_8415839C = BattleAnim_StartEffect62OwnerLinkedFourStream_Update;
+func_84158588 = BattleAnim_StartEffect67OwnerAnchoredFourStream_Init;

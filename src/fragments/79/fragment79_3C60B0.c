@@ -223,7 +223,7 @@ extern u16 D_841A4D4C;
 extern u16 D_841A4D4E;
 extern u16 D_841A4D52;
 extern void BattleAnim_StartEffect19Radial20_EmitVariantD(void);
-extern void func_84157128(void);
+extern void BattleAnim_StartEffect7TexturedRibbonSheet_Emit(void);
 extern void func_84157398(void);
 extern void BattleAnim_StartEffect98Radial20_EmitVariantD(void);
 extern s32 func_8415DAE4(void);
@@ -308,18 +308,49 @@ void func_841570D4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157128.s")
+extern f32 BattleAnim_EffectSecondaryOwnerModelScale(void);
+extern void func_84156AB4(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void func_84162798(f32, f32, f32, f32, f32, f32, u8, u8, u8, u8, f32, s16);
+extern f32 D_8418C544;
+void BattleAnim_StartEffect7TexturedRibbonSheet_Emit(void) {
+    f32 jitterX;
+    f32 jitterY;
+    f32 jitterZ;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 vx;
+    f32 vy;
+    f32 vz;
+    f32 scale;
+    s32 random;
+    scale = BattleAnim_EffectSecondaryOwnerModelScale();
+    func_84156AB4(&x, &y, &z, &vx, &vy, &vz);
+    vx *= 20.0f;
+    vy *= 20.0f;
+    vz *= 20.0f;
+    random = guRandom();
+    jitterX = 30.0f - (random % 60);
+    x += scale * jitterX;
+    random = guRandom();
+    jitterY = 30.0f - (random % 60);
+    y += scale * jitterY;
+    random = guRandom();
+    jitterZ = 30.0f - (random % 60);
+    z += scale * jitterZ;
+    func_84162798(x, y, z, vx, vy, vz, 255, 255, 0, 60, D_8418C544, 30);
+}
 #endif
 
 #ifdef VERSION_US
 extern u16 D_841A4D4C;
 extern void func_84162660(void);
-extern void func_84157128(void);
+extern void BattleAnim_StartEffect7TexturedRibbonSheet_Emit(void);
 void BattleAnim_StartEffect7TexturedRibbonSheet_Init(void) {
     D_841A4D4C = 0;
     BattleAnim_ResetSharedEffectMatrix();
     func_84162660();
-    func_84157128();
+    BattleAnim_StartEffect7TexturedRibbonSheet_Emit();
 }
 #endif
 
@@ -330,7 +361,7 @@ s32 BattleAnim_StartEffect7TexturedRibbonSheet_Update(void) {
         return -1;
     }
     if (*(s16 *)&D_841A4D4C < 0x6EA && (*(s16 *)&D_841A4D4C % 3) == 0) {
-        func_84157128();
+        BattleAnim_StartEffect7TexturedRibbonSheet_Emit();
     }
     return func_84162C88();
 }
@@ -715,7 +746,45 @@ void BattleAnim_StartEffect62OwnerLinkedFourStream_Init(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_8415839C.s")
+extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern u16 D_841A4D02;
+typedef struct { f32 x, y, z; } EmitterPosition;
+extern void OwnerLinkedFourStream_Start(f32, f32, f32, f32, f32, f32, u8, u8, u8, u8, f32, f32, f32, s16);
+extern s32 OwnerLinkedFourStream_IsComplete(void);
+extern void OwnerAnchoredFourStream_Init(void);
+extern void OwnerAnchoredFourStream_Start(f32, f32, f32, f32, f32, f32, u8, u8, u8, u8, f32, f32, f32, s16);
+extern u8 *func_84109B88(EmitterPosition, u8);
+extern f32 __sinf(f32);
+extern f32 __cosf(f32);
+extern f32 D_8418C588;
+extern f32 D_8418C58C;
+extern f32 D_8418C590;
+extern f32 D_8418C594;
+s32 BattleAnim_StartEffect62OwnerLinkedFourStream_Update(void) {
+    s32 result;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 vx;
+    f32 vy;
+    f32 vz;
+    f32 angle;
+    *(s16 *)&D_841A4D02 += 1;
+    if ((*(s16 *)&D_841A4D02 >> 2) < 4 && (*(s16 *)&D_841A4D02 & 3) == 0) {
+        func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+        angle = (2 - (((*(s16 *)&D_841A4D02 >> 2) + 2) % 3)) * D_8418C588 + D_8418C58C;
+        vx *= 7.0f * __cosf(angle);
+        vy = __sinf(angle) * 10.0f;
+        vz = 0.0f;
+        OwnerLinkedFourStream_Start(x, y, z, vx, vy, vz, 208, 255, 255, 128, D_8418C590, 2.0f, 4.0f, 40);
+    }
+    if (*(s16 *)&D_841A4D02 >= 2) {
+        result = OwnerLinkedFourStream_IsComplete();
+    } else {
+        result = 0;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -730,7 +799,30 @@ void BattleAnim_StartEffect62OwnerLinkedFourStream_Draw(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84158588.s")
+extern void BattleAnim_ResetSharedEffectMatrix(void);
+extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern u16 D_841A4D04;
+void BattleAnim_StartEffect67OwnerAnchoredFourStream_Init(void) {
+    EmitterPosition position;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 vx;
+    f32 vy;
+    f32 vz;
+    D_841A4D04 = 0;
+    BattleAnim_ResetSharedEffectMatrix();
+    OwnerAnchoredFourStream_Init();
+    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    vx *= 5.0;
+    vy *= 5.0;
+    vz *= 5.0;
+    OwnerAnchoredFourStream_Start(x, y, z, vx, vy, vz, 192, 255, 255, 160, D_8418C594, 2.0f, 4.0f, 40);
+    position.x = x;
+    position.y = y;
+    position.z = z;
+    func_84109B88(position, 1);
+}
 #endif
 
 #ifdef VERSION_US
