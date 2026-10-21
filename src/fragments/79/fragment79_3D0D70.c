@@ -1,6 +1,48 @@
 #include "global.h"
 
 #ifdef VERSION_US
+extern void Vec3f_CrossProductComponents(f32, f32, f32, f32, f32, f32, f32 *, f32 *, f32 *);
+extern void FlatGrid16_RecomputeNormal(s32, s32);
+extern f32 sqrtf(f32);
+extern f32 __sinf(f32);
+extern const f64 D_8418C780, D_8418C790;
+extern const f32 D_8418C788;
+extern void *D_8418CAB0;
+extern Gfx D_841877C0[];
+extern void FlatGrid16_BuildViewMatrix(void);
+extern void * Gfx_AllocDisplayList(s32);
+typedef struct {
+    /* 0x0 */ u8 r;
+    /* 0x1 */ u8 g;
+    /* 0x2 */ u8 b;
+} S1_Color_RGB8;
+typedef struct S1_Vec3f {
+    /* 0x0 */ f32 x;
+    /* 0x4 */ f32 y;
+    /* 0x8 */ f32 z;
+} S1_Vec3f;
+typedef struct S1_TexturedRibbonSheetNode {
+    /* 0x00 */ f32 unk_00;
+    /* 0x04 */ u8 unk_04;
+    /* 0x08 */ f32 unk_08;
+    /* 0x0C */ S1_Vec3f unk_0C;
+    /* 0x18 */ S1_Vec3f unk_18;
+    /* 0x24 */ S1_Vec3f unk_24;
+    /* 0x30 */ Vtx unk_30[2];
+} S1_TexturedRibbonSheetNode;
+typedef struct S1_TexturedRibbonSheet {
+    /* 0x000 */ s16 unk_000;
+    /* 0x002 */ s16 unk_002;
+    /* 0x004 */ s16 unk_004;
+    /* 0x006 */ s16 unk_006;
+    /* 0x008 */ s16 unk_008;
+    /* 0x00A */ S1_Color_RGB8 unk_00A;
+    /* 0x010 */ f32 unk_010;
+    /* 0x014 */ f32 unk_014;
+    /* 0x018 */ Vtx* unk_018;
+    /* 0x01C */ char unk01C[0x1C];
+    /* 0x038 */ S1_TexturedRibbonSheetNode unk_038[10];
+} S1_TexturedRibbonSheet;
 typedef struct {
     f32 x, y, z;
     f32 nx, ny, nz;
@@ -55,7 +97,122 @@ void FlatGrid16_Initialize(s16 duration) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/func_84161670.s")
+void FlatGrid16_RecomputeNormal(s32 row, s32 column) {
+    f32 sum_x;
+    f32 sum_y;
+    f32 sum_z;
+    f32 cross_x;
+    f32 cross_y;
+    f32 cross_z;
+    f32 center_x;
+    f32 center_y;
+    f32 center_z;
+    f32 first_x;
+    f32 first_y;
+    f32 first_z;
+    f32 second_x;
+    f32 second_y;
+    f32 second_z;
+    Fragment79FlatGridNode *node;
+    s16 contribution_count;
+
+    node = &D_84187790->nodes[row][column];
+    center_x = node->x;
+    center_y = node->y;
+    center_z = node->z;
+    sum_x = 0.0f;
+    sum_y = 0.0f;
+    sum_z = 0.0f;
+    contribution_count = 0;
+
+    if ((row > 0) && (column >= 1)) {
+        node = &D_84187790->nodes[row - 1][column];
+        first_x = node->x - center_x;
+        first_y = node->y - center_y;
+        first_z = node->z - center_z;
+        func_80070C14(&first_x, &first_y, &first_z);
+        node = &D_84187790->nodes[row][column - 1];
+        second_x = node->x - center_x;
+        second_y = node->y - center_y;
+        second_z = node->z - center_z;
+        func_80070C14(&second_x, &second_y, &second_z);
+        Vec3f_CrossProductComponents(first_x, first_y, first_z, second_x, second_y, second_z, &cross_x, &cross_y, &cross_z);
+        func_80070C14(&cross_x, &cross_y, &cross_z);
+        sum_x += cross_x;
+        sum_y += cross_y;
+        sum_z += cross_z;
+        contribution_count = 1;
+    }
+
+    if ((0 < row) && (column < 15)) {
+        node = &D_84187790->nodes[row - 1][column];
+        first_x = node->x - center_x;
+        first_y = node->y - center_y;
+        first_z = node->z - center_z;
+        func_80070C14(&first_x, &first_y, &first_z);
+        node = &D_84187790->nodes[row][column + 1];
+        second_x = node->x - center_x;
+        second_y = node->y - center_y;
+        second_z = node->z - center_z;
+        func_80070C14(&second_x, &second_y, &second_z);
+        Vec3f_CrossProductComponents(first_x, first_y, first_z, second_x, second_y, second_z, &cross_x, &cross_y, &cross_z);
+        func_80070C14(&cross_x, &cross_y, &cross_z);
+        sum_x += cross_x;
+        sum_y += cross_y;
+        sum_z += cross_z;
+        contribution_count += 1;
+    }
+
+    if ((row < 15) && (column >= 1)) {
+        node = &D_84187790->nodes[row + 1][column];
+        first_x = node->x - center_x;
+        first_y = node->y - center_y;
+        first_z = node->z - center_z;
+        func_80070C14(&first_x, &first_y, &first_z);
+        node = &D_84187790->nodes[row][column - 1];
+        second_x = node->x - center_x;
+        second_y = node->y - center_y;
+        second_z = node->z - center_z;
+        func_80070C14(&second_x, &second_y, &second_z);
+        Vec3f_CrossProductComponents(first_x, first_y, first_z, second_x, second_y, second_z, &cross_x, &cross_y, &cross_z);
+        func_80070C14(&cross_x, &cross_y, &cross_z);
+        sum_x += cross_x;
+        sum_y += cross_y;
+        sum_z += cross_z;
+        contribution_count += 1;
+    }
+
+    if ((row < 15) && (column < 15)) {
+        node = &D_84187790->nodes[row + 1][column];
+        first_x = node->x - center_x;
+        first_y = node->y - center_y;
+        first_z = node->z - center_z;
+        func_80070C14(&first_x, &first_y, &first_z);
+        node = &D_84187790->nodes[row][column + 1];
+        second_x = node->x - center_x;
+        second_y = node->y - center_y;
+        second_z = node->z - center_z;
+        func_80070C14(&second_x, &second_y, &second_z);
+        Vec3f_CrossProductComponents(first_x, first_y, first_z, second_x, second_y, second_z, &cross_x, &cross_y, &cross_z);
+        func_80070C14(&cross_x, &cross_y, &cross_z);
+        sum_x -= cross_x;
+        sum_y -= cross_y;
+        sum_z -= cross_z;
+        contribution_count += 1;
+    }
+
+    if (contribution_count != 0) {
+        if ((sum_x == 0.0) && (sum_y == 0.0) && (sum_z == 0.0)) {
+            sum_y = 1.0f;
+        } else {
+            func_80070C14(&sum_x, &sum_y, &sum_z);
+        }
+        node = &D_84187790->nodes[row][column];
+        node->nx = sum_x;
+        node->ny = sum_y;
+        node->nz = sum_z;
+    }
+}
 
 void FlatGrid16_FillVertex(Fragment79FlatGridNode* node, Vtx* vertex) {
     f32 normal_x;
@@ -79,7 +236,62 @@ void FlatGrid16_FillVertex(Fragment79FlatGridNode* node, Vtx* vertex) {
     vertex->v.cn[3] = D_84187790->alpha;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/func_84161DAC.s")
+s32 FlatGrid16_Update(void) {
+    Fragment79FlatGridNode* node;
+    s32 row;
+    s32 column;
+    s32 status;
+    f32 falloff;
+    f32 height;
+    f32 radial_extent;
+    f64 cycle_radians;
+
+    D_84187790->age++;
+    status = (s32)func_841094EC();
+    if ((status == 1) && (D_841A4D90 == 0)) {
+        D_84187790->age = 0;
+        D_84187790->duration = 25;
+        D_841A4D90 = 1;
+    }
+    if (D_84187790->duration < D_84187790->age) {
+        return -1;
+    }
+    if (D_841A4D90 == 0) {
+        D_84187790->alpha += 10;
+        if (D_84187790->alpha >= 81) {
+            D_84187790->alpha = 80;
+        }
+    } else if (D_84187790->age >= 16) {
+        D_84187790->alpha -= 8;
+        if (D_84187790->alpha < 0) {
+            D_84187790->alpha = 0;
+        }
+    }
+
+    if (D_84187790->amplitude < 0.25) {
+        D_84187790->amplitude += D_8418C780;
+    }
+
+    radial_extent = D_8418C788;
+    cycle_radians = D_8418C790;
+    node = &D_84187790->nodes[0][0];
+    for (row = 0; row < 16; row++) {
+        for (column = 0; column < 16; column++, node++) {
+            falloff = 1.0 - (sqrtf(node->x * node->x + node->z * node->z) / radial_extent);
+            height = __sinf((((f32)(D_84187790->age % 20) / 20.0) + (3.0 * falloff)) * cycle_radians) *
+                  ((f64)D_84187790->amplitude * falloff);
+            node->y = height;
+        }
+    }
+
+    for (row = 0; row < 16; row++) {
+        for (column = 0; column < 16; column++) {
+            FlatGrid16_RecomputeNormal(row, column);
+        }
+    }
+
+    return 0;
+}
 
 void FlatGrid16_BuildViewMatrix(void) {
     Fragment79FlatGridCamera * camera;
@@ -132,9 +344,83 @@ void FlatGrid16_BuildViewMatrix(void) {
     func_80070C68(D_84187790->matrix, eye_x, eye_y, eye_z, at_x, at_y, at_z);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/func_841621A4.s")
+Gfx* FlatGrid16_Draw(Gfx* display_list) {
+    s32 row;
+    s32 column;
+    Fragment79FlatGridNode* node;
+    s32 triangle_parity;
+    Vtx* vertex;
+    s32 index;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/func_84162660.s")
+    triangle_parity = 0;
+    D_84187790->vertices = Gfx_AllocDisplayList(sizeof(Vtx) * 16 * 16);
+
+    vertex = D_84187790->vertices;
+    node = &D_84187790->nodes[0][0];
+    for (row = 0; row < 16; row++) {
+        for (column = 0; column < 16; column++) {
+            FlatGrid16_FillVertex(node, vertex);
+            node++;
+            vertex++;
+        }
+    }
+
+    FlatGrid16_BuildViewMatrix();
+
+    gDPLoadTextureBlock(display_list++, D_8418CAB0, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 32, 0, G_TX_NOMIRROR | G_TX_WRAP,
+                        G_TX_NOMIRROR | G_TX_WRAP, 5, 5, G_TX_NOLOD, G_TX_NOLOD);
+    gSPDisplayList(display_list++, D_841877C0);
+    gDPSetPrimColor(display_list++, 0, 0, 255, 255, 255, D_84187790->alpha);
+    gSPMatrix(display_list++, D_84187790->matrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
+
+    vertex = D_84187790->vertices;
+    for (row = 0; row < 15; row++) {
+        for (column = 0; column < 15; column++) {
+            index = row * 16 + column;
+
+            gSPVertex(display_list++, &vertex[index], 1, 0);
+            gSPVertex(display_list++, &vertex[index + 1], 1, 1);
+            gSPVertex(display_list++, &vertex[(row + 1) * 16 + column], 1, 2);
+            gSPVertex(display_list++, &vertex[index + 17], 1, 3);
+
+            if (!(triangle_parity & 1)) {
+                gSP2Triangles(display_list++, 1, 2, 0, 0, 1, 3, 2, 0);
+            } else {
+                gSP2Triangles(display_list++, 3, 2, 0, 0, 1, 3, 0, 0);
+            }
+
+            triangle_parity++;
+        }
+    }
+
+    gSPPopMatrix(display_list++, G_MTX_MODELVIEW);
+    return display_list;
+}
+
+void TexturedRibbonSheet_Init(void) {
+    S1_TexturedRibbonSheet* record;
+    S1_TexturedRibbonSheetNode* node;
+    s32 record_index;
+    s32 node_index;
+
+    D_841A4DA4 = 0;
+    D_841A4DA2 = 0;
+    record = &D_84187840[0];
+    for (record_index = 0; record_index < 14; record_index++, record++) {
+        record->unk_000 = 0;
+        record->unk_004 = 0;
+        record->unk_006 = 0;
+
+        node = &record->unk_038[0];
+        for (node_index = 0; node_index < 10; node_index++, node++) {
+            node->unk_00 = 0.0f;
+            node->unk_04 = 0;
+            node->unk_08 = 0.0f;
+            node->unk_0C.z = node->unk_0C.y = node->unk_0C.x = 0.0f;
+            node->unk_18.z = node->unk_18.y = node->unk_18.x = 0.0f;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/func_84162798.s")
 
@@ -148,38 +434,6 @@ void TexturedRibbonSheet_Update(f32 arg0, f32 *arg1, f32 arg2) {
     guMtxXFMF(sp30, 0.0f, 0.0f, arg2, &arg1[0], &arg1[1], &arg1[2]);
 }
 
-typedef struct {
-    /* 0x0 */ u8 r;
-    /* 0x1 */ u8 g;
-    /* 0x2 */ u8 b;
-} S1_Color_RGB8;
-typedef struct S1_Vec3f {
-    /* 0x0 */ f32 x;
-    /* 0x4 */ f32 y;
-    /* 0x8 */ f32 z;
-} S1_Vec3f;
-typedef struct S1_TexturedRibbonSheetNode {
-    /* 0x00 */ f32 unk_00;
-    /* 0x04 */ u8 unk_04;
-    /* 0x08 */ f32 unk_08;
-    /* 0x0C */ S1_Vec3f unk_0C;
-    /* 0x18 */ S1_Vec3f unk_18;
-    /* 0x24 */ S1_Vec3f unk_24;
-    /* 0x30 */ Vtx unk_30[2];
-} S1_TexturedRibbonSheetNode;
-typedef struct S1_TexturedRibbonSheet {
-    /* 0x000 */ s16 unk_000;
-    /* 0x002 */ s16 unk_002;
-    /* 0x004 */ s16 unk_004;
-    /* 0x006 */ s16 unk_006;
-    /* 0x008 */ s16 unk_008;
-    /* 0x00A */ S1_Color_RGB8 unk_00A;
-    /* 0x010 */ f32 unk_010;
-    /* 0x014 */ f32 unk_014;
-    /* 0x018 */ Vtx* unk_018;
-    /* 0x01C */ char unk01C[0x1C];
-    /* 0x038 */ S1_TexturedRibbonSheetNode unk_038[10];
-} S1_TexturedRibbonSheet;
 void TexturedRibbonSheet_UpdateRecord(S1_TexturedRibbonSheet* arg0) {
     s32 i;
     s32 j;

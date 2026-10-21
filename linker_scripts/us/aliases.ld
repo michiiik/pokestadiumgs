@@ -702,3 +702,7 @@ func_841614E0 = FlatGrid16_Initialize;
 func_84161CF4 = FlatGrid16_FillVertex;
 func_84162078 = FlatGrid16_BuildViewMatrix;
 func_84162C88 = TexturedRibbonSheet_IsComplete;
+func_84161670 = FlatGrid16_RecomputeNormal;
+func_84161DAC = FlatGrid16_Update;
+func_841621A4 = FlatGrid16_Draw;
+func_84162660 = TexturedRibbonSheet_Init;

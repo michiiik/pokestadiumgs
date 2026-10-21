@@ -1,6 +1,6 @@
 # Fragment 79: flat grid and textured ribbon pool
 
-## Accepted batch
+## First accepted batch
 
 Four US assembly owners are replaced by C, totaling 1236 bytes:
 
@@ -46,6 +46,45 @@ lack of GS deadline handling are not transferred to GS. The existing matched
 `TexturedRibbonSheet_UpdateRecord` in this GS source is the completion loop's
 actual callee.
 
+## Second accepted batch
+
+Four additional US owners are C, totaling 3908 bytes:
+
+- `FlatGrid16_RecomputeNormal` (`func_84161670`, 1668 bytes).
+- `FlatGrid16_Update` (`func_84161DAC`, 716).
+- `FlatGrid16_Draw` (`func_841621A4`, 1212).
+- `TexturedRibbonSheet_Init` (`func_84162660`, 312).
+
+The normal builder reuses a node pointer for neighboring positions, with
+scalar center coordinates and a signed 16-bit contribution count. It sums
+three cross-product contributions and subtracts the fourth, then normalizes
+the sum, using an upward normal for a zero vector.
+
+The updater preserves the GS one-shot fade latch: status 1 resets age to zero
+and duration to 25, alpha grows by 10 up to 80 before the latch, and falls by
+8 starting at age 16 afterward. Amplitude grows by double 0.05 while below
+0.25. Each node's radial falloff is `1 - sqrt(x*x + z*z) / radius`; its height
+uses the 20-frame sine cycle, three radial phase turns, and amplitude times
+falloff. Normals are rebuilt after all heights are updated.
+
+The readonly symbols remain owned by the original shared assembly:
+`D_8418C780` is double 0.05, `D_8418C788` is float 76.3667984, and
+`D_8418C790` is double 6.2831854820251465. The updater captures radius and
+cycle radians in real locals before traversing the grid. This preserves the
+immutable loop values across sine calls without new literal pools or layout
+changes. A direct-global source hypothesis had a different frame and register
+allocation; the captured-value hypothesis passed the complete-ROM gate.
+
+The renderer converts all 256 nodes to vertices, loads texture `D_8418CAB0`
+and render state `D_841877C0`, and draws alternating cell diagonals with SDK
+macros and ordinary loops. The compiler performs its observed unroll.
+
+Ribbon initialization clears the GS latch and age, then traverses 14 records
+and ten nodes per record. It clears active/age/duration and the same position
+and velocity fields as the inspected Stadium 1 witness, leaving the other
+fields untouched. The existing ribbon layouts were moved before earlier
+owners only after known/moved/blank whole-object controls passed.
+
 ## Verification
 
 The native recorded runner accepted all four owners through full-ROM gates
@@ -66,23 +105,23 @@ US retail ROM MD5: `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 No instruction rewrite, forced register, dead local, manual unroll, padding
 helper, or coverage update is included.
 
+The second batch independently passed the same six whole-object controls and
+22 layout assertions. Every original section, all 7840 text bytes, all twelve
+function extents, and semantic relocation targets match its retained baseline.
+The 96 shared readonly bytes at ROM `0x3FC010..0x3FC070` match retail directly;
+the final freeze includes their assembly object. Shared cross-product and
+remaining-owner prototypes precede the normal builder, verified through
+known/moved/blank object controls before its successful full-ROM gate.
+
 ## Remaining owners
 
-- `func_84161670`: grid normal construction. Reuse the adjacent accepted
-  grid normal builder as a source hypothesis, retaining this 28-byte stride.
-- `func_84161DAC`: grid updater. Preserve its GS fade latch, alpha cap 80,
-  decrement 8 after age 16, and readonly references starting at `D_8418C780`.
-- `func_841621A4`: grid renderer. Use SDK graphics macros and this file's
-  vertex/camera helpers; inspect texture/state symbols in assembly first.
-- `func_84162660`: ribbon pool initialization. The original clears 14
-  records with ten nodes each; the existing ribbon types currently follow
-  this owner, so establish declaration visibility before candidate probes.
 - `func_84162798`: ribbon start. Preserve the GS phase-2 emission guard and
   14-record pointer-based pool instead of the Stadium 1 static 40-record pool.
 - `func_84162DE8`: ribbon renderer. Reuse the existing matched record and
   rotation helpers and inspect all GS texture/render-state symbols.
 
-These six owners were not candidate-probed in this batch. Readonly data at
-ROM `0x3FC010..0x3FC070` remains in the shared assembly owner; literal-emitting
-or switch candidates need an independently linked and ROM-gated layout plan
-before acceptance. A new file-level subsegment is not part of this batch.
+These two owners were not candidate-probed in either batch. Readonly data at
+ROM `0x3FC010..0x3FC070` remains in the shared assembly owner. References to
+its named symbols do not require moving it. A literal-emitting candidate that
+changes readonly sections still requires an independently linked and ROM-gated
+layout plan. No new file-level subsegment is part of either batch.
