@@ -716,3 +716,7 @@ func_841562BC = BattleMoveState_CopyPartyStatToRecord;
 func_841502D0 = BattlePlan_ApplyPursuitMultiplier;
 func_84152CD8 = BattlePlan_HasOnlyNormalOrFightingMoves;
 func_84153780 = BattlePlan_AddConditionCountBonus;
+func_84150268 = BattlePlan_UpdateMoveAccuracy;
+func_84152600 = BattlePlan_AddStealableItemBonus;
+func_84152D6C = BattlePlan_CountHitObstacles;
+func_84152E10 = BattlePlan_AddHitObstacleBonus;
