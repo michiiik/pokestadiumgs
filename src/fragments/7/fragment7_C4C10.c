@@ -28,7 +28,24 @@ typedef struct {
 } Fragment7BankHeader;
 typedef struct { u32 words[17]; } Fragment7RuleRecord;
 typedef struct { u32 words[292]; } Fragment7TeamRecord;
-typedef struct { u32 words[136]; } Fragment7ProfileRecord;
+typedef struct {
+    u8 species;
+    u8 unk_01[28];
+    u8 level, flags, unk_1F;
+    u32 payload[14];
+} Fragment7ProfilePokemon;
+typedef struct {
+    u8 name[12];
+    u16 trainer_id;
+    u8 unk_0E[2];
+    Fragment7ProfilePokemon pokemon[6];
+} Fragment7ProfileRecord;
+typedef union {
+    struct { s16 unk_00; s8 unk_02; s8 unk_03; };
+    u32 raw;
+} Fragment7ProfileTintResult;
+extern Fragment7ProfileTintResult func_8003F5AC(u8 *);
+
 typedef struct { Fragment7BankHeader header; Fragment7RuleRecord records[8]; } Fragment7RuleBank;
 typedef struct { Fragment7BankHeader header; Fragment7TeamRecord records[6]; } Fragment7TeamBank;
 typedef struct { Fragment7BankHeader header; Fragment7ProfileRecord records[8]; } Fragment7ProfileBank;
@@ -80,7 +97,7 @@ void Fragment7_RemoveRuleRecord(void *bank, s32 selected) {
     }
 }
 
-extern void func_8300B54C(void *);
+extern void Fragment7_ValidateProfileEntries(void *);
 void Fragment7_SwapRuleRecords(void *bank, s32 first, s32 second) {
     Fragment7RuleRecord temporary;
     if (first < (s32)((Fragment7RuleBank *)bank)->header.count &&
@@ -93,12 +110,6 @@ void Fragment7_SwapRuleRecords(void *bank, s32 first, s32 second) {
 }
 
 extern s32 Deck_WriteEntries(u8 *, s32, u8 *);
-typedef struct {
-    u8 species;
-    u8 unk_01[28];
-    u8 level, flags, unk_1F;
-    u32 payload[14];
-} Fragment7ProfilePokemon;
 extern u8 * func_8006218C(s32, s32, s32, s32);
 void Fragment7_SaveRuleBank(void *bank) {
     u8 *handle = NULL;
@@ -278,7 +289,42 @@ s32 Fragment7_IsValidProfilePokemon(Fragment7ProfilePokemon *pokemon) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B54C.s")
+void Fragment7_ValidateProfileEntries(void *profile) {
+    s32 index;
+    s32 gap;
+    s32 destination;
+
+    for (index = 0; index < 6; index++) {
+        if (!Fragment7_IsValidProfilePokemon(&((Fragment7ProfileRecord *)profile)->pokemon[index])) {
+            ((Fragment7ProfileRecord *)profile)->pokemon[index].species = 0;
+        }
+    }
+
+    for (index = 0; index < 6; index++) {
+        if (!Fragment7_IsValidProfilePokemon(&((Fragment7ProfileRecord *)profile)->pokemon[index])) {
+            gap = 1;
+            if (gap < 6 - index) {
+                do {
+                    if (Fragment7_IsValidProfilePokemon(&((Fragment7ProfileRecord *)profile)->pokemon[index + gap])) {
+                        break;
+                    }
+                    gap++;
+                } while (gap != 6 - index);
+            }
+            for (destination = index; destination + gap < 6; destination++) {
+                ((Fragment7ProfileRecord *)profile)->pokemon[destination] =
+                    ((Fragment7ProfileRecord *)profile)->pokemon[destination + gap];
+                ((Fragment7ProfileRecord *)profile)->pokemon[destination + gap].species = 0;
+            }
+        }
+    }
+
+    for (index = 0; index < 6; index++) {
+        if (((Fragment7ProfileRecord *)profile)->pokemon[index].species > 0) {
+            func_8003F5AC((u8 *)&((Fragment7ProfileRecord *)profile)->pokemon[index]);
+        }
+    }
+}
 
 void Fragment7_SwapProfileRecords(void *bank, s32 first, s32 second) {
     Fragment7ProfileRecord temporary;
@@ -326,7 +372,7 @@ void Fragment7_LoadProfileBank(void *bank) {
         func_80062304(handle);
     }
     for (index = 0; index < (s32)((Fragment7ProfileBank *)bank)->header.count; index++) {
-        func_8300B54C(&((Fragment7ProfileBank *)bank)->records[index]);
+        Fragment7_ValidateProfileEntries(&((Fragment7ProfileBank *)bank)->records[index]);
     }
 }
 

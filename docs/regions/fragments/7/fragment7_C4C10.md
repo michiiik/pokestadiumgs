@@ -183,3 +183,49 @@ at its initial score. No candidate was installed or claimed matching.
 Next action: trace the discarded aggregate-result temporary's allocation
 and source-lifetime ownership, rather than retrying these closed families.
 Do not add padding, forced registers, unused locals, or instruction rewrites.
+
+## 2026-10-21: profile compactor accepted; entire file matching C
+
+The `8300B54C` requeue above is resolved as
+`Fragment7_ValidateProfileEntries` (476 bytes). All 28 owners in this file
+are now matching C; no `GLOBAL_ASM` pragmas remain.
+
+The function validates six profile Pokemon, clears invalid species,
+compacts with ordinary aggregate assignments while clearing moved-from
+species, then calls the tint computation for each remaining entry. Its
+four-byte aggregate result is intentionally discarded; the compiler creates
+the hidden result buffer. No explicit unused result variable is introduced.
+
+Ten passive-optimizer controls and ten stock-stream capture controls
+preserved complete game objects, including blank-line controls. Procedure
+23 was mapped explicitly to the compactor. The frontend stream reserved
+20 bytes for four scalar locals and the discarded result, putting the
+result at frame offset -20; the one-word residual was already present
+before optimization. Reusing the search-bound variable as the destination
+index corrected storage but merged optimizer carriers, causing eight
+different register words. Disjoint lexical scopes did not share frontend
+storage and retained the original one-word residual.
+
+The successful source instead uses `6 - index` directly in the guarded
+do-loop search. This removes the unnecessary source bound local while
+letting the optimizer derive and retain that bound across validity calls.
+Three real scalar locals remain: traversal index, gap, and copy destination.
+The original 96-byte frame, stack-byte-80 discarded-result buffer, search
+branch, all copy loops, and the complete original game object now agree.
+No padding, fake layout, forced register, unused local, manual unrolling,
+or instruction/relocation rewriting is involved.
+
+The 544-byte profile storage type now exposes the established 16-byte
+header and six 88-byte Pokemon; all existing append/replace/remove/swap
+helpers share it. The tint return type follows the accepted typed consumer
+in `src/4CC20.c` and callee assembly. Eight complete-original-object controls
+verify deduplication, shared decoded types and return declaration, readable
+aggregate copying, phase separation, naming, and blank-line shifts.
+Twenty-three emitted layout values verify every bank size/stride, the
+decoded profile offsets, Pokemon fields, and four-byte return category;
+two emitted header words reverify flag positions.
+
+Acceptance used the native runner and full-ROM gate. Its first-success
+callback froze the complete changed object, four distinct collateral
+objects, source, ROM, ELF, and linked script, with independent hashes before
+any later compilation. There is no unresolved owner remaining in this file.
