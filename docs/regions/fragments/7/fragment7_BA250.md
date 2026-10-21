@@ -252,3 +252,61 @@ introduce non-text section drift, so those probes do not establish a match or
 an owner-wide impossibility. Next investigate the resource/address-materialization
 representation or frontend lineage while preserving the verified aggregate
 loop. Do not resume the earlier four-record/manual word-copy candidates.
+
+### Remaining switch-table ownership and follow-up
+
+Extended the existing `fragment7_BA250` rodata subsegment from ROM `0xC9E10`
+through `0xC9EF0`, moving the trailing shared-rodata start rather than adding
+a second rodata segment for the same object. This migrates `jtbl_8300FBE0`,
+`jtbl_8300FC08`, and `jtbl_8300FC30` to their three real assembly owners. The
+pinned spimdisasm 1.35.0-dev0 split and still-assembly full-ROM gate pass with
+the original MD5. The generated linker diff is only the shared-tail object's
+`C9E10` to `C9EF0` filename change; foreign source changes were hash-preserved.
+
+`func_830095B8`: accepted, 256 bytes. The ordinary switch handles cancel -1
+and selections 1 through 8. The record-bank header has its count at byte 1,
+followed by eight 544-byte records at byte 4, for a 4356-byte bank stride.
+The bank selector is state byte 63; source collections start at `0x3C854`.
+Typed header and record access reproduces both bank address computations.
+Flat byte offsets wrongly share a biased base across the count guard and
+produce only 232 bytes. The opaque callback argument's typed state view
+preserves the record pointer's stack home. Acceptance includes the full-ROM
+gate and an immediate full-TU/four-distinct-collateral-object freeze.
+
+`func_83009BD0` / `Fragment7_OpenRecordPanel`: accepted, 756 bytes. A typed
+state view restores the three record-index load orders and the panel-pointer
+reload at `0x3FF00`. Keeping the resource parser/allocation locals in their
+own lifetime scope restores the context spill at `36(sp)` while preserving
+the parser result at `44(sp)` and allocation pointer at `48(sp)`. An extra
+mode scalar expands the frame to 64 bytes and is not the answer. A calibrated
+45-second native permuter run with `--stack-diffs` stayed at score 8; its
+base matched all 189 masked instruction words and relocation topology of the
+retained native probe. The accepted source uses normal live scopes instead.
+
+Postacceptance cleanup gives this initializer its concrete pointer parameter
+and updates all same-file prototypes, removing repeated opaque-pointer casts.
+The selector is named `Fragment7_SelectOtherRecord` and reuses the existing
+544-byte record / 4356-byte bank types rather than a duplicate matrix view.
+Fresh, cleanup, naming, blank-line controls, and 14 target-layout assertions
+preserve every original game byte, function extent, and semantic relocation.
+Both owners passed the recorded runner and full-ROM gate, totaling 1012 bytes.
+
+`func_83008290`: requeue update. Twenty-three additional probes tested a
+one-byte fixed-length copy, separate versus reused copy indices, signed versus
+unsigned trip counts, and the proposed builtin copy names. None accepted.
+Reusing the aggregate-loop index changes its unrolling; independent counters
+preserve the good prefix but retain a byte loop (540/544 bytes). The tested
+`__builtin_memcpy` and `__builtin_bcopy` names remain calls (520 bytes), not
+intrinsics. The earlier 512-byte scalar body remains the best source-level
+baseline. Next inspect authentic frontend/block-copy lowering; do not use a
+fabricated one-byte name struct, forced address bias, or instruction rewrite.
+
+`func_8300A2CC`: requeue. Ordinary frame-dispatch candidates preserve the
+incoming result argument, which is also the default returned value. The
+controller context at state `0x4E044` is initialized by `fragment3_main`;
+its selection at +8 is the field tested against -1. Cached current/target
+bytes and the real five-case switch reach 400 bytes, but the oracle accesses
+the interior workspace using a `0x7FFF` pointer bias while raw offsets and
+typed workspace/whole-root views lower the large address differently. Whole-root
+views are not evidence of an impossible owner. Next isolate the frontend's
+large-member addressing mechanism; do not encode the bias by hand just to match.

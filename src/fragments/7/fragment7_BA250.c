@@ -915,7 +915,24 @@ void func_830073F8(void *arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void func_800226C0(s32);
 extern void main_pool_pop_state(s32);
-extern void func_83009BD0(void *, s32);
+typedef struct { u8 unk_00[8]; s16 coord_08; } Fragment7PanelNode;
+typedef struct {
+    u8 unk_00000[28];
+    u8 mode;
+    u8 unk_0001D[33];
+    u8 source_bank;
+    u8 other_bank;
+    u8 source_row;
+    u8 unk_00041[2];
+    u8 other_row;
+    u8 unk_00044[21];
+    u8 record_scroll;
+    u8 unk_0005A[0x3FF00 - 90];
+    Fragment7PanelNode *panel;
+    u8 unk_3FF04[0x3FF30 - 0x3FF04];
+    s32 panel_open;
+} Fragment7PanelOpenState;
+extern void Fragment7_OpenRecordPanel(Fragment7PanelOpenState *, s32);
 extern s16 D_8300F7BC[][2];
 void func_830074C8(void *arg0, s32 arg1) {
     switch (arg1) {
@@ -930,7 +947,7 @@ void func_830074C8(void *arg0, s32 arg1) {
         case 5:
         case 6:
             main_pool_pop_state(0x4D535243);
-            func_83009BD0(arg0, D_8300F7BC[arg1][0]);
+            Fragment7_OpenRecordPanel(arg0, D_8300F7BC[arg1][0]);
             *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 9;
             func_800226C0(0xA3);
             return;
@@ -1105,7 +1122,7 @@ typedef struct {
     u8 controller;
     u8 unk_0003D;
     u8 source_bank;
-    u8 unk_0003F;
+    u8 other_bank;
     u8 source_row;
     u8 unk_00041[6];
     u8 selection;
@@ -1451,13 +1468,49 @@ void func_830094C8(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830095B8.s")
+typedef struct { u32 words[136]; } Fragment7OtherRecord;
+typedef struct {
+    u8 unk_00;
+    u8 count;
+    u8 unk_02[2];
+    Fragment7OtherRecord records[8];
+} Fragment7OtherRecordList;
+extern void func_800226C0(s32);
+extern void func_83000F98(s32 arg0, s32 arg1, s32 arg2);
+extern void func_8300112C(s32);
+void Fragment7_SelectOtherRecord(void *memory, s32 selected) {
+    Fragment7NavigationState *state = memory;
+    void *record;
+
+    switch (selected) {
+    case -1:
+        state->mode = 3;
+        func_800226C0(3);
+        break;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        if (selected <= ((Fragment7OtherRecordList *)((u8 *)state + 0x3C854))[state->other_bank].count) {
+            record = &((Fragment7OtherRecordList *)((u8 *)state + 0x3C854))[state->other_bank].records[selected - 1];
+            func_8300112C((s32)state);
+            func_83000F98((s32)state, (s32)record, 1);
+            state->mode = 17;
+            func_800226C0(144);
+        } else {
+            func_800226C0(5);
+        }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
 typedef struct { u8 header[4]; Fragment7TeamRecord records[6]; } Fragment7TeamRecordList;
-typedef struct { u32 words[136]; } Fragment7OtherRecord;
-typedef struct { u8 header[4]; Fragment7OtherRecord records[8]; } Fragment7OtherRecordList;
 typedef struct {
     Fragment7SavedRecordList saved[2];
     Fragment7TeamRecordList teams[2];
@@ -1534,7 +1587,79 @@ void Fragment7_InitializeRecordCollections(Fragment7RecordInitializeState *state
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83009BD0.s")
+extern void main_pool_push_state(s32);
+extern void func_8004C09C(s32);
+extern s32 func_8004C4B0(s32);
+extern void func_8004C8C0(s32);
+extern void fragment3_main(void *);
+extern void func_81A005F0(u8 *);
+extern void func_81801F60(u8 *);
+extern void WidgetTree_OpenMessagePanel_fragment4(u8 *);
+extern u8 *func_8004E0F0(u8 *, s32, s32);
+extern s32 func_8004DC6C(s32);
+extern void func_8004DCFC(u8 *, s32 *);
+extern s32 main_pool_get_available(void);
+extern u8 *MainPool_AllocState(s32, s32);
+extern s32 func_8004EB58(s32, s32);
+extern void MainPool_FinalizeAllocation(void *);
+extern void func_83000020(s32 arg0);
+extern void func_830009D8(s32 arg0, void *arg1, void *arg2);
+extern void func_83000E40(s32 arg0, s32 arg1);
+extern void func_83000F98(s32 arg0, s32 arg1, s32 arg2);
+extern void func_83001000(void *);
+extern void func_8300112C(s32);
+extern u8 D_8300F84C[];
+void Fragment7_OpenRecordPanel(Fragment7PanelOpenState *state, s32 resource_id) {
+    u8 *sync;
+
+    main_pool_push_state(0x4D535243);
+    func_8004C09C(0x15F);
+    func_8004C4B0(0x3F);
+    func_8004C4B0(0x0F);
+    func_8004C4B0(0x29);
+    func_8004C8C0(0xF0);
+    func_8004C8C0(0x76);
+    func_8004C8C0(0x33);
+    func_8004C8C0(0xEF);
+    func_8004C8C0(0xFE);
+    func_8004C8C0(0x9A);
+    func_8004C8C0(0xF0);
+    sync = (u8 *)state + 0x4E044;
+    fragment3_main(sync);
+    func_81A005F0(sync);
+    func_81801F60(D_8300F84C);
+    WidgetTree_OpenMessagePanel_fragment4(state);
+    func_83001000(state);
+    func_8004E0F0((u8 *)state + 0x30120, 0x40, 1 - *(s32 *)(*(u8 **)((u8 *)state + 56) + 20));
+    func_8004E0F0((u8 *)state + 0x32128, 0x40, 1);
+    switch (state->mode) {
+    case 13:
+        func_830009D8((s32)state, (s32)((u8 *)state + state->source_bank * 7012 + state->source_row * 1168 + state->record_scroll * 1168 + 0x386C4), 0);
+    case 10:
+    case 11:
+    case 12:
+        func_83000E40((s32)((u8 *)state + state->source_bank * 7012 + state->source_row * 1168 + state->record_scroll * 1168 + 0x382A0), (s32)state);
+        break;
+    case 16:
+    case 18:
+    case 19:
+        func_83000F98((s32)state, (s32)((u8 *)state + state->other_bank * 4356 + state->other_row * 544 + 0x3C638), 1);
+        break;
+    }
+    {
+        u8 *allocation;
+        s32 data;
+        data = func_8004DC6C((s16)resource_id);
+        func_8004DCFC((u8 *)data, 0);
+        allocation = MainPool_AllocState(main_pool_get_available(), 0);
+        state->panel = (Fragment7PanelNode *)func_8004EB58((s32)allocation, data);
+        state->panel->coord_08 += 86;
+        MainPool_FinalizeAllocation(allocation);
+    }
+    state->panel_open = 1;
+    func_8300112C((s32)state);
+    func_83000020((s32)state);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1609,7 +1734,7 @@ extern void func_80008648();
 extern void BgStage_DrawFrame();
 extern void func_818017A8();
 extern void func_81805308(s32 *);
-extern void func_83009BD0(void *, s32);
+extern void Fragment7_OpenRecordPanel(Fragment7PanelOpenState *, s32);
 extern void main_pool_pop_state(s32);
 extern u8 D_8300FD00;
 extern u8 D_8304FBCC;
@@ -1620,7 +1745,7 @@ void func_8300A208(void) {
     extern void func_80008648();
     extern void func_8004C398(void);
     extern void main_pool_pop_state(s32);
-    extern void func_83009BD0(void *, s32);
+    extern void Fragment7_OpenRecordPanel(Fragment7PanelOpenState *, s32);
     extern void func_80008624(void);
     extern u8 D_8300FD00;
     extern u8 D_8304FBCC;
@@ -1636,7 +1761,7 @@ void func_8300A208(void) {
     p = (struct State *)(u32)D_8303FD00;
     p->clear = 0;
     Fragment_LoadAndCall((((u32)D_82C00000 & 0x0FF00000) >> 20) - 0x10, fragment83_ROM_START, fragment84_ROM_START, p->argument, D_8304FB84);
-    func_83009BD0(&D_8300FD00, 0xC7);
+    Fragment7_OpenRecordPanel(&D_8300FD00, 0xC7);
     func_80008624();
     D_8304FBCC = 0;
 }
@@ -1694,7 +1819,7 @@ extern void func_80047588(s32, s32);
 extern void func_830098A0(void *, s32, s32, s32);
 extern void func_80008624(void);
 extern void func_81801794(void);
-extern void func_83009BD0(void *, s32);
+extern void Fragment7_OpenRecordPanel(Fragment7PanelOpenState *, s32);
 extern void main_pool_push_state(s32);
 extern u8 D_8300FD00;
 void func_8300A50C(arg0, arg1, arg2)
@@ -1707,7 +1832,7 @@ s32 arg2;
     func_80055948(3);
     func_80047588(0x1C, 0);
     func_830098A0(&D_8300FD00, 0, arg1, arg2);
-    func_83009BD0(&D_8300FD00, 0xC7);
+    Fragment7_OpenRecordPanel(&D_8300FD00, 0xC7);
     func_80008624();
     func_81801794();
 }
