@@ -887,7 +887,33 @@ void func_86103B74(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861044EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861047CC.s")
+extern f32 D_8610ABE4;
+extern f32 D_8610ABE8;
+void func_861047CC(void *arg0) {
+    u8 *a;
+    u8 *b;
+    u8 *c;
+    u8 *d;
+    u8 *modelEntry;
+
+    d = ((*(s32 *)((u8 *)arg0 + 0x20)) * 0x18c) + *(u8 **)(((u8 *)(u32)D_8610AD20) + 0x8fec);
+    *(u32 *)(d + 0xC) &= 0xEFFFFFFF;
+    modelEntry = ((*(s32 *)((u8 *)arg0 + 0x20)) * 0x18) + *(u8 **)(((u8 *)(u32)D_8610AD20) + 0x8ff0);
+    *(void **)modelEntry = (u8 *)arg0 + 0x24;
+    a = ((*(s32 *)((u8 *)arg0 + 0x20)) * 0x18) + *(u8 **)(((u8 *)(u32)D_8610AD20) + 0x8ff0);
+    *(f32 *)(a + 4) = 0.0f;
+    *(f32 *)(a + 8) = *(f32 *)(((u8 *)(u32)D_8610AD20) + 0x9768) * D_8610ABE4 * 700.0f * D_8610ABE8;
+    *(f32 *)(a + 0xC) = 0.0f;
+    b = ((*(s32 *)((u8 *)arg0 + 0x20)) * 0x18c) + *(u8 **)(((u8 *)(u32)D_8610AD20) + 0x8fec);
+    *(f32 *)(b + 0x54) = 1.75f;
+    *(f32 *)(b + 0x58) = 1.75f;
+    *(f32 *)(b + 0x5C) = 1.75f;
+    c = ((*(s32 *)((u8 *)arg0 + 0x20)) * 0x18) + *(u8 **)(((u8 *)(u32)D_8610AD20) + 0x8ff0);
+    c[0x12] = 0xFF;
+    c[0x13] = 0xFF;
+    c[0x14] = 0xFF;
+    c[0x15] = 0xC8;
+}
 
 extern void func_86104B2C();
 void func_861048FC(void **p) {
@@ -935,7 +961,7 @@ void func_861049C0(void) {
 
 void func_861049C0_padding(void) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86104A3C.s")
+#pragma GLOBAL_ASM("hand_asm/fragments/49/func_86104A3C_rodata_manual.s")
 
 extern u32 func_8003570C(void);
 extern f32 D_8610AC08;
