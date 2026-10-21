@@ -86,3 +86,41 @@ function naming, and blank-line shifts. Fifteen emitted layout values cover
 the bank layouts and the 88-byte profile entry, including species at 0,
 level at 29, flags at 30, and payload at 32. The two emitted header words
 still verify the flag positions.
+
+## 2026-10-21: five matching record removal/swap helpers
+
+| Owner | Name | Bytes |
+| --- | --- | --- |
+| `8300ABCC` | `Fragment7_RemoveRuleRecord` | 192 |
+| `8300B038` | `Fragment7_RemoveTeamRecord` | 164 |
+| `8300B0DC` | `Fragment7_SwapTeamRecords` | 240 |
+| `8300B468` | `Fragment7_RemoveProfileRecord` | 156 |
+| `8300B728` | `Fragment7_SwapProfileRecords` | 240 |
+
+Each removal shifts the following records down with aggregate assignments
+and decrements the count. Rule removal also calls `func_8300A9E0` to clear
+unused slots; team/profile removal leaves the unused tail unchanged. Each
+swap uses three aggregate assignments and one real whole-record temporary.
+The compiler emits the original copy loops and the 1176/552-byte swap
+frames. There is no handwritten word-copy loop, manual unrolling, padding,
+or synthetic temporary.
+
+The byte-sized count is explicitly compared as `s32`, preserving the
+original signed `slt` checks. No new lower-bound checks are introduced. All
+five public functions preserve their existing `void *` interfaces.
+
+The storage records are now shared by bank arrays, append/replace helpers,
+removals, and swaps: 17, 292, or 136 aligned words for the established
+68/1168/544-byte payloads. These are opaque serialized storage, not invented
+decoded fields. Consolidating the six older per-function copy types and
+the new move-only views preserves the entire original game object,
+including all previously accepted helpers in this translation unit.
+
+All five owners passed one native-runner full-ROM gate. Its first-success
+callback froze and independently rehashed the whole changed object, four
+distinct collateral objects, source, ROM, ELF, and linked script before
+another compilation. Eight further complete-original-object controls verify
+declaration cleanup, shared record/bank types, consolidation of legacy
+copy types, readable formatting, naming, and blank-line shifts. Thirteen
+emitted layout values verify the record/bank sizes, record offsets, and
+strides; the two header words reverify the bit positions.
