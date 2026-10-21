@@ -954,14 +954,6 @@ void BattleAnim_BuildTerrainCameraBounds(void *output) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84159FA8.s")
-#endif
-
-#ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_8415A364.s")
-#endif
-
-#ifdef VERSION_US
 typedef struct {
     f32 field_00;
     f32 field_04;
@@ -971,6 +963,139 @@ typedef struct {
     u8 unknown_12[2];
 } Fragment79TerrainPointView;
 extern u8 *D_84187330;
+extern s16 MathUtil_Atan2s(f32, f32);
+
+f32 BattleAnim_SampleTerrainHeightAndSlope(f32 x, f32 z, f32 *slope) {
+    f32 cellX;
+    f32 cellZ;
+    f32 height;
+    f32 ax;
+    f32 ay;
+    f32 az;
+    f32 bx;
+    f32 by;
+    f32 bz;
+    f32 cx;
+    f32 cy;
+    f32 cz;
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    f32 dxB;
+    f32 dzB;
+    f32 dxD;
+    f32 dzD;
+    f32 angle;
+    f32 distanceB;
+    f32 distanceD;
+    f32 relativeX;
+    f32 relativeZ;
+    f32 e1x;
+    f32 e1y;
+    f32 e1z;
+    f32 e2x;
+    f32 e2y;
+    f32 e2z;
+    f32 nx;
+    f32 ny;
+    f32 nz;
+    f32 weightedX;
+    f32 weightedZ;
+    s32 i;
+    s32 j;
+    Fragment79TerrainPointView *point;
+
+    cellX = ((x + 440.0f) / 150.0f) + 8.0f;
+    cellZ = (z / 200.0f) + 8.0f;
+    i = (s32)cellX;
+    j = (s32)cellZ;
+    if (i < 0) {
+        i = 0;
+    }
+    if (i >= 15) {
+        i = 14;
+    }
+    if (j < 0) {
+        j = 0;
+    }
+    if (j >= 15) {
+        j = 14;
+    }
+    point = &((Fragment79TerrainPointView (*)[16])(D_84187330 + 0x1010))[i][j];
+    ax = point->field_00;
+    ay = point->field_04;
+    az = point->field_08;
+    point = &((Fragment79TerrainPointView (*)[16])(D_84187330 + 0x1010))[i + 1][j];
+    bx = point->field_00;
+    by = point->field_04;
+    bz = point->field_08;
+    point = &((Fragment79TerrainPointView (*)[16])(D_84187330 + 0x1010))[i][j + 1];
+    cx = point->field_00;
+    cy = point->field_04;
+    cz = point->field_08;
+    point = &((Fragment79TerrainPointView (*)[16])(D_84187330 + 0x1010))[i + 1][j + 1];
+    dx = point->field_00;
+    dy = point->field_04;
+    dz = point->field_08;
+    dxB = bx - x;
+    dzB = bz - z;
+    dxD = dx - x;
+    dzD = dz - z;
+    distanceB = dxB * dxB + dzB * dzB;
+    distanceD = dxD * dxD + dzD * dzD;
+    if (distanceB <= distanceD) {
+        e1x = bx - ax;
+        e1y = by - ay;
+        e1z = bz - az;
+        e2x = cx - ax;
+        e2y = cy - ay;
+        e2z = cz - az;
+        Vec3f_CrossProductComponents(e1x, e1y, e1z, e2x, e2y, e2z, &nx, &ny, &nz);
+        if (ny != 0.0f) {
+            relativeX = x - ax;
+            relativeZ = z - az;
+            weightedX = relativeX * nx;
+            weightedZ = nz * relativeZ;
+            height = ay - ((weightedX + weightedZ) / ny);
+        } else {
+            height = (ay + by + cy) / 3.0f;
+        }
+    } else {
+        e1x = bx - dx;
+        e1y = by - dy;
+        e1z = bz - dz;
+        e2x = cx - dx;
+        e2y = cy - dy;
+        e2z = cz - dz;
+        Vec3f_CrossProductComponents(e1x, e1y, e1z, e2x, e2y, e2z, &nx, &ny, &nz);
+        if (ny != 0.0f) {
+            relativeX = x - dx;
+            relativeZ = z - dz;
+            weightedX = relativeX * nx;
+            weightedZ = nz * relativeZ;
+            height = dy - ((weightedX + weightedZ) / ny);
+        } else {
+            height = (dy + by + cy) / 3.0f;
+        }
+    }
+    angle = (f32)MathUtil_Atan2s(ny, nx);
+    angle = (angle * 360.0f) / 65536.0f;
+    if (angle > 90.0f) {
+        angle -= 180.0f;
+    }
+    if (angle < -90.0f) {
+        angle += 180.0f;
+    }
+    *slope = angle;
+    return height;
+}
+#endif
+
+#ifdef VERSION_US
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_8415A364.s")
+#endif
+
+#ifdef VERSION_US
 extern void *D_84187334;
 extern s16 D_841A4D60;
 extern s16 D_841A4D62;
