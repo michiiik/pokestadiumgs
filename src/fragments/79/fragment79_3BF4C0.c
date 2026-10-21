@@ -121,7 +121,24 @@ s32 func_84151498(u8 *arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841514F8.s")
+extern u8 func_80063454(u8, u8, u8, s32);
+u8 BattlePlan_CountResistingMoveSlots(u8 side, u8 target_type) {
+    u8 count;
+    u8 *record;
+    s32 i;
+    u8 move_type;
+    count = 0;
+    record = func_84154B64(side);
+    for (i = 0; i < 4; i++) {
+        if (func_84151420(record, i) != 0) {
+            move_type = func_80062D98(*(u8 *)((u32)record + (u32)i + 4));
+            if (func_80063454(target_type, move_type, move_type, 0) < 10) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841515AC.s")
 
@@ -825,7 +842,25 @@ s32 BattlePlan_HasUnfavorableStages(u8 *plan, u8 side) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153CB8.s")
+void BattlePlan_AddPsychUpBonus(u8 *plan, u8 side) {
+    BattlePlanStageRecord *own;
+    s32 i;
+    s32 difference;
+    BattlePlanStageRecord *other;
+    s32 base;
+    base = (s32)(u32)plan + 4;
+    own = (void *)func_84154B64(side);
+    other = (void *)func_84154B64((1 - (u32)side) & 0xFF);
+    if (BattlePlan_HasUnfavorableStages(plan, side) != 0) {
+        for (i = 0; i < 7; i++) {
+            difference = other->stages[i] - own->stages[i];
+            if (difference > 0) {
+                func_84150B14(plan, side, 244, 0xFF, i, difference);
+            }
+        }
+        *(u8 *)(u32)base |= 2;
+    }
+}
 
 extern u8 func_8414A2D0(void);
 extern void * func_8414A3A0(u8);
