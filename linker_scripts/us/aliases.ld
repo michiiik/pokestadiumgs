@@ -728,3 +728,7 @@ func_84153930 = BattlePlan_AddSunnyDayBonus;
 func_84153B10 = BattlePlan_HasUnfavorableStages;
 func_84153CB8 = BattlePlan_AddPsychUpBonus;
 func_841514F8 = BattlePlan_CountResistingMoveSlots;
+func_841515AC = BattlePlan_AddConversionBonus;
+func_84151E44 = BattlePlan_AddMimicBonus;
+func_8415169C = BattlePlan_AddFlinchBonus;
+func_84152980 = BattlePlan_ScoreCurse;

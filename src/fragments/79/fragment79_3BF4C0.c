@@ -140,9 +140,51 @@ u8 BattlePlan_CountResistingMoveSlots(u8 side, u8 target_type) {
     return count;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841515AC.s")
+extern u8 func_84148C74(u8);
+void BattlePlan_AddConversionBonus(u8 *plan, u8 side) {
+    u8 other_side;
+    u8 move;
+    s32 base;
+    u8 *table;
+    u8 incoming_type;
+    u8 count;
+    u8 amount;
+    base = (s32)(u32)plan + 4;
+    other_side = 1 - side;
+    move = *(u8 *)((u32)plan + (u32)other_side + 6);
+    if (move == 0) {
+        move = func_84148C74(other_side);
+    }
+    if (func_84151498(func_84154B64(side)) != 0) {
+        *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+        amount = func_8414A2AC();
+        table = func_8414A3A0(side);
+        incoming_type = func_80062D98(move);
+        count = BattlePlan_CountResistingMoveSlots(side, incoming_type);
+        ((u32 *)(u32)base)[(u32)side + 13] += count * table[48] * amount;
+        *(u8 *)(u32)base |= 2;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_8415169C.s")
+extern s32 func_8414C858(u8 *);
+extern u8 func_8414A288(void);
+void BattlePlan_AddFlinchBonus(u8 *plan, u8 side, u8 chance) {
+    u8 *other;
+    BattlePlanScoreHeader *base;
+    u8 *table;
+    u8 amount;
+    base = (void *)(plan + 4);
+    other = func_84154B64((1 - (u32)side) & 0xFF);
+    if (((other[24] & 0x10) == 0) && ((*(u16 *)(other + 38) & 0x27) == 0)) {
+        if (func_8414C858(plan) != 0) {
+            base->selected[side] = chance;
+            amount = func_8414A288();
+            table = func_8414A3A0(side);
+            base->score[side] += table[17] * amount * chance / 255;
+            base->flags |= 2;
+        }
+    }
+}
 
 extern s32 func_8414A2DC(void);
 extern void * func_8414A3A0(u8);
@@ -286,7 +328,31 @@ void func_84151D3C(void *arg0, u8 arg1) { void *state; void *table; s32 base; u8
 extern u8 *func_84154B64(u8);
 void func_84151DD4(void *arg0, u8 arg1) { void *state; s32 base; state = func_84154B64(arg1); base = (s32)(u32)arg0 + 4; if (((*(u8 *)((u8 *)state + 0x18) & 0x10) == 0) && (((s32)*(u16 *)((u8 *)state + 0x2A) >> 2) < (s32)*(u16 *)((u8 *)state + 0x28))) { *(u8 *)((u8 *)(u32)base + arg1 + 8) = 0xFF; *(u8 *)((u8 *)(u32)base) |= 2; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151E44.s")
+void BattlePlan_AddMimicBonus(u8 *plan, u8 side) {
+    u8 *own;
+    u8 *other;
+    u8 move;
+    s32 i;
+    u8 *table;
+    s32 base;
+    u8 amount;
+    base = (s32)(u32)plan + 4;
+    own = func_84154B64(side);
+    other = func_84154B64((1 - (u32)side) & 0xFF);
+    move = other[36];
+    if ((move != 0) && (move != 165)) {
+        for (i = 0; i < 4; i++) {
+            if (own[i + 4] == move) {
+                return;
+            }
+        }
+        *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+        amount = func_8414A2AC();
+        table = func_8414A3A0(side);
+        ((u32 *)(u32)base)[(u32)side + 13] += table[62] * amount;
+        *(u8 *)(u32)base |= 2;
+    }
+}
 
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
@@ -575,7 +641,31 @@ void func_841528C4(void *arg0, u8 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152980.s")
+extern void func_84150B14(void *, u8, s32, s32, s32, s32);
+extern void func_84150EA4(u8 *, u8, u8, u8, u8, u8);
+void BattlePlan_ScoreCurse(u8 *plan, u8 side) {
+    u8 *own;
+    u8 *other;
+    u8 other_side;
+    s32 base;
+    u8 *table;
+    base = (s32)(u32)plan + 4;
+    own = func_84154B64(side);
+    other_side = 1 - side;
+    other = func_84154B64(other_side);
+    if (func_84155544(own, 8) != 0) {
+        if (((other[21] & 2) == 0) && ((other[24] & 0x10) == 0)) {
+            *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+            table = func_8414A3A0(side);
+            ((u32 *)(u32)base)[(u32)side + 13] = table[22] * func_8414A2AC();
+            *(u8 *)(u32)base |= 2;
+        }
+    } else {
+        func_84150B14(plan, side, 174, 0xFF, 0, 1);
+        func_84150B14(plan, side, 174, 0xFF, 1, 1);
+        func_84150EA4(plan, other_side, 174, 0xFF, 2, 1);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152AC0.s")
 

@@ -290,7 +290,7 @@ ASM; external hashes are checked before any further compilation.
 ## Psych Up scoring and resisting move slots
 
 Two more genuine matches, 400 bytes, extend native revision `0895b6c2`.
-There are 21 ASM owners remaining in this file.
+That batch left 21 ASM owners in this file.
 
 - `84153CB8` / `BattlePlan_AddPsychUpBonus` resolves the previous requeue.
   Initializing the consumed header address before the active-record lookups
@@ -325,18 +325,67 @@ all 66 original extents; nine independent links reproduce all 19,440 retail
 text bytes. No fake locals, forced registers/frames, padding, instruction
 rewrites or manual unrolling are used.
 
-`841515AC` remains a requeue after 32 explicit candidates covering local
-views, byte/word side-index origins, early header lifetime, parameter reuse,
-consumed type/count values and a shared integer-address phase carrier. The
-best 240-byte candidate has 16 raw differences: a 56-versus-48-byte frame,
-opponent-index register `v0` instead of `a2`, and corresponding stack homes.
-The early header lifetime recovers the original `s0` header / `s1` side
-ownership. Eight stock/off/on/blank controls calibrate a passive trace while
-preserving the complete retained object. Global coloring is procedure 25,
-while frame emission is procedure 24: the header web uses physical 16,
-side web physical 17, and short-lived index-related web physical 2. The
-measured emitted frame remains 56 bytes. Byte-carrier forms recover stack
-homes but add a mask and disturb the early index schedule; phase reuse does
-not close the mismatch. Next compare short-lived index web formation before
-coloring with the call-argument carrier, keeping the established two-argument
-interface. Do not invent a third parameter to obtain register `a2`.
+## Conversion, Mimic, flinch and Curse scoring
+
+Four more genuine matches, 1,020 bytes, extend native revision `2fefe5be`.
+This batch leaves 17 ASM owners in the file. The original-address aliases
+preserve callers that remain in ASM.
+
+- `841515AC` / `BattlePlan_AddConversionBonus` resolves the Conversion
+  requeue. Move 160 has effect 30 and dispatches through `.L84154528`.
+  A planned opponent move, or the `84148C74` fallback, supplies the type for
+  `BattlePlan_CountResistingMoveSlots`. The byte count times table byte 48
+  times `8414A2AC` contributes to the side score. An early header base and
+  consumed byte temporaries retain the original 48-byte frame. The decisive
+  source expression is `other_side = 1 - side`: normal integer promotion
+  before narrowing to a byte reproduces the original register and mask
+  sequence. The previous `(u32)side` subtraction created a different
+  conversion expression and an extra mask in the byte-carrier variants.
+  The existing two-argument interface remains intact.
+- `84151E44` / `BattlePlan_AddMimicBonus`: move 102 has effect 82 and
+  dispatches through `.L8415461C`. The opponent's recorded move at byte 36
+  must be nonzero, differ from Struggle 165, and be absent from all four own
+  move slots. Table byte 62 times `8414A2AC` is added to the side score. An
+  early header base preserves the separate address increment. Removing the
+  separate score-pointer carrier, and declaring the consumed header before
+  the amount, recovers the original 64-byte frame and spill homes.
+- `8415169C` / `BattlePlan_AddFlinchBonus`: effect 31 (Headbutt 29, Bite 44,
+  Rock Slide 157) routes through `.L8415454C` with a chance byte. Effect 141
+  routes through `.L84154538` with `0xFF`. Opponent byte 24 mask `0x10` and
+  halfword 38 mask `0x27` reject the bonus, as does a false action-order
+  predicate `8414C858`. Its ASM compares move priority, then the two records'
+  halfwords at offset 66. Table byte 17 times `8414A288` times chance,
+  divided by 255, contributes to the side score. Direct typed-header access
+  avoids the extra spill slot introduced by a separate score pointer.
+- `84152980` / `BattlePlan_ScoreCurse`: move 174 has effect 109, dispatched
+  through `.L841546FC`. An own Ghost type (8) selects the guarded branch
+  that replaces the side score with table byte 22 times `8414A2AC`; this is
+  an assignment, not an addition. Otherwise the two `84150B14` calls use
+  stage indices 0 and 1, and `84150EA4` receives the opposing side and index
+  2 so its opposing-target adjustment applies to the user's own record.
+  An early header base and signed-promoted byte side complement preserve
+  the original 64-byte frame and shared spill lifetime.
+
+The Conversion investigation retains the earlier 32 rejected candidates and
+eight stock/off/on/blank frame/allocation controls. Eight further calibrated
+expression-construction controls preserve the complete parent object and
+confirm that its side complement is emitted into `v0`. The following
+eight-candidate signed-complement family accepts its first candidate. This
+is evidence about this function's conversion expression, not a general rule
+that all side subtraction must be signed.
+
+All four have recorded runner acceptances and pass the normal,
+host-syntax-enabled full-ROM gate. Mimic, flinch and Curse are directly
+link-verified. Conversion uses a sequential gate because the call to its
+newly compiled local counter changes relocation representation. Every first
+success freezes complete objects, source, ROM, ELF, linked script, layouts
+and original ASM, with external hashes checked before further compilation.
+Six complete-object controls, including cleanup/naming, leading blanks and
+ABI checks, preserve all 66 original extents. Eleven independent links
+reproduce all 19,440 retail text bytes. No fake locals, forced registers or
+frames, padding, instruction rewrites or manual unrolling are used.
+
+The party-count `841524B4` and entry-hazard `84150330` requeues remain
+unresolved, together with the other remaining ASM owners. The near-match
+evidence for those functions above still applies; this batch does not
+install either body or claim that the file is complete.
