@@ -397,3 +397,50 @@ object controls preserve all text, data, function extents and semantic
 relocation targets through declaration cleanup, grouped calls, names and
 blank lines. The older geometry, radial, mixed-precision, wave and renderer
 requeues remain unchanged; all effect39 emitter owners are now resolved.
+
+## Radial effect33 and full-file float-pool cleanup: accepted
+
+84157398 is now BattleAnim_StartEffect33Radial20_Emit (448 bytes), accepted
+through the native runner and authoritative full-ROM comparison. This closes
+the earlier radial requeue: all non-relocation words matched after replacing
+the four extern loads by the actual0.1f/0.2f/0.3f/0.6f literals. The former
+coherent f0/f2 exchange was not an irreducible register tie.
+
+The early pool3FBDD8..3FBDE8 is outside the former effect39 window, and
+cannot be linked separately inside the same object's single .rodata section.
+The proper solution is the complete file's aligned192-byte float pool,
+3FBDC0..3FBE80. Replace32 readonly extern symbols in the already accepted C
+bodies by bit-verified literals, preserving their operations, expression trees,
+colors, velocity scales, signed RNG behavior and all backend contracts.
+This is whole-object post-acceptance cleanup, not re-probing accepted owners.
+Short decimal spellings are used only after f32 bit-equality and compiler
+object controls confirm them. No register forcing or identity arithmetic.
+
+Pinned extraction stages the enlarged per-file .rodata window. Both the
+radial and mixed-precision effect45 owners remain assembly for the layout
+preflight: independently linked normal/blank controls reproduce all21376
+retail text bytes and all192 readonly bytes. The full-ROM layout-only gate
+passes before the immutable radial candidate is replayed. Its sequential
+full-ROM gate then passes. The existing generated linker ordering is unchanged.
+
+The normal C pools also emit the neighboring1.2f datum at its original
+position, so the temporary D_8418C5D0 data-only GLOBAL_ASM include and
+force_not_migration boundary record introduced for the smaller window are
+no longer needed. Their removal is data cleanup, not an unproven function
+decompilation. No helper file or replacement assembly is introduced.
+
+Five final whole-original-object controls preserve all text,192 readonly
+bytes, function extents and semantic relocation targets through readable
+literal cleanup, naming and blank lines. Every successful gate freezes its
+source, full changed object, distinct collateral objects and linked outputs
+and externally verifies hashes before further compilation. Final retail ROM
+MD5 remains1561c75d11cedf356a8ddb1a4a5f9d5d.
+
+Effect45 owner841580C8 remains assembly after eight additional literal-lineage
+probes. Ordinary double sin/cos declarations call sin/cos, not the retail
+__sinf/__cosf ABI, and produce572 versus576 bytes. Correct float calls give
+560 bytes and omit the retail float-to-double-to-float result conversions.
+Do not fake a double-return float callee or add identity casts/multiplication
+to retain those instructions. Next: establish genuine math-header/intrinsic
+or source-lineage evidence for the promotion, then revisit its live values.
+The geometry, terrain-wave and renderer requeues are otherwise unchanged.
