@@ -148,11 +148,39 @@ All 13616 original text bytes and the 288-byte readonly pool are preserved.
 No dummy use, forced register, arbitrary padding, instruction rewrite, fake
 ABI or manual unrolling is introduced.
 
-## Strip renderer: requeue
+## Accepted strip renderer and RGB records
 
-`8415C2E0` remains assembly. A nested two-vertex loop produced 504 bytes versus
-592 and did not reproduce the original pair shape. An exploratory explicitly
-written pair was closer, but is not adopted as a manually unrolled solution.
-Color expression ordering also differs in the SDK macro expansion. Next:
-establish the original pair representation and macro expression tree before
-further probes; no renderer candidate is installed.
+`8415C2E0` / `Strip400_Draw` replaces 592 original bytes. With fewer than two
+active sections it returns the display-list cursor unchanged. Otherwise it
+allocates two vertices per section, converts node positions to vertex
+coordinates while clamping negative height to zero, and sets the two texture
+edges to T coordinates 0 and 512. It emits the existing display list, primitive
+and environment colors, then a vertex load and two triangles per adjacent
+section pair.
+
+The explicit two-edge representation is witnessed by Stadium 1's
+`Strip400_Draw`, and the GS updater writes the two corresponding geometrically
+distinct nodes. The first and second edges have different T coordinates; they
+are not duplicated identical loop iterations introduced to force an unroll.
+The section and triangle loops remain ordinary counted loops.
+
+The three color bytes at offsets 48 and 51 are named RGB records rather than
+array-index expressions. This retains the initializer's original stores and
+layout while restoring the renderer's original SDK-macro color expression
+order. Expanding and regrouping the color packing manually did not match;
+the accepted source uses the unchanged SDK color macros. Advancing the vertex
+pointer at the end of the triangle-loop body, rather than in its footer,
+recovers the final two instruction-order differences.
+
+Recorded native-runner acceptance and the full-ROM gate verify the renderer
+and paired RGB/initializer cleanup together. The successful gate immediately
+froze source, the complete object, four distinct collateral objects, ROM, ELF
+and linked script, with external hashes checked before further compilation.
+Six whole-original-object controls cover known source, blank lines,
+declaration cleanup, naming, named-source blank lines and layout assertions.
+Six compiler-checked facts verify the three-byte RGB size, complete state size
+and vertex/color/environment/node offsets. All original text, the 288-byte
+readonly pool, function extents and semantic relocations remain equal.
+No instruction rewrite, forced register, dummy local, arbitrary padding or
+manual loop unrolling is introduced. Only `8415DBBC`, the radial renderer,
+remains assembly in this file.

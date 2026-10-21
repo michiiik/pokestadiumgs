@@ -8,6 +8,7 @@ typedef struct Strip400Node_79 {
     f32 unk_08;
     f32 unk_0C;
 } Strip400Node_79;
+typedef struct { u8 r, g, b; } Fragment79StripRGB;
 typedef struct Strip400State_79 {
     s16 unk_00;
     s16 unk_02;
@@ -24,8 +25,8 @@ typedef struct Strip400State_79 {
     s16 unk_28;
     s16 unk_2A;
     Vtx *vertices;
-    u8 color[3];
-    u8 environment_color[3];
+    Fragment79StripRGB color;
+    Fragment79StripRGB environment_color;
     u8 unknown_36[2];
     Strip400Node_79 nodes[400];
 } Strip400State_79;
@@ -50,12 +51,12 @@ void Strip400_Initialize(f32 x, f32 y, f32 z, f32 scale, u8 r, u8 g, u8 b, u8 er
     state->unk_24 = 1.0f;
     state->unk_28 = 0;
     state->unk_2A = 0;
-    state->color[0] = r;
-    state->color[1] = g;
-    state->color[2] = b;
-    state->environment_color[0] = er;
-    state->environment_color[1] = eg;
-    state->environment_color[2] = eb;
+    state->color.r = r;
+    state->color.g = g;
+    state->color.b = b;
+    state->environment_color.r = er;
+    state->environment_color.g = eg;
+    state->environment_color.b = eb;
     node = state->nodes;
     for (i = 0; i < 400; i++) {
         node->unk_00 = x;
@@ -195,7 +196,57 @@ s32 Strip400_Update(s32 alternate_anchor) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CB430/func_8415C2E0.s")
+extern void *Gfx_AllocDisplayList(s32);
+extern Gfx D_841874A0[];
+Gfx *Strip400_Draw(Gfx *display_list) {
+    s32 i;
+    Vtx *vertex;
+    Strip400Node_79 *node;
+    Strip400State_79 *state;
+
+    state = D_84187498;
+    if (state->unk_28 < 2) {
+        return display_list;
+    }
+    vertex = Gfx_AllocDisplayList(state->unk_28 * 2 * sizeof(Vtx));
+    state->vertices = vertex;
+    node = state->nodes;
+    for (i = 0; i < state->unk_28; i++) {
+        vertex->v.ob[0] = node->unk_00;
+        if (node->unk_04 > 0.0) {
+            vertex->v.ob[1] = node->unk_04;
+        } else {
+            vertex->v.ob[1] = 0;
+        }
+        vertex->v.ob[2] = node->unk_08;
+        vertex->v.tc[0] = (i * 8) << 5;
+        vertex->v.tc[1] = 0;
+        vertex++;
+        node++;
+
+        vertex->v.ob[0] = node->unk_00;
+        if (node->unk_04 > 0.0) {
+            vertex->v.ob[1] = node->unk_04;
+        } else {
+            vertex->v.ob[1] = 0;
+        }
+        vertex->v.ob[2] = node->unk_08;
+        vertex->v.tc[0] = (i * 8) << 5;
+        vertex->v.tc[1] = 512;
+        vertex++;
+        node++;
+    }
+    gSPDisplayList(display_list++, D_841874A0);
+    gDPSetPrimColor(display_list++, 0, 0, state->color.r, state->color.g, state->color.b, 200);
+    gDPSetEnvColor(display_list++, state->environment_color.r, state->environment_color.g, state->environment_color.b, 0);
+    vertex = state->vertices;
+    for (i = 0; i < state->unk_28 - 1; i++) {
+        gSPVertex(display_list++, vertex, 4, 0);
+        gSP2Triangles(display_list++, 0, 2, 1, 0, 2, 3, 1, 0);
+        vertex += 2;
+    }
+    return display_list;
+}
 
 typedef struct Radial20Node_79 { f32 unk_00; u8 unk_04; u8 pad_05[3]; f32 unk_08; f32 unk_0C; f32 unk_10; f32 unk_14; f32 unk_18; f32 unk_1C; f32 unk_20; f32 unk_24; u8 pad_28[0x20]; } Radial20Node_79;
 typedef struct Radial20_79 { s16 unk_000; s16 unk_002; s16 unk_004; s16 unk_006; u8 pad_008[0x40]; Radial20Node_79 unk_048[20]; } Radial20_79;
