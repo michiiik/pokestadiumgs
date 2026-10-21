@@ -14,7 +14,23 @@ void func_84155A1C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_84155A44.s")
+extern u8 *D_841951F8[];
+extern u8 D_8419EE00[];
+void BattleMoveState_CopySelectedMoves(u8 side) {
+    u8 *base;
+    u8 *current;
+    u8 *selected;
+    s32 i;
+
+    base = D_8419EE00 + side * 0x132;
+    current = base + 2;
+    selected = base;
+    selected += D_841951F8[side][0xA] * 0x18;
+    selected += 0x12;
+    for (i = 0; i < 4; i++) {
+        current[i + 1] = selected[i + 1];
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -22,7 +38,32 @@ void func_84155A1C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_84155BD4.s")
+extern u8 func_80062D20(u8);
+extern void func_84155AC4(u8, u8, u8, u8);
+extern void func_84156674(u8, u8, u8);
+void BattleMoveState_ApplySelectedMoveEffects(u8 side, u8 move) {
+    u8 effect;
+    u8 other;
+    u8 selected;
+    u8 opposing;
+
+    effect = func_80062D20(move);
+    other = 1 - side;
+    selected = D_841951F8[side][0xA];
+    opposing = D_841951F8[other][0xA];
+    switch (effect) {
+        case 0x59:
+            func_84156674(side, selected, 0x4);
+            break;
+        case 0x90:
+            func_84156674(side, selected, 0x8);
+            break;
+        case 0x62:
+            func_84156674(side, selected, 0x10);
+            break;
+    }
+    func_84155AC4(side, selected, opposing, move);
+}
 #endif
 
 #ifdef VERSION_US
@@ -45,7 +86,21 @@ u8 func_84155D5C(u8 arg0, u8 arg1, u8 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_8415623C.s")
+void BattleMoveState_RefreshSelectedMoves(u8 side) {
+    u8 *base;
+    u8 *current;
+    u8 *selected;
+    s32 i;
+
+    base = D_8419EE00 + side * 0x132;
+    current = base + 2;
+    selected = base;
+    selected += D_841951F8[side][0xA] * 0x18;
+    selected += 0x12;
+    for (i = 0; i < 4; i++) {
+        current[i + 1] = selected[i + 1];
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -54,9 +109,7 @@ u8 func_84155D5C(u8 arg0, u8 arg1, u8 arg2) {
 
 #ifdef VERSION_US
 extern u8 D_8419EE01[];
-extern u8 *D_841951F8[];
 extern void func_84155F28(u8, u8);
-extern void func_8415623C(u8);
 void func_84156464(u8 arg0) {
     s32 i;
     D_8419EE01[arg0 * 0x132] = 1;
@@ -65,7 +118,7 @@ void func_84156464(u8 arg0) {
         func_84155F28(arg0, i);
         i++;
     }
-    func_8415623C(arg0);
+    BattleMoveState_RefreshSelectedMoves(arg0);
 }
 #endif
 
@@ -82,7 +135,6 @@ void func_84156510(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_8419EE00[];
 u8 *func_84156550(void) {
     return D_8419EE00;
 }

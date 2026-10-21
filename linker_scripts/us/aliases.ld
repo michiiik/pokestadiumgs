@@ -651,3 +651,7 @@ func_8300B038 = Fragment7_RemoveTeamRecord;
 func_8300B0DC = Fragment7_SwapTeamRecords;
 func_8300B468 = Fragment7_RemoveProfileRecord;
 func_8300B728 = Fragment7_SwapProfileRecords;
+
+func_84155A44 = BattleMoveState_CopySelectedMoves;
+func_8415623C = BattleMoveState_RefreshSelectedMoves;
+func_84155BD4 = BattleMoveState_ApplySelectedMoveEffects;
