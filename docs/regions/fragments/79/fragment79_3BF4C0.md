@@ -243,15 +243,55 @@ Record type and count declaration order do not explain it. Next compare the
 alias web before and after induction rewriting; another width/cache grid is
 not supported by these results.
 
-`841537FC` is a requeue at 308 bytes with four raw differences: the score
-address's spill/reload uses stack offset 40 instead of 44. Thirty-two
-candidates cover weather/score views, base/score lifetimes, consumed carrier
-ordering, opposing move/type carriers and parameter reuse. Eight calibrated
-stock/off/on/blank controls preserve the entire retained object while a
-passive frame trace locates the temporary. Source-carrier reorderings keep
-the residual; other lifetime forms change frame or saved-register ownership.
-The permuter's default comparison ignores stack offsets and reports a false
-zero for this diagnostic. Enabling `--stack-diffs` gives base score 16; a
-bounded 45-second search remains flat. Next investigate reuse of a consumed
-pointer across the weather and score phases, with the normal ROM gate as the
-oracle. No stack-only near-match is installed.
+## Rain Dance, Sunny Day and stage comparison
+
+Three owners, 1,040 bytes, now have directly link-verified runner acceptances
+and pass the normal host-syntax-enabled full-ROM gate. The complete original
+66-function object remains identical, including independent linkage of all
+19,440 retail text bytes and leading-blank controls. Their original-address
+aliases preserve ASM callers. These results extend native revision
+`a2730070`; 23 ASM owners remain in this source file.
+
+- `841537FC` / `BattlePlan_AddRainDanceBonus`: move 240 has effect 136,
+  whose dispatcher entry reaches `.L841547C0`. Unless weather byte 408 is
+  already 1, table byte 43 times `8414A2B8` contributes for an own powered
+  Water move, incoming Fire move, and own Thunder move 87. Half the signed
+  amount is always added within that weather guard, with C division's
+  toward-zero rounding. The side byte is marked and plan flag 2 is set.
+- `84153930` / `BattlePlan_AddSunnyDayBonus`: move 241 has effect 137,
+  dispatched through `.L841547D0`. Weather 2, table byte 42, own Fire moves,
+  incoming Water moves and SolarBeam move 76 form the corresponding tests.
+- `84153B10` / `BattlePlan_HasUnfavorableStages`: the seven stage bytes at
+  record offsets 13 through 19 are compared with neutral 7. Any own stage
+  below 7 or opposing stage above 7 returns true. The source is a loop;
+  IDO generates the observed unroll. Consumer `84153CB8` belongs to move
+  244 / effect 143, dispatched through `.L841547F0`, and scores positive
+  opposing-minus-own stage differences.
+
+The rain scorer's four-word spill residual was caused by the score-address
+carrier. Forty earlier spellings and eight phase-reuse variants did not
+close it. Eight stock/off/on/blank complete-object controls calibrated an
+all-procedure passive trace: spill planning reserved header and score-address
+temporaries at -28 and -32; later temporary allocation selected -32. A typed
+header with direct score-array access removes the separate score-pointer
+carrier and reproduces offset 44 in every original spill/reload. The same
+source shape matches the sun scorer on its first tested candidate. Shared
+partial record views describe only the accessed fields; unknown ranges
+remain unnamed. The stage predicate also needs the consumed loop index
+declared before its two record pointers to recover the original stack home.
+
+The default permuter comparison ignores stack offsets: its zero for the
+rain residual was not an exact match. `--stack-diffs` exposes score 16; the
+bounded 45-second source search was flat. No forced compiler, dummy locals,
+padding, instruction rewriting or manual unrolling is used. First successes
+freeze source, complete objects, ROM, ELF, linked script, layouts and original
+ASM; external hashes are checked before any further compilation.
+
+`84153CB8` is a requeue after two eight-candidate families. Its natural
+seven-stage difference loop agrees through the loop body. The best 216-byte
+candidate retains the original 72-byte frame and stack home but folds the
+final header-address increment into the byte memory operands, leaving a
+220-versus-216-byte mismatch. Typed/byte stage views, index width, declaration
+order and a consumed late header local do not recover the final separate
+ADDIU. Next investigate parameter/header carrier reuse across the predicate
+and loop; preserve the original ASM until the full ROM gate accepts it.
