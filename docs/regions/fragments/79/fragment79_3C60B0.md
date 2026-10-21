@@ -140,3 +140,46 @@ independently hashed before further compilation. Five complete-original-object
 controls verify the accepted source, blank-line stability, readable local
 names, redundant forward-declaration cleanup and semantic function naming.
 Previously accepted terrain owners and all other neighbors remain identical.
+
+## Accepted terrain height and slope sampler
+
+`84159FA8` / `BattleAnim_SampleTerrainHeightAndSlope` replaces956 original
+bytes through recorded native runner acceptance and a byte-identical full-ROM
+gate. Never re-probe this accepted owner.
+
+The primary assembly converts world coordinates to signed cell indices with
+`((x+440)/150)+8` and `(z/200)+8`, truncates toward zero and clamps each index
+to0..14. It snapshots the four cell corners from the existing16-by-16 grid of
+20-byte points, selects a triangle using the original squared-distance test,
+and uses its cross-product normal to solve the plane height. A zero normal-Y
+falls back to the three-vertex mean. It writes the normal's atan2-derived
+slope in degrees, folded into[-90,90], and returns the sampled height.
+
+The real `MathUtil_Atan2s(f32,f32)` return type is signed16, as verified in
+the accepted definition in `BF50.c`; do not replace it with a guessed word or
+float interface. The original sampler's arithmetic is single precision,
+including the mean and angle scaling. Stadium1's padded source is not the
+matching oracle and was not transplanted.
+
+The first natural cell/plane forms already reproduced all956 instruction
+bytes modulo stack addresses, with identical relocation topology. Explicit
+live cell coordinates, squared corner distances, relative coordinates and
+weighted normal terms recover the original224-byte frame. The accepted form
+also names the two edge vectors passed to the real cross-product helper.
+Every scalar is initialized before use and participates in the calculation;
+there are no padding locals, dummy operations, forced registers, fake
+interfaces or instruction/HEX/relocation rewrites.
+
+Use the existing shared point view and row-array indexing. The sampler and
+initializer now share one declaration of that view, moved before the sampler.
+Only the already established fields and two unknown tail bytes are named.
+Eight emitted layout values verify size20, offsets0/4/8/12/16, row stride320
+and halfword width2. No enclosing state allocation extent is inferred.
+
+The first-success callback froze source, the complete changed TU object,
+four distinct collateral objects, ROM, ELF and linked script; all nine were
+independently hashed before further compilation. Five complete-original-object
+controls cover accepted source, blank-line stability, shared-type/extern
+cleanup, readable guards, semantic naming and named-source blank-line
+stability. All previously accepted camera/terrain owners and other neighbors
+remain object-identical.
