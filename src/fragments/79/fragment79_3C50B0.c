@@ -70,12 +70,31 @@ void BattleMoveState_CopySelectedMoves(u8 side) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_84155AC4.s")
+extern u8 func_80062D5C(u8);
+extern u8 func_80062D20(u8);
+extern u8 D_8419EE17[];
+void BattleMoveState_RecordMoveAgainstSlot(u8 side, u8 selected, u8 opposing, u8 move) {
+    if (func_80062D5C(move) != 0) {
+        switch (func_80062D20(move)) {
+            case 3:
+            case 7:
+            case 8:
+            case 26:
+            case 38:
+            case 89:
+            case 144:
+            case 148:
+            case 154:
+                break;
+            default:
+                D_8419EE17[side * 306 + selected * 24 + opposing] = move;
+                break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-extern u8 func_80062D20(u8);
-extern void func_84155AC4(u8, u8, u8, u8);
 extern void func_84156674(u8, u8, u8);
 void BattleMoveState_ApplySelectedMoveEffects(u8 side, u8 move) {
     u8 effect;
@@ -98,7 +117,7 @@ void BattleMoveState_ApplySelectedMoveEffects(u8 side, u8 move) {
             func_84156674(side, selected, 0x10);
             break;
     }
-    func_84155AC4(side, selected, opposing, move);
+    BattleMoveState_RecordMoveAgainstSlot(side, selected, opposing, move);
 }
 #endif
 
@@ -118,7 +137,6 @@ void BattleMoveState_UpdateMoveSlot(u8 side, u8 slot) {
 #endif
 
 #ifdef VERSION_US
-extern u8 D_8419EE17[];
 u8 func_84155D5C(u8 arg0, u8 arg1, u8 arg2) {
     return D_8419EE17[arg0 * 0x132 + arg1 * 0x18 + arg2];
 }
@@ -127,7 +145,6 @@ u8 func_84155D5C(u8 arg0, u8 arg1, u8 arg2) {
 #ifdef VERSION_US
 extern u8 func_84154B24(void);
 extern s32 func_800630C0(u8);
-extern u8 func_80062D5C(u8);
 extern u8 D_8419EE03[];
 u8 BattleMoveState_FindStrongestMove(u8 side, u8 category) {
     u8 active_side;
@@ -189,7 +206,28 @@ void BattleMoveState_RefreshSelectedMoves(u8 side) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_841562BC.s")
+void BattleMoveState_CopyPartyStatToRecord(u8 side, u8 slot, u8 stat) {
+    u8 *party;
+
+    party = D_841951F8[side] + slot * 88 + 24;
+    switch (stat) {
+        case 0:
+            ((MoveStatSide *)D_8419EE00)[side].records[slot].attack = *(u16 *)(party + 42);
+            break;
+        case 1:
+            ((MoveStatSide *)D_8419EE00)[side].records[slot].defense = *(u16 *)(party + 44);
+            break;
+        case 2:
+            ((MoveStatSide *)D_8419EE00)[side].records[slot].speed = *(u16 *)(party + 46);
+            break;
+        case 3:
+            ((MoveStatSide *)D_8419EE00)[side].records[slot].special_attack = *(u16 *)(party + 48);
+            break;
+        case 4:
+            ((MoveStatSide *)D_8419EE00)[side].records[slot].special_defense = *(u16 *)(party + 50);
+            break;
+    }
+}
 #endif
 
 #ifdef VERSION_US

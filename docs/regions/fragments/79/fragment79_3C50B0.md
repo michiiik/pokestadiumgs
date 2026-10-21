@@ -342,3 +342,110 @@ objects plus source, ROM, ELF and linked script. Every frozen hash is checked
 externally. Three owners remain assembly: the per-record refresh
 `func_84155F28` and dispatchers `func_84155AC4` / `func_841562BC`. The refresh
 requeue and dispatcher readonly-layout prerequisite above remain open.
+
+## Record-refresh phase investigation: requeue, 2026-10-22
+
+Forty additional recorded candidates leave `func_84155F28` in assembly.
+An eight-control passive child-expression trace identifies the `$s0` web as
+the complete side/slot record address, including its 18-byte header offset.
+It is not a conversion-only reservation like the resolved slot updater.
+
+A real halfword view of the stat region at record offset 14 removes the
+saved-register promotion. Its initial 796-byte body still has an extra
+pointer adjustment and spill compared with retail's 788 bytes. Explicit
+calculated-value locals do not improve it. Absolute/relative copy, fill and
+clear loops and reuse of a real record cursor also fail; retain the ordinary
+loops rather than manually unrolling the stores.
+
+The reduced stat-phase source reproduces all 199 masked instruction words
+and relocation topology of its immutable whole-module parent before a
+ninety-second fake-restricted native search. The search score improves from
+1055 to 425, but the best output retains a redundant record reassignment and
+is not adopted. Its useful hypotheses are the common-else address lifetime
+and partial inlining of the stat pointer, not the redundant assignment.
+
+The reviewed common-else form assigns the record address only once on each
+path. Combined with the real suffix stat view, cell 5 of
+`native-f79-refresh-reviewed-stat-lifetimes` has normalized similarity
+0.9749, raw similarity 0.8543, size 796 and a 64-byte frame. Its raw audit
+still finds 44 differing instruction words, including frame/spill homes,
+store scheduling and the final two stat writes. Removing the remaining stat
+alias entirely restores the unwanted saved register, even with that cleaner
+control flow. None of these bodies passes a link check or ROM gate.
+
+Next: keep the reviewed parent and investigate the last two stat writes'
+address lifetime without a retained biased pointer. Preserve all four stat
+calls, their intervening loads and the copied speed. Do not retain redundant
+assignments, add frame storage or patch the eight-byte size/frame residuals.
+
+## Dispatcher readonly-layout prerequisite: verified, 2026-10-22
+
+The selected-state file now owns its original jump-table window at ROM
+`0x3FBCA0..0x3FBD50` (176 bytes). It contains `jtbl_8418C410` (36 entries),
+`jtbl_8418C4A0` (five entries), and twelve original zero bytes. The following
+format string at `0x3FBD50` stays in a separate shared readonly tail.
+
+Pinned spimdisasm 1.35.0-dev0 migrates both tables into their original
+assembly owners in an isolated split first. Normal/leading-blank whole-object
+preflights independently link all 4096 text bytes and 176 readonly bytes to
+retail. The installed generated linker change is exactly the normalized
+staged output: shared head, selected-state object, then new shared tail.
+No unrelated generated-library paths or source changes are copied.
+
+The normal original-assembly full-ROM gate passes with retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Its successful callback freezes fifteen
+whole objects plus eleven source/layout/linked artifacts, including both
+shared-pool objects and all three original assembly owners. Every hash is
+checked externally before another compile. The installed complete module
+equals the independently linked staged object; twelve previously frozen
+collateral objects are unchanged. All four unrelated dirty paths are preserved.
+
+Both dispatchers are now eligible for genuine C switch candidates. This
+layout-only gate accepts no new C body: `func_84155AC4`, `func_84155F28` and
+`func_841562BC` all remain assembly. Keep the separate refresh requeue active.
+
+## Selected-state dispatchers: accepted, 2026-10-22
+
+Two genuine C switches replace 696 original text bytes:
+
+- `func_84155AC4` becomes `BattleMoveState_RecordMoveAgainstSlot` (272B).
+  It checks the byte-returning power getter, excludes effect codes 3, 7, 8,
+  26, 38, 89, 144, 148 and 154, and otherwise stores the move at
+  `D_8419EE17[side * 306 + selected * 24 + opposing]`. Its caller
+  `BattleMoveState_ApplySelectedMoveEffects` obtains `selected` from the own
+  side and `opposing` from the other side. The lookup `func_84155D5C` reads
+  the same indexed byte. These producer/caller/consumer operations justify
+  the function name without assigning broader semantics to `unk_05`.
+- `func_841562BC` becomes `BattleMoveState_CopyPartyStatToRecord` (424B).
+  It selects one of five cached party halfwords at offsets 42, 44, 46, 48
+  and 50 and copies it to the saved record's attack, defense, speed,
+  special-attack or special-defense field. The party stride is 88 bytes,
+  beginning at side-table offset 24. Other selector values do nothing.
+
+The move dispatcher accepts its first nested-guard/direct-selector candidate
+with direct link verification. The stat copier's first two flat halfword
+alias forms are 444B rather than 424B. The existing typed side/record fields
+recover the exact text shape. That winner is relocation-masked, not directly
+link-verified: its `D_8419EE00 + 32` field reference resolves to the original
+`D_8419EE20` address. Only the normal sequential full-ROM gate establishes
+its acceptance. Both switches preserve the original jump-table case targets.
+The initial stat context duplicated an already installed experimental typedef;
+the corrected context reuses it. That failed control is not a compiler
+hypothesis or a C acceptance.
+
+The first-success callbacks retain 16 and 15 artifacts respectively, including
+source, changed whole object, four distinct collateral objects, both shared
+readonly-pool objects, ROM, ELF, linked script and original assembly/layout
+inputs. Each hash is independently checked before further compilation.
+Six cleanup/naming/layout whole-object controls and nine independent retail
+links preserve all 4096 text bytes, 176 readonly bytes and 26 function extents.
+Unused experimental declarations and the unused party view are removed;
+original-address aliases accompany both renamed address-map entries.
+
+The final named normal ROM gate passes with retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d` and immediately freezes 26 artifacts,
+including fifteen complete objects and the readonly-layout inputs. No
+instruction/relocation rewrite, fake storage, forced register, manual unroll,
+volatile qualifier or altered helper interface is used. Only `func_84155F28`
+remains assembly in this file; its documented phase/lifetime requeue and the
+separate geometry requeue remain unresolved.
