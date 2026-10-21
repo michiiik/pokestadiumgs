@@ -604,3 +604,5 @@ func_83001000 = Fragment7_LoadTeamVisualResources;
 func_8300112C = Fragment7_LoadControllerDeck;
 func_83007568 = Fragment7_HandleTeamActions;
 func_83007788 = Fragment7_BuildControllerTeam;
+func_830078E4 = Fragment7_HandleTeamPartActions;
+func_83008494 = Fragment7_HandleRecordActions;

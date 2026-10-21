@@ -383,7 +383,7 @@ Two owners accepted natively from `2417016b`, totaling 688 bytes:
   row is 1168 bytes; its two 476-byte parts select resource/index bytes at
   offsets 11/12. An ordinary pointer to the row's parts, used by the inner
   loop, gives IDO the original source-address lifetime. The destination
-  slots are 8200 bytes each and their resource content begins at byte 96.
+  array starts at state byte 96, and each slot holds all 8200 resource bytes.
   `func_8004E0F0` loads an 8200-byte resource chunk into that destination;
   see `src/4CC20.c`. No manually unrolled loops are needed.
 
@@ -493,7 +493,8 @@ than 64 bytes; offsets 636/640 use `s1` rather than `v0` for the rule-only
 source-address intermediate. All other instructions, including both part-copy
 loops, agree. The actual previous/rule spill homes already match `48(sp)` and
 `36(sp)`. Separate scoped source pointers and integer/byte address views
-still coalesce with the callback-lived team pointer. A consumed fresh
+retain this scalar score, but the expanded raw comparison below distinguishes
+their register improvement from the remaining frame/spill differences. A consumed fresh
 destination carrier can give the 64-byte frame but moves the previous home
 to 52 or 56 and changes temporary allocation, so it is not an acceptance.
 A calibrated 60-second native permuter run reproduced all 192 masked parent
@@ -501,3 +502,78 @@ words and relocation topology; best score 8, with an identity-XOR proposal
 rejected as source. Next inspect the exact parent's web coalescing and live
 scopes; do not pad the frame, force registers, add dummy locals, or restore
 the old incomplete/manual-copy drafts. No body for this owner was installed.
+
+### Team-part and record actions
+
+Two owners accepted natively from `b15f76e`, totaling 1388 bytes:
+
+- `func_830078E4` / `Fragment7_HandleTeamPartActions` (768 bytes): copies the
+  selected 1168-byte team, preserves the rule argument across the predicate,
+  copies the two real 476-byte parts, or builds a controller team on fallback.
+  The old destination snapshot is used only by that fallback; the saved-part
+  branch reloads the current panel destination. A separate short-lived rule
+  source, a typed view of the opaque callback argument, and the real local
+  declaration order reproduce the 64-byte frame and `48(sp)` / `36(sp)` homes.
+  No padding, dummy locals, identity arithmetic, or register constraints are
+  needed. The requeue above is closed.
+- `func_83008494` / `Fragment7_HandleRecordActions` (620 bytes): cancellation
+  refreshes compatibility for the selected 544-byte record; selections 1--3
+  copy that record, build a profile, copy the selected 68-byte rule, and set
+  the panel side/changed state. Panel fields at bytes 8/12 are pointers to the
+  destination buffers, not embedded buffers. Bank 2 uses state byte 67 minus
+  one for the record index; other banks use index zero. The incoming selection
+  remains live for `3 - selection` across both calls. Direct bank-field reads
+  on cancellation keep its temporary independent from the cached bank used
+  by the later copy, restoring the original `v1` bank / `v0` index assignment.
+
+Both owners passed the recorded native runner and full US-ROM gate, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`, with an immediate externally hashed
+full-TU/four-distinct-collateral-object freeze. Every original game section
+byte, function extent, and semantic relocation agrees in the frozen objects.
+Postacceptance cleanup shares the actual team/record layouts, names state
+byte 78 as the part selector, and uses signed object sizes for row strides.
+Cleanup, naming, blank-line controls, and 36 target-layout assertions pass.
+
+The resource-buffer view now gives `Fragment7TeamVisualState` its real
+96-byte leading state header followed by full 8200-byte slots. The bank/row/part
+strides remain 98400/16400/8200, and the team banks still start at `0x3A290`.
+`func_8004E0F0` writes all 8200 bytes, so the prefix belongs before the array,
+rather than shortening every slot's content member to 8104 bytes. This layout
+cleanup preserves the complete original game object, including
+`Fragment7_LoadTeamVisualResources`; it is not another candidate acceptance.
+
+Raw comparison and passive optimizer controls are decisive for future ties:
+the independent rule-source parent had the same 0.9792 scalar score as the
+shared-source parent, but their four differences were different. The shared
+parent differed at frame adjustments and offsets 636/640 (`s1` versus `v0`);
+the independent parent already fixed the registers and differed at frame
+adjustments plus the rule spill at offsets 296/304 (`32(sp)` versus `36(sp)`).
+Stock/off/on/blank controls passed for the complete known game object and
+three exact retained parents before interpreting optimizer color/stack logs.
+Combining the independently verified source view and callback view left only
+the previous-pointer home; reordering its real declaration closed that pair.
+The private harness now reports concrete non-relocation word differences,
+with checked four-word and identical-object controls; it changes diagnostics,
+not acceptance or compiler behavior.
+
+`func_83008290`: requeue update. Eight valid new layout/view candidates tested
+signed versus unsigned ID storage, the shared 88-byte deck entry, and the
+verified controller-state view. All remain 516 bytes with exactly two differing
+non-relocation words: the fallback load/store at offsets 488/492 use `t7`
+rather than `t8`. An omitted identifier replacement in two generated probes
+was repaired and those two probes rerun; it is a generator diagnostic, not
+an owner-wide limitation. Next capture a calibrated UGEN temporary allocation
+and free trace against one exact retained parent, including an emission-to-
+object map before interpreting event ordinals. Do not repeat these layout
+views or accept an identity-mask/index workaround.
+
+`func_83000AA4` / `func_830013A8`: layout-prerequisite. Their actual jump tables
+`jtbl_8300F958` / `jtbl_8300F9FC` remain in `fragment7_data.data.s`, at ROM
+`0xC9B88` / `0xC9C2C`. The per-file `.rodata` subsegment currently begins only
+at ROM `0xC9D30` (VRAM `0x8300FB00`). Between the two early tables and that
+boundary, `D_8300FAA8` through `D_8300FAFC` form an 88-byte floating-constant
+pool. Next plan ownership of both tables and that intervening pool together,
+then re-split with the pinned tool and full-ROM-gate the still-assembly
+owners before sending C switch candidates. Extending the existing per-file
+subsegment must not create a second overlapping `.rodata` output for this
+source or drop constants used by already accepted functions.
