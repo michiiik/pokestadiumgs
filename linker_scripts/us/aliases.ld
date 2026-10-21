@@ -601,3 +601,6 @@ func_83007D40 = Fragment7_DrawSlidingRecordPanel;
 func_8300928C = Fragment7_DrawRecordListIndicators;
 func_83000CB4 = Fragment7_RefreshCollectionCompatibility;
 func_83001000 = Fragment7_LoadTeamVisualResources;
+func_8300112C = Fragment7_LoadControllerDeck;
+func_83007568 = Fragment7_HandleTeamActions;
+func_83007788 = Fragment7_BuildControllerTeam;
