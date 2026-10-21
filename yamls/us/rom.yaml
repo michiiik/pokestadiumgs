@@ -1590,6 +1590,7 @@
     - [0x3FBFD0, .rodata, fragments/79/fragment79_3CE960]
     - [0x3FBFF0, .rodata, fragments/79/fragment79_3CFAE0]
     - [0x3FC010, rodata]
+    - [0x3FC030, .rodata, fragments/79/fragment79_3D0D70]
     - [0x3FC070, .rodata, fragments/79/fragment79_3D2C10] # D_8418C7E0..D_8418C80C
     - [0x3FC0A0, .rodata, fragments/79/fragment79_3D3260] # Trail constants, D_8418C810..D_8418C840
     - [0x3FC0E0, .rodata, fragments/79/fragment79_3D4060] # Owner-linked trail constants, D_8418C850..D_8418C89C

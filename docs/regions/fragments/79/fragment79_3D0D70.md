@@ -113,15 +113,60 @@ the final freeze includes their assembly object. Shared cross-product and
 remaining-owner prototypes precede the normal builder, verified through
 known/moved/blank object controls before its successful full-ROM gate.
 
-## Remaining owners
+## Completion batch
 
-- `func_84162798`: ribbon start. Preserve the GS phase-2 emission guard and
-  14-record pointer-based pool instead of the Stadium 1 static 40-record pool.
-- `func_84162DE8`: ribbon renderer. Reuse the existing matched record and
-  rotation helpers and inspect all GS texture/render-state symbols.
+`TexturedRibbonSheet_Start` (`func_84162798`, 680 bytes) and
+`TexturedRibbonSheet_Draw` (`func_84162DE8`, 1432-byte original span) complete
+this source. All twelve functions are C; no assembly owners remain.
 
-These two owners were not candidate-probed in either batch. Readonly data at
-ROM `0x3FC010..0x3FC070` remains in the shared assembly owner. References to
-its named symbols do not require moving it. A literal-emitting candidate that
-changes readonly sections still requires an independently linked and ROM-gated
-layout plan. No new file-level subsegment is part of either batch.
+Start rejects emission when the GS phase latch is 2, finds a free record in
+the pointer-based 14-record pool, and initializes ten nodes from position,
+velocity, acceleration, color, duration, and phase-step arguments. The random
+phase uses the SDK's actual signed `guRandom() % 100` and double cycle literal.
+The inspected scale getter retains its float return type.
+
+Drawing loads intensity texture `D_8418CABC`, composes translation/rotation/
+scale matrices through the actual helpers, and builds two vertices per node.
+It preserves the existing cached-vertex behavior and draws the nine connecting
+strips with `D_84187888`; the leading quad uses `D_841878D8`. All graphics
+commands use SDK macros and ordinary loops. `TexturedRibbonSheet_Update`
+retains its actual float-array output interface; drawing passes the x field
+of the three-float offset vector.
+
+### Literal ownership and frame evidence
+
+The completion batch assigns ROM `0x3FC030..0x3FC070`, 64 bytes, to this
+source's readonly subsegment. The original shared prefix at
+`0x3FC010..0x3FC030` remains assembly-owned and supplies the grid constants.
+The existing rotation helper spells its known 360-degree and cycle values
+as double literals, allowing its original pool to remain contiguous with
+start and drawing's pools. No data bytes are inserted or removed.
+
+An 8-byte cycle-only proposal failed staged linking because its object padded
+to 16 bytes and would overlap the following degree constant. A 16-byte
+cycle/degrees window then passed normal/blank links and a layout-only ROM gate
+with both remaining assembly owners retained. After start accepted, expanding
+to the full 64-byte window passed separate normal/blank links and another
+layout-only full-ROM gate with drawing retained as assembly.
+
+The local-double snapshot start hypothesis had a 152-byte frame versus 144
+in the original. Capturing drawing's constants also enlarged its frame.
+Using the real literals in their verified pools restores the target frames
+without dummy locals, padding, forced registers, or instruction rewrites.
+The compiler performs the observed loop unrolling.
+
+### Completion verification
+
+Both owners passed recorded native full-ROM gates with host syntax checking.
+Successful runner gates froze nine artifacts each; both layout-only gates
+and the final named gate use independent seventeen-artifact freezes. Hashes
+are checked before subsequent compilation.
+
+Six complete-object controls preserve all 7840 text bytes, all 64 owned
+readonly bytes, and normalized relocation targets. Eleven function extents
+are unchanged. The renderer's 1432-byte original span comprises a 1420-byte
+C body plus the same 12 zero bytes at text offsets 7828 through 7839, rounding
+the section to 16 bytes. This is the only size-metadata exception; no padding
+code is added. Twenty-two target-compiler size/offset assertions pass.
+The shared 32-byte readonly prefix and the owned 64-byte pool together remain
+the original 96 retail bytes. The US ROM MD5 is unchanged.
