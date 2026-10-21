@@ -80,7 +80,17 @@ void Fragment7_RemoveRuleRecord(void *bank, s32 selected) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300AC8C.s")
+extern void func_8300B54C(void *);
+void Fragment7_SwapRuleRecords(void *bank, s32 first, s32 second) {
+    Fragment7RuleRecord temporary;
+    if (first < (s32)((Fragment7RuleBank *)bank)->header.count &&
+        second < (s32)((Fragment7RuleBank *)bank)->header.count) {
+        temporary = ((Fragment7RuleBank *)bank)->records[first];
+        ((Fragment7RuleBank *)bank)->records[first] = ((Fragment7RuleBank *)bank)->records[second];
+        ((Fragment7RuleBank *)bank)->records[second] = temporary;
+        func_8300A9E0(bank);
+    }
+}
 
 extern s32 Deck_WriteEntries(u8 *, s32, u8 *);
 typedef struct {
@@ -196,7 +206,12 @@ void Fragment7_SaveTeamBank(void *bank) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B260.s")
+/* The original owner contains an empty traversal and has no return value. */
+void Fragment7_TeamBankNoOp(void *bank) {
+    s32 index;
+    for (index = 0; index < *(u8 *)((u8 *)bank + 1); index++) {
+    }
+}
 
 void Fragment7_LoadTeamBank(void *bank) {
     u8 *handle = NULL;
@@ -293,7 +308,27 @@ void Fragment7_SaveProfileBank(void *bank) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B8AC.s")
+void Fragment7_LoadProfileBank(void *bank) {
+    u8 *handle = NULL;
+    s32 index;
+
+    ((Fragment7ProfileBank *)bank)->header.count = 0;
+    if (((Fragment7ProfileBank *)bank)->header.expanded) {
+        handle = func_8006218C(27, 0, 0, 0);
+    } else {
+        if (((Fragment7ProfileBank *)bank)->header.source < 4) {
+            handle = func_8006218C(40, ((Fragment7ProfileBank *)bank)->header.source, 0, 0);
+        }
+    }
+    if (handle != NULL) {
+        ((Fragment7ProfileBank *)bank)->header.count = Deck_ReadEntries((u8 *)((Fragment7ProfileBank *)bank)->records,
+            ((Fragment7ProfileBank *)bank)->header.capacity, handle);
+        func_80062304(handle);
+    }
+    for (index = 0; index < (s32)((Fragment7ProfileBank *)bank)->header.count; index++) {
+        func_8300B54C(&((Fragment7ProfileBank *)bank)->records[index]);
+    }
+}
 
 s32 func_8300B988(void *arg0) {
     return (s32) (*(u8 *)((u8 *)(arg0) + (1))) >= (s32) (*(u8 *)((u8 *)(arg0) + (0)));
