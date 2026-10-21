@@ -74,3 +74,82 @@ lookup and the rematerialized base, with complete-object controls and a
 verified procedure mapping. Resume the retained best source rather than
 replaying these closed families. No instruction rewrite, dummy local, or
 register forcing is an acceptable final source solution.
+
+### Capped-update trace follow-up
+
+Two passive allocator campaigns and a stock frontend/optimizer stream
+capture were calibrated against complete original objects, including
+observer-off/on and blank-line controls. The retained parent's procedure
+ordinal was explicitly mapped to 22. The base, amount pointer, and HP cap
+are assigned internal colors 2/3/4, corresponding to v1/a0/a1. Their
+forbidden mask is populated from the terminal block in that retained run:
+`updateforbidden` imports the block's `40000000` mask, excluding color 1
+(v0). This is measured optimizer ownership, not an assembler guess.
+
+Moving the base later causes address folding and changes the expression
+webs; eight genuine sequencing variants retained either the same nine-word
+residual or a worse shape. The original C/ABI declarations around the
+discarded call and block-mask construction need further investigation.
+The callee's real return category was not modified, and no candidate was
+installed. These observations apply to the retained parent and toolchain.
+
+## 2026-10-21: four matching HP/amount planners
+
+| Owner | Name | Bytes |
+| --- | --- | --- |
+| `8414CA80` | `BattleEffects_PlanCalculatedRecovery` | 144 |
+| `8414CE08` | `BattleEffects_PlanSharedHP` | 216 |
+| `8414EB90` | `BattleEffects_ApplyOpposingByteWeight` | 136 |
+| `8414ECE0` | `BattleEffects_HalveAmountsForStatus` | 124 |
+
+The four owners total 620 original bytes. Calculated recovery preserves
+the initializer/modifier calls, stores the calculated amount, and caps
+half of that amount at missing HP when the opposing record's 0x42 field
+is zero. The initializer `func_84149D54` clears exactly 32 bytes and fills
+the four pointer fields at 0x10/0x14/0x18/0x1C. This establishes the real
+`Fragment79DamageCalculation` record, not an arbitrary stack buffer.
+Its amount is at 0x0C; the remaining header bytes stay opaque.
+
+The selected side's interleaved halfword lane is addressed with the
+original 32-bit integer byte-address calculation. Pointer-only arithmetic
+folds away the separate offset-4 instruction and produces 140 bytes;
+the ordinary integer-address spelling reproduces all 144 bytes. Every
+scalar and pointer local has an actual arithmetic or addressing role.
+
+Shared-HP planning computes the signed-shift average of the two current
+HP values, caps each target at that record's maximum HP, then records
+positive or negative deltas in the original amount fields. Real HP locals
+recover the addition order; declaration order places the actual saved
+Pokemon pointer at stack byte 24 in the 40-byte frame. No dummy local or
+padding is used to obtain either home.
+
+The byte-weight helper preserves the existing `s32` address interface and
+computes `own_byte * (255 - other_byte) / 255`. The real denominator local
+is used in both subtraction and division; stock IDO emits the original
+division and checks. Status adjustment preserves both record lookups and
+halves the two halfword amounts only under the original 0x27 flag mask.
+
+The shared effect view now decodes the established halfword arrays at
+0x0E and 0x16. One visible type replaces the two temporary local copies;
+all five earlier accepted helpers still reproduce the original object.
+Eight complete-original-object controls verify cleanup, shared type
+visibility, decoded fields, formatting, naming, and blank-line shifts.
+Twenty-four emitted values verify the partial view and calculator layout.
+Each accepted transaction immediately froze and independently rehashed
+the full changed object, four distinct collateral objects, source, ROM,
+ELF, and linked script before further compilation.
+
+### `8414D9B8`: requeue, filtered amount update
+
+A truthful draft preserves the five excluded effect codes, the conditional
+0x4C/mode-2 guard, and the opposite-side halfword doubling. The best 184-byte
+draft has a 32-byte frame instead of 40 and loses the original explicit
+offset-4 subview carrier. Typed/raw views, switch/default and guard forms,
+address interfaces, and actual move/mode temporaries were tested without
+closing it. Next: trace source-slot and pointer-web lifetimes around the
+conditional mode call. Do not add unused frame storage or padding.
+
+`8414CB10` was inspected but not probed: its oracle reads a pointer from
+0(sp) without a preceding write in that owner. Reconcile that original
+behavior before proposing C; an uninitialized local must not be introduced
+merely to obtain matching bytes.
