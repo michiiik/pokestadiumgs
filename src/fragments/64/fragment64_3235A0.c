@@ -30,7 +30,17 @@ void func_87F01934(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_3235A0/func_87F019A4.s")
+/* mkdraft:func_87F019A4 begin */
+void func_87F019A4(void) {
+    u8 *entry = D_800CE060;
+    s32 offset;
+
+    for (offset = 0; offset < 8; offset += 2) {
+        *(u16 *)(entry + 0x10) = *(u16 *)(D_87F0F610 + offset + 0x34);
+        entry += 0x28;
+    }
+}
+/* mkdraft:func_87F019A4 end */
 
 extern void Audio_PlayDefaultSound(s32);
 extern void func_8002809C();
