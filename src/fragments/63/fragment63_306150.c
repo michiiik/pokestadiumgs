@@ -2,8 +2,54 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E027E0.s")
+s32 func_87E10E64(s32);
+s32 func_87E10EA8(s32);
+s32 func_87E10F2C(s32);
+extern volatile unsigned char D_87E19934;
+extern s32 D_87E19964;
 
+void func_87E027E0(void *arg0)
+{
+  s32 *sp1C;
+  s32 temp_v0_2;
+  int temp_v0;
+  s32 *new_var;
+  void *temp_v1;
+  temp_v1 = *((void **) (((u8 *) arg0) + 0x204));
+  temp_v0 = *((u8 *) (((u8 *) temp_v1) + 0x2180));
+  switch (temp_v0)
+  {
+    case 0:
+
+    case 1:
+      if ((*((u8 *) (((u8 *) temp_v1) + 0x2182))) != 0)
+    {
+      sp1C = ((*((s32 *) (((u8 *) arg0) + 4))) * 0xC) + (&D_87E19934);
+    }
+    else
+    {
+      sp1C = &D_87E19964;
+    }
+      break;
+
+    case 3:
+      sp1C = (((*((s32 *) (((u8 *) arg0) + 4))) * 0xC) + 0x18) + (&D_87E19934);
+      break;
+
+  }
+
+  new_var = (s32 *) (((u8 *) arg0) + 0);
+  temp_v0_2 = *new_var;
+  if ((temp_v0_2 == 2) || (temp_v0_2 == 3))
+  {
+    func_87E10EA8(-1);
+    func_87E10F2C(-1);
+    return;
+  }
+  func_87E10E64(*((s32 *) (((u8 *) sp1C) + 0)));
+  func_87E10EA8(*((s32 *) (((u8 *) sp1C) + 4)));
+  func_87E10F2C(*((s32 *) (((u8 *) sp1C) + 8)));
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_306150/func_87E028D8.s")
 
 extern void func_8004C8C0(s32);
