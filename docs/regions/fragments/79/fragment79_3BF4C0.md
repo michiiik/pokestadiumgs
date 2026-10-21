@@ -81,3 +81,59 @@ func_84152308: matched (call_sequence:carrier_reuse:signed_amount_compound_multi
 ## 2026-10-13
 
 func_84152764: matched (call_sequence:carrier_address:signed_scaled_byte_displacement), 3 iterations, agent codex
+
+## Accepted plan multiplier, move-type predicate and condition bonus
+
+Three original owners, 368 bytes, are replaced by genuine C:
+
+- `841502D0` / `BattlePlan_ApplyPursuitMultiplier` (96 bytes) checks move
+  228, reevaluates its plan through `func_8414D198`, then doubles the
+  side-relative halfword at offset 14. The snapshot-aware callers
+  `func_8414EE88` and `func_8414EFF0` apply it to the plan returned by
+  `func_8414C98C`. Move 228 is Pursuit; its local move metadata has effect
+  128, power 40 and type 27. The integer address base and unsigned side
+  displacement preserve the original operand ownership and incoming homes.
+  The pointer's separate four-byte advance is the plan header transition.
+- `84152CD8` / `BattlePlan_HasOnlyNormalOrFightingMoves` (148 bytes) scans
+  the four packed move bytes at offsets 4 through 7, stopping at the first
+  zero. The existing `func_80062D98` reads move types; ids 0 and 1 are
+  Normal and Fighting. A `u16` result carrier preserves the original
+  comparison lowering without an additional constant temporary.
+- `84153780` / `BattlePlan_AddConditionCountBonus` (124 bytes) marks the
+  side's byte at offset 12, obtains the existing condition count from
+  `func_84153718`, and adds `count * 128 * func_8414A2AC()` to the side's
+  word at offset 56. It then marks plan byte 4 with bit 2. The helper's
+  individual flag meanings remain unresolved. Separate, consumed base,
+  entry, count and amount locals recover the original frame and byte home;
+  the side-relative entry keeps its field offset in the memory operand.
+
+The type predicate preserves a retail bug: it tests the address of
+`func_80062D5C` instead of calling that move-power getter. The original ASM
+loads the symbol into a saved register and branches on the address, with no
+call to it. The source marks this with `//!bug`; inserting a call would change
+the program. The direct small-switch spelling removes this address test and
+does not match. A source search's materialized-constant diagnostic was not
+adopted; the ordinary halfword result carrier matches without that local.
+
+The three recorded runner acceptances are directly link-verified and each
+passes the normal, host-syntax-checked US full-ROM gate. Every first success
+immediately freezes the complete changed object, four other whole objects,
+source, ROM, ELF, linked script and original ASM inputs; their hashes are
+independently checked before further compilation. The retail ROM MD5 is
+`1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+Six complete-object controls cover accepted source, leading blanks, removal
+of two newly redundant externs, semantic names and four target-ABI assertions.
+Ten independent links reproduce all 19,440 text bytes in ROM range
+`0x3BF4C0..0x3C40B0`. All 66 original function extents, sections and semantic
+relocations agree. Address aliases preserve original ASM callers. No
+instruction/relocation rewrite, fake local, forced register/frame, artificial
+padding, volatile workaround or manual unrolling is introduced.
+
+`841524B4` remains a requeue. The count reads party count at state offset 8
+and 88-byte records after the 24-byte header; its predicate reads halfword
+38 and byte 36. Their field meanings are still unknown. Byte-extent bounds,
+record-count loops, pointer walks and row/header views leave register/origin
+differences or trigger unwanted compiler unrolling. The latest 120-byte row
+view has 14 differing raw instruction words. Next inspect its address and
+induction webs before changing the loop again; retain ASM until a full match.

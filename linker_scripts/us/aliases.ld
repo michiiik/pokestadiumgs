@@ -713,3 +713,6 @@ func_84155DB4 = BattleMoveState_FindStrongestMove;
 func_84155CB8 = BattleMoveState_UpdateMoveSlot;
 func_84155AC4 = BattleMoveState_RecordMoveAgainstSlot;
 func_841562BC = BattleMoveState_CopyPartyStatToRecord;
+func_841502D0 = BattlePlan_ApplyPursuitMultiplier;
+func_84152CD8 = BattlePlan_HasOnlyNormalOrFightingMoves;
+func_84153780 = BattlePlan_AddConditionCountBonus;

@@ -6,7 +6,16 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150268.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841502D0.s")
+extern void func_8414D198(void *, u8);
+void BattlePlan_ApplyPursuitMultiplier(u8 *state, u8 side) {
+    u8 *entry;
+    if (*(u8 *)((u32)state + (u32)side + 6) == 228) {
+        func_8414D198(state, side);
+        entry = (u8 *)((u32)state + ((u32)side << 1));
+        entry += 4;
+        *(u16 *)(entry + 10) *= 2;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150330.s")
 
@@ -478,7 +487,23 @@ extern void * func_8414A3A0(u8);
 extern u8 * func_84154B30(u8);
 void func_84152C34(void *arg0, u8 arg1) { s32 base; void *table; u32 *entry; u8 amount; base = (s32)(u32)arg0 + 4; if ((func_84154B30((0x1 - (u32)arg1) & 0xFF)[3] & 1) == 0) { *(u8 *)((u8 *)(u32)base + (u32)arg1 + 8) = 0xFF; amount = func_8414A2AC(); table = func_8414A3A0(arg1); entry = (u32 *)((u8 *)(u32)base + ((u32)arg1 << 2) + 0x34); *entry += *(u8 *)((u8 *)table + 0x38) * amount; *(u8 *)(u32)base |= 2; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152CD8.s")
+extern u8 func_80062D5C(u8);
+extern u8 func_80062D98(u8);
+s32 BattlePlan_HasOnlyNormalOrFightingMoves(u8 *state) {
+    s32 i;
+    u16 type;
+    for (i = 0; i < 4; i++) {
+        if (state[i + 4] == 0) {
+            break;
+        }
+        type = func_80062D98(state[i + 4]);
+        //!bug The retail code tests the power getter address instead of calling it.
+        if (type != 0 && type != 1 && func_80062D5C != NULL) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152D6C.s")
 
@@ -557,7 +582,19 @@ void func_84153454(void *arg0, u8 arg1) {
 u8 *func_84154B30(u8);
 u8 func_84153718(u8 arg0) { u8 *state; u8 result; state = func_84154B30(arg0); result = 0; if ((state[0x20] & 0x80) != 0) result = 1; if ((state[3] & 1) != 0) { result++; result &= 0xFF; } if (state[0x2B] > 0) result++; return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153780.s")
+void BattlePlan_AddConditionCountBonus(u8 *state, u8 side) {
+    s32 base;
+    u32 *entry;
+    u8 count;
+    u8 amount;
+    base = (s32)(u32)state + 4;
+    state[(u32)side + 12] = 0xFF;
+    amount = func_8414A2AC();
+    count = func_84153718(side);
+    entry = (u32 *)(base + ((u32)side << 2));
+    entry[13] += ((u32)count << 7) * amount;
+    *(u8 *)(u32)base |= 2;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841537FC.s")
 
