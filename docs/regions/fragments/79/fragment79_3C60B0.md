@@ -239,3 +239,59 @@ double-math forms are572 bytes. Neither is accepted. Scalar/phase/result
 declaration variants alone do not settle the call-lowering difference.
 Next: inspect authentic compiler intrinsic lowering and the original mixed
 precision expression lineage, rather than add identity casts or padding.
+
+## Ribbon and owner-linked emitters: accepted
+
+Three native runner accepts, 1084 bytes, each through the normal full-ROM
+gate (retail MD5 1561c75d11cedf356a8ddb1a4a5f9d5d):
+
+- 84157128, 376 bytes: BattleAnim_StartEffect7TexturedRibbonSheet_Emit.
+- 8415839C, 388 bytes: BattleAnim_StartEffect62OwnerLinkedFourStream_Update.
+- 84158588, 320 bytes: BattleAnim_StartEffect67OwnerAnchoredFourStream_Init.
+
+84157128 uses the secondary geometry helper, scales velocity by20, then
+applies three independent signed RNG jitters. A reused live s32 random
+carrier plus three live f32 jitter terms, declared before the six geometry
+outputs and scale, reproduces the104-byte frame and scale home0x40. The
+random carrier is declared after scale. Without it, the best376-byte body
+had six differing words: frame96 and scale home0x5C. No unused locals or
+padding were added. Array/record jitter variants did not improve that basin.
+
+8415839C increments the signed counter, emits on each fourth frame while
+its arithmetic right-shifted count is less than4, computes its three-way
+angle, and scales vx by7*cosf(angle), vy by10*sinf(angle), vz to zero. A live
+completion-result local declared before the geometry outputs and angle
+gives the original104-byte frame. Return the actual completion result when
+counter>=2, otherwise zero. The right-shift is signed, not division by4.
+
+84158588 resets matrix/state, initializes its backend, obtains six geometry
+outputs, and multiplies each velocity by double5.0 before narrowing to f32.
+It passes a genuine12-byte xyz record by value to func_84109B88 with kind1.
+That real particle-stub ABI is already evidenced by its C definition and
+other accepted backends; the ignored return is a particle pointer, not a
+fabricated void or integer interface. Declare the record before outputs.
+Float5.0f loses the original double conversions and does not match.
+
+All first-success evidence captured the complete changed translation unit,
+four distinct collateral objects, source and linked outputs, externally
+hashed before another compile. Five complete-original-object controls cover
+baseline/blank stability, minimal declarations/readable source with12/4/8
+position size/offset assertions, names, and named-source blank stability.
+Existing radial, trail, terrain and camera neighbors remain unchanged.
+
+## Radial effect33 emitter: requeue
+
+84157398 remains assembly after24 natural variants in this session. Best
+body448 bytes matches all instruction shapes and relocation topology, but
+has nine raw differing words: a coherent f0/f2 exchange between vy and the
+shared D_8418C548 spread constant. Its colors are255/255/255/100/100/150/150,
+backend kind2, signed RNG moduli5/5, and final scale3.0f*ownerScale. Backend
+8415C884 has s16 kind/lifetime, seven u8 colors, and real f32 values;
+its primary assembly stack loads confirm these widths.
+
+Closed families: two RNG placements and four live-local orders; four
+velocity expression orders with/without a shared spread carrier; four
+explicit jitter/velocity carrier forms with two declaration positions.
+Explicit extra carriers changed frame or schedule and did not close the
+exchange. Next hypothesis is an allocator-web trace for vy versus the
+common spread constant, not another declaration permutation or dummy use.
