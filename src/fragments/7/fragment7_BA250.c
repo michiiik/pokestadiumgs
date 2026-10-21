@@ -24,6 +24,7 @@ void func_8300021C(s32 arg0) {
 
 #ifdef VERSION_US
 extern void func_8300021C(s32 arg0);
+extern s32 func_83000274(void *, void *, void *);
 void func_830009D8(s32 arg0, void *arg1, void *arg2) {
     typedef struct {
         void *ptr;
@@ -80,7 +81,41 @@ s32 func_83000BC0(u8 arg0, u8 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83000CB4.s")
+typedef struct { void *record; u8 reason; u8 flags[3]; } Fragment7CheckResult;
+typedef struct { u8 bytes[68]; } Fragment7RuleRecord;
+typedef struct { u8 header[16]; u8 entries[6][88]; } Fragment7RuleDeck;
+typedef struct {
+    u8 unk_00000[0x3A06D];
+    u8 saved_count;
+    u8 unk_3A06E[2];
+    Fragment7RuleRecord saved[8];
+    u8 unk_3A290[0x3FB60 - 0x3A290];
+    u8 entries[6][88];
+    u8 unk_3FD70[4];
+    Fragment7RuleRecord fixed[4];
+    u8 unk_3FE84[0x3FED0 - 0x3FE84];
+    s32 fixed_status[4];
+    s32 saved_status[8];
+} Fragment7RuleCheckState;
+void Fragment7_RefreshCollectionCompatibility(Fragment7RuleCheckState *state, Fragment7RuleDeck *other) {
+    s32 i;
+    Fragment7CheckResult check;
+    for (i = 0; i < 4; i++) {
+        state->fixed_status[i] = func_83000274(&check, &state->fixed[i], state->entries);
+        if (other != 0) {
+            state->fixed_status[i] = state->fixed_status[i] && func_83000274(&check, &state->fixed[i], other->entries);
+        }
+    }
+    for (i = 0; i < state->saved_count; i++) {
+        state->saved_status[i] = func_83000274(&check, &state->saved[i], state->entries);
+        if (other != 0) {
+            state->saved_status[i] = state->saved_status[i] && func_83000274(&check, &state->saved[i], other->entries);
+        }
+    }
+    for (; i < 8; i++) {
+        state->saved_status[i] = 0;
+    }
+}
 #endif
 
 void func_83000E38(void) {
@@ -128,11 +163,11 @@ void func_83000F04(s32 arg0, s32 arg1, s32 arg2)
 
 #ifdef VERSION_US
 extern void func_83000F04(s32, s32, s32);
-extern void func_83000CB4(s32, s32);
+extern void Fragment7_RefreshCollectionCompatibility(Fragment7RuleCheckState *, Fragment7RuleDeck *);
 void func_83000F98(s32 arg0, s32 arg1, s32 arg2) {
     func_83000F04(arg1, arg0, arg2);
     if (arg2 != 0) {
-        func_83000CB4(arg0, arg1);
+        Fragment7_RefreshCollectionCompatibility(arg0, arg1);
     } else {
         _bzero((u8 *)(u32)arg0 + 0x3FF20, 8);
     }
@@ -140,7 +175,51 @@ void func_83000F98(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83001000.s")
+typedef struct {
+    u8 unk_00[96];
+    u8 content[8200 - 96];
+} Fragment7TeamVisualSlot;
+typedef struct {
+    u8 unk_00[11];
+    u8 resource;
+    u8 entry;
+    u8 unk_0D[476 - 13];
+} Fragment7TeamRecordPart;
+typedef struct {
+    Fragment7TeamRecordPart parts[2];
+    u8 unk_3B8[1168 - 952];
+} Fragment7TeamVisualRecord;
+typedef struct {
+    u8 unk_00;
+    u8 count;
+    u8 unk_02[2];
+    Fragment7TeamVisualRecord records[6];
+} Fragment7TeamVisualBank;
+typedef struct {
+    Fragment7TeamVisualSlot visuals[2][6][2];
+    u8 unk_300C0[0x3A290 - 2 * 6 * 2 * 8200];
+    Fragment7TeamVisualBank teams[2];
+} Fragment7TeamVisualState;
+extern u8 *func_8004E0F0(u8 *, s32, s32);
+void Fragment7_LoadTeamVisualResources(Fragment7TeamVisualState *state) {
+    s32 bank;
+    s32 row;
+    s32 part;
+    Fragment7TeamRecordPart *parts;
+    Fragment7TeamVisualBank *team;
+
+    for (bank = 0; bank < 2; bank++) {
+        team = &state->teams[bank];
+        for (row = 0; row < 6 && row < team->count; row++) {
+            parts = team->records[row].parts;
+            for (part = 0; part < 2; part++) {
+                func_8004E0F0(state->visuals[bank][row][part].content,
+                    parts[part].resource,
+                    parts[part].entry);
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -880,7 +959,7 @@ void func_83007218(void *arg0, s32 arg1) {
         if ((s32)((u8 *)arg0)[0x3D959] > 0) {
             ((u8 *)arg0)[0x1E] = 0x11;
             q = (u8 *)arg0 + 0x3D95C;
-            func_83000CB4(arg0, q);
+            Fragment7_RefreshCollectionCompatibility(arg0, q);
             ((u8 *)arg0)[0x43] = 1;
             func_83000F98((s32)arg0, q, 0);
             func_800226C0(0xA3);
@@ -908,7 +987,7 @@ void func_83007318(void *arg0, s32 arg1) { switch (arg1) { case -1: if (_bcmp((u
 #endif
 
 #ifdef VERSION_US
-extern void func_83001000(void *);
+extern void Fragment7_LoadTeamVisualResources(Fragment7TeamVisualState *);
 void func_830073F8(void *arg0, s32 arg1) {
     struct Buffer {
         s32 data[0x5D18 / 4];
@@ -929,7 +1008,7 @@ void func_830073F8(void *arg0, s32 arg1) {
         break;
     case 1:
         func_800226C0(0x11);
-        func_83001000(state);
+        Fragment7_LoadTeamVisualResources(state);
         state->unk1E = 8;
         break;
     case 2:
@@ -1310,7 +1389,7 @@ void Fragment7_SelectTeamRecord(Fragment7NavigationState *state, s32 selected) {
     } else if (selected >= 4) {
         if (selected + state->team_scroll < ((u8 *)state)[0x3BDF5] + 4) {
             func_83000E40((s32)((u8 *)(((Fragment7TeamRecord *)((u8 *)state + 0x3BDF8) + (selected - 4)) + state->team_scroll)), (s32)state);
-            func_83001000(state);
+            Fragment7_LoadTeamVisualResources(state);
             state->mode = 23;
             func_800226C0(144);
         } else {
@@ -1319,7 +1398,7 @@ void Fragment7_SelectTeamRecord(Fragment7NavigationState *state, s32 selected) {
     } else if (selected > 0) {
         if (selected < ((u8 *)state)[0x3A291] + 1) {
             func_83000E40((s32)(((Fragment7TeamRecord *)((u8 *)state + 0x3A294) + (selected - 1))), (s32)state);
-            func_83001000(state);
+            Fragment7_LoadTeamVisualResources(state);
             func_800226C0(2);
             state->mode = 23;
         } else {
@@ -1661,7 +1740,6 @@ extern void fragment3_main(void *);
 extern void func_81A005F0(u8 *);
 extern void func_81801F60(u8 *);
 extern void WidgetTree_OpenMessagePanel_fragment4(u8 *);
-extern u8 *func_8004E0F0(u8 *, s32, s32);
 extern s32 func_8004DC6C(s32);
 extern void func_8004DCFC(u8 *, s32 *);
 extern s32 main_pool_get_available(void);
@@ -1689,7 +1767,7 @@ void Fragment7_OpenRecordPanel(Fragment7PanelOpenState *state, s32 resource_id) 
     func_81A005F0(sync);
     func_81801F60(D_8300F84C);
     WidgetTree_OpenMessagePanel_fragment4(state);
-    func_83001000(state);
+    Fragment7_LoadTeamVisualResources(state);
     func_8004E0F0((u8 *)state + 0x30120, 0x40, 1 - *(s32 *)(*(u8 **)((u8 *)state + 56) + 20));
     func_8004E0F0((u8 *)state + 0x32128, 0x40, 1);
     switch (state->mode) {
