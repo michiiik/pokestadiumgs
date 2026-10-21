@@ -166,7 +166,6 @@ void func_830016BC(void *arg0, s32 arg1) { u8 *p = (u8 *)arg0; volatile s32 *sta
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
 extern void func_8300AC8C(void *, s32, s32, void *);
 extern void func_8300B728(void *, s32, s32, void *);
 void func_83001788(void *arg0, s32 arg1) {
@@ -254,7 +253,6 @@ extern f32 D_8300FAAC;
 extern f32 D_8300FAB0;
 extern f32 D_8300FAB4;
 extern void Fragment7_DrawSavedRecordList(u8 *records, s32 x, s32 y, f32 weight);
-extern void WidgetResources_DrawRecords(s32, s32, s32);
 extern void func_8004B2CC(s32, s32, s32, s32, s32, s32, s32, s32);
 extern void func_81801854(void *, void *, void *);
 extern f32 func_818055E0(void *, u8 *);
@@ -282,16 +280,6 @@ void Fragment7_DrawFirstRecordListPanel(s32 definition, void *memory, Fragment7D
 #endif
 
 #ifdef VERSION_US
-extern void Fragment7_DrawSavedRecordList(u8 *records, s32 x, s32 y, f32 weight);
-extern void WidgetResources_DrawRecords(s32, s32, s32);
-extern void func_8004B2CC(s32, s32, s32, s32, s32, s32, s32, s32);
-extern void func_81801854(void *, void *, void *);
-extern f32 func_818055E0(void *, u8 *);
-extern void func_8180567C(s32, void *, void *);
-extern s32 func_8300AED8(void *);
-extern u8 D_8300C01C[];
-extern f32 D_8300FAB0;
-extern f32 D_8300FAB4;
 void Fragment7_DrawSecondRecordListPanel(s32 definition, void *memory, Fragment7DrawOrigin *origin) {
     u8 *state = memory;
     f32 weight;
@@ -320,13 +308,11 @@ void Fragment7_DrawSecondRecordListPanel(s32 definition, void *memory, Fragment7
 
 #ifdef VERSION_US
 extern s32 func_8300B31C(void *arg0);
-extern void func_800226C0(s32);
 void func_83001DAC(void *arg0, s32 arg1) { u8 *p = (u8 *)arg0; volatile s32 *status; if (arg1 == -1) { p[0x1E] = 0x14; func_800226C0(3); } else if (arg1 > 0) { if (arg1 < (s32)((u8 *)(u32)arg0)[0x3A291] + 1) { if (p[0x46] == 1) { status = (volatile s32 *)(p + 0x4E040); *status = func_8300B31C((u8 *)(u32)arg0 + 0x3BDF4); status = (volatile s32 *)((u8 *)(u32)arg0 + 0x4E040); if (*status != 0) p[0x1E] = 0x19; else p[0x1E] = 0x1A; func_800226C0(0x90); } } else { func_800226C0(5); } } }
 #endif
 
 #ifdef VERSION_US
 extern void func_8300B0DC(void *, s32, s32, void *);
-extern void func_800226C0(s32);
 void func_83001E78(void *arg0, s32 arg1) {
     u8 temp_v0;
     s32 temp_v0_2;
@@ -370,9 +356,6 @@ void func_83001E78(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
-extern void func_8300AC8C(void *, s32, s32, void *);
-extern void func_8300B728(void *, s32, s32, void *);
 void func_83001FA4(void *arg0, s32 arg1) {
     u8 temp_v0;
     if (arg1 == -1) {
@@ -413,8 +396,6 @@ void func_83001FA4(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800498C4();
-extern void func_800499EC();
 extern void func_8180351C(void *);
 extern char *func_81802168(void *);
 extern void func_800495F8(s32, s32, s32, void *);
@@ -445,21 +426,51 @@ void func_830020CC(void *arg0, f32 arg1, s32 arg2, s32 arg3, f32 arg4) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830022F0.s")
+typedef struct {
+    u8 unk_00000[22];
+    u16 buttons;
+    u8 unk_00018[51];
+    u8 row;
+    u8 unk_0004C[11];
+    u8 current;
+    u8 target;
+    u8 unk_00059[0x4E03C - 89];
+    f32 progress;
+} Fragment7GridScrollState;
+extern f32 func_818006B4(void);
+extern void func_81805524(void *, void *);
+s32 Fragment7_HandleTeamGridScroll(void *definition, Fragment7GridScrollState *state) {
+    s32 current;
+    s32 target;
+
+    current = state->current;
+    target = state->target;
+    if (target != current) {
+        state->progress += func_818006B4() * 0.125f;
+        if (state->progress > 1.0f) {
+            state->progress = 0.0f;
+            state->current = state->target;
+        }
+    } else if (current > 0 && ((state->row < 2 && (state->buttons & 0x800)) || (state->buttons & 8))) {
+        state->target = target - 1;
+        func_800226C0(1);
+    } else if (current < 3 && ((state->row >= 3 && (state->buttons & 0x400)) || (state->buttons & 4))) {
+        state->target = target + 1;
+        func_800226C0(1);
+    } else {
+        func_81805524(definition, state);
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
 typedef struct Rect02424 { s16 x, y, w, h; } Rect02424;
 extern Rect02424 D_8300C3EC;
 extern u8 D_8300C29C[];
-extern void func_818006FC(s32, s32, s32, f32);
 extern void func_830020CC(void *, f32, s32, s32, f32);
-extern void func_81801854(void *, void *, void *);
-extern void func_8004B2CC(s32, s32, s32, s32, s32, s32, s32, s32);
 extern f32 D_8300FAB8;
 extern f32 D_8300FABC;
-extern f32 func_818055E0(void *, u8 *);
-extern void func_8180567C(s32, void *, void *);
 extern void func_818057D0(s32, void *, void *);
 void func_83002424(s32 arg0, void *arg1, void *arg2) {
     void *state = arg1;
@@ -489,18 +500,8 @@ void func_83002424(s32 arg0, void *arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800495F8(s32, s32, s32, void *);
-extern void func_8004972C(s32, s32, s32, s32);
-extern void func_800498C4();
-extern void func_800499EC();
-extern void func_818006FC(s32, s32, s32, f32);
-extern void func_81800C18(s32, s32, s32, s32);
-extern void func_8180351C(void *);
 extern void func_81803964(void *, void *, f32, s32);
-extern f32 func_818055E0(void *, u8 *);
 extern void func_81805644(s32, s32, s32);
-extern u8 D_8300C43C[];
-extern s32 D_8300F890[];
 void Fragment7_DrawRecordSummary(void *definition, u8 *state, Fragment7DrawOrigin *origin) {
     void *entry;
     f32 weight;
@@ -535,7 +536,6 @@ void Fragment7_DrawRecordSummary(void *definition, u8 *state, Fragment7DrawOrigi
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
 void func_83002F50(void *arg0, s32 arg1) {
     void *temp_a2;
     u8 temp_v0;
@@ -570,8 +570,6 @@ void func_83002F50(void *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern s32 func_81804A20(void *);
-extern void func_81805524(void *, void *);
-extern void func_800226C0(s32);
 void func_83003320(void *arg0, void *arg1) {
     struct Record { s32 words[17]; };
     struct State {
@@ -631,7 +629,6 @@ void func_83004218(s32 a,u8 *b,u8 *c){extern u8 *func_818054D0(void *,u8);extern
 
 #ifdef VERSION_US
 extern u8 *func_818054D0(void *, u8);
-extern void func_81801CB8(u8 *, u8 *, u8 *, s32);
 extern u8 D_8300D164[];
 extern u8 D_8300F8C8[];
 extern u8 D_8300F8D0[];
@@ -684,7 +681,49 @@ void func_830042F0(s32 arg0, void *arg1, u8 *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830061BC.s")
+typedef struct {
+    u8 unk_00000[31];
+    u8 mode;
+    u8 unk_00020[31];
+    u8 bank;
+    u8 unk_00040[3];
+    u8 row;
+    u8 unk_00044[13];
+    u8 selection;
+    u8 unk_00052[0x3A06D - 82];
+    u8 saved_count;
+} Fragment7RecordComparisonState;
+extern void func_8300021C(s32);
+extern void func_830009D8(s32, void *, void *);
+void Fragment7_RefreshRecordCompatibility(s32 definition, void *memory) {
+    Fragment7RecordComparisonState *state = memory;
+    s32 row;
+    void *record;
+
+    if (state->mode == 17 || state->selection > state->saved_count + 4) {
+        func_8300021C((s32)state);
+        return;
+    }
+    if (state->selection >= 5) {
+        record = (u8 *)state + state->selection * 68 + 0x39F1C;
+        if (state->bank == 2) {
+            row = state->row - 1;
+        } else {
+            row = 0;
+        }
+        func_830009D8((s32)state, record,
+            (u8 *)state + state->bank * 4356 + row * 544 + 0x3C858);
+    } else {
+        record = (u8 *)state + state->selection * 68 + 0x3FD30;
+        if (state->bank == 2) {
+            row = state->row - 1;
+        } else {
+            row = 0;
+        }
+        func_830009D8((s32)state, record,
+            (u8 *)state + state->bank * 4356 + row * 544 + 0x3C858);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -722,7 +761,6 @@ void func_83006AF0(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
 void func_83006EB0(void *arg0, s32 arg1) {
     u8 temp_v0;
 
@@ -747,7 +785,6 @@ void func_83006EB0(void *arg0, s32 arg1) {
 #ifdef VERSION_US
 typedef struct { s32 x; s32 y; } Pair;
 extern Pair D_8300F918;
-extern void func_81801CB8(u8 *, u8 *, u8 *, s32);
 extern u8 * func_818054D0(void *,u8);
 void func_83006F30(s32 arg0, void *arg1, u8 *arg2) {
     struct Arg { u8 pad[0x1C]; u8 a; u8 b; u8 pad2[0xE]; s32 c; u8 pad3[0xE]; u8 flag; };
@@ -765,7 +802,6 @@ void func_83006F30(s32 arg0, void *arg1, u8 *arg2) {
 #endif
 
 #ifdef VERSION_US
-extern void func_81805644(s32, s32, s32);
 extern void WidgetText_DrawRecordWithSetup(void *, void *, f32, s32);
 extern u8 D_8300D908[];
 void func_83006FDC(s32 arg0, s32 arg1, s32 arg2) {
@@ -780,7 +816,6 @@ void func_83006FDC(s32 arg0, s32 arg1, s32 arg2) {
 
 #ifdef VERSION_US
 
-extern void func_800226C0(s32);
 void func_83007044(void *arg0, s32 arg1) {
     switch (arg1) {
         case -1:
@@ -812,7 +847,6 @@ void func_83007044(void *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern u8 D_8300DBE4[];
-extern void func_81805644(s32, s32, s32);
 void func_83007100(s32 arg0, void *arg1, void *arg2) {
     void *state = arg1;
     func_81805644(arg0, (s32)arg1, (s32)arg2);
@@ -823,7 +857,6 @@ void func_83007100(s32 arg0, void *arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
 void func_83007160(void *arg0, s32 arg1) {
     u8 *p = arg0;
     s32 a = 10;
@@ -835,8 +868,6 @@ void func_83007160(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
-extern void func_83000CB4(s32, s32);
 extern void func_83000F98(s32 arg0, s32 arg1, s32 arg2);
 void func_83007218(void *arg0, s32 arg1) {
     u8 *q;
@@ -873,13 +904,11 @@ void func_83007218(void *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern s32 _bcmp(void *, void *, s32);
-extern void func_800226C0(s32);
 void func_83007318(void *arg0, s32 arg1) { switch (arg1) { case -1: if (_bcmp((u8 *)(u32)arg0 + 0x39E48, (u8 *)(u32)arg0 + 0x34130, 0x5D18) != 0) { *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 7; func_800226C0(3); return; } *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 1; func_800226C0(3); return; case 1: *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 0x14; func_800226C0(0xA3); return; case 2: *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 0x1C; func_800226C0(0xA3); return; case 3: *(u8 *)((u8 *)(u32)arg0 + 0x1E) = 0x23; func_800226C0(0xA3); return; } }
 #endif
 
 #ifdef VERSION_US
 extern void func_83001000(void *);
-extern void func_800226C0(s32);
 void func_830073F8(void *arg0, s32 arg1) {
     struct Buffer {
         s32 data[0x5D18 / 4];
@@ -913,7 +942,6 @@ void func_830073F8(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
 extern void main_pool_pop_state(s32);
 typedef struct { u8 unk_00[8]; s16 coord_08; } Fragment7PanelNode;
 typedef struct {
@@ -968,7 +996,6 @@ void func_830074C8(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
 void func_83007BE4(void *arg0, s32 arg1) {
     void *temp_a2;
 
@@ -989,9 +1016,6 @@ void func_83007BE4(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800498C4();
-extern void func_800499EC();
-extern void func_818057D0(s32, void *, void *);
 void func_83007C5C(s32 arg0, void *arg1, void *arg2) {
     f32 sp1C;
 
@@ -1017,15 +1041,52 @@ void func_83007D10(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83007D40.s")
+typedef struct {
+    u8 unk_00000[79];
+    u8 record_group;
+    u8 unk_00050[0x3FF00 - 80];
+    s16 *panel;
+    u8 unk_3FF04[0x4E038 - 0x3FF04];
+    u8 current;
+    u8 target;
+    u8 unk_4E03A[2];
+    f32 progress;
+} Fragment7PanelPositionState;
+extern u8 D_8300EA14[];
+extern u8 D_8300EA34[];
+extern u8 D_8300EA54[];
+extern void func_800503A4(void *);
+extern void func_818017A8(void);
+extern void WidgetTexture_DrawRecord(u8 *, u8 *, f32, s32);
+extern u16 D_8300F7BE[][2];
+void Fragment7_DrawSlidingRecordPanel(s32 definition, void *memory, void *origin) {
+    Fragment7PanelPositionState *state = memory;
+    f32 weight;
+    f32 position;
+    u8 target;
+
+    weight = func_818055E0((void *)definition, (u8 *)state);
+    position = ((f32)state->target - (f32)state->current) * state->progress + (f32)state->current;
+    WidgetResources_DrawRecords(definition, (s32)state, (s32)origin);
+    state->panel[5] = (s16)(s32)(114.0f - 311.0f * position);
+    if (func_81804A20(state) != 0) {
+        func_800503A4(state->panel);
+    }
+    func_818017A8();
+    target = state->target;
+    if (target > 0) {
+        WidgetTexture_DrawRecord(D_8300EA14, origin, weight, 0);
+        target = state->target;
+    }
+    if (target < D_8300F7BE[state->record_group][0] - 1) {
+        WidgetTexture_DrawRecord(D_8300EA34, origin, weight, 0);
+    } else if (state->current == target) {
+        WidgetTexture_DrawRecord(D_8300EA54, origin, weight, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
-extern f32 func_818006B4(void);
-extern u16 D_8300F7BE[][2];
-extern void func_800226C0(s32);
-extern s32 func_81804A20(void *);
-extern void func_81805524(void *, void *);
 s32 func_83007ECC(s32 arg0, void *arg1) {
     struct State { u8 pad[0x4E038]; u8 current; u8 target; u8 pad2[2]; f32 scroll_progress; };
     s32 limit;
@@ -1072,7 +1133,6 @@ void func_83008070(void *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 extern void func_830034C8(void *, void *, void *, f32);
-extern void func_818057D0(s32, void *, void *);
 void func_830080AC(s32 arg0, void *arg1, void *arg2) { struct Locals { void *ptr; u32 pad; f32 value; }; struct Locals local; void *base = arg1; u8 index; local.value = func_818055E0((void *)arg0, (u8 *)arg1); index = *((u8 *)base + 0x48); if (index >= 2) local.ptr = (u8 *)base + index * 0x220 + 0x3E620; else local.ptr = (u8 *)base + 0x3D95C; func_818057D0(arg0, base, arg2); func_830034C8(base, local.ptr, arg2, local.value); }
 #endif
 
@@ -1086,9 +1146,6 @@ void func_8300814C(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void WidgetResources_DrawRecords(s32, s32, s32);
-extern f32 func_818055E0(void *, u8 *);
-extern void func_830043F0(void *, void *, void *, void *, f32, s32);
 void Fragment7_DrawSelectedRecordView(void *definition, u8 *state, void *origin) {
     f32 weight;
     s32 index;
@@ -1163,9 +1220,6 @@ typedef struct {
     void *styles[3];
 } Fragment7StatusTextRecord;
 extern Fragment7StatusTextRecord D_8300EE88;
-extern void WidgetText_DrawRecordWithSetup(void *, void *, f32, s32);
-extern void WidgetResources_DrawRecords(s32, s32, s32);
-extern f32 func_818055E0(void *, u8 *);
 void Fragment7_DrawRecordStatus(s32 definition, void *memory, void *origin) {
     Fragment7StatusTextRecord record;
     Fragment7NavigationState *state = memory;
@@ -1204,7 +1258,6 @@ s32 func_83008844(s32 arg0, u8 arg1) { s32 selector; s32 result = 0; selector = 
 #ifdef VERSION_US
 typedef struct { u8 data[5][8]; } Table088A0;
 extern Table088A0 D_8300F928;
-extern void func_81801CB8(u8 *, u8 *, u8 *, s32);
 extern s32 func_83008844(s32 arg0, u8 arg1);
 void func_830088A0(s32 arg0, void *arg1, u8 *arg2) {
     Table088A0 table = D_8300F928;
@@ -1219,8 +1272,6 @@ void func_830088A0(s32 arg0, void *arg1, u8 *arg2) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
-extern void func_83000F98(s32 arg0, s32 arg1, s32 arg2);
 void func_83008960(void *arg0, s32 arg1) {
     if (arg1 == -1) {
         *((u8 *)arg0 + 0x1E) = 0x1C;
@@ -1251,9 +1302,7 @@ void func_83008960(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
 extern void func_83000E40(s32 arg0, s32 arg1);
-extern void func_83001000(void *);
 void Fragment7_SelectTeamRecord(Fragment7NavigationState *state, s32 selected) {
     if (selected == -1) {
         state->mode = 20;
@@ -1281,10 +1330,6 @@ void Fragment7_SelectTeamRecord(Fragment7NavigationState *state, s32 selected) {
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
-extern f32 func_818006B4(void);
-extern s32 func_81804A20(void *);
-extern void func_81805524(void *, void *);
 s32 Fragment7_HandleTeamListScroll(void *definition, Fragment7NavigationState *state) {
     if (state->team_scroll != state->target_team_scroll) {
         state->scroll_progress += func_818006B4() * 0.125f;
@@ -1308,9 +1353,6 @@ s32 Fragment7_HandleTeamListScroll(void *definition, Fragment7NavigationState *s
 #endif
 
 #ifdef VERSION_US
-extern void func_818057D0(s32, void *, void *);
-extern void func_8180567C(s32, void *, void *);
-extern void func_81803964(void *, void *, f32, s32);
 extern u8 D_8300F118[];
 extern u8 D_8300F138[];
 void func_83008D18(s32 arg0, void *arg1, void *arg2) {
@@ -1349,7 +1391,6 @@ typedef struct {
     s32 action;
     u8 active;
 } Fragment7RecordSelectionState;
-extern void func_800226C0(s32);
 void Fragment7_SelectSavedRecord(Fragment7RecordSelectionState *state, s32 selected) {
     if (selected == -1) {
         state->mode = 35;
@@ -1379,7 +1420,6 @@ void Fragment7_SelectSavedRecord(Fragment7RecordSelectionState *state, s32 selec
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
 void func_83008F84(void *arg0, s32 arg1)
 {
   u8 *p = arg0;
@@ -1407,10 +1447,6 @@ void func_83008F84(void *arg0, s32 arg1)
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
-extern f32 func_818006B4(void);
-extern s32 func_81804A20(void *);
-extern void func_81805524(void *, void *);
 s32 Fragment7_HandleRecordListScroll(void *definition, void *memory) {
     Fragment7NavigationState *state = memory;
     s32 limit;
@@ -1442,11 +1478,45 @@ s32 Fragment7_HandleRecordListScroll(void *definition, void *memory) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300928C.s")
+typedef struct {
+    u8 unk_00000[62];
+    u8 source_bank;
+    u8 unk_0003F[26];
+    u8 scroll;
+    u8 unk_0005A[0x3BDF4 - 90];
+    u8 header0;
+    u8 count;
+} Fragment7ListIndicatorState;
+extern Gfx D_80094E38[];
+extern u8 D_8300F360[];
+extern u8 D_8300F380[];
+extern void WidgetResources_DrawSelection(s32, s32, s32);
+extern void func_81800D70(s32, s32);
+extern Gfx * D_800D0510;
+void Fragment7_DrawRecordListIndicators(s32 definition, void *memory, void *origin) {
+    Fragment7ListIndicatorState *state = memory;
+    f32 weight;
+
+    weight = func_818055E0((void *)definition, (u8 *)state);
+    WidgetResources_DrawRecords(definition, (s32)state, (s32)origin);
+    WidgetResources_DrawSelection(definition, (s32)state, (s32)origin);
+    if (((u8 *)state)[state->source_bank * 7012 + 0x3872C] >= 4) {
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        gDPSetEnvColor(D_800D0510++, 255, 255, 255, (u32)(255.0f * weight));
+        func_81800C18(0x1D3, 0x6D, 1, state->count);
+        func_81800D70(0x1DC, 0x6D);
+        func_81800C18(0x1E5, 0x6D, 1, state->header0);
+    }
+    if (state->scroll > 0) {
+        WidgetTexture_DrawRecord(D_8300F360, origin, weight, 0);
+    }
+    if (state->scroll < ((u8 *)state)[state->source_bank * 7012 + 0x3872C] - 3) {
+        WidgetTexture_DrawRecord(D_8300F380, origin, weight, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_800226C0(s32);
 extern void func_830009D8(s32 arg0, void *arg1, void *arg2);
 void func_830094C8(void *arg0, s32 arg1) {
     u8 *p = arg0;
@@ -1475,9 +1545,6 @@ typedef struct {
     u8 unk_02[2];
     Fragment7OtherRecord records[8];
 } Fragment7OtherRecordList;
-extern void func_800226C0(s32);
-extern void func_83000F98(s32 arg0, s32 arg1, s32 arg2);
-extern void func_8300112C(s32);
 void Fragment7_SelectOtherRecord(void *memory, s32 selected) {
     Fragment7NavigationState *state = memory;
     void *record;
@@ -1541,7 +1608,6 @@ extern void func_8300AA58(void *, s32, s32);
 extern void func_8300AE40(void *);
 extern void func_8300B330(void *, s32, s32);
 extern void func_8300B8AC(void *);
-extern void func_8300112C(s32);
 void Fragment7_InitializeRecordCollections(Fragment7RecordInitializeState *state) {
     s32 controller;
     void *first;
@@ -1603,12 +1669,6 @@ extern u8 *MainPool_AllocState(s32, s32);
 extern s32 func_8004EB58(s32, s32);
 extern void MainPool_FinalizeAllocation(void *);
 extern void func_83000020(s32 arg0);
-extern void func_830009D8(s32 arg0, void *arg1, void *arg2);
-extern void func_83000E40(s32 arg0, s32 arg1);
-extern void func_83000F98(s32 arg0, s32 arg1, s32 arg2);
-extern void func_83001000(void *);
-extern void func_8300112C(s32);
-extern u8 D_8300F84C[];
 void Fragment7_OpenRecordPanel(Fragment7PanelOpenState *state, s32 resource_id) {
     u8 *sync;
 
@@ -1669,7 +1729,6 @@ extern void func_8300B818(void *);
 extern void func_80051D64(s32, s32);
 extern void func_80055028(void);
 extern s32 func_81A00074(void *, s32);
-extern s32 _bcmp(void *, void *, s32);
 void func_83009EC4(void *arg0) {
     typedef struct { u32 words[0x1B64 / 4]; } Large;
     typedef struct { u32 words[0x224 / 4]; } Small;
@@ -1729,13 +1788,10 @@ extern u8 fragment84_ROM_START[];
 extern void StageLoader_WaitForRetrace();
 s32 Fragment_LoadAndCall(s32, void *, void *, s32, void *);
 extern s32 Fragment_LoadAndCall(s32, void *, void *, s32, void *);
-extern void StageLoader_WaitForRetrace();
 extern void func_80008648();
 extern void BgStage_DrawFrame();
 extern void func_818017A8();
 extern void func_81805308(s32 *);
-extern void Fragment7_OpenRecordPanel(Fragment7PanelOpenState *, s32);
-extern void main_pool_pop_state(s32);
 extern u8 D_8300FD00;
 extern u8 D_8304FBCC;
 void func_8300A208(void) {
@@ -1772,13 +1828,7 @@ void func_8300A208(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80008648();
-extern void BgStage_DrawFrame();
-extern void func_818017A8();
-extern void func_81805308(s32 *);
 extern void func_8300A208();
-extern u8 D_8300FD00;
-extern u8 D_8304FBCC;
 extern u8 D_8305DD44;
 void func_8300A45C(s32 arg0) {
     BgStage_DrawFrame();
@@ -1809,7 +1859,6 @@ void func_8300A4BC(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void main_pool_push_state(s32);
 extern u8 D_1000000[];
 extern u8 D_446E30[];
 extern u8 D_447D00[];
@@ -1819,9 +1868,6 @@ extern void func_80047588(s32, s32);
 extern void func_830098A0(void *, s32, s32, s32);
 extern void func_80008624(void);
 extern void func_81801794(void);
-extern void Fragment7_OpenRecordPanel(Fragment7PanelOpenState *, s32);
-extern void main_pool_push_state(s32);
-extern u8 D_8300FD00;
 void func_8300A50C(arg0, arg1, arg2)
 s32 arg0;
 s32 arg1;
@@ -1842,8 +1888,6 @@ s32 arg2;
 extern u8 D_8300FD3C[];
 extern void func_8004C398(void);
 extern void func_80047610(void);
-extern void main_pool_pop_state(s32);
-extern u8 D_8300FD00;
 void func_8300A5B4(s32 arg0, s32 arg1) {
     struct Payload { u8 bytes[31]; };
     struct Object { u8 pad[0x10]; s32 active; u8 pad2[8]; struct Payload payload; };
@@ -1865,8 +1909,6 @@ void func_8300A5B4(s32 arg0, s32 arg1) {
 extern void Gfx_InitDisplayListBuffers(s32, s32);
 s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
 extern void func_80008514(s32);
-extern void StageLoader_WaitForRetrace();
-extern void main_pool_push_state(s32);
 void func_8300A6B0(s32 arg0, s32 arg1) {
     main_pool_push_state(0x4D535F31);
     Gfx_InitDisplayListBuffers(0x10000, 0);
@@ -1878,7 +1920,6 @@ void func_8300A6B0(s32 arg0, s32 arg1) {
 #ifdef VERSION_US
 extern void Gfx_FreeDisplayListBuffers();
 extern void func_80008574();
-extern void main_pool_pop_state(s32);
 
 void func_8300A71C(s32 arg0, s32 arg1) {
     func_80008574();
@@ -1950,7 +1991,6 @@ void func_8300A858(void) {
 extern u8 func_8005D8CC(s32);
 extern void func_80057908(u8);
 extern void func_8300A81C(s32, s32, s32);
-extern void _bzero(void *, s32);
 extern void func_8300A6B0(s32 arg0, s32 arg1);
 extern void func_8300A71C(s32 arg0, s32 arg1);
 extern s32 func_8300A754(s32 arg0, s32 arg1, s32 arg2, s32 arg3);

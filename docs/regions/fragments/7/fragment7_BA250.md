@@ -310,3 +310,54 @@ the interior workspace using a `0x7FFF` pointer bias while raw offsets and
 typed workspace/whole-root views lower the large address differently. Whole-root
 views are not evidence of an impossible owner. Next isolate the frontend's
 large-member addressing mechanism; do not encode the bias by hand just to match.
+
+### Grid scrolling, panel movement, indicators, and comparison refresh
+
+Four owners accepted natively from `47a4cfa5`, totaling 1608 bytes:
+
+- `func_830022F0` / `Fragment7_HandleTeamGridScroll` (308 bytes): preserve both
+  real current/target snapshots as signed word locals. Reading the target
+  snapshot in the comparison and in the input branch's increment/decrement
+  restores the one reversed branch operand. Reload the target after the
+  interpolation callback before committing current. State row is byte 75;
+  current/target are bytes 87/88 and progress is at `0x4E03C`.
+- `func_830061BC` / `Fragment7_RefreshRecordCompatibility` (332 bytes): use the
+  selection field directly in the source-record address before choosing the
+  reference row. A separate selection scalar survives the row phi and adds
+  an unwanted `move a3,v0`. Mode is byte 31, bank/row bytes 63/67, selection
+  byte 81, and saved-count byte `0x3A06D`. The source records have 68-byte
+  strides; reference banks/records have 4356/544-byte strides.
+- `func_83007D40` / `Fragment7_DrawSlidingRecordPanel` (396 bytes): the typed
+  state view restores interpolation and the callback-safe panel-pointer reload.
+  The real byte-sized target snapshot is read again after the first indicator
+  draw. Its consumed comparison with current restores the branch operand order.
+  The coefficient is an ordinary `311.0f` literal: referring to the old
+  `D_8300FBA4` assembly symbol can text-match but drops the constant's own
+  rodata contribution and fails the ROM gate. No such body was accepted.
+- `func_8300928C` / `Fragment7_DrawRecordListIndicators` (572 bytes): ordinary
+  `gSPDisplayList` and `gDPSetEnvColor` SDK macros reproduce the command writes
+  and unsigned alpha conversion; no hand-written command words are needed.
+  Put the real state view before the weight local to preserve `48(sp)`.
+
+Every acceptance includes the recorded native runner, full-ROM gate, and an
+immediate externally hashed full-TU/four-distinct-collateral-object freeze.
+
+Postacceptance cleanup uses the repository's exact-extern deduper on this
+owned file and replaces the indicator header's raw offsets with its verified
+fields. Complete original game bytes, function extents, and semantic
+relocations agree for every frozen acceptance, declaration cleanup, naming,
+blank-line control, and all 20 target-layout assertions. No source padding,
+register constraints, dummy locals, or instruction/relocation rewrites were
+introduced.
+
+`func_8300A2CC`: requeue update. Stock-driver fixtures now distinguish the
+mechanism: both IDO 7.1 and 5.3 emit the `+0x7FFF` / positive-displacement
+sequence for pointer arguments but fold direct-global accesses to a different
+high/low address shape. The 7.1 fixture path first reproduced the complete
+known game object and its blank-line control. Twenty-four new recorded game
+probes tested integer-address carriers, use-region lifetimes, and a typed
+external workspace. None accepted; carriers can restore an indirect address
+but keep a biased base live across callbacks and add spills. This is not a
+compiler-impossibility claim. Next isolate address-identity/rematerialization
+at a calibrated frontend/backend boundary rather than adding a fixed bias or
+replaying the failed carrier families.

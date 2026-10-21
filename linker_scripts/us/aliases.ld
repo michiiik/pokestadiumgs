@@ -595,3 +595,7 @@ func_83008BB8 = Fragment7_HandleTeamListScroll;
 func_830090D0 = Fragment7_HandleRecordListScroll;
 func_830095B8 = Fragment7_SelectOtherRecord;
 func_83009BD0 = Fragment7_OpenRecordPanel;
+func_830022F0 = Fragment7_HandleTeamGridScroll;
+func_830061BC = Fragment7_RefreshRecordCompatibility;
+func_83007D40 = Fragment7_DrawSlidingRecordPanel;
+func_8300928C = Fragment7_DrawRecordListIndicators;
