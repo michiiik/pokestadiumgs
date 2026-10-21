@@ -128,7 +128,14 @@ void func_81600408(u8 *arg0) {
     func_816003C8(arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D7BC0/func_81600450.s")
+/* mkdraft:Rect_Contains begin */
+s32 Rect_Contains(u8 *arg0, void *arg1) {
+    return (*(s16 *)((u8 *)arg1 + 0) >= *(s16 *)(arg0 + 0)) &&
+           (*(s16 *)(arg0 + 0) + *(s16 *)(arg0 + 4) >= *(s16 *)((u8 *)arg1 + 4) + *(s16 *)((u8 *)arg1 + 0)) &&
+           (*(s16 *)((u8 *)arg1 + 2) >= *(s16 *)(arg0 + 2)) &&
+           (*(s16 *)(arg0 + 2) + *(s16 *)(arg0 + 6) >= *(s16 *)((u8 *)arg1 + 6) + *(s16 *)((u8 *)arg1 + 2));
+}
+/* mkdraft:Rect_Contains end */
 
 s32 func_816004C0(u8 *arg0, u8 *arg1) {
     return (*(s16 *)(arg0 + 0) + *(s16 *)(arg0 + 4) < *(s16 *)(arg1 + 0))
@@ -222,7 +229,7 @@ void func_81600648(u8 *arg0) {
     }
 }
 
-s32 func_81600450(u8 *, void *);
+s32 Rect_Contains(u8 *, void *);
 void func_816006BC(u8 *arg0) {
     void *var_s0;
 
@@ -230,7 +237,7 @@ void func_816006BC(u8 *arg0) {
         var_s0 = (*(void **)((u8 *)(arg0) + (0x10)));
         if (var_s0 != NULL) {
             do {
-                if (func_81600450(arg0, var_s0) != 0) {
+                if (Rect_Contains(arg0, var_s0) != 0) {
                     (*(s32 *)((u8 *)(var_s0) + (0x18))) = 0;
                 }
                 var_s0 = (*(void **)((u8 *)(var_s0) + (0x10)));
