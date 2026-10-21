@@ -691,3 +691,7 @@ func_8415F9A0 = RippleGrid16_Update;
 func_8415FC60 = RippleGrid16_BuildViewMatrix;
 func_8415FD8C = RippleGrid16_Draw;
 func_8415F0D0 = RippleGrid16_Initialize;
+func_841605F4 = PhaseGrid16_RecomputeNormal;
+func_84160C20 = PhaseGrid16_FillVertex;
+func_84160CD8 = PhaseGrid16_Update;
+func_84160EEC = PhaseGrid16_BuildViewMatrix;
