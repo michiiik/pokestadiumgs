@@ -23,13 +23,42 @@ typedef struct {
 } Fragment79GridCamera;
 extern Fragment79GridState *D_84187630;
 extern s16 D_841A4D70;
-extern const f32 D_8418C740;
 extern void *Gfx_AllocDisplayList(s32);
 extern void func_80070C14(f32 *, f32 *, f32 *);
 extern void Vec3f_CrossProductComponents(f32, f32, f32, f32, f32, f32, f32 *, f32 *, f32 *);
 extern void func_80070C68(Mtx *, f32, f32, f32, f32, f32, f32);
 extern u32 func_841094A4(void);
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CE960/func_8415F0D0.s")
+extern s16 D_841A4D70;
+void RippleGrid16_Initialize(s16 duration) {
+    s32 row;
+    s32 column;
+    s16 row_uv;
+    s16 column_uv;
+    Fragment79GridNode* node;
+
+    D_84187630->age = 0;
+    D_84187630->duration = duration;
+    D_84187630->alpha = 0;
+    D_84187630->amplitude = 0.01f;
+    D_841A4D70 = 0;
+    node = &D_84187630->nodes[0][0];
+
+    for (row = 0; row < 16; row++) {
+        for (column = 0; column < 16; column++) {
+            row_uv = row * 32;
+
+            node->x = (row * 6.75f) - 54.0f;
+            node->y = 1.0f;
+            node->z = (column * 5.25f) - 42.0f;
+
+            node->s = row_uv * 16;
+            column_uv = column * 32;
+            node->t = column_uv * 16;
+
+            node++;
+        }
+    }
+}
 
 void RippleGrid16_RecomputeNormal(s32 row, s32 column) {
     f32 sum_x;

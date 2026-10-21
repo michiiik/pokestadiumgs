@@ -690,3 +690,4 @@ func_8415F8E8 = RippleGrid16_FillVertex;
 func_8415F9A0 = RippleGrid16_Update;
 func_8415FC60 = RippleGrid16_BuildViewMatrix;
 func_8415FD8C = RippleGrid16_Draw;
+func_8415F0D0 = RippleGrid16_Initialize;
