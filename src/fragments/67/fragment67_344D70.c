@@ -92,7 +92,14 @@ void func_829084E4(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_82908520.s")
+extern u8 D_8291B838;
+extern s32 D_8291B858;
+
+void func_82908520(void) {
+    for (D_8291B858 = 0; D_8291B858 < 4; D_8291B858++) {
+        ((void (*)(void)) *(s32 *)((u8 *)&D_8291B838 + D_8291B858 * 4))();
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -135,7 +142,14 @@ void func_82908640(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_8290867C.s")
+extern u8 D_8291B848;
+extern s32 D_8291B858;
+
+void func_8290867C(void) {
+    for (D_8291B858 = 0; D_8291B858 < 4; D_8291B858++) {
+        ((void (*)(void)) *(s32 *)((u8 *)&D_8291B848 + D_8291B858 * 4))();
+    }
+}
 #endif
 
 void func_829086F0(void) {
@@ -371,7 +385,99 @@ void func_82908E6C(f32 *arg0, const f32 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_344D70/func_829092AC.s")
+/* mkdraft:func_829092AC begin */
+extern u8 D_8291A7C0;
+extern s16 D_8291B862;
+extern u8 D_82913210[];
+extern u8 D_82916EB8;
+extern f32 D_82917694;
+extern u8 D_8291B880;
+extern s32 func_80001FF0(void);
+extern void func_82908E90(u8, s32);
+extern void func_829090A0(u8, s32);
+extern void func_82908F60(u8, s32);
+extern void func_82909170(u8, s32);
+
+void func_829092AC(void)
+{
+  s16 temp_s2;
+  s16 temp_v1;
+  s16 var_b862;
+  u8 *temp_s0;
+  s32 var_fp;
+  s32 var_s1;
+  s32 var_s5;
+  var_fp = 0xE;
+  if ((((*((s16 *) ((&D_8291A7C0) + 0x1068))) == 0x24) || ((*((s16 *) ((&D_8291A7C0) + 0x1068))) == 0x25)) || ((*((s16 *) ((&D_8291A7C0) + 0x1068))) == 0x26))
+  {
+    var_fp = 1;
+  }
+  var_s1 = 0;
+  if (var_fp > 0)
+  {
+ var_s5 = 0; do { temp_s2 = *((s16 *) ((((u8 *) D_82913210) + ((*((s16 *) ((&D_8291A7C0) + 0x1068))) * 0x22)) + var_s5)); temp_s0 = (var_s1 << 6) + (&D_8291B880); if (temp_s2 > 0) { switch (*((u8 *) temp_s0)) { case 0:
+            var_b862 = 1;
+            if (func_80001FF0() == 0x32)
+          {
+            if (D_8291B862 == ((s32) (((f32) (*((s16 *) ((((u8 *) (&D_82916EB8)) + (temp_s2 * 4)) - 4)))) * D_82917694)))
+            {
+              *((u8 *) temp_s0) = var_b862;
+              func_82908E90(*((u8 *) (temp_s0 + 2)), var_s1);
+              func_829090A0(*((u8 *) (temp_s0 + 2)), var_s1);
+              func_82908F60(*((u8 *) (temp_s0 + 2)), var_s1);
+              func_82909170(*((u8 *) (temp_s0 + 2)), var_s1);
+            }
+          }
+          else
+            if (D_8291B862 == (*((s16 *) ((((u8 *) (&D_82916EB8)) + (temp_s2 * 4)) - 4))))
+          {
+            *((u8 *) temp_s0) = var_b862;
+            func_82908E90(*((u8 *) (temp_s0 + 2)), var_s1);
+            func_829090A0(*((u8 *) (temp_s0 + 2)), var_s1);
+            func_82908F60(*((u8 *) (temp_s0 + 2)), var_s1);
+            func_82909170(*((u8 *) (temp_s0 + 2)), var_s1);
+          }
+            break;
+
+          case 1:
+            func_82908E90(++(*((u8 *) (temp_s0 + 2))), var_s1);
+            func_829090A0(*((u8 *) (temp_s0 + 2)), var_s1);
+            func_82908F60(*((u8 *) (temp_s0 + 2)), var_s1);
+            func_82909170(*((u8 *) (temp_s0 + 2)), var_s1);
+            if ((*((s16 *) ((&D_8291A7C0) + 0x1068))) == 0x27)
+          {
+            temp_v1 = *((s16 *) ((((u8 *) (&D_82916EB8)) + (temp_s2 * 4)) - 4));
+            var_b862 = D_8291B862;
+            if (((temp_v1 + 0x6E) >= var_b862) && ((*((u8 *) (temp_s0 + 2))) >= 0x18))
+            {
+              *((u8 *) (temp_s0 + 2)) = 0x18;
+            }
+            if (var_b862 == (temp_v1 + 0x78))
+            {
+              *((u8 *) temp_s0) = 0;
+            }
+            if ((*((u8 *) (temp_s0 + 2))) >= 0x1D)
+            {
+              *((u8 *) (temp_s0 + 2)) = 0x1D;
+            }
+          }
+          else
+            if ((*((u8 *) (temp_s0 + 2))) == 0x1E)
+          {
+            *((u8 *) temp_s0) = 0;
+          }
+            break;
+
+        }
+
+      }
+      var_s1 += 1;
+      var_s5 += 2;
+    }
+    while (var_s1 != var_fp);
+  }
+}
+/* mkdraft:func_829092AC end */
 #endif
 
 #ifdef VERSION_US
