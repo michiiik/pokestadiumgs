@@ -33,9 +33,84 @@ extern u32 func_841094EC(void);
 extern f32 sqrtf(f32);
 extern f32 __sinf(f32);
 extern void PhaseGrid16_RecomputeNormal(s32, s32);
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CFAE0/func_84160250.s")
+void PhaseGrid16_AddRipple(s16 origin_column, s16 origin_row) {
+    Fragment79PhaseGridNode* node = &D_841876E0->nodes[0][0];
+    s32 row;
+    s32 column;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CFAE0/func_841603A0.s")
+    for (row = 0; row < 16; row++) {
+        f32 row_delta;
+
+        for (column = 0; column < 16; column++) {
+            f32 column_delta = origin_column - column;
+            row_delta = origin_row - row;
+
+            if ((column_delta == 0.0f) && (row_delta == 0.0f)) {
+                node->phase += 1.5707963705062866;
+            } else {
+                node->phase += 1.5707963705062866 / sqrtf(column_delta * column_delta + row_delta * row_delta);
+            }
+            node++;
+        }
+    }
+}
+
+extern void PhaseGrid16_AddRipple(s16, s16);
+extern void *D_8418CAB0;
+extern Gfx D_84187710[];
+void PhaseGrid16_Initialize(s16 duration) {
+    s32 row;
+    s32 column;
+    s32 ripple;
+    s16 random_column;
+    s16 random_row;
+    s16 texture_row;
+    s16 texture_column;
+    Fragment79PhaseGridNode* node;
+
+    D_841876E0->age = 0;
+    D_841876E0->duration = duration;
+    D_841876E0->alpha = 0;
+    D_841876E0->amplitude = 0.01f;
+    D_841A4D80 = 0;
+    node = &D_841876E0->nodes[0][0];
+
+    for (row = 0; row < 16; row++) {
+        for (column = 0; column < 16; column++) {
+            texture_row = row * 0x20;
+
+            node->x = (row * 6.75f) - 54.0f;
+
+            node->phase = 0.0f;
+            node->y = (__sinf(node->phase) * 0.5) + 1.0;
+
+            texture_column = column * 0x20;
+
+            node->z = (column * 5.25f) - 42.0f;
+
+            node->s = texture_row * 0x10;
+            node->t = texture_column * 0x10;
+
+            node++;
+        }
+    }
+
+    PhaseGrid16_AddRipple(8, 8);
+
+    for (ripple = 0; ripple < 10; ripple++) {
+        random_column = (guRandom() % 16);
+        random_row = (guRandom() % 16);
+        PhaseGrid16_AddRipple(random_column, random_row);
+    }
+
+    node = &D_841876E0->nodes[0][0];
+    for (row = 0; row < 16; row++) {
+        for (column = 0; column < 16; column++) {
+            node->y = (__sinf(node->phase) * 0.5) + 1.0;
+            node++;
+        }
+    }
+}
 
 void PhaseGrid16_RecomputeNormal(s32 row, s32 column) {
     f32 sum_x;
@@ -278,5 +353,58 @@ void PhaseGrid16_BuildViewMatrix(void) {
     func_80070C68(D_841876E0->matrix, eye_x, eye_y, eye_z, at_x, at_y, at_z);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CFAE0/func_84161018.s")
+extern void * Gfx_AllocDisplayList(s32);
+extern void PhaseGrid16_BuildViewMatrix(void);
+Gfx* PhaseGrid16_Draw(Gfx* display_list) {
+    s32 row;
+    s32 column;
+    Fragment79PhaseGridNode* node;
+    s32 triangle_parity;
+    Vtx* vertex;
+    s32 index;
+
+    triangle_parity = 0;
+    D_841876E0->vertices = Gfx_AllocDisplayList(sizeof(Vtx) * 16 * 16);
+
+    vertex = D_841876E0->vertices;
+    node = &D_841876E0->nodes[0][0];
+    for (row = 0; row < 16; row++) {
+        for (column = 0; column < 16; column++) {
+            PhaseGrid16_FillVertex(node, vertex);
+            node++;
+            vertex++;
+        }
+    }
+
+    PhaseGrid16_BuildViewMatrix();
+
+    gDPLoadTextureBlock(display_list++, D_8418CAB0, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 32, 0, G_TX_NOMIRROR | G_TX_WRAP,
+                        G_TX_NOMIRROR | G_TX_WRAP, 5, 5, G_TX_NOLOD, G_TX_NOLOD);
+    gSPDisplayList(display_list++, D_84187710);
+    gDPSetPrimColor(display_list++, 0, 0, 255, 255, 255, D_841876E0->alpha);
+    gSPMatrix(display_list++, D_841876E0->matrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
+
+    vertex = D_841876E0->vertices;
+    for (row = 0; row < 15; row++) {
+        for (column = 0; column < 15; column++) {
+            index = row * 16 + column;
+
+            gSPVertex(display_list++, &vertex[index], 1, 0);
+            gSPVertex(display_list++, &vertex[index + 1], 1, 1);
+            gSPVertex(display_list++, &vertex[(row + 1) * 16 + column], 1, 2);
+            gSPVertex(display_list++, &vertex[index + 17], 1, 3);
+
+            if (!(triangle_parity & 1)) {
+                gSP2Triangles(display_list++, 1, 2, 0, 0, 1, 3, 2, 0);
+            } else {
+                gSP2Triangles(display_list++, 3, 2, 0, 0, 1, 3, 0, 0);
+            }
+
+            triangle_parity++;
+        }
+    }
+
+    gSPPopMatrix(display_list++, G_MTX_MODELVIEW);
+    return display_list;
+}
 #endif

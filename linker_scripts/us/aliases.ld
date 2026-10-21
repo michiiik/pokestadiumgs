@@ -695,3 +695,6 @@ func_841605F4 = PhaseGrid16_RecomputeNormal;
 func_84160C20 = PhaseGrid16_FillVertex;
 func_84160CD8 = PhaseGrid16_Update;
 func_84160EEC = PhaseGrid16_BuildViewMatrix;
+func_84160250 = PhaseGrid16_AddRipple;
+func_841603A0 = PhaseGrid16_Initialize;
+func_84161018 = PhaseGrid16_Draw;
