@@ -32,23 +32,56 @@ naming and named-source blank lines. Twenty-two compiler-checked layout facts
 cover node/state sizes and the accessed offsets. They preserve all original
 game sections, function extents and semantic relocation targets.
 
-## Wave allocators: requeue
+## Accepted velocity-wave allocators and per-file readonly pool
 
-`8415C884` and `8415CC74` remain assembly. Natural vector/loop forms initially
-produced 1032/1044 bytes versus the original 1008/1024. Caching the readonly
-cycle angle once outside the node loop removes repeated loads across math
-calls. Separating random phase seeds from their advancing counters and moving
-the node index increment before the fractional position offset reproduces
-both original instruction counts. The best cached forms still use a 224-byte
-frame versus 216, with 33 raw differing words including stack homes and cycle
-load scheduling. A match is not established.
+`8415C884` / `Radial20_StartYVelocityWave` replaces 1008 original bytes;
+`8415CC74` / `Radial20_StartZVelocityWave` replaces 1024. Both allocate the
+first free twenty-node state, copy position/velocity vectors and seed two
+independent integer phases and periods with four random draws. The first
+adds a two-sine product to Y velocity and a smaller sine to Z velocity; the
+second applies the larger product to Z and the smaller sine to Y. Both use
+the fractional part of half the current node index to offset X position.
 
-The cycle constants at `D_8418C670` and `D_8418C678` both encode the double
-6.28318548202514648. Readonly extern qualification alone did not produce the
-original hoisting. Next: independently preflight a per-file literal-pool
-layout with remaining owners still assembly, then test the authentic literal
-expression instead of an addressable cycle local. Preserve existing accepted
-neighbors and use full-ROM acceptance; do not fill the frame with dummy data.
+The current index is important: the original transfers its old value to a
+floating register before incrementing it. Earlier next-index candidates had
+three instruction-order differences and used a different fractional offset.
+They were rejected. The accepted code increments the index in the loop footer.
+Keeping the second phase initialization in the loop initializer and advancing
+the phase counters before the node pointer recovers the remaining lifetimes.
+
+The literal double 6.2831854820251465 has exactly the original cycle bits.
+It eliminates the addressable cycle local and reproduces the original
+216-byte frames. A staged extraction established the per-file readonly window
+at ROM 0x3FBEB0..0x3FBFD0 (288 bytes), including the remaining assembly owners'
+constants and jump tables. The preceding 48 shared bytes remain external.
+Normal and blank-line staged objects independently link to all 13616 retail
+text bytes and all 288 readonly bytes with all seven owners still assembly.
+The layout-only full-ROM gate passes before either wave owner is installed.
+
+The existing rotation helper's 360-degree and cycle constants now use ordinary
+double literals. Its original instructions and pool positions are verified;
+unrelated historical locals are preserved. The generated linker change only
+places the 48-byte shared head before this object's readonly section and uses
+the new shared tail afterward.
+
+Recorded native-runner gates verify each wave allocator separately and both
+together. Each successful gate immediately freezes source, the complete changed
+object, four distinct collateral objects, ROM, ELF and linked script, with
+independent hashes before further compilation. Five final whole-original-object
+controls cover known source, blank lines, declaration/readability cleanup,
+naming and named-source blank lines. No instruction rewrite, forced register,
+dummy local, arbitrary padding or manual unrolling is introduced.
+
+## Orbit allocator: requeue
+
+`8415D074` remains assembly. Natural two-angle sine/cosine variants reproduce
+its 956-byte instruction count but retain a 232-byte frame versus 216 and
+31 raw differing words. Removing redundant phase seeds and reusing the slot
+index reduce the frame, but also alter allocation and instruction counts;
+the fully reused form has the right frame and 952 bytes, not a match.
+Next: inspect the stock compiler's real local reservations and phase lifetimes
+against the retained 956-byte parent before changing source topology again.
+Do not add padding or remove a live value to close the frame difference.
 
 ## Strip renderer: requeue
 

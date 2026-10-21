@@ -178,19 +178,141 @@ void Radial20_StartStraight(f32 x, f32 y, f32 z, f32 vx, f32 vy, f32 vz, s16 typ
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CB430/func_8415C884.s")
+extern f32 __sinf(f32);
+extern u8 * D_84187530;
+void Radial20_StartYVelocityWave(
+    f32 x, f32 y, f32 z, f32 vx, f32 vy, f32 vz,
+    s16 type, u8 r, u8 g, u8 b, u8 alpha, u8 er,
+    u8 eg, u8 eb, f32 field_18, f32 scale, f32 field_14, s16 duration) {
+    Fragment79RadialState *state;
+    Fragment79RadialNode *node;
+    s32 i;
+    s32 j;
+    Fragment79RadialVector position;
+    Fragment79RadialVector velocity;
+    s32 phase1;
+    s32 period1;
+    s32 seed2;
+    s32 phase2;
+    s32 period2;
+    s32 seed1;
+    f32 sine;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CB430/func_8415CC74.s")
+    position.x = x;
+    position.y = y;
+    position.z = z;
+    velocity.x = vx;
+    velocity.y = vy;
+    velocity.z = vz;
+    state = (Fragment79RadialState *)(D_84187530 + 0x3C8);
+    for (i = 0; i < 10; i++, state++) {
+        if (state->active == 0) {
+            state->active = 1;
+            state->age = 0;
+            state->duration = duration;
+            state->type = type;
+            state->r = r;
+            state->g = g;
+            state->b = b;
+            state->a = alpha;
+            state->er = er;
+            state->eg = eg;
+            state->eb = eb;
+            state->field_14 = field_14;
+            state->field_18 = field_18;
+            node = state->nodes;
+            seed1 = (guRandom() % 20) + 2;
+            period1 = (guRandom() % 10) + 4;
+            seed2 = (guRandom() % 20) + 2;
+            period2 = (guRandom() % 10) + 4;
+            phase1 = seed1;
+            for (j = 0, phase2 = seed2; j < 20; j++, phase2++, phase1++, node++) {
+                node->ordinal = j;
+                node->alpha = alpha;
+                node->scale = scale;
+                node->angle = 0.0f;
+                node->position = position;
+                node->velocity = velocity;
+                sine = __sinf(((phase2 % (period2 + 20)) * 6.2831854820251465) / (period2 + 20));
+                node->velocity.y += 2.0 * __sinf(((phase1 % period1) * 6.2831854820251465) / period1) * sine;
+                node->velocity.z += 0.5 * __sinf(((phase2 % period2) * 6.2831854820251465) / period2);
+                node->position.x += node->velocity.x * ((j * 0.5) - (s32)(j * 0.5));
+            }
+            break;
+        }
+    }
+}
+
+void Radial20_StartZVelocityWave(
+    f32 x, f32 y, f32 z, f32 vx, f32 vy, f32 vz,
+    s16 type, u8 r, u8 g, u8 b, u8 alpha, u8 er,
+    u8 eg, u8 eb, f32 field_18, f32 scale, f32 field_14, s16 duration) {
+    Fragment79RadialState *state;
+    Fragment79RadialNode *node;
+    s32 i;
+    s32 j;
+    Fragment79RadialVector position;
+    Fragment79RadialVector velocity;
+    s32 phase1;
+    s32 period1;
+    s32 seed2;
+    s32 phase2;
+    s32 period2;
+    s32 seed1;
+    f32 sine;
+
+    position.x = x;
+    position.y = y;
+    position.z = z;
+    velocity.x = vx;
+    velocity.y = vy;
+    velocity.z = vz;
+    state = (Fragment79RadialState *)(D_84187530 + 0x3C8);
+    for (i = 0; i < 10; i++, state++) {
+        if (state->active == 0) {
+            state->active = 1;
+            state->age = 0;
+            state->duration = duration;
+            state->type = type;
+            state->r = r;
+            state->g = g;
+            state->b = b;
+            state->a = alpha;
+            state->er = er;
+            state->eg = eg;
+            state->eb = eb;
+            state->field_14 = field_14;
+            state->field_18 = field_18;
+            node = state->nodes;
+            seed1 = (guRandom() % 20) + 2;
+            period1 = (guRandom() % 10) + 4;
+            seed2 = (guRandom() % 20) + 2;
+            period2 = (guRandom() % 10) + 4;
+            phase1 = seed1;
+            for (j = 0, phase2 = seed2; j < 20; j++, phase2++, phase1++, node++) {
+                node->ordinal = j;
+                node->alpha = alpha;
+                node->scale = scale;
+                node->angle = 0.0f;
+                node->position = position;
+                node->velocity = velocity;
+                sine = __sinf(((phase2 % (period2 + 20)) * 6.2831854820251465) / (period2 + 20));
+                node->velocity.z += 2.5 * __sinf(((phase1 % period1) * 6.2831854820251465) / period1) * sine;
+                node->velocity.y += 0.5 * __sinf(((phase2 % period2) * 6.2831854820251465) / period2);
+                node->position.x += node->velocity.x * ((j * 0.5) - (s32)(j * 0.5));
+            }
+            break;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CB430/func_8415D074.s")
 
-extern f64 D_8418C688;
-extern f64 D_8418C690;
 void Radial20_RotateVertexOffset(f32 arg0, f32 *arg1, f32 *arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
     UNUSED f32 pad[16];
     f32 sp30[4][4];
     UNUSED s32 pad2[2];
-    guRotateF(sp30, (arg0 * D_8418C688) / D_8418C690, 1.0f, 0.0f, 0.0f);
+    guRotateF(sp30, (arg0 * 360.0) / 6.2831854820251465, 1.0f, 0.0f, 0.0f);
     guMtxXFMF(sp30, 0.0f, 0.0f, arg3, &arg2[0], &arg2[1], &arg2[2]);
 }
 
