@@ -36,6 +36,7 @@ func_81804720 = WidgetResources_Release;
 func_818048A4 = WidgetDefinitions_Initialize;
 func_81804A2C = WidgetState_AdvanceTransition;
 func_81804B74 = WidgetResources_UseTransitionWeight;
+GbSave_GetMapObjectPtr = GbSave_GetMapObject;
 /* Fragment 4 state construction and rectangle/resource drawing. */
 func_81804954 = WidgetState_Initialize;
 func_81805308 = WidgetDefinitions_Draw;
@@ -130,6 +131,10 @@ D_80128C5C = D_80128C54 + 0x8;
 /* Attachment scales retain their original addresses inside this C data block. */
 D_86409C4C = fragments_52_fragment52_285F60 + 0xC;
 D_86409C50 = fragments_52_fragment52_285F60 + 0x10;
+
+/* Fragment16 fade-state fields retain their original addresses inside the
+ * C-owned data block (func_82000794's mode/counter/alpha words; the three
+ * still-asm fade users and the in-file C externs keep these spellings). */
 func_87D00020 = fragment65_main;
 func_8F2007B4 = fragment70_main;
 func_8F0007E8 = fragment68_main;
@@ -726,3 +731,35 @@ func_84152EE8 = BattlePlan_AddPerishSongBonus;
 func_841537FC = BattlePlan_AddRainDanceBonus;
 func_84153930 = BattlePlan_AddSunnyDayBonus;
 func_84153B10 = BattlePlan_HasUnfavorableStages;
+
+/* Campaign rename aliases (branch-relative): forward aliases resolve
+   old-name externs against included C; reverse aliases resolve our new-name
+   references against origin's still-asm definitions. */
+func_8131001C = MathUtil_Atan2d_fragment14;
+Sched_HandleRspEvent = func_800052C4;
+profiler_log_worker_time = func_8000A080;
+GbApu_InitSlowCopySlot = func_800162D0;
+GbApu_ResetSlotFlags = func_8001644C;
+Ui_DrawGradientQuad = func_8004A858;
+Type_IdToChartIndex = func_800630F0;
+Type_ChartIndexToId = func_800631B4;
+Gfx_SetupOrthoProjection = func_81800A90;
+fragment10_main = func_82800490;
+Rect_Contains = func_81600450;
+Fragment11_SetClippedScissor = func_816028E4;
+Fragment11_DrawThickPanelFrame = func_816039B0;
+Fragment11_DrawTexturedPanelBorder = func_81603CD0;
+Fragment11_DrawBorderedPanelFill = func_816044AC;
+Envelope_Advance = func_88000080;
+ModelPreview_UpdateAutoRotation_fragment33 = func_8840011C;
+TradeCable_UpdateLightWaitPulse = func_88508B10;
+TradeCable_UpdateLightFlashPulse = func_88508CAC;
+TradeCable_SpawnBallTrailGhost = func_885096E0;
+MathUtil_Atan2d_fragment48 = func_87C00D14;
+GeoCallback_OrientToCamera = func_86706874;
+GeoCallback_InitCamera = func_86900020;
+Audio_SetChannelGroupCounts = func_8410A4F8;
+BattleAnim_InitSwayOffset = func_84120464;
+Audio_LookupScaledRatio_fragment79 = func_84124514;
+MoveDamage_ComputeBase_fragment79 = func_84149568;
+Gfx_DrawTexturedFrame16 = func_8FC00218;
