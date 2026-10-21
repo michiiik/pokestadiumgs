@@ -124,3 +124,62 @@ declaration cleanup, shared record/bank types, consolidation of legacy
 copy types, readable formatting, naming, and blank-line shifts. Thirteen
 emitted layout values verify the record/bank sizes, record offsets, and
 strides; the two header words reverify the bit positions.
+
+## 2026-10-21: rule swap, profile loading, and original no-op
+
+| Owner | Name | Bytes |
+| --- | --- | --- |
+| `8300AC8C` | `Fragment7_SwapRuleRecords` | 280 |
+| `8300B260` | `Fragment7_TeamBankNoOp` | 36 |
+| `8300B8AC` | `Fragment7_LoadProfileBank` | 220 |
+
+Rule swapping uses the shared 68-byte aggregate and three assignments,
+then clears unused rules through `func_8300A9E0`. Its signed count guards
+and real record temporary reproduce the original 96-byte frame.
+
+Profile loading first resets the count, opens provider 27 or 40 in mode 0,
+reads at most the bank capacity, closes the acquired handle, then calls
+`func_8300B54C` on every loaded 544-byte profile. The expanded/source flags
+choose the provider just as in the other accepted bank loaders. There is
+no processing when acquisition fails, because count was reset first.
+
+`8300B260` really is an empty count-bounded traversal: its original nine
+instructions contain no call, memory store, or observable per-entry work.
+No caller or data reference was found in the source/split assembly. The
+delay-slot increment leaves an incidental register value even for an empty
+bank; this is not invented as a C return value. The void function retains
+the actual empty loop rather than adding work to force another owner.
+
+All three owners passed one native runner/full-ROM gate. The first-success
+callback froze the complete changed object, four distinct collateral
+objects, source, ROM, ELF, and linked script; all nine artifacts were
+independently rehashed before later compilation. Eight complete-original-
+object controls cover cleanup, formatting, documentation, naming, and
+blank-line shifts. Thirteen emitted layout values and two header words
+reverify the shared storage types.
+
+### `8300B54C`: requeue, discarded aggregate-result stack home
+
+This is the only remaining assembly owner in the file. Its real operation
+checks six 88-byte Pokemon at profile offset 16, clears invalid species,
+compacts entries with aggregate assignments while clearing moved-from
+species, and finally calls `func_8003F5AC` for each remaining entry.
+That callee returns a four-byte tint aggregate through a hidden result
+pointer; the result is discarded, not an explicit extra source argument.
+The accepted consumer in `src/4CC20.c` and callee assembly establish this
+ABI. Do not use a made-up eight-byte return type or unused color local.
+
+Seven eight-variant source batches explored search termination, the actual
+tint union, declaration ownership/order, real traversal scopes/reuse, and
+fixed bounds. Guarding `gap = 1` with `gap < remaining` then using a do-loop
+with `gap != remaining` recovers the original search branch and 476-byte
+size. The best candidate has the exact frame, opcode sequence, and
+relocation topology. Only byte offset 396 differs: `addiu s2,sp,76` instead
+of `addiu s2,sp,80` (raw similarity 0.9916). A distinct final-pass counter
+places the result at 80 but enlarges the frame to 104, so it is not a fix.
+A calibrated 60-second native fake-restricted permuter search stayed flat
+at its initial score. No candidate was installed or claimed matching.
+
+Next action: trace the discarded aggregate-result temporary's allocation
+and source-lifetime ownership, rather than retrying these closed families.
+Do not add padding, forced registers, unused locals, or instruction rewrites.
