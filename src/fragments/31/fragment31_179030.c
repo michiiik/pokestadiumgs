@@ -57,8 +57,29 @@ void func_88206508(void *arg0, u8 *arg1) {
                  &D_880068B4, &D_880068B8, func_88903B00, D_88000E4C);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_179030/func_8820659C.s")
+s32 func_8004C990(s32, s32);
+s32 func_8004D150(s32, s32, s32, s32, s32, s32);
+extern s32 D_8823459C;
+extern s32 D_882345A0;
+extern s32 D_882345A4;
+extern s32 D_882345B0;
+extern s32 D_882345BC;
+extern s32 D_882345C0;
+extern s32 D_882345C4;
 
+void func_8820659C(s16 arg0, s16 arg1, s32 arg2, s32 arg3) {
+    u16 flag = 0;
+
+    if (arg3 != 0) {
+        if (arg2 == D_8823459C) {
+            arg2 = func_8004C990(0xF, 2);
+        } else if ((arg2 == D_882345A0) || (arg2 == D_882345A4) || (arg2 == D_882345B0) ||
+                   (arg2 == D_882345BC) || (arg2 == D_882345C0) || (arg2 == D_882345C4)) {
+            flag = 1;
+        }
+    }
+    func_8004D150(arg0, arg1, arg2, 0, flag, 0);
+}
 extern Gfx *D_800D0510;
 extern Gfx D_80094E38[];
 extern Gfx D_80094F50[];

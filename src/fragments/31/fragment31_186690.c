@@ -72,7 +72,58 @@ void func_88214394(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_882143EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_882152F4.s")
+/* mkdraft:func_882152F4 begin */
+typedef struct { u8 pad[8]; s16 position; s16 start; u8 pad2[0x20]; } Scroll18690;
+typedef struct { u8 slot; u8 reserved[0xB]; Scroll18690 records[2]; u8 pad[0xC]; s32 position; } State18690;
+extern s32 D_882346F0;
+extern s32 D_882346F4;
+
+s32 func_882152F4(u8 arg0, u8 arg1) {
+    u32 index = arg0;
+    State18690 *state;
+    s32 result = 0;
+
+    switch (D_882346F0) {
+    default:
+        goto done;
+    case 0:
+        if (D_882346F4 == 0) {
+            goto done;
+        }
+        state = (State18690 *)D_88234730;
+        if (arg0 != state->slot) {
+            goto done;
+        }
+        if (arg1 == state->records[index].position - state->records[index].start) {
+            result = 1;
+            goto done;
+        }
+        goto done;
+    case 1:
+    case 3:
+        state = (State18690 *)D_88234730;
+        if (arg0 == state->slot) {
+            goto done;
+        }
+        if (arg1 == state->records[index].position - state->records[index].start) {
+            result = 1;
+            goto done;
+        }
+        goto done;
+    case 2:
+        state = (State18690 *)D_88234730;
+        if (arg0 != state->slot) {
+            goto done;
+        }
+        if ((s16)arg1 == *(s16 *)((u8 *)state + 0x70) - state->records[index].start) {
+            result = 1;
+        }
+        goto done;
+    }
+done:
+    return result;
+}
+/* mkdraft:func_882152F4 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88215420.s")
 
@@ -109,7 +160,7 @@ s32 func_88215CE0(void) {
     return var_v1;
 }
 
-extern u8 *func_88213450(s32, u8); extern void func_8004989C(s32); extern void func_80049668(s32); extern void func_800495F8(s32, s32, s32, void *, s32); extern u8 D_88233F88[];
+extern u8 *func_88213450(s32, u8); extern void func_8004989C(s32); extern void func_80049668(s32); extern void func_800495F8(s32, s32, s32, const char *, ...); extern u8 D_88233F88[];
 extern void func_80047634(s32);
 extern void func_80047650(s32);
 extern void func_80048E30(s32, s16, s16, s32, s32);
@@ -199,8 +250,54 @@ void func_88216F74(void) { func_800226C0(0x4B); if ((*(u16 *)((u8 *)D_80087200 +
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88217040.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88217C90.s")
+#ifndef M2C_FIELD /* m2c --valid-syntax helpers (mirrors mkdraft.py) */
+#define M2C_UNK s32
+#define M2C_UNK8 s8
+#define M2C_UNK16 s16
+#define M2C_UNK32 s32
+#define M2C_UNK64 s64
+#define M2C_FIELD(expr, type, offset) (*(type)((u8*)(expr) + (offset)))
+#define M2C_BITWISE(type, expr) ((type)(expr))
+#define M2C_ERROR(desc) 0
+#define M2C_TRAP_IF(cond) ((void)0)
+#define M2C_BREAK() ((void)0)
+#define M2C_SYNC() ((void)0)
+#define M2C_CARRY 0
+#define M2C_STRUCT_COPY(dst, src) ((dst) = (src))
+#endif
 
+void func_80049628(s32, s32, s32);
+void func_88000EC0(s8 *, s16, s32);
+s32 func_88216D98(s8, s8);
+void func_800495F8(s32, s32, s32, const char *, ...);
+
+void func_88217C90(s8 arg0, s16 arg1, s16 arg2) {
+    s8 sp4A;
+    M2C_UNK sp48;
+    s16 temp_s1;
+    s32 temp_s2;
+    s32 var_s0;
+    s8 *var_s1;
+    s8 temp_v0;
+
+    temp_s1 = func_88216E28(1, arg0), var_s0 = func_88216D98(1, arg0);
+    temp_s2 = ((s32) M2C_FIELD(D_88234740, u8 *, 0x96) >> 1) + var_s0 + (temp_s1 >> 1);
+    if (arg2 < 0) {
+        func_800495F8(temp_s2, arg1 + 2, 2, func_8004C874(0x25, 0x82));
+        return;
+    }
+    func_88000EC0((s8 *) &sp48, arg2, 0);
+    var_s0 = 2;
+    var_s1 = (s8 *) &sp48 + 2;
+    do {
+        temp_v0 = *var_s1;
+        if (temp_v0 >= 0) {
+            func_80049628(temp_s2 - M2C_FIELD((D_88234740 + var_s0), u8 *, 0x94), arg1 + 2, temp_v0 + 0x30);
+        }
+        var_s0 -= 1;
+        var_s1 -= 1;
+    } while (var_s0 >= 0);
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88217DA8.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_186690/func_88217F70.s")
