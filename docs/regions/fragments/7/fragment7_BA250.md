@@ -690,8 +690,9 @@ Two owners accepted natively from `61d2f6a`, totaling 1544 bytes:
   one-based row from the 52-byte widget-definition stride, selects the
   544-byte record from a 4356-byte bank, and draws its name, trainer ID,
   texture record, and resource thumbnail. Later modes delegate to
-  `func_830034C8`. The one-based byte anchor `0x3C638` equals the bank start
-  `0x3C854` plus the four-byte header minus one 544-byte record. Its unsigned
+  `func_830034C8`. The one-based byte anchor `0x3C638` equals the first real
+  bank start `0x3D958` plus the four-byte header minus one 4356-byte bank
+  and one 544-byte record. Its unsigned
   row-byte stride keeps the actual row number distinct from the zero-based
   array index; the signed form cancels the increment and changes the count
   comparison and address shape.
@@ -723,3 +724,55 @@ is the wrong opcode; ordinary `char` views retain `lbu` but still allocate
 `t7` instead of `t8`. The destination text-byte signedness is inert here.
 Keep the calibrated UGEN emission/queue evidence above as the next diagnostic
 basis; do not repeat these character views or install the nonmatching body.
+
+### Team-list rendering and real collection-bank views
+
+`func_83004CBC` / `Fragment7_DrawTeamListRows` accepted natively from
+`9e6ef8e` (772 bytes), for publication on `b4b4ca7`. The callback interpolates
+the scroll position, derives the widget row from a 52-byte definition stride,
+and draws one compact row or two full rows through `func_830043F0`. It uses
+the existing 8-byte rectangle and 8200-byte visual-buffer layouts. Modes
+11/12 at both transition endpoints use full weight; weights below the
+original double-precision `0.01` cutoff skip drawing.
+
+The integer index first carries the truncated scroll position across
+`WidgetResources_DrawRecords`, then becomes the drawing-loop index. The
+floating visible-row accumulator is initialized from that integer before
+adding the widget row. These real lifetime boundaries remove an extra float
+move and reproduce the saved-float allocation. Decoding the origin callback
+pointer locally and declaring the rectangle before the bank pointer gives
+the original 168-byte frame and rectangle at stack byte 132. No dummy locals,
+forced registers, instruction rewrites, or padding are used.
+
+`Fragment7_InitializeRecordCollections` and the bank-selection callbacks
+establish two real team banks beginning at state byte `0x3A290` and two
+profile banks beginning at `0x3D958`. Logical bank selectors are 1/2. Team
+row selectors are also one-based. The action, profile-display, and
+other-record-selection views now describe those actual two-element arrays
+and subtract one from selectors. In particular, a two-element array based
+at `0x3829C` with an unsubtracted selector 2 extended past its declared
+bounds; a three-element profile array based at `0x3C854` included a shifted
+anchor rather than a real extra bank. All corrected views preserve the
+complete original object, including previously accepted functions.
+
+Target-compiler emitted-data controls verify 30 sizes, offsets, array
+counts, and selector-derived addresses. Team bank 1/row 1 addresses
+`0x3A294`, bank 2/row 1 addresses `0x3BDF8`; profile bank 1/record 0
+addresses `0x3D95C`, bank 2/record 0 addresses `0x3EA60`. Visual storage
+begins at byte 96 with 98400-byte bank and 16400-byte row strides. The
+fixture's extra data is excluded only when checking the unchanged game
+sections; all positive compiler logs are checked for invalid-array warnings.
+
+The first successful runner gate immediately froze the complete changed
+object, four distinct collateral objects, source, ROM, ELF, and linker
+output. External hashes were checked before another compilation. Extern
+deduplication, layout formatting, naming, and twenty-blank-line controls
+preserve all original game section bytes, function extents, and semantic
+relocations. The final normal US-ROM gate remains byte-identical, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+`func_83008290`: requeue. The calibrated two-word fallback byte-copy
+register residual remains unresolved. The team-list renderer is accepted
+and must not be sent as a new candidate. Continue with its remaining
+row-rendering sibling `func_830043F0`, using the proven real-bank and visual
+layouts rather than shifted array anchors.
