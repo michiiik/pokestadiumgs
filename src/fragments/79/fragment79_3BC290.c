@@ -268,7 +268,31 @@ void BattleEffects_CopyOpposingMove(void *state) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414DA70.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414DB14.s")
+extern s32 func_800630C0(u8);
+extern s32 func_84155544(u8 *, u8);
+void BattleEffects_AddMoveTypeResponse(Fragment79EffectView *view, u8 side) {
+    u8 other;
+    const u8 *selected;
+
+    selected = (const u8 *)view + side;
+    if (selected[2] == 0x44 && func_800630C0(view->moves[(u8)(1 - side)]) != 0) {
+        other = 1 - side;
+        if (func_84155544(func_84154B64(other), 0x8) == 0) {
+            view->amount_1A[other] = view->amount_0A[other] * 2 + view->amount_1A[other];
+            if (side == func_84154B24()) {
+                view->unk_00 |= 2;
+            }
+        }
+    } else if (selected[2] == 0xF3 && func_800630C0(view->moves[(u8)(1 - side)]) == 0) {
+        other = 1 - side;
+        if (func_84155544(func_84154B64(other), 0x1B) == 0) {
+            view->amount_1A[other] = view->amount_0A[other] * 2 + view->amount_1A[other];
+            if (side == func_84154B24()) {
+                view->unk_00 |= 2;
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414DC58.s")
 

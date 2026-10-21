@@ -153,3 +153,62 @@ conditional mode call. Do not add unused frame storage or padding.
 0(sp) without a preceding write in that owner. Reconcile that original
 behavior before proposing C; an uninitialized local must not be introduced
 merely to obtain matching bytes.
+
+## 2026-10-21: matching move/type response
+
+`8414DB14` is now `BattleEffects_AddMoveTypeResponse`, 324 original bytes.
+It receives the existing offset-4 effect view, not the enclosing record.
+Under the original move 0x44/0xF3 and opposing move-category conditions,
+it retains the opposing record lookup and the 0x08/0x1B two-byte-record
+test, adds twice the opposing 0x0A amount into its 0x1A halfword, and sets
+bit 2 of the view's first byte only when the supplied side is active.
+`func_800630C0` and `func_84155544` both really return `s32`; the latter
+tests the record's bytes 2 and 3, rather than an invented flag interface.
+
+Writing the doubled incoming amount first in both sums recovers the
+original temporary sequence. The last two differing words were the saved
+selected-side byte-lane pointer at stack byte 44 instead of 40. Naming that
+real pointer, then reading its move byte at offset 2, recovers the original
+home without extra storage. It is read-only in the cleaned C. All halfword
+narrowing, calls, fallback behavior, and active-side checks are retained.
+
+The native runner accepted the owner through the authoritative full-ROM
+gate. Its first successful gate immediately froze source, the entire changed
+object, four distinct collateral objects, ROM, ELF, and linked script; all
+nine were independently rehashed before another compile. Eight whole-object
+controls cover known/blank sources, extern cleanup, readable source, the
+read-only lane, and naming/blank naming. Twenty-four emitted layout values
+recheck the existing effect-view and calculator types; neither type's layout
+was changed for this owner. Earlier accepted helpers remain byte-identical.
+
+### Remaining owners: updated durable handoffs
+
+- `8414DA70`: requeue. New logging-only observer campaigns passed complete
+  original-object controls before interpretation. The `40000000` terminal
+  mask is written in `localcolor`, then imported by `updateforbidden` before
+  global allocation. The producer is a fixed-register expression for
+  register 2, not an assembler decision. Both stock IDO 7.1 and 5.3 retain
+  the same nine-word residual; 5.3 also changes unrelated code in the TU.
+  Next: follow the fixed-register expression's frontend/Ucode liveness and
+  actual declaration lineage. Do not fake the lookup's real `u8` return or
+  invent a return interface for this owner.
+- `8414CD18`: requeue. A real two-pass calculator draft now has the original
+  88-byte frame, calculator at stack byte 40, address lane, body operations,
+  and register assignments. The best retained family uses a cached amount
+  multiplied by the zero-based hit index plus one; its 156-byte result still
+  uses an equality loop exit rather than the original signed comparison.
+  Fifty-six genuine accumulation/product, bound, and increment-placement
+  forms were tested; a duplicate preflight rejection was not counted.
+  Next: capture loop lowering and induction/exit ownership from this parent,
+  rather than repeat the earlier source spellings or add frame filler.
+- `8414D9B8`: requeue. Eight further integer-address view spellings did not
+  fix the original frame/home difference. Resume pointer lifetime/source-slot
+  tracing around the conditional mode call, not more literal view casts.
+- `8414DC58`: requeue. Preserve its existing `s32` address interface, both
+  record lookups, HP gate, sparse effect switch, and conditional calls to the
+  newly matched response. The best 316-byte draft has the right frame and
+  instruction shape but 22 differing register/home words. Pointer/side/index
+  declaration and width families were tested. Next: trace side/other/base
+  webs and their cached stack homes around the second lookup and effect call.
+  The first void-pointer ABI drafts failed the existing prototype; those
+  context failures are not evidence against the source algorithm.

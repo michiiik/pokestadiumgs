@@ -9,6 +9,7 @@
  */
 Audio_ThreadEntry = Audio_ThreadMain;
 /* Fragment 79 calculated/shared HP and amount planning. */
+func_8414DB14 = BattleEffects_AddMoveTypeResponse;
 func_8414CA80 = BattleEffects_PlanCalculatedRecovery;
 func_8414CE08 = BattleEffects_PlanSharedHP;
 func_8414EB90 = BattleEffects_ApplyOpposingByteWeight;
