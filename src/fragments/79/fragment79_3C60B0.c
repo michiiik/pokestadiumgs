@@ -119,7 +119,7 @@ void BattleAnim_ResetSharedEffectMatrix(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8415A9E4(s32, s32, s32);
+extern void BattleAnim_InitializeTerrainGrid(s32, s16, s32);
 void BattleAnim_StartEffect34TerrainGrid_Init(void) {
     u8 pad[8];
     f32 sp1C;
@@ -127,17 +127,17 @@ void BattleAnim_StartEffect34TerrainGrid_Init(void) {
     BattleAnim_EffectSecondaryOwnerAnchorPosition(&sp1C);
     BattleAnim_ResetSharedEffectMatrix();
     if ((f64)sp1C < 0.0) {
-        func_8415A9E4(1, 0, 0x4650);
+        BattleAnim_InitializeTerrainGrid(1, 0, 0x4650);
         return;
     }
-    func_8415A9E4(-1, 0, 0x4650);
+    BattleAnim_InitializeTerrainGrid(-1, 0, 0x4650);
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_8415AD58(void);
+extern void BattleAnim_UpdateTerrainGrid(void);
 void func_84156C40(void) {
-    func_8415AD58();
+    BattleAnim_UpdateTerrainGrid();
 }
 #endif
 
@@ -877,16 +877,55 @@ void BattleAnim_StartEffect39CombinedTrail_Draw(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_8415A9E4.s")
-#endif
-
-#ifdef VERSION_US
-extern u8 *D_84187330;
 typedef struct {
-    u8 unknown_00[0x10];
+    f32 field_00;
+    f32 field_04;
+    f32 field_08;
+    f32 field_0C;
     s16 value;
     u8 unknown_12[2];
 } Fragment79TerrainPointView;
+extern u8 *D_84187330;
+extern void *D_84187334;
+extern s16 D_841A4D60;
+extern s16 D_841A4D62;
+extern s16 D_841A4D64;
+extern s32 func_8415A364(void);
+extern void func_84159D30(void *);
+
+void BattleAnim_InitializeTerrainGrid(s32 orientation, s16 warmup, s32 duration) {
+    s32 i;
+    s32 j;
+    Fragment79TerrainPointView *point;
+
+    D_841A4D60 = 0;
+    *(s16 *)(D_84187330 + 4) = 0;
+    *(f32 *)D_84187330 = 0.0f;
+    *(s16 *)(D_84187330 + 6) = warmup;
+    *(s16 *)(D_84187330 + 8) = 30000;
+    point = (Fragment79TerrainPointView *)(D_84187330 + 0x1010);
+    for (i = 0; i < 16; i++) {
+        for (j = 0; j < 16; j++) {
+            point->field_00 = (f32)orientation * (((f32)i * 150.0f - 1200.0f) - 440.0f);
+            point->field_04 = 1.0f;
+            point->field_08 = (f32)j * 200.0f - 1600.0f;
+            point->field_0C = 1.0f;
+            point->value = 0;
+            point++;
+        }
+    }
+    D_841A4D62 = 0;
+    D_841A4D64 = 8;
+    if (warmup > 0) {
+        for (i = 0; i < warmup; i++) {
+            func_8415A364();
+        }
+        func_84159D30(D_84187334);
+    }
+}
+#endif
+
+#ifdef VERSION_US
 
 void BattleAnim_SetTerrainGridPointValue(u8 value) {
     Fragment79TerrainPointView *point;
@@ -903,7 +942,20 @@ void BattleAnim_SetTerrainGridPointValue(u8 value) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_8415AD58.s")
+extern u32 func_841094EC(void);
+
+void BattleAnim_UpdateTerrainGrid(void) {
+    s32 status;
+
+    status = (s32)func_841094EC();
+    if (status == 1 && D_841A4D60 == 0) {
+        *(s16 *)(D_84187330 + 8) = *(s16 *)(D_84187330 + 4) + 0x463C;
+        D_841A4D60 = 1;
+    }
+    func_8415A364();
+    D_841A4D62 = (D_841A4D62 + 2) & 0x3FFF;
+    D_841A4D64 = (D_841A4D64 - 1) & 0x3FFF;
+}
 #endif
 
 #ifdef VERSION_US
