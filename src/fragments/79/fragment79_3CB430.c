@@ -650,5 +650,347 @@ s32 func_8415DAE4(void) {
     return -1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CB430/func_8415DBBC.s")
+typedef struct { u8 r, g, b, a; } Fragment79RadialRenderRGBA;
+typedef struct {
+    s16 active, resource, age, duration, type;
+    Fragment79RadialRenderRGBA color;
+    Fragment79StripRGB environment_color;
+    u8 unknown_11[3];
+    f32 field_14, field_18;
+    Vtx *vertices;
+    u8 unknown_20[40];
+    Fragment79RadialNode nodes[20];
+} Fragment79RadialRenderState;
+extern Gfx D_84187538[], D_841875C0[];
+extern u8 D_84187610[], D_84187614[], D_84187618[];
+extern f32 D_8418761C[];
+extern void AuxiliaryEffect_Spawn(s16, f32, f32, f32, s16, f32);
+extern Gfx *AuxiliaryEffect_Draw(s16, Gfx *);
+extern void * Gfx_AllocDisplayList(s32);
+extern void Radial20_RotateVertexOffset(f32 arg0, f32 *arg1, f32 *arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6);
+Gfx *Radial20_Draw(Gfx *display_list) {
+    s32 slot_index;
+    s32 x;
+    s32 j;
+    s32 y;
+    Fragment79RadialRenderState *state;
+    Fragment79RadialNode *node;
+    Vtx* vertex;
+    Fragment79RadialVector offset;
+
+    state = (Fragment79RadialRenderState *)(D_84187530 + 0x3C8);
+
+    for (slot_index = 0; slot_index < 10; slot_index++) {
+        if (state->active == 1) {
+            node = &state->nodes[0];
+
+            switch (state->type) {
+                case 0:
+                case 2:
+                    vertex = Gfx_AllocDisplayList(sizeof(Vtx) * 40);
+                    state->vertices = vertex;
+
+                    for (j = 0; j < 20; j++, vertex++) {
+                        Radial20_RotateVertexOffset(node->angle, &node->velocity.x, &offset.x, node->scale, 1.0f, 0.0f, 0.0f);
+
+                        vertex->v.ob[0] = node->position.x + offset.x;
+                        vertex->v.ob[1] = node->position.y + offset.y;
+                        vertex->v.ob[2] = node->position.z + offset.z;
+                        vertex->v.tc[0] = (j * 8) << 5;
+                        vertex->v.tc[1] = 0;
+                        vertex++;
+
+                        if (node->ordinal <= 0.0) {
+                            Radial20_RotateVertexOffset(node->angle + 3.14159274101257324f, &node->velocity.x, &offset.x, node->scale, 1.0f, 0.0f,
+                                          0.0f);
+                        }
+
+                        vertex->v.ob[0] = node->position.x + offset.x;
+                        vertex->v.ob[1] = node->position.y + offset.y;
+                        vertex->v.ob[2] = node->position.z + offset.z;
+                        vertex->v.tc[0] = (j * 8) << 5;
+                        vertex->v.tc[1] = 0x200;
+                        node++;
+                    }
+                    break;
+
+                case 1:
+                    vertex = Gfx_AllocDisplayList(sizeof(Vtx) * 60);
+                    state->vertices = vertex;
+
+                    for (j = 0; j < 20; j++, vertex++) {
+                        Radial20_RotateVertexOffset(node->angle, &node->velocity.x, &offset.x, node->scale, 1.0f, 0.0f, 0.0f);
+
+                        vertex->v.ob[0] = node->position.x + offset.x;
+                        vertex->v.ob[1] = node->position.y + offset.y;
+                        vertex->v.ob[2] = node->position.z + offset.z;
+                        vertex->v.cn[0] = 0xFF;
+                        vertex->v.cn[1] = 0x40;
+                        vertex->v.cn[2] = 0x40;
+                        vertex->v.cn[3] = node->alpha;
+                        vertex++;
+
+                        if (node->ordinal <= 0.0) {
+                            Radial20_RotateVertexOffset(node->angle + 2.09439516067504883, &node->velocity.x, &offset.x, node->scale, 1.0f,
+                                          0.0f, 0.0f);
+                        }
+
+                        vertex->v.ob[0] = node->position.x + offset.x;
+                        vertex->v.ob[1] = node->position.y + offset.y;
+                        vertex->v.ob[2] = node->position.z + offset.z;
+                        vertex->v.cn[0] = 0;
+                        vertex->v.cn[1] = 0xA0;
+                        vertex->v.cn[2] = 0xFF;
+                        vertex->v.cn[3] = node->alpha;
+                        vertex++;
+
+                        if (node->ordinal <= 0.0) {
+                            Radial20_RotateVertexOffset(node->angle + 2.09439516067504883 * 2, &node->velocity.x, &offset.x, node->scale, 1.0f,
+                                          0.0f, 0.0f);
+                        }
+
+                        vertex->v.ob[0] = node->position.x + offset.x;
+                        vertex->v.ob[1] = node->position.y + offset.y;
+                        vertex->v.ob[2] = node->position.z + offset.z;
+                        vertex->v.cn[0] = 0xFF;
+                        vertex->v.cn[1] = 0xFF;
+                        vertex->v.cn[2] = 0;
+                        vertex->v.cn[3] = node->alpha;
+                        node++;
+                    }
+                    break;
+
+                case 3:
+                    vertex = Gfx_AllocDisplayList(sizeof(Vtx) * 60);
+                    state->vertices = vertex;
+
+                    for (j = 0; j < 20; j++, vertex++) {
+                        Radial20_RotateVertexOffset(node->angle, &node->velocity.x, &offset.x, node->scale, 1.0f, 0.0f, 0.0f);
+
+                        vertex->v.ob[0] = node->position.x + offset.x;
+                        vertex->v.ob[1] = node->position.y + offset.y;
+                        vertex->v.ob[2] = node->position.z + offset.z;
+                        vertex->v.cn[0] = state->color.r;
+                        vertex->v.cn[1] = state->color.g;
+                        vertex->v.cn[2] = state->color.b;
+                        vertex->v.cn[3] = node->alpha;
+                        vertex++;
+
+                        if (node->ordinal <= 0.0) {
+                            Radial20_RotateVertexOffset(node->angle + 2.09439516067504883, &node->velocity.x, &offset.x, node->scale, 1.0f,
+                                          0.0f, 0.0f);
+                        }
+
+                        vertex->v.ob[0] = node->position.x + offset.x;
+                        vertex->v.ob[1] = node->position.y + offset.y;
+                        vertex->v.ob[2] = node->position.z + offset.z;
+                        vertex->v.cn[0] = state->color.r;
+                        vertex->v.cn[1] = state->color.g;
+                        vertex->v.cn[2] = state->color.b;
+                        vertex->v.cn[3] = node->alpha;
+                        vertex++;
+
+                        if (node->ordinal <= 0.0) {
+                            Radial20_RotateVertexOffset(node->angle + 2.09439516067504883 * 2, &node->velocity.x, &offset.x, node->scale, 1.0f,
+                                          0.0f, 0.0f);
+                        }
+
+                        vertex->v.ob[0] = node->position.x + offset.x;
+                        vertex->v.ob[1] = node->position.y + offset.y;
+                        vertex->v.ob[2] = node->position.z + offset.z;
+                        vertex->v.cn[0] = state->color.r;
+                        vertex->v.cn[1] = state->color.g;
+                        vertex->v.cn[2] = state->color.b;
+                        vertex->v.cn[3] = node->alpha;
+                        node++;
+                    }
+                    break;
+
+                case 4:
+                    vertex = Gfx_AllocDisplayList(sizeof(Vtx) * 20 * 6);
+                    state->vertices = vertex;
+
+                    for (j = 0; j < 20; j++, node++) {
+                        for (x = 0; x < 6; x++) {
+                            Radial20_RotateVertexOffset(node->angle + ((2.0 * x * 3.14159274101257324f) / 6.0), &node->velocity.x, &offset.x,
+                                          node->scale, 1.0f, 0.0f, 0.0f);
+
+                            vertex->v.ob[0] = node->position.x + offset.x;
+                            vertex->v.ob[1] = node->position.y + offset.y;
+                            vertex->v.ob[2] = node->position.z + offset.z;
+                            vertex->v.cn[0] = state->color.r;
+                            vertex->v.cn[1] = state->color.g;
+                            vertex->v.cn[2] = state->color.b;
+                            vertex->v.cn[3] = 0x64;
+                            vertex++;
+                        }
+                    }
+                    break;
+
+                case 5:
+                    vertex = Gfx_AllocDisplayList(sizeof(Vtx) * 20 * 3 * 3);
+                    state->vertices = vertex;
+
+                    for (j = 0; j < 20; j++, node++) {
+                        for (x = 0; x < 3; x++) {
+                            for (y = 0; y < 3; y++) {
+                                f32 vertex_x, vertex_y, vertex_z;
+
+                                Radial20_RotateVertexOffset(node->angle + ((6.2831854820251465f * y) / 12.0f) + ((6.2831854820251465f * x) / 3.0f),
+                                              &node->velocity.x, &offset.x, D_8418761C[y] * node->scale, 1.0f, 0.0f, 0.0f);
+
+                                vertex_x = node->position.x + offset.x;
+                                vertex_y = node->position.y + offset.y;
+                                vertex_z = node->position.z + offset.z;
+
+                                vertex->v.ob[0] = vertex_x;
+                                vertex->v.ob[1] = vertex_y;
+                                vertex->v.ob[2] = vertex_z;
+
+                                if ((y == 0) && (((s32)guRandom() % 100) == 0)) {
+                                    AuxiliaryEffect_Spawn(state->resource, vertex_x, vertex_y, vertex_z, 10, 0.75f);
+                                }
+
+                                vertex->v.cn[0] = ((D_84187610[x] * (0xFF - node->alpha)) + (node->alpha * 0xFF)) / 255;
+                                vertex->v.cn[1] = ((D_84187614[x] * (0xFF - node->alpha)) + (node->alpha * 0xFF)) / 255;
+                                vertex->v.cn[2] = ((D_84187618[x] * (0xFF - node->alpha)) + (node->alpha * 0xFF)) / 255;
+                                vertex->v.cn[3] = node->alpha;
+                                vertex++;
+                            }
+                        }
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+
+            vertex = state->vertices;
+            for (x = 0; x < 19; x++) {
+                switch (state->type) {
+                    case 0:
+                    case 2:
+                        gSPDisplayList(display_list++, D_84187538);
+                        gDPSetPrimColor(display_list++, 0, 0, state->color.r, state->color.g, state->color.b,
+                                        state->color.a);
+                        gDPSetEnvColor(display_list++, state->environment_color.r, state->environment_color.g, state->environment_color.b, 0);
+                        gSPVertex(display_list++, vertex, 4, 0);
+                        gSP2Triangles(display_list++, 0, 2, 1, 0, 2, 3, 1, 0);
+                        vertex += 2;
+                        break;
+
+                    case 1:
+                    case 3:
+                    default:
+                        gSPDisplayList(display_list++, D_841875C0);
+                        gSPClearGeometryMode(display_list++, G_CULL_BOTH);
+                        gSPSetGeometryMode(display_list++, G_CULL_FRONT);
+                        gSPVertex(display_list++, vertex, 6, 0);
+                        gSP2Triangles(display_list++, 0, 3, 1, 0, 3, 4, 1, 0);
+                        gSP2Triangles(display_list++, 1, 4, 2, 0, 4, 5, 2, 0);
+                        gSP2Triangles(display_list++, 2, 5, 0, 0, 5, 3, 0, 0);
+                        vertex += 3;
+                        break;
+
+                    case 4:
+                        gSPDisplayList(display_list++, D_841875C0);
+                        gSPClearGeometryMode(display_list++, G_CULL_BOTH);
+                        gSPSetGeometryMode(display_list++, G_CULL_FRONT);
+                        gSPVertex(display_list++, vertex, 12, 0);
+
+                        for (j = 0; j < 5; j++) {
+                            gSP2Triangles(display_list++, j + 0, j + 6, j + 1, 0, j + 1, j + 6, j + 7, 0);
+                        }
+
+                        gSP2Triangles(display_list++, 5, 11, 0, 0, 0, 11, 6, 0);
+                        vertex += 6;
+                        break;
+
+                    case 5:
+                        gSPDisplayList(display_list++, D_841875C0);
+                        gSPClearGeometryMode(display_list++, G_CULL_BOTH);
+                        gSPSetGeometryMode(display_list++, G_CULL_FRONT);
+                        gSPVertex(display_list++, vertex, 18, 0);
+
+                        for (j = 0; j < 3; j++) {
+                            u8 idx = j * 3;
+                            gSP2Triangles(display_list++, idx + 0, idx + 9, idx + 1, 0, idx + 1, idx + 9, idx + 10, 0);
+                            gSP2Triangles(display_list++, idx + 1, idx + 10, idx + 2, 0, idx + 2, idx + 10, idx + 11, 0);
+                            gSP2Triangles(display_list++, idx + 2, idx + 11, idx + 0, 0, idx + 0, idx + 11, idx + 9, 0);
+                        }
+
+                        vertex += 9;
+                        break;
+                }
+            }
+
+            vertex = state->vertices;
+            for (x = 0; x < 19; x++) {
+                switch (state->type) {
+                    case 0:
+                    case 2:
+                        break;
+
+                    default:
+                    case 1:
+                    case 3:
+                        gSPDisplayList(display_list++, D_841875C0);
+                        gSPClearGeometryMode(display_list++, G_CULL_BOTH);
+                        gSPSetGeometryMode(display_list++, G_CULL_BACK);
+                        gSPVertex(display_list++, vertex, 6, 0);
+                        gSP2Triangles(display_list++, 0, 3, 1, 0, 3, 4, 1, 0);
+                        gSP2Triangles(display_list++, 1, 4, 2, 0, 4, 5, 2, 0);
+                        gSP2Triangles(display_list++, 2, 5, 0, 0, 5, 3, 0, 0);
+                        vertex += 3;
+                        break;
+
+                    case 4:
+                        gSPDisplayList(display_list++, D_841875C0);
+                        gSPClearGeometryMode(display_list++, G_CULL_BOTH);
+                        gSPSetGeometryMode(display_list++, G_CULL_BACK);
+                        gSPVertex(display_list++, vertex, 12, 0);
+
+                        for (j = 0; j < 5; j++) {
+                            gSP2Triangles(display_list++, j + 0, j + 6, j + 1, 0, j + 1, j + 6, j + 7, 0);
+                        }
+
+                        gSP2Triangles(display_list++, 5, 11, 0, 0, 0, 11, 6, 0);
+                        vertex += 6;
+                        break;
+
+                    case 5:
+                        gSPDisplayList(display_list++, D_841875C0);
+                        gSPClearGeometryMode(display_list++, G_CULL_BOTH);
+                        gSPSetGeometryMode(display_list++, G_CULL_BACK);
+                        gSPVertex(display_list++, vertex, 18, 0);
+
+                        for (j = 0; j < 3; j++) {
+                            u8 idx = j * 3;
+                            gSP2Triangles(display_list++, idx + 0, idx + 9, idx + 1, 0, idx + 1, idx + 9, idx + 10, 0);
+                            gSP2Triangles(display_list++, idx + 1, idx + 10, idx + 2, 0, idx + 2, idx + 10, idx + 11, 0);
+                            gSP2Triangles(display_list++, idx + 2, idx + 11, idx + 0, 0, idx + 0, idx + 11, idx + 9, 0);
+                        }
+
+                        vertex += 9;
+                        break;
+                }
+            }
+
+            vertex = state->vertices;
+            switch (state->type) {
+                case 5:
+                    gSPDisplayList(display_list++, D_841875C0);
+                    gSPClearGeometryMode(display_list++, G_CULL_BOTH);
+                    gSPVertex(display_list++, vertex, 9, 0);
+                    gSP2Triangles(display_list++, 2, 1, 0, 0, 5, 4, 3, 0);
+                    gSP1Triangle(display_list++, 8, 7, 6, 0);
+                    break;
+            }
+            display_list = AuxiliaryEffect_Draw(state->resource, display_list);
+        }
+        state++;
+    }
+
+    return display_list;
+}
 #endif
