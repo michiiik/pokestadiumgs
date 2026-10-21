@@ -2,13 +2,110 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20A610/func_8AF1C3A0.s")
+/* mkdraft:func_8AF1C3A0 begin */
+extern void func_800504BC(s16 *);
+extern void func_8AC015B0(s16, s16, s32, s32, s16);
+extern u8 D_8AF274A0[];
+extern s16 D_8AF27920;
+extern s16 D_8AF37798;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20A610/func_8AF1C43C.s")
+s32 func_8AF1C3A0(s32 mode, void *record) {
+    s16 x;
+    s16 y;
+    void *preserved;
+    s16 values[2];
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20A610/func_8AF1C4D8.s")
+    preserved = record;
+    switch (mode) {
+    case 0:
+        *(u16 *)((u8 *)preserved + 2) &= 0xFFFD;
+        break;
+    case 1:
+        func_800504BC(values);
+        x = *(s16 *)((u8 *)preserved + 8) + values[0];
+        y = *(s16 *)((u8 *)preserved + 0xA) + values[1];
+        func_8AC015B0(x, y, (s32)(D_8AF274A0), D_8AF27920, D_8AF37798);
+        break;
+    }
+    return 0;
+}
+/* mkdraft:func_8AF1C3A0 end */
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20A610/func_8AF1C574.s")
+/* mkdraft:func_8AF1C43C begin */
+extern void func_800504BC(s16 *);
+extern void func_8AC015B0(s16, s16, s32, s32, s16);
+extern u8 D_8AF275E0[];
+extern s16 D_8AF27928;
+extern s16 D_8AF3779C;
+
+s32 func_8AF1C43C(s32 mode, void *record) {
+    s16 x;
+    s16 y;
+    void *preserved;
+    s16 values[2];
+
+    preserved = record;
+    switch (mode) {
+    case 0:
+        *(u16 *)((u8 *)preserved + 2) &= 0xFFFD;
+        break;
+    case 1:
+        func_800504BC(values);
+        x = *(s16 *)((u8 *)preserved + 8) + values[0];
+        y = *(s16 *)((u8 *)preserved + 0xA) + values[1];
+        func_8AC015B0(x, y, (s32)(D_8AF275E0), D_8AF27928, D_8AF3779C);
+        break;
+    }
+    return 0;
+}
+/* mkdraft:func_8AF1C43C end */
+
+/* mkdraft:func_8AF1C4D8 begin */
+extern void func_800504BC(s16 *);
+extern void func_8AC015B0(s16, s16, s32, s32, s16);
+extern u8 D_8AF277E0[];
+extern s16 D_8AF27924;
+extern s16 D_8AF3779A;
+
+s32 func_8AF1C4D8(s32 mode, void *record) {
+    s16 x;
+    s16 y;
+    void *preserved;
+    s16 values[2];
+
+    preserved = record;
+    switch (mode) {
+    case 0:
+        *(u16 *)((u8 *)preserved + 2) &= 0xFFFD;
+        break;
+    case 1:
+        func_800504BC(values);
+        x = *(s16 *)((u8 *)preserved + 8) + values[0];
+        y = *(s16 *)((u8 *)preserved + 0xA) + values[1];
+        func_8AC015B0(x, y, (s32)(D_8AF277E0), D_8AF27924, D_8AF3779A);
+        break;
+    }
+    return 0;
+}
+/* mkdraft:func_8AF1C4D8 end */
+
+/* mkdraft:func_8AF1C574 begin */
+extern void *D_8AF37778;
+extern void *D_8AF37784;
+extern void *D_8AF3777C;
+extern void *D_8AF37788;
+extern void *D_8AF37780;
+extern void *D_8AF3778C;
+
+void func_8AF1C574(void) {
+    *(u16 *)((u8 *)D_8AF37778 + 2) &= ~2;
+    *(u16 *)((u8 *)D_8AF37784 + 2) &= ~2;
+    *(u16 *)((u8 *)D_8AF3777C + 2) &= ~2;
+    *(u16 *)((u8 *)D_8AF37788 + 2) &= ~2;
+    *(u16 *)((u8 *)D_8AF37780 + 2) &= ~2;
+    *(u16 *)((u8 *)D_8AF3778C + 2) &= ~2;
+}
+/* mkdraft:func_8AF1C574 end */
 
 extern void *D_8AF37778;
 extern void *D_8AF3777C;

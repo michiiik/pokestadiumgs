@@ -58,7 +58,33 @@ s16 func_8AF16D2C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF16DC8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF16E60.s")
+/* mkdraft:func_8AF16E60 begin */
+extern s16 *D_8AF2BA94;
+extern u8 D_8AF34C38[250];
+
+void func_8AF16E60(void) {
+    s16 *source;
+    s16 index;
+    s16 value;
+    s16 sentinel;
+
+    source = D_8AF2BA94;
+    index = 0;
+    sentinel = -1;
+    for (;;) {
+        value = *source;
+        if (sentinel != value) {
+            *((u8 *)&D_8AF34C38 + index) = value;
+            index++;
+            index = (s16) index;
+            if (index >= 250) {
+                break;
+            }
+        }
+        source++;
+    }
+}
+/* mkdraft:func_8AF16E60 end */
 
 extern u16 *D_8AF2BAA4;
 s32 func_8AF16EB0(u8 arg0) {
@@ -100,7 +126,63 @@ void func_8AF1722C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF17264.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF174DC.s")
+/* mkdraft:func_8AF174DC begin */
+extern void func_8AC007FC(void);
+extern s32 func_8AC0660C(s16);
+extern s32 func_8AC06630(s16, void *);
+extern s16 D_8AF3480A;
+extern s16 D_8AF3480C;
+extern s16 D_8AF34812;
+extern u8 D_8AF34818[][3];
+extern s32 D_8AF341F0;
+extern s32 D_8AF34268;
+
+s16 func_8AF174DC(void) {
+    s16 result;
+    UNUSED s16 pad1;
+    UNUSED s16 pad2;
+    UNUSED s16 pad3;
+    s16 x;
+    s16 y;
+    UNUSED s32 pad4;
+    s32 flag;
+
+    x = D_8AF347F4;
+    y = D_8AF347F6;
+    func_8AC007FC();
+    result = 0x12;
+    func_8AC0686C(&D_8AF34808, D_8AF347F6);
+    if (*(u16 *)((u8 *)D_8AF263C0 + 8) & 0x4000) {
+        func_8AF00130(3);
+        result = 0x10;
+    } else if (D_8AF3480C == 0) {
+        flag = 0;
+        if ((*(u16 *)((u8 *)D_8AF263C0 + 6) & 0x800) && (func_8AC0660C(D_8AF3480A) != 0)) {
+            func_8AF00130(1);
+            flag = 1;
+            D_8AF347F6 = D_8AF3480A - 1;
+        } else if (*(u16 *)((u8 *)D_8AF263C0 + 6) & 0x400) {
+            if (func_8AC06630(D_8AF3480A + D_8AF34812, &D_8AF34808) != 0) {
+                func_8AF00130(1);
+                flag = 1;
+                D_8AF347F6 = D_8AF3480A + D_8AF34812 + 1;
+            }
+        }
+        if (flag != 0) {
+            func_8AC0686C(&D_8AF34808, D_8AF347F6);
+        }
+    }
+    if ((x != D_8AF347F4) || (y != D_8AF347F6)) {
+        // The [][3] row scaling keeps (D_8AF347F6 * 4) and the *3 as two separate
+        // multiplies; a flat `* 4 * 3` gets reassociated by cfe into IDO's canonical
+        // *12 expansion, which orders the shift/subtract differently than retail.
+        func_8AF171D8((s32)((D_8AF347F4 * 3) + &D_8AF34818[D_8AF347F6 * 4][0]));
+    }
+    func_8AC0619C(&D_8AF341F0, D_8AF2BDC6);
+    func_8AC06220(&D_8AF34268, D_8AF2BDC6);
+    return result;
+}
+/* mkdraft:func_8AF174DC end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_204950/func_8AF176C4.s")
 #endif

@@ -2,7 +2,36 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF20ED0.s")
+/* mkdraft:func_8AF20ED0 begin */
+extern void func_800504BC(s16 *);
+extern void func_8AC007B8(s32, s32, s32, s32);
+extern void func_8AF02F18(void *);
+extern void func_8AC00738(void);
+
+s32 func_8AF20ED0(s32 arg0, u8 *arg1) {
+    struct { s32 pad[2]; s16 angles[2]; } scratch;
+    s32 *ptr;
+    s16 x;
+    s16 y;
+    s16 z;
+    s16 w;
+
+    ptr = *(s32 **)(arg1 + 0x20);
+    if ((arg0 != 0) && (arg0 == 1)) {
+        func_800504BC(scratch.angles);
+        x = *(s16 *)(arg1 + 8) + scratch.angles[0];
+        y = *(s16 *)(arg1 + 0xA) + scratch.angles[1];
+        z = *(s16 *)(arg1 + 0xC);
+        w = *(s16 *)(arg1 + 0xE);
+        ptr[2] = x;
+        ptr[3] = y;
+        func_8AC007B8(x, y, z, w);
+        func_8AF02F18(ptr);
+        func_8AC00738();
+    }
+    return 0;
+}
+/* mkdraft:func_8AF20ED0 end */
 
 typedef struct {
     u32 unk_00[321];
@@ -32,11 +61,100 @@ void func_8AF20F64(u8* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, u8 arg5, u8
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF2123C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF21610.s")
+/* mkdraft:func_8AF21610 begin */
+extern s32 func_8AF0326C(u8 *);
+extern void func_8AC0602C(void *, u16, s32);
+extern void func_8AC060E4(void *, u16, s32);
+extern void func_8AC0686C(void *, s16);
+extern void func_8AF00130(s32);
+extern u8 *D_8AF263C0;
+extern u8 *D_8AF279B0;
+extern u16 D_8AF2BDC6;
+extern u8 D_8AF39E00;
+extern u8 D_8AF39E78;
+extern u8 D_8AF39EF0;
+extern u8 D_8AF39F68;
+extern u8 D_8AF39FE0;
+extern u8 D_8AF39FF0;
+extern s16 D_8AF3A008;
+extern u8 *D_8AF3A03C;
+extern u8 *D_8AF3A040;
+extern u8 *D_8AF3A044;
+extern u8 *D_8AF3A048;
+
+s16 func_8AF21610(void) {
+    s16 result = 0x1B;
+    u8 *ptr;
+    s32 state;
+    s32 temp;
+
+    state = D_8AF3A008;
+    switch (state) {
+    case 0:
+        ptr = D_8AF279B0;
+        temp = func_8AF0326C(ptr);
+        func_8AC0602C(&D_8AF39E00, D_8AF2BDC6, 1);
+        func_8AC060E4(&D_8AF39E78, D_8AF2BDC6, 1);
+        func_8AC0602C(&D_8AF39EF0, D_8AF2BDC6, 0);
+        func_8AC060E4(&D_8AF39F68, D_8AF2BDC6, 0);
+        func_8AC0686C(&D_8AF39FE0, *(s16 *)(ptr + 0x38));
+        break;
+    case 1:
+        ptr = D_8AF279B0 + 0x52C;
+        temp = func_8AF0326C(ptr);
+        func_8AC0602C(&D_8AF39EF0, D_8AF2BDC6, 1);
+        func_8AC060E4(&D_8AF39F68, D_8AF2BDC6, 1);
+        func_8AC0602C(&D_8AF39E00, D_8AF2BDC6, 0);
+        func_8AC060E4(&D_8AF39E78, D_8AF2BDC6, 0);
+        func_8AC0686C(&D_8AF39FF0, *(s16 *)(ptr + 0x38));
+        break;
+    default:
+        temp = 0;
+        break;
+    }
+    if (temp == 0) {
+        if ((D_8AF3A008 == 0) && (*(u16 *)(D_8AF263C0 + 8) & 0x100)) {
+            func_8AF00130(1);
+            D_8AF3A008 = 1;
+        } else if ((D_8AF3A008 == 1) && (*(u16 *)(D_8AF263C0 + 8) & 0x200)) {
+            func_8AF00130(1);
+            D_8AF3A008 = 0;
+        } else if (*(u16 *)(D_8AF263C0 + 8) & 0x4000) {
+            func_8AF00130(3);
+            D_8AF3A008 = -1;
+            result = 0x18;
+            *(u16 *)(D_8AF3A03C + 2) &= 0xFFFE;
+            *(u16 *)(D_8AF3A040 + 2) &= 0xFFFE;
+            *(u16 *)(D_8AF3A044 + 2) &= 0xFFFE;
+            *(u16 *)(D_8AF3A048 + 2) &= 0xFFFE;
+        }
+    }
+    return result;
+}
+/* mkdraft:func_8AF21610 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF21864.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF21960.s")
+/* mkdraft:func_8AF21960 begin */
+extern f32 D_80088E50[];
+extern f32 D_8AF2A3E8;
+
+void func_8AF21960(void *arg0, u16 *arg1) {
+    f32 scale;
+    u16 temp_v0;
+
+    temp_v0 = *arg1;
+    scale = D_8AF2A3E8;
+    // karodo: empty block. Its line boundary keeps the 1.0f materialization attributed
+    // here instead of uopt's entry constant pool, so as1 schedules it next to the multiplies.
+    if (arg0) {
+    }
+    *(f32 *)((u8 *)arg0 + 0x40) = D_80088E50[temp_v0 >> 4] * scale + 1.0f;
+    *(f32 *)((u8 *)arg0 + 0x44) = D_80088E50[temp_v0 >> 4] * scale + 1.0f;
+    temp_v0 += 0x2000;
+    *arg1 = temp_v0;
+}
+/* mkdraft:func_8AF21960 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_20F140/func_8AF219B4.s")
 
