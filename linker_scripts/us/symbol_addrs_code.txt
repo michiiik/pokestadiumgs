@@ -10383,8 +10383,8 @@ BattleAnim_StartEffect70DoubleTextureTrail_Emit = 0x84159584; // type:func
 BattleAnim_StartEffect70DoubleTextureTrail_Init = 0x84159708; // type:func
 BattleAnim_StartEffect70DoubleTextureTrail_Update = 0x84159738; // type:func
 BattleAnim_StartEffect70DoubleTextureTrail_Draw = 0x84159758; // type:func
-func_841597AC = 0x841597AC; // type:func
-func_84159A50 = 0x84159A50; // type:func
+BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture = 0x841597AC; // type:func
+BattleAnim_StartEffect39CombinedTrail_EmitSixSlot = 0x84159A50; // type:func
 BattleAnim_StartEffect39CombinedTrail_Init = 0x84159C2C; // type:func
 BattleAnim_StartEffect39CombinedTrail_Update = 0x84159C6C; // type:func
 BattleAnim_StartEffect39CombinedTrail_Draw = 0x84159CC8; // type:func
@@ -10899,3 +10899,6 @@ MysteryGift_SelectReward_fragment88 = 0x81C004E4; // type:func
 MysteryGift_BuildTeam_fragment88 = 0x81C00584; // type:func
 func_81C00740 = 0x81C00740; // type:func
 func_81C007A4 = 0x81C007A4; // type:func
+
+// Retained boundary data for fragment79_3C60B0's aligned rodata window.
+D_8418C5D0 = 0x8418C5D0; // type:f32 size:0x4 force_not_migration:true

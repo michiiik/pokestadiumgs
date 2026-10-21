@@ -673,3 +673,5 @@ func_84158C4C = BattleAnim_StartEffect47SixSlotTrail_Emit;
 func_84158F00 = BattleAnim_StartEffect4DoubleTextureTrail_Emit;
 func_8415923C = BattleAnim_StartEffect77DoubleTextureTrail_Emit;
 func_84159584 = BattleAnim_StartEffect70DoubleTextureTrail_Emit;
+func_841597AC = BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture;
+func_84159A50 = BattleAnim_StartEffect39CombinedTrail_EmitSixSlot;

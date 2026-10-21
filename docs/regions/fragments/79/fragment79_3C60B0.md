@@ -340,3 +340,60 @@ baseline/blank stability, consolidated declarations, readable grouped calls,
 texture layout, semantic names and named blank stability. Existing accepted
 neighbors remain unchanged. No byte/relocation rewrite, forced register,
 dummy local, arbitrary padding or private helper tooling is published.
+
+## Effect39 combined emitters and literal-pool layout: accepted
+
+Two more owners, 1152 bytes, accepted by the native runner with the full
+retail-ROM comparison:
+
+- 841597AC: BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture,676 bytes.
+- 84159A50: BattleAnim_StartEffect39CombinedTrail_EmitSixSlot,476 bytes.
+
+The double-texture emitter uses the established six-output geometry helper,
+scales all three velocities by12.0f, and starts two distinct layers with
+the original texture records, controls, and colors. It matched directly.
+The six-slot emitter uses the same geometry, independent cosine jitter on
+vy/vz, scale12.0f, and lifetime60. All backend parameter widths are inherited
+from their actual accepted definitions, not guessed from register occupancy.
+
+Important source-lineage result: spelling all four angle/jitter constants
+as their original float literals (pi3.141592741f and0.4f) reproduces every
+non-relocation instruction word of84159A50 and its four-word constant pool
+40490FDB/3ECCCCCD/40490FDB/3ECCCCCD in order. Writable extern declarations
+instead produced an extra allocation range and16 differing words; explicit
+coefficient carriers changed frame/lifetimes, readonly qualification was
+inert, and changing only0.4f reduced but did not resolve the residual.
+This was not an exhausted register tie. The runner's historical futility
+warning did not establish that source-shape work could not close it.
+
+Logging-only allocation observation was calibrated on a known accepted
+neighbor and the retained candidate under stock/logging-off/logging-on and
+blank-line controls: all eight complete-object comparisons passed without
+changing tracked source. It exposed the extra common-coefficient web and
+guided the literal-lineage experiment. No instrumented output is installed.
+
+The original literals still lived in the shared3FB010.rodata blob, so a
+normal per-file .rodata subsegment is required. The aligned32-byte window
+3FBE60..3FBE80 includes neighboring D_8418C5D0 (1.2f), the16-byte pool and
+the original trailing zeros. Keep D_8418C5D0 as standalone extracted data,
+with force_not_migration:true and its ordinary GLOBAL_ASM data include;
+it is not a function, padding helper, or instruction rewrite. A C const
+definition was not adopted: IDO puts that object in .data, not .rodata.
+The boundary metadata is in symbol_addrs_code.txt to avoid touching another
+session's active symbol_addrs.txt edits. The generated linker script moves
+only the shared head before this object and introduces the3FBE80 tail.
+
+Pinned spimdisasm1.35.0-dev0 extraction was staged separately. Both normal
+and blank-line layout controls independently linked all21376 text bytes
+and32 readonly bytes to their retail ROM ranges. The full-ROM gate passed
+with84159A50 still assembly, before replaying the immutable C candidate.
+After the split its sequential ROM gate passed too. Do not force a
+section-layout rejection through the gate or treat a normalized score as
+acceptance; the matching ROM is the final oracle.
+
+First-success artifacts were immediately frozen and externally hashed at
+each acceptance and at the layout-only gate. Five final whole-original-
+object controls preserve all text, data, function extents and semantic
+relocation targets through declaration cleanup, grouped calls, names and
+blank lines. The older geometry, radial, mixed-precision, wave and renderer
+requeues remain unchanged; all effect39 emitter owners are now resolved.

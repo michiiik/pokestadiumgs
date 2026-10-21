@@ -1195,22 +1195,82 @@ void BattleAnim_StartEffect70DoubleTextureTrail_Draw(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841597AC.s")
+extern S1_unk_D_843C2C00_024 D_84187270;
+extern S1_unk_D_843C2C00_024 D_84187290;
+extern S1_unk_D_843C2C00_024 D_841872B0;
+extern S1_unk_D_843C2C00_024 D_841872D0;
+extern S1_unk_D_843C2C00_024 D_841872F0;
+extern S1_unk_D_843C2C00_024 D_84187310;
+extern f32 D_8418C5CC;
+extern f32 D_8418C5D0;
+extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+void BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture(void) {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 vx;
+    f32 vy;
+    f32 vz;
+    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    vx *= 12.0f;
+    vy *= 12.0f;
+    vz *= 12.0f;
+    DoubleTextureTrail_Spawn(
+        x, y, z, vx, vy, vz,
+        0.0f, 5.0f, D_8418C5CC, 2.0f, 10.0f, 20,
+        21, 22, 5, 30, 0, 13,
+        -5, 30, 15, 13, &D_84187270, &D_84187290,
+        255, 255, 0, 255, 150, 50,
+        0, 0, 255, 255, 200, 100,
+        200);
+    DoubleTextureTrail_Spawn(
+        x, y, z, vx, vy, vz,
+        0.0f, 5.0f, D_8418C5D0, 3.0f, 15.0f, 20,
+        27, 26, 6, 20, 14, 15,
+        -3, 10, 0, 15, &D_841872B0, &D_841872D0,
+        255, 255, 100, 150, 255, 255,
+        100, 0, 200, 0, 0, 0,
+        0);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84159A50.s")
+// Retained neighboring readonly value, not a function or instruction rewrite.
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/D_8418C5D0.s")
+extern f32 __cosf(f32);
+extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+void BattleAnim_StartEffect39CombinedTrail_EmitSixSlot(void) {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 vx;
+    f32 vy;
+    f32 vz;
+    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    vy += 0.4f * __cosf(((guRandom() % 10) * 3.141592741f) / 10.0f);
+    vz += 0.4f * __cosf(((guRandom() % 10) * 3.141592741f) / 10.0f);
+    vx *= 12.0f;
+    vy *= 12.0f;
+    vz *= 12.0f;
+    BattleAnim_SixSlotTrail_Spawn(
+        0, x, y, z, vx, vy,
+        vz, 255, 255, 100, 50, 200,
+        255, 50, 0, 255, 0.4f, 2.0f,
+        5.0f, 60, 25, 25, 0, 20,
+        0, 13, 0, 25, 0, 13,
+        &D_841872F0, &D_84187310);
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_841597AC(void);
-extern void func_84159A50(void);
+extern void BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture(void);
+extern void BattleAnim_StartEffect39CombinedTrail_EmitSixSlot(void);
 void BattleAnim_StartEffect39CombinedTrail_Init(void) {
     BattleAnim_ResetSharedEffectMatrix();
     func_84166F60();
-    func_841597AC();
+    BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture();
     func_84168540();
-    func_84159A50();
+    BattleAnim_StartEffect39CombinedTrail_EmitSixSlot();
 }
 #endif
 
@@ -1219,7 +1279,7 @@ extern u16 D_841A4D50;
 void BattleAnim_StartEffect39CombinedTrail_Update(void) {
     (*(s16 *)&D_841A4D50) = (*(s16 *)&D_841A4D50) + 1;
     if ((*(s16 *)&D_841A4D50 % 10) == 0) {
-        func_84159A50();
+        BattleAnim_StartEffect39CombinedTrail_EmitSixSlot();
     }
     func_84169040();
     func_841677C4();
