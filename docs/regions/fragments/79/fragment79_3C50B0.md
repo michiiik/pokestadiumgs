@@ -226,3 +226,119 @@ Remaining owners are `func_84155AC4`, `func_84155CB8`, `func_84155F28` and
 subsegment before C switch candidates. The move-slot requeue above and the
 separate ten-vertex geometry requeue remain unresolved; this batch does not
 complete the file or project.
+
+## Per-record refresh: requeue, 2026-10-22
+
+`func_84155F28` remains assembly. Its original 788-byte body copies or masks
+four move bytes according to species 202 and opposing-state bit 0x8000,
+clears six bytes, writes record bytes 11 and 12, and refreshes four calculated
+stats. Speed is copied from party-record offset 46, not calculated. The
+88-byte party record starts at side-table offset 24. Preserve the helper's
+actual `u8 *(u8)` signature and the stat calculator's
+`u32(s32, s32, u16, u16, u16)` interface.
+
+Fifty recorded source candidates cover typed party/record views, conditional
+byte spelling, stat-experience expression trees, pointer declaration order,
+separate byte-loop aliases, bounded loop-index widths and side/record address
+association. Every family first passes known/context/leading-blank
+whole-original-object controls. No candidate accepts or installs. Ordinary
+four- and six-iteration loops already produce compiler unrolling; manually
+unrolling them is not the next hypothesis.
+
+The affine stat-experience expression `65280 + ((-(u32)other[4]) << 8)` uses
+defined unsigned wraparound before conversion to the real u16 argument. It
+recovers the original negate-then-shift instructions, whereas the signed
+negative-product spelling uses an extra `$at` carrier and the simple
+`(255 - other[4]) << 8` lowers a different expression tree. Cell 0 of the
+private `native-f79-record-refresh-exp-tree` batch retains this useful
+partial result: 776 bytes, 48-byte frame, normalized similarity 0.9239 and
+raw similarity 0.3096. These scores are not match evidence.
+
+An eight-control passive allocator trace compares stock, observer-off/on and
+leading-blank complete objects for both the known module and retained affine
+parent. All allocatable bytes, sections, function extents and semantic
+relocations agree within each parent. The trace measures an address-expression
+web assigned to `$s0`; the ROM instead spills the record pointer across the
+four stat calls and saves only `$ra`. Byte aliases and simple pointer-order
+permutations do not remove this promotion. Address reassociation can instead
+promote the slot or side argument, so it does not solve the frame problem.
+
+Next: inspect the retained unsigned-scaling parent's address-expression/web
+construction and real pointer lifetime across the copy/reset/stat phases.
+Keep the four stat calls, their intervening loads, and the copied speed;
+do not add address-taking no-ops, volatile qualifiers, fake locals or altered
+helper interfaces to defeat promotion. The compiler trace is diagnostic only,
+not a modified-compiler acceptance path.
+
+## Slot updater: typed-view follow-up, 2026-10-22
+
+Twenty-four additional recorded candidates use the established side-record
+view, index widths, guard-return spelling, record-pointer lifetimes and a
+stored-value call argument. The typed view recovers the original 164-byte
+body, frame and opcode sequence. Cell 0 of the private
+`native-f79-slot-typed-state` batch has twelve remaining instruction-word
+differences, all register operands. The first is the selected-record load
+at function offset 48: `$t0` instead of `$a3`. Later temporary registers
+shift accordingly. Relocation offsets and kinds agree. No C body installs.
+
+The reduced search input is calibrated against the retained complete-module
+candidate: all 41 masked instruction words and relocation topology agree.
+A bounded ninety-second native search excludes fake, ABI and type mutations;
+its score stays at 95, with no improvement. Its unchanged-score output is not
+adopted. Four selected-index widths and both guard spellings also reproduce
+the same twelve-word residual, not eight independent improvements.
+
+Eight passive allocator controls cover known and candidate whole objects
+under stock, observer-off/on and leading-blank builds. Within each source,
+all allocatable bytes, layouts, function extents and semantic relocations
+agree. The retained candidate assigns the selected-index local to physical
+register 8 while an intermediate expression occupies physical register 7.
+This is measured allocation evidence, not proof that a particular historical
+declaration is impossible.
+
+Next: inspect that intermediate expression's provenance and the selected
+index's lifetime before and after typed record addressing. Preserve the
+unconditional selected-record read, slot guard, both move stores and effect
+notification. Repeating width, guard or simple declaration-order variants
+does not test a new hypothesis. Do not reserve `$a3` using unused expressions,
+fake parameters or forced registers.
+
+### Guarded index domain resolves the slot-updater requeue
+
+`func_84155CB8` is now `BattleMoveState_UpdateMoveSlot`. It reads the selected
+record before validating the slot, copies the live move-table byte at slot+5
+to both the selected saved record and current move slot, then invokes
+`BattleMoveState_ApplySelectedMoveEffects`. These two stores and the effect
+call justify the name; the 164-byte original body remains the comparison
+oracle.
+
+A bounded child-expression observer passes eight stock/off/on/leading-blank
+whole-object controls. It identifies the intermediate occupying physical
+register 7 as a conversion of argument-home offset 7, the slot argument.
+An initial side-conversion hypothesis is rejected: sixteen genuine unsigned
+side-stride/table-index variants do not change the residual. The child trace,
+not the earlier pointer-only allocator log, establishes the operand identity.
+
+Keep the signed `slot < 4` guard, then index the source and two destination
+arrays with `(u32)slot`. The guard has already restricted that index to 0..3;
+unsigned address arithmetic removes the repeatedly used signed-conversion
+web without changing the accepted slot domain or adding an operation. Cell 0
+of the eight-cell `native-f79-slot-guarded-index-domain` batch is directly
+link-verified and accepted by the normal full-ROM gate. Subsequent candidates
+are skipped after acceptance. No fake local, dummy expression, forced register,
+prototype change or instruction rewrite is used.
+
+The first successful comparison freezes source, changed whole object, four
+distinct collateral objects, ROM, ELF and linked script. All nine hashes are
+independently checked before more compilation. Eight subsequent whole-object
+controls cover the accepted body, leading blanks, redundant extern removal,
+naming and six target-layout assertions. Ten independent unmodified-linker
+checks preserve all 4096 retail text bytes and all 26 function extents.
+The original-address alias accompanies the renamed address-map entry.
+
+The final named normal ROM gate passes with retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d` and immediately freezes thirteen complete
+objects plus source, ROM, ELF and linked script. Every frozen hash is checked
+externally. Three owners remain assembly: the per-record refresh
+`func_84155F28` and dispatchers `func_84155AC4` / `func_841562BC`. The refresh
+requeue and dispatcher readonly-layout prerequisite above remain open.

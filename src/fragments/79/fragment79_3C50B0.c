@@ -103,7 +103,18 @@ void BattleMoveState_ApplySelectedMoveEffects(u8 side, u8 move) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C50B0/func_84155CB8.s")
+void BattleMoveState_UpdateMoveSlot(u8 side, u8 slot) {
+    u8 selected;
+    u8 move;
+
+    selected = D_841951F8[side][10];
+    if (slot < 4) {
+        move = D_84195208[side][(u32)slot + 5];
+        ((MoveStatSide *)D_8419EE00)[side].records[selected].moves[(u32)slot] = move;
+        ((MoveStatSide *)D_8419EE00)[side].moves[(u32)slot] = move;
+        BattleMoveState_ApplySelectedMoveEffects(side, move);
+    }
+}
 #endif
 
 #ifdef VERSION_US
