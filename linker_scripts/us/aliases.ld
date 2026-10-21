@@ -8,6 +8,12 @@
  * undefined_syms.ld, and the other hand-written scripts are.
  */
 Audio_ThreadEntry = Audio_ThreadMain;
+/* Fragment 79 side-indexed effect bookkeeping. */
+func_8414D910 = BattleEffects_CopyOpposingMove;
+func_8414E224 = BattleEffects_SetOpposingAmountFromHP;
+func_8414E508 = BattleEffects_ClearInsufficientAmount;
+func_8414E5B0 = BattleEffects_DoubleConditionalScale;
+func_8414E7D8 = BattleEffects_DoubleScaleForIncomingAmount;
 /* Fragment 7 profile-entry validation and compaction. */
 func_8300B54C = Fragment7_ValidateProfileEntries;
 /* Fragment 7 rule swapping, retained no-op, and profile loading. */

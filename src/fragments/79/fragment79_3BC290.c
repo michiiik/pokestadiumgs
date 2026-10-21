@@ -36,8 +36,6 @@ void func_8414CDB8(u8 *arg0, u8 arg1, u8 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414CE08.s")
 
-extern void func_84149D54(void *, u8, u8);
-extern void func_84149D0C(void *);
 void func_8414CEE0(s32 arg0, u8 arg1, u8 arg2) {
     u8 rec[0x20];
     u8 *value;
@@ -53,8 +51,6 @@ void func_8414CEE0(s32 arg0, u8 arg1, u8 arg2) {
     *(u16 *)(value + 0x1E) = *(s32 *)(rec + 0xC) >> 3;
 }
 
-extern void func_84149D54(void *, u8, u8);
-extern void func_84149D0C(void *);
 void func_8414CF74(s32 arg0, u8 arg1, u8 arg2) {
     u8 rec[0x20];
     u8 *value;
@@ -112,7 +108,6 @@ void func_8414D51C(s32 arg0, u8 arg1) {
     }
 }
 
-extern u8 * func_84154B64(u8);
 void func_8414D610(s32 arg0, u8 arg1) {
     u8 *value;
     s32 diff;
@@ -161,7 +156,46 @@ s32 func_8414D680(u8 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414D720.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414D910.s")
+typedef struct {
+    u8 unk_00;
+    u8 selected_side;
+    u8 moves[2];
+    u8 unk_04[6];
+    u16 amount_0A[2];
+    u8 unk_0E[4];
+    u16 amount_12[2];
+    u8 unk_16[4];
+    u16 amount_1A[2];
+    u8 unk_1E[0x34 - 0x1E];
+    u32 scale_34[2];
+} Fragment79EffectView;
+extern u8 func_84154B24(void);
+extern void func_8414FC30(void *, u8);
+extern void func_84150268(void *, u8);
+extern void func_8414D198(void *, u8);
+extern void func_84153E28(void *, u8);
+extern u8 func_80062D20(u8);
+void BattleEffects_CopyOpposingMove(void *state) {
+    u8 side;
+    u8 other;
+    const u8 *mon;
+    Fragment79EffectView *view;
+
+    side = func_84154B24();
+    other = 1 - side;
+    mon = func_84154B64(other);
+    view = (Fragment79EffectView *)((u8 *)state + 4);
+
+    if (view->selected_side == side) {
+        view->moves[side] = mon[0x24];
+    } else {
+        view->moves[side] = view->moves[other];
+    }
+    func_8414FC30(state, side);
+    func_84150268(state, side);
+    func_8414D198(state, side);
+    func_84153E28(state, side);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414D9B8.s")
 
@@ -173,16 +207,68 @@ s32 func_8414D680(u8 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414DD94.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414E224.s")
+void BattleEffects_SetOpposingAmountFromHP(void *state) {
+    u8 side;
+    u8 other;
+    const u8 *mon;
+    const u8 *opponent;
+    Fragment79EffectView *view;
+
+    side = func_84154B24();
+    other = 1 - side;
+    mon = func_84154B64(side);
+    opponent = func_84154B64(other);
+    view = (Fragment79EffectView *)((u8 *)state + 4);
+
+    if (view->selected_side == side) {
+        if (*(u16 *)(mon + 0x28) < view->amount_0A[other]) {
+            view->amount_1A[other] = *(u16 *)(opponent + 0x28);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414E2A8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414E508.s")
+void BattleEffects_ClearInsufficientAmount(void *state) {
+    u8 side;
+    Fragment79EffectView *view;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414E5B0.s")
+    side = func_84154B24();
+    view = (Fragment79EffectView *)((u8 *)state + 4);
+
+    if (view->selected_side == side) {
+        if (view->amount_0A[(u8)(1 - side)] < view->amount_1A[side]) {
+            view->amount_0A[side] = 0;
+        }
+    } else {
+        if (view->amount_0A[(u8)(1 - side)] * 2 < view->amount_1A[side]) {
+            view->amount_0A[side] = 0;
+        }
+    }
+}
+
+void BattleEffects_DoubleConditionalScale(void *state) {
+    u8 side;
+    u8 other;
+    const u8 *mon;
+    Fragment79EffectView *view;
+
+    side = func_84154B24();
+    other = 1 - side;
+    mon = func_84154B64(side);
+    func_84154B64(other);
+    view = (Fragment79EffectView *)((u8 *)state + 4);
+
+    if (view->selected_side == side) {
+        if (view->amount_12[side] + *(u16 *)(mon + 0x28) <
+                *(u16 *)(mon + 0x2A) &&
+            view->amount_0A[other] < view->amount_12[side]) {
+            view->scale_34[side] *= 2;
+        }
+    }
+}
 
 extern u8 func_84154B24();
-extern u8 * func_84154B64(u8);
 extern s32 func_841556C4(u8 *, u8);
 void func_8414E658(s32 arg0)
 {
@@ -221,9 +307,6 @@ void func_8414E658(s32 arg0)
   }
 }
 
-extern s32 func_841556C4(u8 *, u8);
-extern u8 func_84154B24();
-extern u8 * func_84154B64(u8);
 void func_8414E760(s32 arg0) {
     u8 side;
     u8 other;
@@ -237,7 +320,23 @@ void func_8414E760(s32 arg0) {
         *(u8 *)((u8 *)(u32)arg0 + side + 0xA) = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414E7D8.s")
+void BattleEffects_DoubleScaleForIncomingAmount(void *state) {
+    u8 side;
+    u8 other;
+    const u8 *mon;
+    Fragment79EffectView *view;
+
+    side = func_84154B24();
+    other = 1 - side;
+    mon = func_84154B64(side);
+    func_84154B64(other);
+    view = (Fragment79EffectView *)((u8 *)state + 4);
+
+    if (*(u16 *)(mon + 0x28) < view->amount_0A[other] ||
+        (view->selected_side == other && *(u16 *)(mon + 0x28) < view->amount_0A[other] * 2)) {
+        view->scale_34[side] *= 2;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414E880.s")
 
@@ -248,9 +347,6 @@ void func_8414E760(s32 arg0) {
 extern void func_8414DC58(s32, u8);
 extern void func_8414EA4C(s32);
 extern void func_8414EB90(s32);
-extern u8 func_80062D20(u8 arg0);
-extern u8 func_84154B24();
-extern u8 * func_84154B64(u8);
 void func_8414EC18(s32 arg0) {
     u8 current;
     u8 other;
