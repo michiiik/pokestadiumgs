@@ -698,3 +698,7 @@ func_84160EEC = PhaseGrid16_BuildViewMatrix;
 func_84160250 = PhaseGrid16_AddRipple;
 func_841603A0 = PhaseGrid16_Initialize;
 func_84161018 = PhaseGrid16_Draw;
+func_841614E0 = FlatGrid16_Initialize;
+func_84161CF4 = FlatGrid16_FillVertex;
+func_84162078 = FlatGrid16_BuildViewMatrix;
+func_84162C88 = TexturedRibbonSheet_IsComplete;
