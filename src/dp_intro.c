@@ -157,7 +157,7 @@ extern void func_80004BEC(void *);
 extern s32 func_80004F34(void *);
 extern s32 Sched_TryReceiveClientQueue(void *);
 extern void func_80009EB4(void *, u16, s32);
-extern void func_8000A080(s32);
+extern void profiler_log_worker_time(s32);
 extern s32 Display_GetFramebufferClearColor(void);
 
 /* A local `ctx` variable holding this cast (computed once) makes IDO
@@ -241,7 +241,7 @@ s32 func_800017F8(void) {
     D_800AB490 = D_800AB480;
     D_800AB480 = D_800AB470;
 
-    func_8000A080(3);
+    profiler_log_worker_time(3);
 
     if (func_80004F34(ctx) == 0x56545245) {
         retraceCount++;
@@ -276,7 +276,7 @@ extern void func_80005568(void *);
 extern u8 D_800CD020[];
 extern OSMesgQueue D_800AB3CC;
 extern OSMesgQueue D_800AB3E4;
-extern void func_8000A080(s32);
+extern void profiler_log_worker_time(s32);
 
 void func_80001B20(UNUSED void *arg0) {
     OSMesg msg;
@@ -292,12 +292,12 @@ void func_80001B20(UNUSED void *arg0) {
         if (*(s16 *)(D_800CD020 + 0xA38) > 0) {
             DisplayWorker_DrainEvents();
         } else {
-            func_8000A080(0);
+            profiler_log_worker_time(0);
             leoDiskID[0xA8A] = 1;
             osRecvMesg(&D_800AB3CC, &msg, 1);
             leoDiskID[0xA8A] = 0;
-            func_8000A080(1);
-            func_8000A080(2);
+            profiler_log_worker_time(1);
+            profiler_log_worker_time(2);
             func_8000177C(msg);
             leoDiskID[0xA8B] = func_800017F8();
             osSendMesg(&D_800AB3E4, (OSMesg)0x444F4E45, 0);

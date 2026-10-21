@@ -19,7 +19,47 @@ s32 func_80004BEC(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_80004C14.s")
+extern s32 profiler_log_gfx_time(s32);
+typedef struct S1_UnkStruct80001380 {
+    OSMesg mesg;
+    OSMesgQueue queue;
+    u16 state;
+    u16 notifyFlag;
+    OSTask task;
+} S1_UnkStruct80001380;
+s32 func_80004C14(S1_UnkStruct80001380 *arg0) {
+    s32 var_v1 = 0;
+
+    if (arg0->state == 2) {
+        osSpTaskLoad(&arg0->task);
+        osSpTaskStartGo(&arg0->task);
+        arg0->state = 1;
+        var_v1 = 1;
+    } else if (arg0->state == 0) {
+        switch (arg0->task.t.type) {
+            case M_AUDTASK:
+                profiler_log_vblank_time();
+                break;
+
+            case M_GFXTASK:
+                profiler_log_gfx_time(0);
+                arg0->notifyFlag = 1;
+                osDpSetStatus(0x3C0);
+                break;
+
+            case 4:
+                arg0->notifyFlag = 2;
+                break;
+        }
+
+        osSpTaskLoad(&arg0->task);
+        osSpTaskStartGo(&arg0->task);
+
+        arg0->state = 1;
+        var_v1 = 1;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -302,7 +342,38 @@ void Sched_HandlePreNMI(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800052C4.s")
+void Sched_HandleRspEvent(void) {
+    S1_UnkStruct80001380* sp24 = (S1_UnkStruct80001380 *)D_800CD020[0xA14 / 4];
+    s32 tmp = Sched_HandleRspCompletion((u8 *)D_800CD020[0xA14 / 4]);
+
+    D_800CD020[0xA14 / 4] = 0;
+
+    if (tmp) {
+        D_800CD020[0xA14 / 4] = (u32)Sched_TryStartTask((void *)D_800CD020[0xA18 / 4]);
+    }
+
+    if (sp24->state == 3) {
+        switch (sp24->task.t.type) {
+            case M_AUDTASK:
+                D_800CD020[0xA18 / 4] = 0;
+                D_800CD020[0xA28 / 4] = 0;
+                D_800CD020[0xA14 / 4] = (u32)Sched_TryStartTask((void *)D_800CD020[0xA1C / 4]);
+                break;
+
+            case M_GFXTASK:
+                if (((S1_UnkStruct80001380 *)D_800CD020[0xA1C / 4])->notifyFlag == 2) {
+                    D_800CD020[0xA1C / 4] = 0;
+                    D_800CD020[0xA2C / 4] = 0;
+                }
+                break;
+
+            case 4:
+                D_800CD020[0xA1C / 4] = 0;
+                D_800CD020[0xA30 / 4] = 0;
+                break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -316,7 +387,46 @@ void Sched_HandleRdpEvent(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800053D4.s")
+extern OSMesgQueue D_800CDA10;
+extern u8 D_800CD9D0[];
+extern void func_800051B0(void);
+extern void Sched_HandleRspEvent(void);
+void func_800053D4(void *arg0) {
+    s32 sp24;
+
+    __osSetFpcCsr(0x01000C01);
+    osCreateMesgQueue(&D_800CDA10, D_800CD9D0, 0x10);
+    osViSetEvent(&D_800CDA10, 0x66, 1);
+    osSetEventMesg(4, &D_800CDA10, 0x64);
+    osSetEventMesg(9, &D_800CDA10, 0x65);
+    osSetEventMesg(0xE, &D_800CDA10, 0x68);
+
+    while (1) {
+        osRecvMesg(&D_800CDA10, &sp24, 1);
+
+        switch (sp24) {
+            case 0x66:
+                func_800051B0();
+                break;
+
+            case 0x64:
+                Sched_HandleRspEvent();
+                break;
+
+            case 0x65:
+                Sched_HandleRdpEvent();
+                break;
+
+            case 0x67:
+                Sched_StartPendingTask();
+                break;
+
+            case 0x68:
+                Sched_HandlePreNMI();
+                break;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -356,7 +466,19 @@ void func_80005568(S1_unk_D_800AA660 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800055B0.s")
+void func_800055B0(S1_unk_D_800AA660 *arg0) {
+    S1_unk_D_800AA660 **var_v0 = (S1_unk_D_800AA660 **)((u8 *)D_800CD020 + 0xA10);
+    S1_unk_D_800AA660 *var_v1 = D_800CDA30;
+
+    while (var_v1 != NULL) {
+        if (var_v1 == arg0) {
+            *var_v0 = var_v1->nextClient;
+            break;
+        }
+        var_v0 = &var_v1->nextClient;
+        var_v1 = var_v1->nextClient;
+    }
+}
 #endif
 
 #ifdef VERSION_US

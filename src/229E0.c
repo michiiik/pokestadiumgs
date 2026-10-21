@@ -192,7 +192,14 @@ s32 func_80024864(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800248A0.s")
+extern u32 D_800D1900;
+extern u8 D_154F190[];
+extern void func_80035068(u32 rom, u8 *destination, u32 remaining);
+
+void func_800248A0(void) {
+    func_80035068((u32)D_154F190 + 4, (u8 *)&D_800D1900, 8);
+    D_800D1900 += (u32)D_154F190;
+}
 #endif
 
 #ifdef VERSION_US
@@ -6312,7 +6319,54 @@ void Geo_NodeReference(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_8003A4CC.s")
+/* mkdraft:func_8003A4CC begin */
+extern Gfx *D_800D0510;
+extern void *D_80094908;
+extern void Gfx_ApplyScissorRect(void **);
+extern void func_80077DC0(Mtx *, u16 *, f32, f32, f32, f32, f32);
+extern void func_8003A2C8(void *);
+
+void func_8003A4CC(S1_GraphNode *arg0) {
+    UNUSED S1_MtxF pad_mtx;
+    S1_unk_D_86002F34_00C *arg = (S1_unk_D_86002F34_00C *)arg0;
+    S1_unk_D_86002F34_00C_040 *temp_s2 = &arg->unk_40;
+    S1_unk_D_86002F34_00C_060 *temp_s1 = &arg->unk_60;
+    S1_unk_D_86002F34_00C_024 *sp48 = &arg->unk_24;
+    S1_unk_D_86002F34_00C_018 *temp_s0 = &arg->unk_18;
+
+    temp_s0->vp = Gfx_AllocDisplayList(sizeof(Vp) * 1);
+    temp_s2->mtx = Gfx_AllocDisplayList(sizeof(Mtx) * 1);
+    sp48->mtx = Gfx_AllocDisplayList(sizeof(S1_MtxF) * 1);
+    temp_s1->p_mtxf = Gfx_AllocDisplayList(sizeof(S1_MtxF) * 1);
+    temp_s1->lookat = Gfx_AllocDisplayList(sizeof(LookAt) * 1);
+
+    temp_s0->vp->vp.vtrans[0] = (temp_s0->x * 4) + (temp_s0->width * 2);
+    temp_s0->vp->vp.vtrans[1] = (temp_s0->y * 4) + (temp_s0->height * 2);
+    temp_s0->vp->vp.vtrans[2] = 0x1FF;
+
+    temp_s0->vp->vp.vscale[0] = temp_s0->width * 2;
+    temp_s0->vp->vp.vscale[1] = temp_s0->height * 2;
+    temp_s0->vp->vp.vscale[2] = 0x1FF;
+
+    gSPViewport(D_800D0510++, (u32)temp_s0->vp & 0x1FFFFFFF);
+    gDPSetScissorFrac(D_800D0510++, G_SC_NON_INTERLACE, temp_s0->x * 4.0f, temp_s0->y * 4.0f,
+                      (temp_s0->x + temp_s0->width) * 4.0f, (temp_s0->y + temp_s0->height) * 4.0f);
+
+    guOrtho(temp_s2->mtx, temp_s2->l, temp_s2->r, temp_s2->b, temp_s2->t, temp_s2->n, temp_s2->f, temp_s2->scale);
+    func_80077DC0(sp48->mtx, &sp48->perspNorm, sp48->fovy, sp48->aspect, sp48->near, sp48->far, sp48->scale);
+    guLookAtReflectF(&temp_s1->mtxf, temp_s1->lookat, temp_s1->eye.x, temp_s1->eye.y, temp_s1->eye.z, temp_s1->at.x,
+                     temp_s1->at.y, temp_s1->at.z, temp_s1->up.x, temp_s1->up.y, temp_s1->up.z);
+    MtxF_ToFixed(temp_s1->p_mtxf, &temp_s1->mtxf);
+
+    D_80094908 = arg;
+    if ((arg->unk_CC.unk_00 != 1) && (arg->unk_00.unk_0C != NULL)) {
+        func_8003A2C8(&arg->unk_00);
+    }
+    GeoOverlay_Draw(&arg->unk_CC, temp_s2);
+    Gfx_ApplyScissorRect(&D_800D0510);
+    D_80094908 = NULL;
+}
+/* mkdraft:func_8003A4CC end */
 #endif
 
 #ifdef VERSION_US
@@ -9217,7 +9271,16 @@ typedef struct {
     SceneModelEntry entry;
 } SceneGeometryNode;
 extern void *process_geo_layout(S1_MemoryBlock *, void *);
-SceneProcessedModel *Fragment_ProcessGeoLayout(S1_MemoryBlock *pool, SceneModelEntry entry, S1_arg1_func_80010CA8 adjustment, u8 format, s32 special) {
+// K&R definition (no prototype): this file's caller of the narrowed `u8 format`
+// formal must forward the cached s16 format word as a full lw; a prototyped
+// form narrows it to lbu at the call. The callee reads lbu either way.
+SceneProcessedModel *Fragment_ProcessGeoLayout(pool, entry, adjustment, format, special)
+S1_MemoryBlock *pool;
+SceneModelEntry entry;
+S1_arg1_func_80010CA8 adjustment;
+u8 format;
+s32 special;
+{
     SceneProcessedModel *model;
     s32 i;
     model = entry(0, 0);
@@ -9255,7 +9318,32 @@ void Fragment_ProcessGeoLayoutList(S1_MemoryBlock* arg0, S1_arg1_func_80019420* 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/229E0/func_800416C8.s")
+/* mkdraft:func_800416C8 begin */
+typedef struct { s16 kind; s16 id; s16 buffer; s8 variant; u8 unknown07; OSMesgQueue *reply; void *data; s32 source; u8 *destination; s32 size; S1_arg1_func_80010CA8 adjustment; } SceneWorkerMessageLoad;
+extern u8 *MainPool_InitState(u8 *, s32);
+extern void MainPool_FinalizeAllocation(S1_MemoryBlock *);
+extern OSThread D_80126530;
+
+void func_800416C8(SceneWorkerMessageLoad *message) {
+    s32 fragment;
+    s32 buffer;
+    S1_MemoryBlock *pool;
+    s32 used;
+
+    buffer = message->buffer;
+    pool = (S1_MemoryBlock *)MainPool_InitState(message->destination, message->size);
+    fragment = func_80041430((s32)pool, 0, *(s32 *)((u8 *)&D_80126530 + 0x9E8), message->id,
+                             *(s32 *)((u8 *)&D_80126530 + 0x9FC), 0xF000);
+    if (fragment != 0) {
+        message->data = Fragment_ProcessGeoLayout(pool, fragment, message->adjustment, buffer, message->variant);
+    } else {
+        message->data = NULL;
+    }
+    used = pool->size;
+    message->size = (used + 1039) & ~0x3FF;
+    MainPool_FinalizeAllocation(pool);
+}
+/* mkdraft:func_800416C8 end */
 #endif
 
 #ifdef VERSION_US
@@ -9322,7 +9410,9 @@ void func_80041A18(void *arg0) {
 
 #ifdef VERSION_US
 extern void __osSetFpcCsr(s32);
-extern void func_800416C8(void *);
+// Dispatcher passes an OSMesg (void*) that this handler reads as a
+// SceneWorkerMessageLoad (the typedef above func_800416C8's splice).
+extern void func_800416C8(SceneWorkerMessageLoad *);
 extern void PokeIcon_LoadResourceList(SceneWorkerMessage *);
 extern void func_8004186C(void *);
 extern void func_80041A18(void *arg0);

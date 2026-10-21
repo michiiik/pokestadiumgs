@@ -286,6 +286,10 @@ $(DECOMP_POKESTADIUMGS_FILTERED): CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC) -- $
 # The JPEG entropy decoder's original lowering is reproduced by stock IDO 5.3.
 # Keep this source-specific; the rest of the game continues to use IDO 7.1.
 build/src/C890.o: CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC_OLD) -- $(AS) $(ASFLAGS) --
+# C380 (the JPEG huffman/quantization routines) was also compiled with IDO 5.3
+# in the retail build; 7.1 produces different regalloc/scheduling (bnezl, folded
+# andi/move pairs) that never matches the target .s.
+build/src/C380.o: CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC_OLD) -- $(AS) $(ASFLAGS) --
 
 rom: $(ROM)
 	@$(PRINT) "$(RED)Building ROM...\n$(NO_COL)"

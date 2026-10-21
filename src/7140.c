@@ -2,8 +2,27 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_80006540.s")
+extern void _bzero(void *, s32);
 
+OSPiHandle *func_80006540(void) {
+    static OSPiHandle sramHandle;
+
+    void *baseAddr = OS_PHYSICAL_TO_K1(0x08000000);
+    if (baseAddr != (void *)(u32)sramHandle.baseAddress) {
+        sramHandle.type = DEVICE_TYPE_SRAM;
+        sramHandle.baseAddress = (u32)baseAddr;
+        sramHandle.latency = 5;
+        sramHandle.pulse = 0xC;
+        sramHandle.pageSize = 0xD;
+        sramHandle.relDuration = 2;
+
+        sramHandle.domain = PI_DOMAIN2;
+        sramHandle.speed = 0;
+        _bzero(&sramHandle.transferInfo, sizeof(sramHandle.transferInfo));
+        osEPiLinkHandle(&sramHandle);
+    }
+    return &sramHandle;
+}
 s32 Storage_ReadSram(void *arg0) {
     struct Func800065DCState { u8 pad[0x1C]; s32 unk1C; void *vaddr; s32 size; s32 unk28; };
     extern OSMesgQueue D_800D0474;

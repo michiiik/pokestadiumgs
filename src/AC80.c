@@ -2,7 +2,32 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A080.s")
+/* mkdraft:profiler_log_worker_time begin */
+void profiler_log_worker_time(s32 arg0) {
+    typedef struct {
+        s16 count;
+        u8 pad[6];
+        OSTime times[4];
+        u8 tail[0xA0];
+    } ProfilerRecordWorker;
+    extern u8 D_800D0F90;
+    extern OSTime D_800CDA28;
+    extern OSTime osGetTime(void);
+    if (arg0 == 0) {
+        ((ProfilerRecordWorker *)&D_800D0F90)[*(s16 *)((u8 *)&D_800D0F90 + 0x25A)].times[arg0] = D_800CDA28;
+    } else {
+        ((ProfilerRecordWorker *)&D_800D0F90)[*(s16 *)((u8 *)&D_800D0F90 + 0x25A)].times[arg0] = osGetTime();
+    }
+    if (arg0 == 3) {
+        if (*(s16 *)((u8 *)&D_800D0F90 + 0x25A) == 2) {
+            *(s16 *)((u8 *)&D_800D0F90 + 0x25A) = 0;
+        } else {
+            *(s16 *)((u8 *)&D_800D0F90 + 0x25A) += 1;
+        }
+        ((ProfilerRecordWorker *)&D_800D0F90)[*(s16 *)((u8 *)&D_800D0F90 + 0x25A)].count = 0;
+    }
+}
+/* mkdraft:profiler_log_worker_time end */
 
 extern u8 D_800D0F90;
 extern OSTime osGetTime(void);
@@ -123,8 +148,73 @@ void draw_reference_profiler_bars(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000A730.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000AA2C.s")
+typedef struct ProfilerFrameDataAC80 {
+    s16 numSoundTimes;
+    s16 numVblankTimes;
+    OSTime gameTimes[5];
+    OSTime gfxTimes[3];
+    OSTime soundTimes[8];
+    OSTime vblankTimes[8];
+} ProfilerFrameDataAC80;
+extern u8 D_800D0F90;
 
+void func_8000AA2C(void) {
+    s32 i;
+    ProfilerFrameDataAC80 *profiler =
+        &(*(ProfilerFrameDataAC80 (*)[3])&D_800D0F90)[(*(s16 *)((u8 *)&D_800D0F90 + 0x25A) == 0) ? 2 : *(s16 *)((u8 *)&D_800D0F90 + 0x25A) - 1];
+    OSTime clockStart = profiler->gameTimes[0] <= profiler->soundTimes[0] ? profiler->gameTimes[0] : profiler->soundTimes[0];
+    OSTime gameDuration = profiler->gameTimes[1] - clockStart;
+    OSTime renderDuration = profiler->gameTimes[2] - profiler->gameTimes[1];
+    OSTime taskStart = 0;
+    ProfilerFrameDataAC80 *profiler_2 =
+        &(*(ProfilerFrameDataAC80 (*)[3])&D_800D0F90)[(*(s16 *)((u8 *)&D_800D0F90 + 0x25C) == 0) ? 2 : *(s16 *)((u8 *)&D_800D0F90 + 0x25C) - 1];
+    OSTime rspDuration = profiler_2->gfxTimes[1] - profiler_2->gfxTimes[0];
+    OSTime rdpDuration = profiler_2->gfxTimes[2] - profiler_2->gfxTimes[0];
+    OSTime vblank = 0;
+    static s16 sRenderLastMax = 0;
+    static s16 sRenderResetCtr = 0;
+    static s16 sRDPLastMax = 0;
+    static s16 sRDPResetCtr = 0;
+
+    profiler->numSoundTimes &= 0xFFFE;
+
+    for (i = 0; i < profiler->numSoundTimes; i += 2) {
+        u64 soundDuration = profiler->soundTimes[i + 1] - profiler->soundTimes[i];
+        taskStart += soundDuration;
+        if (profiler->soundTimes[i] < profiler->gameTimes[1]) {
+            gameDuration -= soundDuration;
+        } else if (profiler->soundTimes[i] < profiler->gameTimes[2]) {
+            renderDuration -= soundDuration;
+        }
+    }
+
+    profiler_2->numVblankTimes &= 0xFFFE;
+
+    for (i = 0; i < profiler_2->numVblankTimes; i += 2) {
+        vblank += (profiler_2->vblankTimes[i + 1] - profiler_2->vblankTimes[i]);
+    }
+
+    clockStart = 0;
+    draw_profiler_bar_cpu(0, clockStart, clockStart + taskStart, 212, 0xF94B);
+
+    clockStart += taskStart;
+    draw_profiler_bar_cpu(0, clockStart, clockStart + gameDuration, 212, 0xFFCB);
+
+    clockStart += gameDuration;
+    draw_profiler_bar_cpu(0, clockStart, clockStart + renderDuration, 212, 0xFBCB);
+
+    draw_profiler_bar_cpu_keep_max(0, clockStart + renderDuration, 212, &sRenderLastMax, &sRenderResetCtr);
+
+    draw_profiler_bar_cpu(0, 0, rdpDuration, 216, 0xFBCB);
+
+    draw_profiler_bar_cpu(0, 0, rspDuration, 216, 0xFFCB);
+
+    draw_profiler_bar_cpu(0, 0, vblank, 216, 0xF94B);
+
+    draw_profiler_bar_cpu_keep_max(0, rdpDuration, 216, &sRDPLastMax, &sRDPResetCtr);
+
+    draw_reference_profiler_bars();
+}
 extern Gfx* D_800D0510;
 void draw_profiler(s32 profiler_mode) {
     s32 ulx;
@@ -170,7 +260,29 @@ void clear_profiler_data(void) {
     (*(s16 *)((u8 *)(&D_800D0F90) + (0x25C))) = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000B28C.s")
+/* mkdraft:func_8000B28C begin */
+extern s16 D_80087E30;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/AC80/func_8000B2A4.s")
+void func_8000B28C(void) {
+    *(OSTime *)&D_80087E30 = 0;
+}
+/* mkdraft:func_8000B28C end */
+
+s16 D_80087E30 = 0;
+s16 D_80087E34 = 0;
+u32 func_8000B2A4(s32 arg0) {
+    u32 ret = 0;
+    static OSTime sBackupTime = 0ULL;
+
+    switch (arg0) {
+        case 1:
+            sBackupTime = osGetTime();
+            ret = 0;
+            break;
+        case 2:
+            ret = OS_CYCLES_TO_USEC(osGetTime() - sBackupTime);
+            break;
+    }
+    return ret;
+}
 #endif

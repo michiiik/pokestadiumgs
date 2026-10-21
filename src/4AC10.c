@@ -122,7 +122,43 @@ void Ui_FillInsetRectangleB(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4AC10/func_8004A858.s")
+/* mkdraft:Ui_DrawGradientQuad begin */
+extern s32 func_8000731C(void);
+extern void *Gfx_AllocDisplayList(s32);
+extern void Gfx_SetViewportDimensions(void *, s16, s16);
+extern void Gfx_SetVertexAttributes(Vtx *, s16, s16, s16, s16, s16, u8, u8, u8, u8);
+extern Mtx D_80094890;
+
+void Ui_DrawGradientQuad(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 *arg4, u8 *arg5) {
+    s16 *dims;
+    Vtx *vertices;
+    Mtx *matrix;
+    Vp *viewport;
+
+    dims = (s16 *)func_8000731C();
+    vertices = Gfx_AllocDisplayList(0x40);
+    matrix = Gfx_AllocDisplayList(0x40);
+    viewport = Gfx_AllocDisplayList(0x10);
+    Gfx_SetViewportDimensions(viewport, dims[2], dims[3]);
+    gSPViewport(D_800D0510++, (u32)viewport & 0x1FFFFFFF);
+    guOrtho(matrix, 0.5f, (f32)(u16)dims[2] - 0.5f, (f32)(u16)dims[3] - 0.5f, 0.5f, -2.0f, 2.0f, 1.0f);
+    Gfx_SetVertexAttributes(vertices, (s16)arg0, (s16)arg1, -1, 0, 0, arg4[0], arg4[1], arg4[2], 0xFF);
+    Gfx_SetVertexAttributes(vertices + 1, (s16)(arg0 + arg2), (s16)arg1, -1, 0, 0, arg4[0], arg4[1], arg4[2], 0xFF);
+    Gfx_SetVertexAttributes(vertices + 2, (s16)arg0, (s16)(arg1 + arg3), -1, 0, 0, arg5[0], arg5[1], arg5[2], 0xFF);
+    Gfx_SetVertexAttributes(vertices + 3, (s16)(arg0 + arg2), (s16)(arg1 + arg3), -1, 0, 0, arg5[0], arg5[1], arg5[2], 0xFF);
+    gDPPipeSync(D_800D0510++);
+    gDPSetCycleType(D_800D0510++, G_CYC_1CYCLE);
+    gSPClearGeometryMode(D_800D0510++, G_ZBUFFER | G_LIGHTING);
+    gSPSetGeometryMode(D_800D0510++, G_SHADING_SMOOTH | G_SHADE);
+    gDPSetCombine(D_800D0510++, 0xFFFFFF, 0xFFFE793C);
+    gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
+    gSPPerspNormalize(D_800D0510++, 0xFFFF);
+    gSPMatrix(D_800D0510++, (u32)matrix & 0x1FFFFFFF, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+    gSPMatrix(D_800D0510++, (u32)&D_80094890 & 0x1FFFFFFF, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPVertex(D_800D0510++, (u32)vertices & 0x1FFFFFFF, 4, 0);
+    gSP2Triangles(D_800D0510++, 0, 2, 3, 0, 0, 3, 1, 0);
+}
+/* mkdraft:Ui_DrawGradientQuad end */
 
 extern Gfx *D_800D0510;
 extern s32 StageContext_IsHighResolution(void);
@@ -146,7 +182,7 @@ void Ui_DrawBorderedPanel(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
 
 extern Gfx *D_800D0510;
 extern s32 StageContext_IsHighResolution(void);
-extern void func_8004A858(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
+extern void Ui_DrawGradientQuad(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 *arg4, u8 *arg5);
 extern void Ui_DrawBorderStyleA(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 extern void Ui_DrawBorderStyleC(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
 extern u8 D_80094E38[];
@@ -154,9 +190,9 @@ extern u8 D_80094F50[];
 void Ui_DrawGradientPanel(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     if (arg2 >= 15 && arg3 >= 15) {
         if (StageContext_IsHighResolution() != 0) {
-            func_8004A858(arg0 + 6, arg1 + 6, arg2 - 12, arg3 - 12, arg4, arg5);
+            Ui_DrawGradientQuad(arg0 + 6, arg1 + 6, arg2 - 12, arg3 - 12, arg4, arg5);
         } else {
-            func_8004A858(arg0 + 2, arg1 + 2, arg2 - 4, arg3 - 4, arg4, arg5);
+            Ui_DrawGradientQuad(arg0 + 2, arg1 + 2, arg2 - 4, arg3 - 4, arg4, arg5);
         }
     }
     gSPDisplayList(D_800D0510++, D_80094E38);

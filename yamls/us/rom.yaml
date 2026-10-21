@@ -286,6 +286,9 @@
     - [0x85D90, lib, libultra, setwatchlo]
 
     - [0x85DA0, data]
+    - [0x88A20, .data, AC80] # src/AC80.c owns [0x80087E20, 0x80087E40): profiler/render statics,
+                             # D_80087E30/E34, sBackupTime (wave-5 migration)
+    - [0x88A40, data]
     - [0x97ED0, .data, 56F90]
     - [0x97EE0, data]
     
@@ -365,6 +368,7 @@
     - [0xA5610, .rodata, 585D0] # jtbl_800A4AB4 (+44 more)
     - [0xA5BF0, .rodata, 615D0] # jtbl_800A4FF0 (+2 more)
     - [0xA5C80, rodata]
+    - [0xA5C90, .rodata, 63CF0] # D_800A5090 + jtbl_800A5094 + jtbl_800A5104
     - [0xA5D50, .rodata, 641E0] # Fallback records and all three species/move jump tables.
     - [0xA5EA0, rodata] # 654A0 jtbl_800A52A0 (+2 more): mixed 4/8 late_rodata alignment skews asm-processor text by +4; keep in the blob
     - [0xA5FD0, .rodata, 65820] # jtbl_800A53D0
@@ -405,6 +409,8 @@
     - {vram: 0x800A7E80, type:  .bss, name: main}
     - {vram: 0x800AAA00, type:  bss, name: unk_bss}
     - {vram: 0x800AB3C0, type:  bss, name: unk_bss2}
+    - {vram: 0x800D0490, type: .bss, name: 7140} # src/7140.c sramHandle (0x74 bytes; SUBALIGN(16) pads to 0x80)
+    - {vram: 0x800D0510, type:  bss, name: unk_bss3}
 
     # ultralib
     - {type: lib, vram: 0x8012B510, name: libultra, object: sptask, section: .bss}
