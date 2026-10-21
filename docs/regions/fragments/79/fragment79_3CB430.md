@@ -182,5 +182,51 @@ Six compiler-checked facts verify the three-byte RGB size, complete state size
 and vertex/color/environment/node offsets. All original text, the 288-byte
 readonly pool, function extents and semantic relocations remain equal.
 No instruction rewrite, forced register, dummy local, arbitrary padding or
-manual loop unrolling is introduced. Only `8415DBBC`, the radial renderer,
-remains assembly in this file.
+manual loop unrolling is introduced. The radial renderer is documented below.
+
+## Accepted radial renderer; file complete
+
+`8415DBBC` / `Radial20_Draw` replaces the final assembly owner in this file.
+It visits ten states, generates twenty cross-sections for each active state,
+emits the front and back geometry passes, and draws the associated auxiliary
+effect. GS modes 0/2 use two textured edge vertices; modes 1/3 use three
+colored vertices; mode 4 uses six vertices around each ring; mode 5 uses three
+triangular lobes, interpolated colors and occasional auxiliary particles.
+The six-entry tables, existing display lists, RGB arrays and radial scale
+array establish these mode-dependent paths.
+
+Stadium 1's `func_84362084` provides a structural source witness. Its nine
+modes are not copied verbatim: GS removes the fifteen-vertex path and maps
+the remaining modes into six values. Explicit mode labels for the default
+front-face path reproduce the original dispatch and allocator behavior.
+The accepted source uses a real three-float output vector and ordinary loops;
+moving the state pointer into the outer loop footer or switching the output
+to an array changed allocation and was not adopted. Existing helper signatures
+are used consistently, including the rotation and auxiliary-effect calls.
+
+The renderer state view has named color records, a vertex-buffer pointer at
+offset 28, and twenty 72-byte nodes at offset 72. Nine compiler-checked facts
+verify the color/state/node sizes and every accessed header layout group.
+No new data definitions are introduced; the original display lists and color
+and scale tables remain external.
+
+Recorded native-runner acceptance uses the sequential full-ROM gate for the
+relocation-masked probe. The successful gate immediately freezes source, the
+complete changed object, four distinct collateral objects, ROM, ELF and linked
+script, with external hashes checked before further compilation. Six final
+whole-original-object controls cover known source, blank lines, readable
+locals/declarations, naming, named-source blank lines and layout assertions.
+All 13616 text bytes, 288 readonly bytes, section shapes and semantic relocation
+targets match the original object. Every other function extent is unchanged.
+
+The original assembly owner's 5396-byte span includes twelve terminal zero
+bytes after its return delay slot. The compiled C body is 5384 bytes; natural
+16-byte section alignment supplies the same twelve zeros. Only the function's
+`st_size` excludes that alignment tail. This metadata difference is explicitly
+audited: body start, section end, all tail bytes, all other function extents
+and all relocation records are checked. No padding pragma or helper, dummy
+local, forced register, instruction rewrite or manual unrolling is added.
+
+There are now no `GLOBAL_ASM` owners in `fragment79_3CB430.c`; its complete C
+translation unit passes full-ROM comparison. This is file-level completion,
+not completion of the repository-wide decompilation.
