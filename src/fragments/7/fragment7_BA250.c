@@ -1010,14 +1010,14 @@ extern void func_800226C0(s32);
 extern s32 func_81804A20(void *);
 extern void func_81805524(void *, void *);
 s32 func_83007ECC(s32 arg0, void *arg1) {
-    struct State { u8 pad[0x4E038]; u8 current; u8 target; u8 pad2[2]; f32 progress; };
+    struct State { u8 pad[0x4E038]; u8 current; u8 target; u8 pad2[2]; f32 scroll_progress; };
     s32 limit;
     func_81805524((void *)arg0, arg1);
     if (((struct State *)arg1)->current != ((struct State *)arg1)->target) {
-        ((struct State *)arg1)->progress += func_818006B4() * 0.0625f;
-        if (((struct State *)arg1)->progress > 1.0f) {
+        ((struct State *)arg1)->scroll_progress += func_818006B4() * 0.0625f;
+        if (((struct State *)arg1)->scroll_progress > 1.0f) {
             ((struct State *)arg1)->current = ((struct State *)arg1)->target;
-            ((struct State *)arg1)->progress = 0.0f;
+            ((struct State *)arg1)->scroll_progress = 0.0f;
         }
     } else if (func_81804A20(arg1) != 0) {
         arg0 = ((struct State *)arg1)->current;
@@ -1095,6 +1095,30 @@ void Fragment7_DrawSelectedRecordView(void *definition, u8 *state, void *origin)
 #endif
 
 #ifdef VERSION_US
+typedef struct { u32 words[292]; } Fragment7TeamRecord;
+typedef struct {
+    u8 unk_00000[22];
+    u16 buttons;
+    u8 unk_00018[6];
+    u8 mode;
+    u8 unk_0001F[29];
+    u8 controller;
+    u8 unk_0003D;
+    u8 source_bank;
+    u8 unk_0003F;
+    u8 source_row;
+    u8 unk_00041[6];
+    u8 selection;
+    u8 unk_00048[15];
+    u8 team_scroll;
+    u8 target_team_scroll;
+    u8 record_scroll;
+    u8 target_record_scroll;
+    u8 unk_0005B[0x3FF1C - 91];
+    u8 message_selector;
+    u8 unk_3FF1D[0x4E03C - 0x3FF1D];
+    f32 scroll_progress;
+} Fragment7NavigationState;
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008290.s")
 #endif
 
@@ -1112,7 +1136,48 @@ void func_83008700(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008740.s")
+typedef struct {
+    s16 archive;
+    s16 entry;
+    s16 x;
+    s16 y;
+    u8 text_settings[8];
+    s32 blend;
+    void *styles[3];
+} Fragment7StatusTextRecord;
+extern Fragment7StatusTextRecord D_8300EE88;
+extern void WidgetText_DrawRecordWithSetup(void *, void *, f32, s32);
+extern void WidgetResources_DrawRecords(s32, s32, s32);
+extern f32 func_818055E0(void *, u8 *);
+void Fragment7_DrawRecordStatus(s32 definition, void *memory, void *origin) {
+    Fragment7StatusTextRecord record;
+    Fragment7NavigationState *state = memory;
+    f32 weight;
+
+    record = D_8300EE88;
+    weight = func_818055E0((void *)definition, (u8 *)state);
+    switch (state->message_selector) {
+    case 1:
+        record.entry = 79;
+        break;
+    case 2:
+        record.entry = 80;
+        break;
+    case 3:
+    case 4:
+    case 6:
+    case 7:
+        record.entry = 78;
+        break;
+    case 5:
+        record.entry = 81;
+        WidgetResources_DrawRecords(definition, (s32)state, (s32)origin);
+        break;
+    default:
+        return;
+    }
+    WidgetText_DrawRecordWithSetup(&record, origin, weight, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1169,11 +1234,60 @@ void func_83008960(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008A68.s")
+extern void func_800226C0(s32);
+extern void func_83000E40(s32 arg0, s32 arg1);
+extern void func_83001000(void *);
+void Fragment7_SelectTeamRecord(Fragment7NavigationState *state, s32 selected) {
+    if (selected == -1) {
+        state->mode = 20;
+        func_800226C0(3);
+    } else if (selected >= 4) {
+        if (selected + state->team_scroll < ((u8 *)state)[0x3BDF5] + 4) {
+            func_83000E40((s32)((u8 *)(((Fragment7TeamRecord *)((u8 *)state + 0x3BDF8) + (selected - 4)) + state->team_scroll)), (s32)state);
+            func_83001000(state);
+            state->mode = 23;
+            func_800226C0(144);
+        } else {
+            func_800226C0(5);
+        }
+    } else if (selected > 0) {
+        if (selected < ((u8 *)state)[0x3A291] + 1) {
+            func_83000E40((s32)(((Fragment7TeamRecord *)((u8 *)state + 0x3A294) + (selected - 1))), (s32)state);
+            func_83001000(state);
+            func_800226C0(2);
+            state->mode = 23;
+        } else {
+            func_800226C0(5);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008BB8.s")
+extern void func_800226C0(s32);
+extern f32 func_818006B4(void);
+extern s32 func_81804A20(void *);
+extern void func_81805524(void *, void *);
+s32 Fragment7_HandleTeamListScroll(void *definition, Fragment7NavigationState *state) {
+    if (state->team_scroll != state->target_team_scroll) {
+        state->scroll_progress += func_818006B4() * 0.125f;
+        if (state->scroll_progress > 1.0f) {
+            state->scroll_progress = 0.0f;
+            state->team_scroll = state->target_team_scroll;
+        }
+    } else if (func_81804A20(state) != 0) {
+        if (state->team_scroll > 0 && ((state->selection == 4 && (state->buttons & 0x800)) || (state->buttons & 8))) {
+            state->target_team_scroll--;
+            func_800226C0(1);
+        } else if (state->team_scroll < 3 && ((state->selection >= 6 && (state->buttons & 0x400)) || (state->buttons & 4))) {
+            state->target_team_scroll++;
+            func_800226C0(1);
+        } else {
+            func_81805524(definition, state);
+        }
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1276,7 +1390,38 @@ void func_83008F84(void *arg0, s32 arg1)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830090D0.s")
+extern void func_800226C0(s32);
+extern f32 func_818006B4(void);
+extern s32 func_81804A20(void *);
+extern void func_81805524(void *, void *);
+s32 Fragment7_HandleRecordListScroll(void *definition, void *memory) {
+    Fragment7NavigationState *state = memory;
+    s32 limit;
+
+    limit = (s32)((u8 *)state)[state->source_bank * 7012 + 0x3872C] - 3;
+    if (limit < state->record_scroll) {
+        state->target_record_scroll = limit;
+        state->record_scroll = limit;
+    }
+    if (state->record_scroll != state->target_record_scroll) {
+        state->scroll_progress += func_818006B4() * 0.125f;
+        if (state->scroll_progress > 1.0f) {
+            state->scroll_progress = 0.0f;
+            state->record_scroll = state->target_record_scroll;
+        }
+    } else if (func_81804A20(state) != 0) {
+        if (state->record_scroll > 0 && ((state->source_row < 2 && (state->buttons & 0x800)) || (state->buttons & 8))) {
+            state->target_record_scroll--;
+            func_800226C0(1);
+        } else if (state->record_scroll < limit && ((state->source_row >= 3 && (state->buttons & 0x400)) || (state->buttons & 4))) {
+            state->target_record_scroll++;
+            func_800226C0(1);
+        } else {
+            func_81805524(definition, state);
+        }
+    }
+    return 1;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1310,7 +1455,6 @@ void func_830094C8(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-typedef struct { u32 words[292]; } Fragment7TeamRecord;
 typedef struct { u8 header[4]; Fragment7TeamRecord records[6]; } Fragment7TeamRecordList;
 typedef struct { u32 words[136]; } Fragment7OtherRecord;
 typedef struct { u8 header[4]; Fragment7OtherRecord records[8]; } Fragment7OtherRecordList;

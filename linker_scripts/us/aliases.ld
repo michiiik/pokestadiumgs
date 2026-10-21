@@ -589,3 +589,7 @@ func_83001A3C = Fragment7_DrawFirstRecordListPanel;
 func_83001BA4 = Fragment7_DrawSecondRecordListPanel;
 func_83008DC0 = Fragment7_SelectSavedRecord;
 func_830096B8 = Fragment7_InitializeRecordCollections;
+func_83008740 = Fragment7_DrawRecordStatus;
+func_83008A68 = Fragment7_SelectTeamRecord;
+func_83008BB8 = Fragment7_HandleTeamListScroll;
+func_830090D0 = Fragment7_HandleRecordListScroll;

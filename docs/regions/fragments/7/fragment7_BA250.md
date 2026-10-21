@@ -203,3 +203,52 @@ All original game section bytes, function extents, and semantic relocations
 agree in the frozen first-success objects. Cleanup, naming, and twenty-blank-line
 controls preserve that complete-object result. Seventeen target-compiler layout
 assertions check record/list/collection sizes and the used state-field offsets.
+
+### Navigation and status follow-up
+
+Four further owners accepted natively from ff25a234, totaling 1392 bytes:
+`func_83008740` / `Fragment7_DrawRecordStatus` (260 bytes), `func_83008A68` /
+`Fragment7_SelectTeamRecord` (336 bytes), `func_83008BB8` /
+`Fragment7_HandleTeamListScroll` (352 bytes), and `func_830090D0` /
+`Fragment7_HandleRecordListScroll` (444 bytes). Each passed the recorded runner
+and full US-ROM comparison, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+The team selector needs separate pointer-stride additions for the selected row
+and scroll offset. Plain repeated multiplication by 1168 instead shares a
+multiplier and emits `multu`. Ordinary pointer arithmetic on the already
+established `Fragment7TeamRecord` reproduces the original shift/add sequence.
+
+Bytes 87/88 are the current/target team-list scroll offsets: byte 87 is added
+to record selections at least 4, and the callback scrolls upward at selection
+4 or downward at selections at least 6. Bytes 89/90 are the other list's
+current/target scroll offsets; its limit subtracts three from the source
+slot-count byte at `source_bank * 7012 + 0x3872C`. Both callbacks advance the
+shared interpolation at `0x4E03C`
+using `func_818006B4() * 0.125f`. Preserve fresh field reads after the readiness
+callback. A conventional typed state view of the opaque callback argument
+reproduces the latter callback's 24-byte limit spill home without random
+partial aliases, extra scalar locals, register constraints, or source padding.
+
+`Fragment7_DrawRecordStatus` copies the 32-byte text record at `D_8300EE88`
+and chooses archive entry 79, 80, 78, or 81 from the message selector at
+`0x3FF1C`. Its existing per-file rodata migration already owns `jtbl_8300FBA8`,
+so an ordinary C switch works. The layout follows the actual
+`Fragment4TextRecordView` consumer in `src/fragments/4/fragment4_AFAA0.c`.
+All complete original game bytes, extents, and semantic relocations are
+preserved; cleanup, naming, blank-line controls, and 15 target layout assertions
+pass. Stack-residual searches must use decomp-permuter's `--stack-diffs`:
+its default scorer reported zero for a body still spilling at 28 rather than 24.
+
+`func_83008290`: requeue. A natural six-iteration aggregate loop over 88-byte
+entries matches the first 117 instructions exactly, including ID lookup and
+the real two-argument `func_8005DC48(controller, destination)` call. The source
+array begins at `0x3FB60`; destination entries begin at byte 16. The remaining
+fallback copies the first byte of the empty-name resource `D_8300F924`.
+Scalar-load spellings produce 512 rather than 516 bytes because IDO folds
+the low relocation into the byte load; the oracle first materializes the
+resource address. Explicit pointer aliases fold the same way. `strcpy`,
+`memcpy`, and `bcopy` spellings retain calls. Empty literal probes additionally
+introduce non-text section drift, so those probes do not establish a match or
+an owner-wide impossibility. Next investigate the resource/address-materialization
+representation or frontend lineage while preserving the verified aggregate
+loop. Do not resume the earlier four-record/manual word-copy candidates.
