@@ -123,6 +123,7 @@ void func_83000E38(void) {
 
 #ifdef VERSION_US
 extern void func_80051830();
+extern u8 *func_8004D878(u8 *, s32, u8 *);
 void func_83000E40(s32 arg0, s32 arg1)
 {
   struct Record { u8 data[0x3C]; };
@@ -223,7 +224,77 @@ void Fragment7_LoadTeamVisualResources(Fragment7TeamVisualState *state) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_8300112C.s")
+typedef struct {
+    u8 species;
+    u8 unk_01[29];
+    u8 flags;
+    u8 unk_1F;
+    u32 payload[14];
+} Fragment7DeckEntry;
+typedef struct { u8 bytes[3200]; } Fragment7DeckVisual;
+typedef struct {
+    u8 unk_00000[60];
+    u8 controller;
+    u8 unk_0003D[0x3FB60 - 61];
+    Fragment7DeckEntry entries[6];
+    u8 unk_3FD70[0x3FF08 - 0x3FD70];
+    u8 identity[16];
+    u8 unk_3FF18[0x3FF30 - 0x3FF18];
+    s32 panel_open;
+    u8 unk_3FF34[0x49538 - 0x3FF34];
+    Fragment7DeckVisual visuals[6];
+} Fragment7DeckReadState;
+extern u8 func_8005D8CC(s32);
+extern u8 *func_8006218C(s32, s32, s32, s32);
+extern s32 Deck_ReadEntries(u8 *, s32, u8 *);
+extern void func_80061F44(u8 *);
+extern s32 func_80062304(u8 *);
+extern void func_8005D9E0(s32, void *);
+void Fragment7_LoadControllerDeck(Fragment7DeckReadState *state) {
+    s32 count;
+    s32 loaded;
+    s32 controller;
+    u8 *handle;
+    Fragment7DeckEntry entry;
+    Fragment7DeckVisual *visual;
+
+    controller = state->controller;
+    count = 0;
+    loaded = 0;
+    handle = 0;
+    if (controller >= 0 && controller < 4 && func_8005D8CC(controller) == 0) {
+        handle = func_8006218C(0x20, state->controller, 0, 0);
+    }
+    if (handle != 0) {
+        while (count < 6 && Deck_ReadEntries((u8 *)&entry, 1, handle) != 0) {
+            func_80061F44((u8 *)&entry);
+            if ((entry.flags & 1) == 0 && entry.species > 0 && entry.species < 252) {
+                *(Fragment7DeckEntry *)((s32)state + count * sizeof(Fragment7DeckEntry) + 0x3FB60) = entry;
+                count++;
+            }
+        }
+        loaded = count;
+        func_80062304(handle);
+    }
+    for (; count < 6; count++) {
+        state->entries[count].species = 0;
+    }
+    if (state->panel_open != 0 && loaded > 0) {
+        u8 *record = (u8 *)state->entries, *end =
+            (u8 *)(loaded * sizeof(Fragment7DeckVisual) + (u32)state + 0x49538);
+        visual = state->visuals;
+        do {
+            func_8004D878(visual->bytes, 0, record);
+            visual++;
+            record += sizeof(Fragment7DeckEntry);
+        } while ((u8 *)visual != end);
+    }
+    if (controller >= 0 && controller < 4) {
+        func_8005D9E0(controller, state->identity);
+    } else {
+        _bzero(state->identity, 16);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -807,10 +878,10 @@ void Fragment7_RefreshRecordCompatibility(s32 definition, void *memory) {
 
 #ifdef VERSION_US
 extern void WidgetSelection_ResetFlaggedVariant(s32, s32);
-extern void func_8300112C(s32);
+extern void Fragment7_LoadControllerDeck(Fragment7DeckReadState *);
 void func_83006308(s32 arg0, s32 arg1) {
     WidgetSelection_ResetFlaggedVariant(arg0, arg1);
-    func_8300112C(arg1);
+    Fragment7_LoadControllerDeck(arg1);
 }
 #endif
 
@@ -1063,11 +1134,112 @@ void func_830074C8(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83007568.s")
+typedef struct { u32 words[17]; } Fragment7ActionRule;
+typedef struct {
+    u8 unk_000[0x424];
+    Fragment7ActionRule rule;
+    u8 unk_468[1168 - 0x468];
+} Fragment7ActionTeam;
+typedef struct { u8 header[4]; Fragment7ActionTeam teams[6]; } Fragment7ActionBank;
+typedef struct {
+    Fragment7ActionTeam *team;
+    u8 unk_04[12];
+    s32 changed;
+} Fragment7ActionPanel;
+typedef struct {
+    u8 unk_00[30];
+    u8 mode;
+    u8 unk_1F[56 - 31];
+    Fragment7ActionPanel *panel;
+    u8 unk_3C[2];
+    u8 bank;
+    u8 unk_3F;
+    u8 row;
+    u8 unk_41[89 - 65];
+    u8 scroll;
+    u8 unk_5A[0x3829C - 90];
+    Fragment7ActionBank banks[2];
+    u8 unk_3B964[0x3FE84 - 0x3B964];
+    Fragment7ActionRule edit_rule;
+    s32 rule_flags;
+    u8 rule_pending;
+    u8 team_pending;
+} Fragment7TeamActionState;
+void Fragment7_HandleTeamActions(Fragment7TeamActionState *state, s32 selection) {
+    Fragment7ActionTeam *team;
+    switch (selection) {
+    case -1:
+        state->mode = 10;
+        func_800226C0(3);
+        break;
+    case 1:
+        state->team_pending = 1;
+        *state->panel->team = *(state->banks[state->bank].teams + (state->row + state->scroll));
+        state->panel->changed = 1;
+        func_800226C0(147);
+        break;
+    case 2:
+        state->mode = 12;
+        func_800226C0(2);
+        break;
+    case 3:
+        team = (Fragment7ActionTeam *)((u8 *)state->banks[state->bank].teams + state->row * (s32)sizeof(Fragment7ActionTeam) + state->scroll * sizeof(Fragment7ActionTeam));
+        state->edit_rule = team->rule;
+        state->rule_flags = 0x700;
+        state->rule_pending = 1;
+        func_800226C0(210);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83007788.s")
+typedef struct { u8 species; u8 unk_01[59]; } Fragment7ExportEntry;
+typedef struct {
+    u8 name[11];
+    u8 flags;
+    u8 active;
+    u8 label[23];
+    u16 trainer_id;
+    u8 unk_26[2];
+    Fragment7ExportEntry entries[6];
+} Fragment7ExportTeam;
+typedef Fragment7DeckReadState Fragment7ExportSource;
+extern s32 func_8005DA1C(s32);
+extern s32 func_8005DC48(s32, s32);
+extern u8 *func_80060D70(u8 *, s8 *);
+extern void func_80051864(s32, s32);
+extern s8 *HAL_Strcpy(s8 *, s8 *);
+extern void *func_8004C874(s32, s32);
+extern s8 D_8300F920[];
+void Fragment7_BuildControllerTeam(Fragment7ExportTeam *destination, Fragment7ExportSource *source, void *unused_rule) {
+    s8 name[11];
+    s32 count;
+    s32 i;
+    s32 controller;
+    controller = source->controller;
+    if (controller >= 0 && controller < 4) {
+        destination->trainer_id = func_8005DA1C(controller);
+        func_80060D70(destination->name, (s8 *)func_8005DC48(source->controller, (s32)name));
+    } else {
+        destination->trainer_id = 0;
+        func_80060D70(destination->name, D_8300F920);
+    }
+    for (count = 0; count < 6; count++) {
+        if (source->entries[count].species == 0) {
+            break;
+        }
+    }
+    for (i = 0; i < count; i++) {
+        func_80051864((s32)&source->entries[i], (s32)&destination->entries[i]);
+    }
+    for (; i < 6; i++) {
+        destination->entries[i].species = 0;
+    }
+    destination->active = 1;
+    destination->flags = 0x40;
+    HAL_Strcpy((s8 *)destination->label, func_8004C874(41, 41));
+}
 #endif
 
 #ifdef VERSION_US
@@ -1643,7 +1815,7 @@ void Fragment7_SelectOtherRecord(void *memory, s32 selected) {
     case 8:
         if (selected <= ((Fragment7OtherRecordList *)((u8 *)state + 0x3C854))[state->other_bank].count) {
             record = &((Fragment7OtherRecordList *)((u8 *)state + 0x3C854))[state->other_bank].records[selected - 1];
-            func_8300112C((s32)state);
+            Fragment7_LoadControllerDeck((s32)state);
             func_83000F98((s32)state, (s32)record, 1);
             state->mode = 17;
             func_800226C0(144);
@@ -1723,7 +1895,7 @@ void Fragment7_InitializeRecordCollections(Fragment7RecordInitializeState *state
     func_8300B8AC(&state->collections.other[0]);
     func_8300B8AC(&state->collections.other[1]);
     state->snapshot = *(Fragment7RecordCollections *)first;
-    func_8300112C((s32)state);
+    Fragment7_LoadControllerDeck((s32)state);
 }
 #endif
 
@@ -1795,7 +1967,7 @@ void Fragment7_OpenRecordPanel(Fragment7PanelOpenState *state, s32 resource_id) 
         MainPool_FinalizeAllocation(allocation);
     }
     state->panel_open = 1;
-    func_8300112C((s32)state);
+    Fragment7_LoadControllerDeck((s32)state);
     func_83000020((s32)state);
 }
 #endif
@@ -2066,7 +2238,6 @@ void func_8300A858(void) {
 #endif
 
 #ifdef VERSION_US
-extern u8 func_8005D8CC(s32);
 extern void func_80057908(u8);
 extern void func_8300A81C(s32, s32, s32);
 extern void func_8300A6B0(s32 arg0, s32 arg1);

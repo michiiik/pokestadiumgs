@@ -431,3 +431,73 @@ counts occupied entries before conversion and stops after six. Next isolate
 the count-loop topology and controller lifetime, checking the caller
 `func_830078E4` before making any interface change. Its visible call prepares
 only two arguments. No candidate was installed.
+
+### Controller decks, team construction, and team actions
+
+Three owners accepted natively from `8c559bb`, totaling 1468 bytes:
+
+- `func_8300112C` / `Fragment7_LoadControllerDeck` (576 bytes): opens the
+  controller's type-32 stream, normalizes and filters 88-byte entries, copies
+  at most six using ordinary aggregate assignment, and clears unused species.
+  When the panel is open, it builds the corresponding 3200-byte visual slots
+  and copies or clears the 16-byte controller identity. The final scheduling
+  residual is closed by initializing the consumed input/output byte-range
+  pointers in one declaration. A conventional continuation after `*end =`
+  preserves the match. The output loop advances real 88/3200-byte strides;
+  there is no multi-statement line group, fake local, instruction rewrite, or
+  manually unrolled copy. The earlier requeue is closed.
+- `func_83007788` / `Fragment7_BuildControllerTeam` (348 bytes): fills the
+  trainer ID and encoded name, scans up to six occupied entries, converts
+  them from 88 to 60 bytes with `func_80051864`, clears remaining species,
+  sets the active/flags bytes, and copies text resource 41:41 into the label.
+  The 60-byte entry's species is at byte 0. The name decoder's real buffer
+  holds eleven bytes: `func_80060E48` decodes ten characters plus a terminator;
+  see `src/615D0.c`. Declaring that consumed buffer before the counters restores
+  its original `76(sp)` home. A bounded scan with an early break restores
+  pointer induction; the prior empty-loop spelling retained multiplication.
+  The original stores incoming `a2` at `96(sp)` and never reads that home;
+  the C preserves this unused third argument. `func_830078E4` carries its rule
+  pointer in `a2` into the fallback call. The earlier export requeue is closed.
+- `func_83007568` / `Fragment7_HandleTeamActions` (544 bytes): handles cancel,
+  a complete 1168-byte team copy, the next-mode action, and a 68-byte rule
+  copy from team offset `0x424`. Banks have a four-byte header and six teams,
+  with a 7012-byte stride; their first team is at state `0x382A0`. The panel
+  pointer at byte 56 must be reloaded after the aggregate copy before writing
+  its changed word at byte 16. For the rule-only source, use a signed byte
+  offset for the row and an unsigned object-size offset for scrolling.
+  Writing both multiplications in the unsigned domain makes IDO share a
+  multiplier and emits `multu`; the oracle uses independent shift/add chains.
+  `(s32)sizeof(Fragment7ActionTeam)` expresses the real signed row stride
+  without a duplicated numeric size or hand-written strength reduction.
+
+Every acceptance passed the recorded native runner and full US-ROM gate,
+MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`, with an immediate externally hashed
+full-TU/four-distinct-collateral-object freeze. Complete original game section
+bytes, function extents, and semantic relocations agree for all three frozen
+objects. Cleanup shares the verified deck-state view between loading and
+export, gives the row stride its actual object size, and deduplicates externs.
+Cleanup, naming, blank-line controls, and 31 target size/offset assertions pass.
+
+`func_830078E4`: requeue. Ordinary 1168-byte and 476-byte aggregate copies
+now reach the original 768-byte size. The rule pointer is genuinely preserved
+across `func_80071250` and passed to the controller-team fallback. Compute the
+selected team before snapshotting the previous panel destination. On the
+saved-part path, reload `state->panel->team` after the rule predicate; the
+cached previous pointer is used only by the fallback. Reusing it for the
+saved-part copy drops one real pointer load and changes subsequent temporaries.
+
+Best raw similarity is 0.9792, candidate 0 of
+`native-f7-team-swap-fresh-output-batch`. A relocation-masked raw comparison
+finds exactly four differing words: entry/exit adjust the frame by 56 rather
+than 64 bytes; offsets 636/640 use `s1` rather than `v0` for the rule-only
+source-address intermediate. All other instructions, including both part-copy
+loops, agree. The actual previous/rule spill homes already match `48(sp)` and
+`36(sp)`. Separate scoped source pointers and integer/byte address views
+still coalesce with the callback-lived team pointer. A consumed fresh
+destination carrier can give the 64-byte frame but moves the previous home
+to 52 or 56 and changes temporary allocation, so it is not an acceptance.
+A calibrated 60-second native permuter run reproduced all 192 masked parent
+words and relocation topology; best score 8, with an identity-XOR proposal
+rejected as source. Next inspect the exact parent's web coalescing and live
+scopes; do not pad the frame, force registers, add dummy locals, or restore
+the old incomplete/manual-copy drafts. No body for this owner was installed.
