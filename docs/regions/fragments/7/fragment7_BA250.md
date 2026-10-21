@@ -1010,3 +1010,52 @@ spill homes, and text-address induction still differ, so it remains
 `requeue` and assembly. This result establishes a scope mechanism, not the
 original buffer capacity. Resume from this buffer-correct source basin;
 do not restore the earlier buffer-at-152 parent or add stack padding.
+
+### 2026-10-21: bank-transfer action callback and profile-panel requeue
+
+`Fragment7_HandleBankTransferActions` (`83006B48`, 872 bytes) handles the
+three bank categories selected by byte 69. On confirmation, operation 1
+replaces or appends a record in the destination bank, then removes the
+source record; operation 4 removes the selected destination record. Team
+records are 1168 bytes, profiles are 544 bytes, and rule records are 68
+bytes. The append/replace consumers in `fragment7_C4C10.c` establish these
+roles and sizes. `func_8300B31C`, `func_8300B988`, and `func_8300AED8` compare
+each bank's count against its capacity to choose replacement versus append.
+The callback also sets target-mode byte 30 and plays the existing action
+sounds. A nonzero validation result at `0x4E040` takes the error-mode path
+instead of transferring a record.
+
+The matching source uses the observed state header, direct switches over
+its category and operation fields, shared switch exits, and three ordinary
+record/destination pointers. Declaring the destination pointer before the
+rule-record pointer recovers that record's stack byte 40 while preserving
+the team-record home at 48 and the 56-byte frame. No padding, unused local,
+forced register, altered call interface, or instruction rewrite is used.
+
+The native runner accepted the source against the complete US ROM. Its
+first successful gate froze and independently hashed the whole changed
+object, four distinct collateral objects, source, ROM, ELF, and linked
+script before further compilation. Eight complete-original-object controls
+verify declaration cleanup, formatting, field/function naming, and blank
+line shifts. Eleven emitted layout values verify the state size and all
+ten accessed fields, including validation status at `0x4E040`.
+
+`func_83002ADC`: `requeue` after 88 recorded source variants and two bounded
+native source searches. The best readable draft draws the eight-profile
+bank at `0x3EA5C`: three shared-index loops render names, textures, and
+trainer IDs before the selection highlight. It has the correct 1140-byte
+extent, 128-byte frame, registers, branch/call sequence, and relocation
+topology. Only four instruction words differ: the optimizer-created bank
+address spill and its three reloads use stack byte 84 instead of 80.
+Declaring alpha, index, position, selected entry, and highlight rectangle in
+that order recovers the other homes. Preserve this four-word basin rather
+than the earlier frame-mismatching draft.
+
+Ten stock/keep/blank complete-object controls precede the retained compiler
+streams. The optimized stream explicitly assigns the spill to frame
+offset -44; the ROM requires -48. Selection widths/scopes, initializer
+forms, separate loop counters, explicit record induction, equivalent bank
+views, and grid-coordinate temporaries did not close that residual in
+this source basin. The next action is to inspect temporary-home assignment
+for this one optimizer expression, then test a compiler-faithful lifetime
+or expression-topology change. No non-matching C is installed.

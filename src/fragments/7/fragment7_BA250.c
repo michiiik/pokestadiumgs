@@ -1247,7 +1247,122 @@ void func_83006AF0(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83006B48.s")
+extern void func_8300AAD4(void *, void *);
+extern void func_8300AB58(void *, void *, s32);
+extern void func_8300ABCC(void *, s32);
+extern void func_8300AF68(void *, void *);
+extern void func_8300AFD8(void *, void *, s32);
+extern void func_8300B038(void *, s32);
+extern void func_8300B3A8(void *, void *);
+extern void func_8300B410(void *, void *, s32);
+extern void func_8300B468(void *, s32);
+extern s32 func_8300B988(void *);
+typedef struct {
+    u8 unk_00[30];
+    u8 target_mode;
+    u8 unk_1F[69 - 31];
+    u8 category, operation;
+    u8 unk_47[74 - 71];
+    u8 team_source, team_target, rule_source, rule_target;
+    u8 unk_4E[80 - 78];
+    u8 profile_target;
+    u8 unk_51[87 - 81];
+    u8 scroll;
+    u8 unk_58[0x4E040 - 88];
+    s32 validation_status;
+} Fragment7BankTransferState;
+void Fragment7_HandleBankTransferActions(void *memory, s32 event) {
+    Fragment7BankTransferState *state = memory;
+    void *team_record;
+    void *destination;
+    void *rule_record;
+
+    if (event == -1 || event == 2) {
+        func_800226C0(3);
+    }
+    switch (state->category) {
+    case 1:
+        state->target_mode = 20;
+        if (event == 1) {
+            switch (state->operation) {
+            case 1:
+                if (state->validation_status != 0) {
+                    state->target_mode = 27;
+                    func_800226C0(68);
+                    break;
+                }
+                team_record = (u8 *)state + state->team_source * 1168 + 0x39E04;
+                destination = (u8 *)state + 0x3BDF4;
+                if (func_8300B31C(destination)) {
+                    func_8300AFD8(destination, team_record, state->team_target + state->scroll - 1);
+                } else {
+                    func_8300AF68(destination, team_record);
+                }
+                func_8300B038((u8 *)state + 0x3A290, state->team_source - 1);
+                func_800226C0(68);
+                break;
+            case 4:
+                func_8300B038((u8 *)state + 0x3BDF4, state->team_target + state->scroll - 1);
+                func_800226C0(67);
+                break;
+            }
+        }
+        break;
+    case 2:
+        state->target_mode = 28;
+        if (event == 1) {
+            switch (state->operation) {
+            case 1:
+                destination = (u8 *)state + 0x3EA5C;
+                if (state->validation_status != 0) {
+                    state->target_mode = 34;
+                    func_800226C0(68);
+                    break;
+                }
+                if (func_8300B988(destination)) {
+                    func_8300B410(destination, (u8 *)state + 0x3D95C, state->profile_target - 1);
+                } else {
+                    func_8300B3A8(destination, (u8 *)state + 0x3D95C);
+                }
+                func_8300B468((u8 *)state + 0x3D958, 0);
+                func_800226C0(68);
+                break;
+            case 4:
+                func_8300B468((u8 *)state + 0x3EA5C, state->profile_target - 1);
+                func_800226C0(67);
+                break;
+            }
+        }
+        break;
+    case 3:
+        state->target_mode = 35;
+        if (event == 1) {
+            switch (state->operation) {
+            case 1:
+                if (state->validation_status != 0) {
+                    state->target_mode = 42;
+                    func_800226C0(68);
+                    break;
+                }
+                rule_record = (u8 *)state + state->rule_source * 68 + 0x39E08;
+                destination = (u8 *)state + 0x3A06C;
+                if (func_8300AED8(destination)) {
+                    func_8300AB58(destination, rule_record, state->rule_target - 1);
+                } else {
+                    func_8300AAD4(destination, rule_record);
+                }
+                func_8300ABCC((u8 *)state + 0x39E48, state->rule_source - 1);
+                func_800226C0(68);
+                break;
+            case 4:
+                func_8300ABCC((u8 *)state + 0x3A06C, state->rule_target - 1);
+                func_800226C0(67);
+                break;
+            }
+        }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
