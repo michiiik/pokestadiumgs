@@ -1511,10 +1511,12 @@ SECTIONS
         fragment16_DATA_START = .;
         fragments_16_fragment16_header = .;
         build/asm/us/data/fragments/16/fragment16_header.o(.data);
-        fragments_16_fragment16_code = .;
-        build/src/fragments/16/fragment16_code.o(.data);
         fragments_16_fragment16_data_data = .;
         build/asm/us/data/fragments/16/fragment16_data.data.o(.data);
+        fragments_16_fragment16_code = .;
+        build/src/fragments/16/fragment16_code.o(.data);
+        _10F320_data = .;
+        build/asm/us/data/10F320.data.o(.data);
         fragment16_DATA_END = .;
         fragment16_DATA_SIZE = ABSOLUTE(fragment16_DATA_END - fragment16_DATA_START);
         fragment16_RODATA_START = .;
