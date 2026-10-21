@@ -137,3 +137,64 @@ record-count loops, pointer walks and row/header views leave register/origin
 differences or trigger unwanted compiler unrolling. The latest 120-byte row
 view has 14 differing raw instruction words. Next inspect its address and
 induction webs before changing the loop again; retain ASM until a full match.
+
+## Move accuracy, hit obstacles and stealable-item scoring
+
+Four more original owners, 688 bytes, are replaced by genuine C:
+
+- `84150268` / `BattlePlan_UpdateMoveAccuracy` builds the 12-byte context
+  initialized by `func_8414A180`, applies `func_8414A144`, and writes the
+  adjusted accuracy byte to plan offset 10 plus side. The initializer clears
+  exactly 12 bytes, reads base accuracy through `func_80062DD4`, and writes
+  the two record pointers at offsets 4 and 8. Declaration order of the move,
+  entry and context recovers the original frame without extra locals.
+- `84152600` / `BattlePlan_AddStealableItemBonus` requires an empty own item
+  slot and an opponent item accepted by `func_80063754`. The same predicate
+  guards the actual item transfer in `func_8412DC20` in
+  `src/fragments/79/fragment79_393CA0.c`. It marks the side byte, adds table
+  byte 53 times `func_8414A2AC` to the side score at offset 56, and sets the
+  plan flag. An integer header base initialized before the guard and a direct
+  word-array field view preserve the address transition and 56-byte frame.
+- `84152D6C` / `BattlePlan_CountHitObstacles` counts own record byte 18 below
+  7 and opponent byte 19 above 7, then adds two when the opponent has type 8
+  and the own move list passes `BattlePlan_HasOnlyNormalOrFightingMoves`.
+  `func_84149F74` in `fragment79_3B7EA0.c` passes those same two stage fields
+  to accuracy adjustment `func_84124410`. The result is a weighted obstacle
+  count, not a hit probability. The previously documented move-power getter
+  address-test bug remains in the called predicate. Declaring the consumed
+  byte count before the two record pointers preserves the original homes.
+- `84152E10` / `BattlePlan_AddHitObstacleBonus` skips opponent byte 21 bit 8,
+  marks the side byte, and adds the obstacle count times table byte 57 times
+  `func_8414A2AC` to the side score. Its consumed header and side-score views
+  retain offset 52 in the memory operand. The flag's precise meaning remains
+  unresolved.
+
+The active-record getter is defined as `u8 *func_84154B64(u8)` and the type
+predicate as `s32 func_84155544(u8 *, u8)` in `fragment79_3C40B0.c`.
+Nineteen stale getter prototypes and two predicate prototypes now use those
+real interfaces. Four callers (`84151B8C`, `8415220C`, `84152764`, `8415335C`)
+also drop a redundant argument mask: the byte parameter already performs
+that conversion. Correcting the getter prototypes alone changes those four
+callers; correcting the prototypes and removing the masks together preserves
+the entire original object, including leading-blank controls.
+
+Each owner has a recorded runner acceptance and passes the ordinary,
+host-syntax-checked full-ROM gate. Three probes are directly link-verified.
+The obstacle-count probe instead needs the sequential gate because its call
+to the newly compiled local predicate changes relocation representation;
+the linked retail bytes and complete original object still agree. Every
+first success freezes the complete changed object, four collateral whole
+objects, source, ROM, ELF, linked script, layout inputs and original ASM;
+external hashes are checked before further compilation. No fake locals,
+forced registers or frames, padding, instruction rewriting or manual
+unrolling is used.
+
+`84150330` is a requeue at 128 bytes with two raw instruction differences:
+the final ADDU and SH use `t2` instead of `t4`. Declaration order fixes the
+state spill at offset 24. Header-base forms add an offset mismatch; separate
+old-score carriers worsen allocation; explicit narrowing and accumulation do
+not close the two-word residual. A calibrated stock/off/on/blank UGEN trace
+preserves complete-object identity and identifies the sum's temporary-pool
+allocation. A bounded source-only search remains flat. Next compare the
+emission/free events of a materially different field-expression topology;
+retain ASM rather than forcing a register.

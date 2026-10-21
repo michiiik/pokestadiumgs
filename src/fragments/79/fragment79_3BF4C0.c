@@ -4,7 +4,22 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_8414FC30.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150268.s")
+extern void func_8414A180(u8 *, u8, u8);
+extern void func_8414A144(u8 *);
+extern u8 * func_84154B64(u8);
+void BattlePlan_UpdateMoveAccuracy(u8 *plan, u8 side) {
+    u8 move;
+    u8 *entry;
+    u8 context[12];
+    entry = (u8 *)((u32)plan + (u32)side);
+    move = entry[6];
+    func_84154B64(side);
+    if (move != 0) {
+        func_8414A180(context, side, move);
+        func_8414A144(context);
+        entry[10] = context[2];
+    }
+}
 
 extern void func_8414D198(void *, u8);
 void BattlePlan_ApplyPursuitMultiplier(u8 *state, u8 side) {
@@ -68,7 +83,7 @@ void func_8415132C(void *arg0, u8 arg1) {
 }
 
 extern u8 func_80062D98(u8);
-extern u8 func_84155544(void *, u8);
+extern s32 func_84155544(u8 *, u8);
 s32 func_84151420(u8 *arg0, u8 arg1) {
     u8 value;
     u8 result;
@@ -101,7 +116,7 @@ s32 func_84151498(u8 *arg0) {
 
 extern s32 func_8414A2DC(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_8415178C(void *arg0, u8 arg1, u8 arg2) {
     void *state;
     s32 base;
@@ -140,7 +155,7 @@ void func_841518D0(void *arg0, u8 arg1, u8 arg2) {
 extern s32 func_841493F4(void);
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_84151940(void *arg0, u8 arg1) {
     u8 *state;
     s32 base;
@@ -161,7 +176,7 @@ void func_84151940(void *arg0, u8 arg1) {
 
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_84151A5C(void *arg0, u8 arg1) {
     s32 base;
     void *state;
@@ -180,7 +195,7 @@ void func_84151A5C(void *arg0, u8 arg1) {
 
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_84151AF4(void *arg0, u8 arg1) {
     s32 base;
     void *state;
@@ -201,7 +216,7 @@ extern s32 func_80063660(u8);
 extern u8 func_8414A2A0(void);
 extern void * func_8414A3A0(u8);
 extern u8 * func_84154B30(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 extern s32 func_841556C4(u8 *, u8);
 void func_84151B8C(s32 arg0, u8 arg1, u8 arg2) {
     u8 *state;
@@ -214,7 +229,7 @@ void func_84151B8C(s32 arg0, u8 arg1, u8 arg2) {
 
     state = func_84154B30((1 - (u32)arg1) & 0xFF);
     sub = state + 8;
-    other = func_84154B64(arg1 & 0xFF);
+    other = func_84154B64(arg1);
     if (func_80063660(sub[1]) == 0x19) return;
     if (sub[0x17] & 0x80) return;
     if (sub[0x18] & 0x10) return;
@@ -230,7 +245,7 @@ void func_84151B8C(s32 arg0, u8 arg1, u8 arg2) {
     *(u8 *)(u32)base |= 2;
 }
 
-void *func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_84151CD8(void *arg0, u8 arg1) { s32 base; base = (s32)(u32)arg0 + 4; if ((*(u8 *)((u8 *)func_84154B64((1 - arg1) & 0xFF) + 0x19) & 8) == 0) { *(u8 *)((u8 *)(u32)base + arg1 + 8) = 0xFF; *(u8 *)((u8 *)(u32)base) |= 2; } }
 
 extern u8 func_8414A2AC(void);
@@ -238,7 +253,7 @@ extern void *func_8414A3A0(u8);
 extern u8 * func_84154B30(u8);
 void func_84151D3C(void *arg0, u8 arg1) { void *state; void *table; s32 base; u8 value; state = func_84154B30(arg1); base = (s32)(u32)arg0 + 4; if ((*(u8 *)((u8 *)state + 3) & 0x10) == 0) { *(u8 *)((u8 *)(u32)base + arg1 + 8) = 0xFF; value = func_8414A2AC(); table = func_8414A3A0(arg1); *(u32 *)((u8 *)(u32)base + (arg1 << 2) + 0x34) += (*(u8 *)((u8 *)table + 0x28)) * value; *(u8 *)((u8 *)(u32)base) |= 2; } }
 
-void *func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_84151DD4(void *arg0, u8 arg1) { void *state; s32 base; state = func_84154B64(arg1); base = (s32)(u32)arg0 + 4; if (((*(u8 *)((u8 *)state + 0x18) & 0x10) == 0) && (((s32)*(u16 *)((u8 *)state + 0x2A) >> 2) < (s32)*(u16 *)((u8 *)state + 0x28))) { *(u8 *)((u8 *)(u32)base + arg1 + 8) = 0xFF; *(u8 *)((u8 *)(u32)base) |= 2; } }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151E44.s")
@@ -263,7 +278,7 @@ void func_84151F20(void *arg0, u8 arg1) {
 
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_84152088(void *arg0, u8 arg1) {
     s32 base;
     u8 *state;
@@ -288,7 +303,7 @@ void func_84152088(void *arg0, u8 arg1) {
 
 extern u8 func_8414A2A0(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_84152140(void *arg0, u8 arg1) {
     s32 sp18;
     s32 base;
@@ -315,8 +330,8 @@ extern u8 func_80063454(u8, u8, u8, s32);
 extern u8 func_80062D98(u8);
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
-extern u8 func_84155544(void *, u8);
+extern u8 *func_84154B64(u8);
+extern s32 func_84155544(u8 *, u8);
 void func_8415220C(void *arg0, u8 arg1) {
     void *ptr1;
     s32 index;
@@ -328,7 +343,7 @@ void func_8415220C(void *arg0, u8 arg1) {
 
     base = (s32)(u32)arg0 + 4;
     index = arg1;
-    ptr1 = func_84154B64(index & 0xFF);
+    ptr1 = func_84154B64(index);
     ptr2 = func_84154B64((1 - index) & 0xFF);
     val1 = *(u8 *)((u8 *)ptr2 + 0x24);
     if (val1 != 0) {
@@ -347,7 +362,7 @@ void func_8415220C(void *arg0, u8 arg1) {
 
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_84152308(void *arg0, u8 arg1) {
     void *state;
     s32 base;
@@ -380,7 +395,7 @@ void func_841523BC(void *arg0, u8 arg1) {
 
 extern u8 func_8414A2D0(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_84152408(void *arg0, u8 arg1) {
     u8 scratch[8];
     void *table;
@@ -403,11 +418,28 @@ void func_84152408(void *arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_8415252C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152600.s")
+extern s32 func_80063754(s32);
+void BattlePlan_AddStealableItemBonus(u8 *plan, u8 side) {
+    u8 *own;
+    u8 *other;
+    s32 base;
+    u8 *table;
+    u8 amount;
+    own = func_84154B64(side);
+    other = func_84154B64((1 - (u32)side) & 0xFF);
+    base = (s32)(u32)plan + 4;
+    if (own[1] == 0 && other[1] != 0 && func_80063754(other[1]) == 0) {
+        *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+        amount = func_8414A2AC();
+        table = func_8414A3A0(side);
+        ((u32 *)(u32)base)[(u32)side + 13] += table[53] * amount;
+        *(u8 *)(u32)base |= 2;
+    }
+}
 
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_841526CC(void *arg0, u8 arg1) {
     s32 base;
     void *state;
@@ -428,7 +460,7 @@ extern void *D_841951FC[];
 extern s32 func_841493F4(void);
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 extern s32 func_841556C4(u8 *, u8);
 void func_84152764(void *arg0, u8 arg1)
 {
@@ -439,7 +471,7 @@ void func_84152764(void *arg0, u8 arg1)
     void *table;
 
     base = (s32)(u32)arg0 + 4;
-    state = func_84154B64(arg1 & 0xFF);
+    state = func_84154B64(arg1);
     table = (void *)(u32)arg1;
     other = func_84154B64((u8)(1 - (u32)table));
     if (!(state[0x19] & 0x80) && (*(u8 *)((u8 *)(*(void **)((u8 *)D_841951FC + -(s32)((u32)table << 2))) + 9) >= 2) && (func_841556C4(other, 0x7F) == 0)) {
@@ -458,7 +490,7 @@ void func_84152764(void *arg0, u8 arg1)
 
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_841528C4(void *arg0, u8 arg1) {
     s32 base;
     u8 *state;
@@ -505,9 +537,47 @@ s32 BattlePlan_HasOnlyNormalOrFightingMoves(u8 *state) {
     return 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152D6C.s")
+u8 BattlePlan_CountHitObstacles(u8 side) {
+    u8 result;
+    u8 *own;
+    u8 *other;
+    result = 0;
+    own = func_84154B64(side);
+    other = func_84154B64((1 - side) & 0xFF);
+    if (own[18] < 7) {
+        result = 1;
+    }
+    if (other[19] >= 8) {
+        result++;
+    }
+    if (func_84155544(other, 8) != 0 && BattlePlan_HasOnlyNormalOrFightingMoves(own) != 0) {
+        result += 2;
+    }
+    return result;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152E10.s")
+void BattlePlan_AddHitObstacleBonus(u8 *plan, u8 side) {
+    u8 count;
+    u8 *other;
+    s32 base;
+    u8 *table;
+    u32 *score;
+    u8 amount;
+    func_84154B64(side);
+    other = func_84154B64((1 - (u32)side) & 0xFF);
+    base = (s32)(u32)plan + 4;
+    if ((other[21] & 8) == 0) {
+        *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+        count = BattlePlan_CountHitObstacles(side);
+        if (count > 0) {
+            amount = func_8414A2AC();
+            table = func_8414A3A0(side);
+            score = (u32 *)((u32)base + ((u32)side << 2));
+            score[13] += count * table[57] * amount;
+            *(u8 *)(u32)base |= 2;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152EE8.s")
 
@@ -516,7 +586,7 @@ s32 BattlePlan_HasOnlyNormalOrFightingMoves(u8 *state) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841531D4.s")
 
 extern void func_84151B8C(s32, u8, u8);
-void *func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_84153304(s32 arg0, u8 arg1, u8 arg2) {
     if ((s32) (*(u8 *)((u8 *)(func_84154B64((1 - arg1) & 0xFF)) + (0xD))) < 0xD) {
         func_84151B8C(arg0, arg1, arg2);
@@ -526,7 +596,7 @@ void func_84153304(s32 arg0, u8 arg1, u8 arg2) {
 extern s32 func_80064474(u8, u16);
 extern u8 func_8414A2A0(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_8415335C(void *arg0, u8 arg1) {
     u8 val1;
     void *ptr1, *ptr2;
@@ -537,7 +607,7 @@ void func_8415335C(void *arg0, u8 arg1) {
 
     base = (s32)(u32)arg0 + 4;
     index = arg1;
-    ptr1 = func_84154B64(index & 0xFF);
+    ptr1 = func_84154B64(index);
     ptr2 = func_84154B64((1 - index) & 0xFF);
     if (!(*(u8 *)((u8 *)ptr2 + 0x15) & 0x80)) {
         val1 = func_80064474(*(u8 *)ptr1, *(u16 *)((u8 *)ptr1 + 0x40));
@@ -601,7 +671,7 @@ void BattlePlan_AddConditionCountBonus(u8 *state, u8 side) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153930.s")
 
 extern void func_84150B14(void *, u8, s32, s32, s32, s32);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_84153A64(void *arg0, u8 arg1)
 {
   u8 *state;
@@ -622,7 +692,7 @@ void func_84153A64(void *arg0, u8 arg1)
 
 extern u8 func_8414A2D0(void);
 extern void * func_8414A3A0(u8);
-extern void * func_84154B64(s32);
+extern u8 *func_84154B64(u8);
 void func_84153D94(void *arg0, u8 arg1)
 {
   s32 base;
