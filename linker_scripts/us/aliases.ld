@@ -609,4 +609,5 @@ func_83008494 = Fragment7_HandleRecordActions;
 func_83000AA4 = Fragment7_ClassifyHeldItem;
 func_830013A8 = Fragment7_DrawModeHeader;
 func_83003F40 = Fragment7_DrawProfileRecordRow;
+func_83004CBC = Fragment7_DrawTeamListRows;
 func_830098A0 = Fragment7_InitializeRecordPanel;

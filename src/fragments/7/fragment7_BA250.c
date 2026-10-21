@@ -891,7 +891,7 @@ void func_83003320(void *arg0, void *arg1) {
 typedef struct { u8 bytes[52]; } Fragment7ProfileRowDefinition;
 typedef struct { u8 name[12]; u16 trainer_id; u8 unk_0E[2]; Fragment7DeckEntry entries[6]; } Fragment7ProfileDisplayRecord;
 typedef struct { u8 capacity, count; u16 flags; Fragment7ProfileDisplayRecord records[8]; } Fragment7ProfileDisplayBank;
-typedef struct { u8 unk_00[31]; u8 mode; u8 unk_20[31]; u8 bank; u8 unk_40[0x3C854-64]; Fragment7ProfileDisplayBank banks[3]; } Fragment7ProfileDisplayState;
+typedef struct { u8 unk_00[31]; u8 mode; u8 unk_20[31]; u8 bank; u8 unk_40[0x3D958-64]; Fragment7ProfileDisplayBank banks[2]; } Fragment7ProfileDisplayState;
 extern u8 D_8300CD00[];
 extern u8 D_8300F8B0[], D_8300CEA0[];
 extern Gfx D_80094F50[];
@@ -909,7 +909,7 @@ void Fragment7_DrawProfileRecordRow(Fragment7ProfileRowDefinition *definition, v
     row = definition - (Fragment7ProfileRowDefinition *)D_8300CD00 + 1;
     record = (Fragment7ProfileDisplayRecord *)((u8 *)state + state->bank * sizeof(Fragment7ProfileDisplayBank) + row * sizeof(Fragment7ProfileDisplayRecord) + 0x3C638);
     WidgetResources_DrawRecords((s32)definition, (s32)state, (s32)origin);
-    if (row <= state->banks[state->bank].count) {
+    if (row <= state->banks[state->bank - 1].count) {
         if (state->mode < 17) {
             func_800498C4();
             func_8180351C(D_8300F8B0);
@@ -976,7 +976,56 @@ void func_830042F0(s32 arg0, void *arg1, u8 *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83004CBC.s")
+typedef struct {
+    u8 capacity, count;
+    u16 flags;
+    u8 records[6][1168];
+} Fragment7TeamRenderBank;
+typedef struct {
+    u8 unk_00[28];
+    u8 previous_mode, target_mode, mode, mode_selector;
+    u8 unk_20[30];
+    u8 bank;
+    u8 unk_3F[89 - 63];
+    u8 scroll, target_scroll;
+    u8 unk_5B[96 - 91];
+    Fragment7TeamVisualSlot visuals[2][6][2];
+    u8 unk_30120[0x3A290 - 0x30120];
+    Fragment7TeamRenderBank banks[2];
+    u8 unk_3D958[0x4E03C - 0x3D958];
+    f32 scroll_progress;
+} Fragment7TeamRenderState;
+void Fragment7_DrawTeamListRows(s32 definition, Fragment7TeamRenderState *state, void *origin_memory) {
+    Fragment7ListRect *origin = origin_memory;
+    s32 compact;
+    f32 weight;
+    f32 scroll_position;
+    f32 row_base;
+    f32 visible_row;
+    s32 index;
+    Fragment7ListRect rect;
+    Fragment7TeamRenderBank *bank;
+    compact = state->mode_selector >= 11;
+    weight = func_818055E0((void *)definition, (u8 *)state);
+    scroll_position = (state->target_scroll - state->scroll) * state->scroll_progress + state->scroll;
+    index = (s32)scroll_position;
+    bank = &state->banks[state->bank - 1];
+    WidgetResources_DrawRecords(definition, (s32)state, (s32)origin);
+    row_base = (definition - (s32)D_8300D164) / 52;
+    visible_row = index;
+    visible_row = row_base + visible_row;
+    if (state->target_mode >= 11 && state->target_mode < 13 && state->previous_mode >= 11 && state->previous_mode < 13) {
+        weight = 1.0f;
+    }
+    if (weight < 0.01) return;
+    for (index = (s32)visible_row; index < visible_row + (compact ? 1 : 2); index++) {
+        rect = *origin;
+        if (index < bank->count) {
+            rect.y = rect.y + 100.0f * (index - row_base - scroll_position);
+            func_830043F0(state, bank->records[index], state->visuals[state->bank - 1][index], &rect, weight, compact);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1317,9 +1366,9 @@ typedef struct {
     u8 side;
     u8 unk_4F[89 - 79];
     u8 scroll;
-    u8 unk_5A[0x3829C - 90];
+    u8 unk_5A[0x3A290 - 90];
     Fragment7ActionBank banks[2];
-    u8 unk_3B964[0x3FE84 - 0x3B964];
+    u8 unk_3D958[0x3FE84 - 0x3D958];
     Fragment7ActionRule edit_rule;
     s32 rule_flags;
     u8 rule_pending;
@@ -1334,7 +1383,7 @@ void Fragment7_HandleTeamActions(Fragment7TeamActionState *state, s32 selection)
         break;
     case 1:
         state->team_pending = 1;
-        *state->panel->team = *(state->banks[state->bank].teams + (state->row + state->scroll));
+        *state->panel->team = *(state->banks[state->bank - 1].teams + (state->row - 1 + state->scroll));
         state->panel->changed = 1;
         func_800226C0(147);
         break;
@@ -1343,7 +1392,7 @@ void Fragment7_HandleTeamActions(Fragment7TeamActionState *state, s32 selection)
         func_800226C0(2);
         break;
     case 3:
-        team = (Fragment7ActionTeam *)((u8 *)state->banks[state->bank].teams + state->row * (s32)sizeof(Fragment7ActionTeam) + state->scroll * sizeof(Fragment7ActionTeam));
+        team = (Fragment7ActionTeam *)((u8 *)state->banks[state->bank - 1].teams + (state->row - 1) * (s32)sizeof(Fragment7ActionTeam) + state->scroll * sizeof(Fragment7ActionTeam));
         state->edit_rule = team->rule;
         state->rule_flags = 0x700;
         state->rule_pending = 1;
@@ -1418,7 +1467,7 @@ void Fragment7_HandleTeamPartActions(void *memory, s32 selection) {
         func_800226C0(3);
         break;
     case 2:
-        team = (Fragment7SwapTeam *)((u8 *)state->banks[state->bank].teams + state->row * (s32)sizeof(Fragment7ActionTeam) + state->scroll * sizeof(Fragment7ActionTeam));
+        team = (Fragment7SwapTeam *)((u8 *)state->banks[state->bank - 1].teams + (state->row - 1) * (s32)sizeof(Fragment7ActionTeam) + state->scroll * sizeof(Fragment7ActionTeam));
         previous = (Fragment7ExportTeam *)state->panel->team;
         func_800226C0(140);
         *state->panel->team = *(Fragment7ActionTeam *)team;
@@ -1433,7 +1482,7 @@ void Fragment7_HandleTeamPartActions(void *memory, s32 selection) {
         state->team_pending = 1;
         break;
     case 1:
-        source = (Fragment7ActionTeam *)((u8 *)state->banks[state->bank].teams + state->row * (s32)sizeof(Fragment7ActionTeam) + state->scroll * sizeof(Fragment7ActionTeam));
+        source = (Fragment7ActionTeam *)((u8 *)state->banks[state->bank - 1].teams + (state->row - 1) * (s32)sizeof(Fragment7ActionTeam) + state->scroll * sizeof(Fragment7ActionTeam));
         state->edit_rule = source->rule;
         state->rule_flags = 0x700;
         state->rule_pending = 1;
@@ -1668,8 +1717,8 @@ typedef struct {
     u8 selection;
     u8 unk_52[0x3A070 - 82];
     Fragment7ActionRule saved_rules[8];
-    u8 unk_3A290[0x3C854 - 0x3A290];
-    Fragment7ActionOtherBank banks[3];
+    u8 unk_3A290[0x3D958 - 0x3A290];
+    Fragment7ActionOtherBank banks[2];
     u8 unk_3FB60[0x3FD74 - 0x3FB60];
     Fragment7ActionRule fixed_rules[4];
     u8 unk_3FE84[0x3FECD - 0x3FE84];
@@ -1689,7 +1738,7 @@ void Fragment7_HandleRecordActions(Fragment7OtherActionState *state, s32 selecti
             record = 0;
         }
         Fragment7_RefreshCollectionCompatibility((Fragment7RuleCheckState *)state,
-            (Fragment7RuleDeck *)&state->banks[state->bank].records[record]);
+            (Fragment7RuleDeck *)&state->banks[state->bank - 1].records[record]);
         func_800226C0(3);
         break;
     case 1:
@@ -1698,7 +1747,7 @@ void Fragment7_HandleRecordActions(Fragment7OtherActionState *state, s32 selecti
         func_800226C0(147);
         bank = state->bank;
         record = bank == 2 ? state->record - 1 : 0;
-        *state->panel->record = state->banks[bank].records[record];
+        *state->panel->record = state->banks[bank - 1].records[record];
         func_83008290(state->panel->profile, state);
         selected = state->selection;
         if (selected >= 5) {
@@ -2064,8 +2113,8 @@ void Fragment7_SelectOtherRecord(void *memory, s32 selected) {
     case 6:
     case 7:
     case 8:
-        if (selected <= ((Fragment7OtherRecordList *)((u8 *)state + 0x3C854))[state->other_bank].count) {
-            record = &((Fragment7OtherRecordList *)((u8 *)state + 0x3C854))[state->other_bank].records[selected - 1];
+        if (selected <= ((Fragment7OtherRecordList *)((u8 *)state + 0x3D958))[state->other_bank - 1].count) {
+            record = &((Fragment7OtherRecordList *)((u8 *)state + 0x3D958))[state->other_bank - 1].records[selected - 1];
             Fragment7_LoadControllerDeck((s32)state);
             func_83000F98((s32)state, (s32)record, 1);
             state->mode = 17;
