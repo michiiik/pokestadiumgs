@@ -3,8 +3,8 @@
 # Decompilation coverage
 
 <!-- AUTO_COVERAGE:START -->
-- US functions with C implementations: **6,986 / 10,532 (66.3%)**
-- Remaining `GLOBAL_ASM` owners: **3,546**
+- US functions with C implementations: **7,034 / 10,532 (66.8%)**
+- Remaining `GLOBAL_ASM` owners: **3,498**
 - Baseline: **10,532** US `GLOBAL_ASM` owners in the original pragma snapshot
 <!-- AUTO_COVERAGE:END -->
 
@@ -140,10 +140,10 @@
 | `src/fragments/31/fragment31_1A3960.c` | 6 | 13 | 53.8% |
 | `src/fragments/31/fragment31_1A4160.c` | 3 | 4 | 25.0% |
 | `src/fragments/31/fragment31_1A43F0.c` | 1 | 3 | 66.7% |
-| `src/fragments/32/fragment32_1B1330.c` | 11 | 22 | 50.0% |
-| `src/fragments/32/fragment32_1B6E40.c` | 9 | 12 | 25.0% |
-| `src/fragments/32/fragment32_1B8010.c` | 6 | 14 | 57.1% |
-| `src/fragments/32/fragment32_1B8DE0.c` | 5 | 6 | 16.7% |
+| `src/fragments/32/fragment32_1B1330.c` | 8 | 22 | 63.6% |
+| `src/fragments/32/fragment32_1B6E40.c` | 8 | 12 | 33.3% |
+| `src/fragments/32/fragment32_1B8010.c` | 4 | 14 | 71.4% |
+| `src/fragments/32/fragment32_1B8DE0.c` | 4 | 6 | 33.3% |
 | `src/fragments/32/fragment32_1B9390.c` | 3 | 3 | 0.0% |
 | `src/fragments/32/fragment32_1B9840.c` | 2 | 2 | 0.0% |
 | `src/fragments/33/fragment33_code.c` | 5 | 12 | 58.3% |
@@ -317,13 +317,10 @@
 | `src/fragments/79/fragment79_3BC290.c` | 13 | 36 | 63.9% |
 | `src/fragments/79/fragment79_3BE6B0.c` | 2 | 4 | 50.0% |
 | `src/fragments/79/fragment79_3BEAF0.c` | 8 | 15 | 46.7% |
-| `src/fragments/79/fragment79_3BF4C0.c` | 36 | 66 | 45.5% |
+| `src/fragments/79/fragment79_3BF4C0.c` | 23 | 66 | 65.2% |
 | `src/fragments/79/fragment79_3C40B0.c` | 6 | 23 | 73.9% |
-| `src/fragments/79/fragment79_3C50B0.c` | 6 | 25 | 76.0% |
+| `src/fragments/79/fragment79_3C50B0.c` | 1 | 25 | 96.0% |
 | `src/fragments/79/fragment79_3C60B0.c` | 5 | 110 | 95.5% |
-| `src/fragments/79/fragment79_3CE960.c` | 6 | 6 | 0.0% |
-| `src/fragments/79/fragment79_3CFAE0.c` | 7 | 7 | 0.0% |
-| `src/fragments/79/fragment79_3D0D70.c` | 10 | 12 | 16.7% |
 | `src/fragments/79/fragment79_3D4060.c` | 1 | 6 | 83.3% |
 | `src/fragments/79/fragment79_3D4DA0.c` | 3 | 20 | 85.0% |
 | `src/fragments/79/fragment79_3D7DD0.c` | 3 | 17 | 82.4% |
