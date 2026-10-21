@@ -732,3 +732,4 @@ func_841515AC = BattlePlan_AddConversionBonus;
 func_84151E44 = BattlePlan_AddMimicBonus;
 func_8415169C = BattlePlan_AddFlinchBonus;
 func_84152980 = BattlePlan_ScoreCurse;
+func_84151270 = BattlePlan_AddRampageBonus;

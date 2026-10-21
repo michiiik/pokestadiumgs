@@ -389,3 +389,158 @@ The party-count `841524B4` and entry-hazard `84150330` requeues remain
 unresolved, together with the other remaining ASM owners. The near-match
 evidence for those functions above still applies; this batch does not
 install either body or claim that the file is complete.
+
+## Party-count copy-propagation checkpoint
+
+`841524B4` remains a requeue on native revision `e6d5a853`; its best retained
+candidate is still 120 bytes with 14 raw differences. Forty further source
+candidates reject. The five eight-candidate families cover consumed-header
+reuse, positively guarded byte extents, mixed array/byte-address row origins,
+an independent global-header bound, and a consumed integer row-address value.
+Header reuse triggers unwanted unrolling in the record-count forms. The
+other forms produce 124--140-byte loops or retain an extra loop-carried
+pointer; none recovers the original per-record copy and register ownership.
+No candidate is installed and no compiler modification is used for matching.
+
+Two corrected logging-only observers pass sixteen fresh stock/off/on/blank
+complete-object controls, covering the known matching module and the exact
+retained candidate object. The first observer's empty capture was rejected:
+the active CFG head is at compiler VM address `0x1001C358`, while
+`0x1001C360` is a traversal cursor. The corrected snapshots capture all 32
+candidate statements without truncation; both leading-blank controls agree.
+
+The assignment `row = party[i]` is statement 14, tied to retained source
+line 418 by the preceding location record. It survives loop-unroll handling
+with statement word `0x7B000000`, then becomes `0x60000000` immediately
+across `f_copypropagate`. The earlier party-base assignment, statement 4,
+changes in the same pass. The row assignment is already eliminated before
+`f_findinduct` and `f_eliminduct`, so another induction-only loop-spelling
+grid does not target the measured cause. This identifies the owning pass
+for the retained candidate, not an impossibility proof for genuine C.
+
+Next inspect the copy-propagation eligibility and expression identity of
+those two assignments, then test a source-level distinction supported by
+that evidence. Preserve the original one-byte side interface and byte count;
+do not add parameters, dead reads, volatile qualifiers or forced registers
+to reserve a color or retain the copy.
+
+### Copy substitution and cursor-advance follow-up
+
+Eight additional stock/off/on/leading-blank whole-object controls validate
+passive logging inside the copy-substitution helper and final dead-store
+deletion. The retained parent's row use at compiler expression `0x10071738`
+is replaced by address expression `0x10071AA8`; its party-base uses are
+likewise replaced. The final deletion at `L41A188` removes statements 4 and
+14 after these substitutions. This separates use replacement from the later
+removal of the now-unused assignments; it does not establish the original
+source's variable names or expression topology.
+
+Sixteen recorded source candidates test real cursor advances rather than
+dead uses: saving `party[i++]` before reading either field yields 124 bytes,
+with a copy before the halfword load instead of the original branch-delay
+copy. Reading the halfword before the advance, either through a consumed
+halfword local or separate guarded advances, produces 132 or 144 bytes.
+The original 120-byte, 14-raw-word parent remains best. Both eight-candidate
+batches pass known/context/leading-blank controls and install nothing.
+
+`841524B4` remains a requeue. A next hypothesis must account for the copy's
+placement as well as its existence; repeating the saved-index cursor forms
+or induction-only spellings above is not a new experiment. The passive
+observer, retained sources, objects and raw reports stay in private scratch.
+
+## Protect/Detect score allocation checkpoint
+
+`84152AC0` is a requeue on native revision `e6d5a853`. The original move
+effect table routes effect 111 through `.L8415470C` to this owner; the
+local six-byte move table gives that effect to moves 182 (Protect) and 197
+(Detect). It stores `255 >> own[33]` to the side byte at plan offset 12,
+scales table byte 55 times `8414A2AC` by that byte divided by 255, then
+applies four status-dependent score updates. The individual opposing
+status-field meanings remain unresolved.
+
+Fifty-six recorded candidates cover header representation and lifetime,
+measured stack-home ordering, real incoming-pointer/chance reuse, a consumed
+side-index local, alias-preserving explicit status-byte lifetimes, and
+integer-product expression topology. Every eight-candidate batch passes
+known/context/leading-blank whole-object controls. One earlier batch is
+refused before compilation because it contains a previously rejected body;
+that refusal is not counted as an attempted hypothesis. No body is installed.
+
+The best retained parent is candidate 1 of
+`native-f79-plan-status-score-header-lifetime`: 372 bytes, the original
+56-byte frame, original stack offsets and relocation topology, and thirteen
+raw word differences. Moving the header calculation just after the second
+record getter fixes the earlier header-register difference. The remaining
+differences are the coherent `a1`/`a2` exchange between the signed bonus
+amount and the promoted opposing status-byte load. Integer and typed-header
+spellings reach the same residual; normalization reporting 1.0 is not an
+exact match.
+
+A calibrated 45-second source-only permuter search improves its own score
+from 105 to 65, but its proposed additional side-index local expands the
+real frame to 64 bytes. Eight recorded lifetime variants confirm that this
+is not an improved project match. Removing that local and isolating the
+header-lifetime move produces the thirteen-word parent above. The returned
+edits were reviewed for initialized uses and integer arithmetic before
+testing; no forced code or compiler output is adopted.
+
+Sixteen fresh stock/off/on/leading-blank whole-object controls validate
+normal allocation logging and semantic-web tree logging against the exact
+retained parent, with procedure ordinal 53 in both captures. Bonus web 31
+is the signed local at virtual slot -20; it receives physical register 5
+(`a1`). Web 66 is a promoted byte-load tree rooted in the opposing record
+at virtual slot -12 and receives physical register 6 (`a2`). Both have
+reported save priority 2, with the bonus processed first. The explicit-byte
+and staged-product families do not improve the parent. Next inspect the
+priority/tie ordering of these two genuine webs before another source
+family; changing declaration order alone already failed to affect the
+initial rotation. Preserve the alias-sensitive status rereads after score
+stores, signed division and right shift, and the original two-argument ABI.
+
+Eight further whole-object controls validate passive logging at the actual
+allocation scan. Both competing webs are eligible with identical priority
+bits `0x40000000` in rounds 1--5. The scan walks web indices in ascending
+order and updates its winner only for a strictly greater priority. In round
+5, web 31 replaces incumbent web 19; web 66 then ties it and is skipped.
+These indices are the scan's work-list indices, distinct from the expression
+hash bits printed by the earlier color receipt. Thus the tie is measured,
+not inferred from rounded final priorities. Eight typed-record/field-access
+candidates retain exactly the same thirteen-word residual, despite covering
+typed own/opposing record pointers and direct/cast status-field accesses.
+No body is installed. A successor must change real web construction or cost
+without dummy reads or forced colors; another record-field spelling grid
+does not address this measured first-wins scan.
+
+## Accepted Rampage score bonus
+
+`84151270` / `BattlePlan_AddRampageBonus` replaces 188 original bytes with
+genuine C. The local six-byte move table assigns effect 27 to Thrash (37),
+Petal Dance (80) and Outrage (200); the effect dispatcher reaches this owner
+through `.L84154508`. With snapshot byte 3 bit 4 clear and the original
+getter-result guard passing, it marks the side's byte at plan offset 12 and
+adds table byte 18 times `8414A2A0` to the score word at offset 56.
+
+The original guard stores `func_80063660(sub[1]) != 25` into a byte, then
+tests that Boolean against 0, 16 and 15. The latter two tests therefore
+cannot filter the getter's values; the C preserves this behavior and marks
+it with `//!bug`. The exact meaning of those getter codes is not asserted
+here. Its declaration is corrected to the `u8` return type of the definition
+in `src/641E0.c`; whole-object controls prove the existing caller remains
+unchanged. Four newly redundant declarations are removed within this file.
+
+An early, consumed header base recovers the original 56-byte frame and
+188-byte instruction sequence. Declaring the real table pointer before the
+one-byte multiplier moves that multiplier from stack offset 39 to original
+offset 35, resolving the final two word differences without dummy locals,
+padding, volatile qualifiers, forced registers or instruction rewriting.
+The runner accepts the first candidate of that measured layout family,
+directly verifies its link shape and passes the ordinary host-syntax-enabled
+full-ROM gate. Source, complete object, four collateral objects, ROM, ELF,
+linked script, layouts and original ASM are frozen and externally hashed
+immediately after the first successful gate, before another compilation.
+
+Six additional full-module controls cover cleanup, naming, leading blanks
+and ABI widths; eight independent links reproduce all 19,440 retail text
+bytes and preserve all 66 original function extents. Sixteen ASM owners
+remain in this file. The Protect/Detect and party-count checkpoints above
+remain unresolved; no diagnostic tooling or rejected candidate is published.
