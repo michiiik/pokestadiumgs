@@ -881,7 +881,25 @@ void BattleAnim_StartEffect39CombinedTrail_Draw(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_8415AC64.s")
+extern u8 *D_84187330;
+typedef struct {
+    u8 unknown_00[0x10];
+    s16 value;
+    u8 unknown_12[2];
+} Fragment79TerrainPointView;
+
+void BattleAnim_SetTerrainGridPointValue(u8 value) {
+    Fragment79TerrainPointView *point;
+    s32 i;
+    s32 j;
+
+    for (i = 1; i < 15; i++) {
+        for (j = 1; j < 15; j++) {
+            point = &((Fragment79TerrainPointView (*)[16])(D_84187330 + 0x1010))[i][j];
+            point->value = value;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US

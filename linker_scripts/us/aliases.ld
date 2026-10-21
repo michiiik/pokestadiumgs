@@ -655,3 +655,5 @@ func_8300B728 = Fragment7_SwapProfileRecords;
 func_84155A44 = BattleMoveState_CopySelectedMoves;
 func_8415623C = BattleMoveState_RefreshSelectedMoves;
 func_84155BD4 = BattleMoveState_ApplySelectedMoveEffects;
+
+func_8415AC64 = BattleAnim_SetTerrainGridPointValue;
