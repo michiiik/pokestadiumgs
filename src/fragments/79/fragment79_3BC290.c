@@ -12,7 +12,10 @@ typedef struct {
     u16 amount_12[2];
     u16 amount_16[2];
     u16 amount_1A[2];
-    u8 unk_1E[0x34 - 0x1E];
+    u8 unk_1E[4];
+    u16 amount_22[2];
+    u16 amount_26[2];
+    u8 unk_2A[0x34 - 0x2A];
     u32 scale_34[2];
 } Fragment79EffectView;
 
@@ -151,7 +154,41 @@ void func_8414CF74(s32 arg0, u8 arg1, u8 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414D198.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414D348.s")
+void BattleEffects_PlanResidualDamage(void *state, u8 side) {
+    const u8 *opponent;
+    const u8 *mon;
+    s32 status;
+    Fragment79EffectView *view;
+
+    mon = func_84154B64(side);
+    opponent = func_84154B64((u8)(1 - side));
+    view = (Fragment79EffectView *)((u8 *)state + 4);
+    status = *(u16 *)(mon + 0x26);
+    if (status & 8) {
+        if (mon[0x19] & 1) {
+            view->amount_22[side] += (*(u16 *)(mon + 0x2A) >> 4) * (mon[0x1C] + 1);
+        } else {
+            view->amount_22[side] += *(u16 *)(mon + 0x2A) >> 3;
+        }
+    } else if (status & 0x10) {
+        view->amount_22[side] += *(u16 *)(mon + 0x2A) >> 3;
+    }
+    if (mon[0x18] & 0x80) {
+        view->amount_22[side] += *(u16 *)(mon + 0x2A) >> 3;
+    }
+    if (opponent[0x18] & 0x80) {
+        view->amount_26[side] += *(u16 *)(opponent + 0x2A) >> 3;
+    }
+    if (mon[0x15] & 1) {
+        view->amount_22[side] += *(u16 *)(mon + 0x2A) >> 2;
+    }
+    if (mon[0x15] & 2) {
+        view->amount_22[side] += *(u16 *)(mon + 0x2A) >> 2;
+    }
+    if ((mon[0x15] & 0x10) && mon[0x1F] == 1) {
+        view->amount_22[side] = *(u16 *)(mon + 0x28);
+    }
+}
 
 extern u8 func_80062D20(u8 arg0);
 void func_8414D51C(s32 arg0, u8 arg1) {

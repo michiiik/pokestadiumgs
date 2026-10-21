@@ -167,9 +167,40 @@ void func_84155574(u8 *arg0, u8 arg1) {
     func_80063454(arg1, arg0[2], arg0[3], (arg0[0x15] & 8) != 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_841555B4.s")
+extern u8 func_80062D98(u8 move);
+extern u8 func_80062D5C(u8 move);
+extern void _bcopy(void *source, u8 *destination, s32 size);
+s32 BattleRecord_HasPoweredMoveOfType(u8 *record, u8 type) {
+    s32 i;
+    const u8 *cursor;
+    u8 move;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_8415565C.s")
+    i = 0;
+    cursor = record;
+    for (; i != 4; i++, cursor++) {
+        move = cursor[4];
+        if (move == 0) {
+            return 0;
+        }
+        if (type == func_80062D98((u8)move) && func_80062D5C((u8)move) >= 2) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+s32 BattleRecord_HasMove(u8 *record, u8 move) {
+    s32 i;
+    u8 current;
+
+    for (i = 0; i < 4; i++) {
+        current = record[i + 4];
+        if (current == move) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 extern u8 func_80062D20(u8);
 s32 func_841556C4(u8 *arg0, u8 arg1)
@@ -203,11 +234,10 @@ block_5:
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C40B0/func_84155750.s")
+void BattleState_PushSnapshot(void) {
+    _bcopy(D_8419E780, &D_8419E920[D_8419E920[0]++ * 0x19C + 4], 0x19C);
+}
 
-extern u8 D_8419E920[];
-extern u8 D_8419E780[];
-extern void _bcopy(void *, u8 *, s32);
 void func_841557B0(void)
 {
   u8 temp_v0;
