@@ -63,7 +63,31 @@ void BattlePlan_ApplyPursuitMultiplier(u8 *state, u8 side) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151128.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151270.s")
+extern u8 func_80063660(u8);
+extern u8 func_8414A2A0(void);
+extern void * func_8414A3A0(u8);
+extern u8 * func_84154B30(u8);
+void BattlePlan_AddRampageBonus(u8 *plan, u8 side) {
+    u8 *state;
+    u8 *sub;
+    u8 value;
+    s32 base;
+    u8 *table;
+    u8 amount;
+    base = (s32)(u32)plan + 4;
+    state = func_84154B30(side);
+    sub = state + 8;
+    if ((state[3] & 4) == 0) {
+        //!bug: Later comparisons test the stored Boolean, not the getter result.
+        value = func_80063660(sub[1]) != 25;
+        if (value != 0 && value != 16 && value != 15) {
+            *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+            amount = func_8414A2A0();
+            table = func_8414A3A0(side);
+            ((u32 *)(u32)base)[(u32)side + 13] += table[18] * amount;
+        }
+    }
+}
 
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
@@ -284,10 +308,6 @@ void func_84151AF4(void *arg0, u8 arg1) {
     }
 }
 
-extern s32 func_80063660(u8);
-extern u8 func_8414A2A0(void);
-extern void * func_8414A3A0(u8);
-extern u8 * func_84154B30(u8);
 extern u8 *func_84154B64(u8);
 extern s32 func_841556C4(u8 *, u8);
 void func_84151B8C(s32 arg0, u8 arg1, u8 arg2) {
