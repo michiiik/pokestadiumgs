@@ -169,18 +169,6 @@ extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 extern void func_8415CC74(f32, f32, f32, f32, f32, f32, s16, u8, u8, u8, u8, u8, u8, u8, f32, f32, f32, s16);
 extern void TrailEffectPool_Start(f32, f32, f32, f32, f32, f32, u8, u8, u8, u8, f32, f32, f32, s16);
 extern s32 TrailEffectPool_IsComplete(void);
-extern f32 D_8418C530;
-extern f32 D_8418C534;
-extern f32 D_8418C538;
-extern f32 D_8418C53C;
-extern f32 D_8418C540;
-extern f32 D_8418C558;
-extern f32 D_8418C55C;
-extern f32 D_8418C560;
-extern f32 D_8418C564;
-extern f32 D_8418C568;
-extern f32 D_8418C56C;
-extern f32 D_8418C570;
 
 void BattleAnim_StartEffect19Radial20_EmitVariantD(void) {
     f32 x;
@@ -200,7 +188,7 @@ void BattleAnim_StartEffect19Radial20_EmitVariantD(void) {
     vy += 6.0f;
     scale = BattleAnim_EffectSecondaryOwnerModelScale();
     randomY = guRandom();
-    func_8415CC74(x, y, z, vx, (((randomY % 4) * D_8418C530) + vy) - D_8418C534, (vz - (((randomZ = guRandom()) % 5) * D_8418C538)) + D_8418C53C, 2, 100, 200, 255, 200, 0, 100, 200, D_8418C540, scale, 4.0f * scale, 60);
+    func_8415CC74(x, y, z, vx, (((randomY % 4) * 0.01f) + vy) - 0.02f, (vz - (((randomZ = guRandom()) % 5) * 0.3f)) + 0.6f, 2, 100, 200, 255, 200, 0, 100, 200, 0.1f, scale, 4.0f * scale, 60);
 }
 #endif
 
@@ -224,7 +212,7 @@ extern u16 D_841A4D4E;
 extern u16 D_841A4D52;
 extern void BattleAnim_StartEffect19Radial20_EmitVariantD(void);
 extern void BattleAnim_StartEffect7TexturedRibbonSheet_Emit(void);
-extern void func_84157398(void);
+extern void BattleAnim_StartEffect33Radial20_Emit(void);
 extern void BattleAnim_StartEffect98Radial20_EmitVariantD(void);
 extern s32 func_8415DAE4(void);
 s32 func_84156E8C(void) {
@@ -311,7 +299,6 @@ void func_841570D4(void) {
 extern f32 BattleAnim_EffectSecondaryOwnerModelScale(void);
 extern void func_84156AB4(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 extern void func_84162798(f32, f32, f32, f32, f32, f32, u8, u8, u8, u8, f32, s16);
-extern f32 D_8418C544;
 void BattleAnim_StartEffect7TexturedRibbonSheet_Emit(void) {
     f32 jitterX;
     f32 jitterY;
@@ -338,7 +325,7 @@ void BattleAnim_StartEffect7TexturedRibbonSheet_Emit(void) {
     random = guRandom();
     jitterZ = 30.0f - (random % 60);
     z += scale * jitterZ;
-    func_84162798(x, y, z, vx, vy, vz, 255, 255, 0, 60, D_8418C544, 30);
+    func_84162798(x, y, z, vx, vy, vz, 255, 255, 0, 60, 0.3f, 30);
 }
 #endif
 
@@ -376,17 +363,42 @@ void BattleAnim_StartEffect7TexturedRibbonSheet_Draw(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157398.s")
+extern void func_8415C884(f32, f32, f32, f32, f32, f32, s16, u8, u8, u8, u8, u8, u8, u8, f32, f32, f32, s16);
+extern f32 BattleAnim_EffectSecondaryOwnerModelScale(void);
+extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+void BattleAnim_StartEffect33Radial20_Emit(void) {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 vx;
+    f32 vy;
+    f32 vz;
+    f32 scale;
+    s32 randomZ;
+    s32 randomY;
+
+    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    vx *= 8.0f;
+    vy *= 4.0f;
+    vz = 0.0f;
+    vy += 6.0f;
+    scale = BattleAnim_EffectSecondaryOwnerModelScale();
+    randomY = guRandom();
+    func_8415C884(
+        x, y, z, vx, (((randomY % 5) * 0.1f) + vy) - 0.2f, (vz - (((randomZ = guRandom()) % 5) * 0.3f)) + 0.6f,
+        2, 255, 255, 255, 100, 100,
+        150, 150, 0.1f, scale, 3.0f * scale, 60);
+}
 #endif
 
 #ifdef VERSION_US
 extern u16 D_841A4D4E;
-extern void func_84157398(void);
+extern void BattleAnim_StartEffect33Radial20_Emit(void);
 void BattleAnim_StartEffect33Radial20_Init(void) {
     D_841A4D4E = 0;
     BattleAnim_ResetSharedEffectMatrix();
     func_8415C530();
-    func_84157398();
+    BattleAnim_StartEffect33Radial20_Emit();
 }
 #endif
 
@@ -397,7 +409,7 @@ s32 BattleAnim_StartEffect33Radial20_Update(void) {
         return -1;
     }
     if (*(s16 *)&D_841A4D4E < 0x78 && (*(s16 *)&D_841A4D4E % 7) == 0) {
-        func_84157398();
+        BattleAnim_StartEffect33Radial20_Emit();
     }
     return func_8415DAE4();
 }
@@ -487,7 +499,7 @@ void BattleAnim_StartEffect98Radial20_EmitVariantD(void) {
     vy += 6.0f;
     scale = BattleAnim_EffectSecondaryOwnerModelScale();
     randomY = guRandom();
-    func_8415CC74(x, y, z, vx, (((randomY % 4) * D_8418C558) + vy) - D_8418C55C, (vz - (((randomZ = guRandom()) % 5) * D_8418C560)) + D_8418C564, 2, 255, 255, 100, 255, 150, 150, 0, D_8418C568, scale, 4.0f * scale, 60);
+    func_8415CC74(x, y, z, vx, (((randomY % 4) * 0.01f) + vy) - 0.02f, (vz - (((randomZ = guRandom()) % 5) * 0.3f)) + 0.6f, 2, 255, 255, 100, 255, 150, 150, 0, 0.1f, scale, 4.0f * scale, 60);
 }
 #endif
 
@@ -559,7 +571,7 @@ s32 BattleAnim_StartEffect11Trail50Alt_Update(void) {
         if ((f64)x > 0.0) {
             velocity = -velocity;
         }
-        TrailEffectPool_Start(x, y, z, velocity, 0.0f, 0.0f, 255, 255, 255, 100, D_8418C56C, 1.0f, 4.0f, 30);
+        TrailEffectPool_Start(x, y, z, velocity, 0.0f, 0.0f, 255, 255, 255, 100, 0.3f, 1.0f, 4.0f, 30);
     }
     return TrailEffectPool_IsComplete();
 }
@@ -612,7 +624,7 @@ s32 BattleAnim_StartEffect57Trail50_Update(void) {
         if ((f64)x > 0.0) {
             velocity = -velocity;
         }
-        TrailEffectPool_Start(x, y, z, velocity, 0.0f, 0.0f, 255, 255, 255, 100, D_8418C570, 1.0f, 4.0f, 30);
+        TrailEffectPool_Start(x, y, z, velocity, 0.0f, 0.0f, 255, 255, 255, 100, 0.3f, 1.0f, 4.0f, 30);
     }
     return TrailEffectPool_IsComplete();
 }
@@ -756,10 +768,6 @@ extern void OwnerAnchoredFourStream_Start(f32, f32, f32, f32, f32, f32, u8, u8, 
 extern u8 *func_84109B88(EmitterPosition, u8);
 extern f32 __sinf(f32);
 extern f32 __cosf(f32);
-extern f32 D_8418C588;
-extern f32 D_8418C58C;
-extern f32 D_8418C590;
-extern f32 D_8418C594;
 s32 BattleAnim_StartEffect62OwnerLinkedFourStream_Update(void) {
     s32 result;
     f32 x;
@@ -772,11 +780,11 @@ s32 BattleAnim_StartEffect62OwnerLinkedFourStream_Update(void) {
     *(s16 *)&D_841A4D02 += 1;
     if ((*(s16 *)&D_841A4D02 >> 2) < 4 && (*(s16 *)&D_841A4D02 & 3) == 0) {
         func_841569E0(&x, &y, &z, &vx, &vy, &vz);
-        angle = (2 - (((*(s16 *)&D_841A4D02 >> 2) + 2) % 3)) * D_8418C588 + D_8418C58C;
+        angle = (2 - (((*(s16 *)&D_841A4D02 >> 2) + 2) % 3)) * 0.5235988f + 0.34906587f;
         vx *= 7.0f * __cosf(angle);
         vy = __sinf(angle) * 10.0f;
         vz = 0.0f;
-        OwnerLinkedFourStream_Start(x, y, z, vx, vy, vz, 208, 255, 255, 128, D_8418C590, 2.0f, 4.0f, 40);
+        OwnerLinkedFourStream_Start(x, y, z, vx, vy, vz, 208, 255, 255, 128, 0.8f, 2.0f, 4.0f, 40);
     }
     if (*(s16 *)&D_841A4D02 >= 2) {
         result = OwnerLinkedFourStream_IsComplete();
@@ -817,7 +825,7 @@ void BattleAnim_StartEffect67OwnerAnchoredFourStream_Init(void) {
     vx *= 5.0;
     vy *= 5.0;
     vz *= 5.0;
-    OwnerAnchoredFourStream_Start(x, y, z, vx, vy, vz, 192, 255, 255, 160, D_8418C594, 2.0f, 4.0f, 40);
+    OwnerAnchoredFourStream_Start(x, y, z, vx, vy, vz, 192, 255, 255, 160, 0.6f, 2.0f, 4.0f, 40);
     position.x = x;
     position.y = y;
     position.z = z;
@@ -848,14 +856,13 @@ void BattleAnim_StartEffect67OwnerAnchoredFourStream_Draw(void) {
 #ifdef VERSION_US
 extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 extern void func_8415C644(f32, f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, f32, f32, f32, s32);
-extern f32 D_8418C598;
 void BattleAnim_StartEffect78Radial20_EmitVariantA(void) {
     f32 out[6];
     func_841569E0(&out[5], &out[4], &out[3], &out[2], &out[1], &out[0]);
     out[2] *= 6.0f;
     out[1] *= 6.0f;
     out[0] *= 6.0f;
-    func_8415C644(out[5], out[4], out[3], out[2], out[1], out[0], 5, 0xFF, 0xFF, 0xFF, 0xB4, D_8418C598, 2.0f, 20.0f, 0x3C);
+    func_8415C644(out[5], out[4], out[3], out[2], out[1], out[0], 5, 0xFF, 0xFF, 0xFF, 0xB4, 0.3f, 2.0f, 20.0f, 0x3C);
 }
 #endif
 
@@ -910,18 +917,6 @@ extern S1_unk_D_843C2C00_024 D_841871B0;
 extern S1_unk_D_843C2C00_024 D_841871D0;
 extern S1_unk_D_843C2C00_024 D_841871F0;
 extern S1_unk_D_843C2C00_024 D_84187210;
-extern f32 D_8418C59C;
-extern f32 D_8418C5A0;
-extern f32 D_8418C5A4;
-extern f32 D_8418C5A8;
-extern f32 D_8418C5AC;
-extern f32 D_8418C5B0;
-extern f32 D_8418C5B4;
-extern f32 D_8418C5B8;
-extern f32 D_8418C5BC;
-extern f32 D_8418C5C0;
-extern f32 D_8418C5C4;
-extern f32 D_8418C5C8;
 extern S1_unk_D_843C2C00_024 D_84187230;
 extern S1_unk_D_843C2C00_024 D_84187250;
 
@@ -938,7 +933,7 @@ void BattleAnim_StartEffect26DoubleTextureTrail_Emit(void) {
     vz *= 10.0f;
     DoubleTextureTrail_Spawn(
         x, y, z, vx, vy, vz,
-        0.0f, 5.0f, D_8418C59C, 2.0f, 10.0f, 20,
+        0.0f, 5.0f, 1.2f, 2.0f, 10.0f, 20,
         19, 19, 6, 10, 15, 14,
         -3, 5, 0, 15, &D_84187070, &D_84187090,
         255, 255, 0, 150, 100, 255,
@@ -946,7 +941,7 @@ void BattleAnim_StartEffect26DoubleTextureTrail_Emit(void) {
         120);
     DoubleTextureTrail_Spawn(
         x, y, z, vx, vy, vz,
-        0.0f, 5.0f, D_8418C5A0, 3.0f, 15.0f, 20,
+        0.0f, 5.0f, 1.2f, 3.0f, 15.0f, 20,
         19, 20, 2, 6, 0, 15,
         -4, 2, 0, 0, &D_841870B0, &D_841870D0,
         0, 255, 100, 150, 100, 100,
@@ -983,11 +978,6 @@ void BattleAnim_StartEffect26DoubleTextureTrail_Draw(void) {
 #ifdef VERSION_US
 extern f32 __cosf(f32);
 extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
-extern f32 D_8418C5A4;
-extern f32 D_8418C5A8;
-extern f32 D_8418C5AC;
-extern f32 D_8418C5B0;
-extern f32 D_8418C5B4;
 void BattleAnim_StartEffect47SixSlotTrail_Emit(void) {
     f32 x;
     f32 y;
@@ -996,15 +986,15 @@ void BattleAnim_StartEffect47SixSlotTrail_Emit(void) {
     f32 vy;
     f32 vz;
     func_841569E0(&x, &y, &z, &vx, &vy, &vz);
-    vy += D_8418C5A8 * __cosf(((guRandom() % 10) * D_8418C5A4) / 10.0f);
-    vz += D_8418C5B0 * __cosf(((guRandom() % 10) * D_8418C5AC) / 10.0f);
+    vy += 0.2f * __cosf(((guRandom() % 10) * 3.1415927f) / 10.0f);
+    vz += 0.2f * __cosf(((guRandom() % 10) * 3.1415927f) / 10.0f);
     vx *= 12.0f;
     vy *= 12.0f;
     vz *= 12.0f;
     BattleAnim_SixSlotTrail_Spawn(
         0, x, y, z, vx, vy,
         vz, 255, 255, 255, 255, 0,
-        0, 100, 255, 255, D_8418C5B4, 2.0f,
+        0, 100, 255, 255, 0.4f, 2.0f,
         20.0f, 60, 25, 25, 0, 10,
         0, 13, 0, 0, 0, 0,
         &D_841870F0, &D_84187110);
@@ -1056,7 +1046,7 @@ void BattleAnim_StartEffect4DoubleTextureTrail_Emit(void) {
     vz *= 10.0f;
     DoubleTextureTrail_Spawn(
         x, y, z, vx, vy, vz,
-        0.0f, 5.0f, D_8418C5B8, 2.0f, 10.0f, 20,
+        0.0f, 5.0f, 1.2f, 2.0f, 10.0f, 20,
         23, 23, 5, 10, 15, 15,
         -5, 5, 15, 15, &D_84187130, &D_84187150,
         200, 200, 0, 100, 0, 0,
@@ -1064,7 +1054,7 @@ void BattleAnim_StartEffect4DoubleTextureTrail_Emit(void) {
         90);
     DoubleTextureTrail_Spawn(
         x, y, z, vx, vy, vz,
-        0.0f, 5.0f, D_8418C5BC, 3.0f, 15.0f, 20,
+        0.0f, 5.0f, 1.2f, 3.0f, 15.0f, 20,
         21, 21, -2, 10, 15, 15,
         5, 15, 15, 15, &D_84187170, &D_84187190,
         255, 50, 100, 200, 0, 100,
@@ -1109,7 +1099,7 @@ void BattleAnim_StartEffect77DoubleTextureTrail_Emit(void) {
     vz *= 10.0f;
     DoubleTextureTrail_Spawn(
         x, y, z, vx, vy, vz,
-        0.0f, 5.0f, D_8418C5C0, 2.0f, 10.0f, 20,
+        0.0f, 5.0f, 1.2f, 2.0f, 10.0f, 20,
         27, 28, -5, 20, 15, 13,
         -5, 20, 0, 14, &D_841871B0, &D_841871D0,
         255, 255, 255, 50, 100, 100,
@@ -1117,7 +1107,7 @@ void BattleAnim_StartEffect77DoubleTextureTrail_Emit(void) {
         150);
     DoubleTextureTrail_Spawn(
         x, y, z, vx, vy, vz,
-        0.0f, 5.0f, D_8418C5C4, 3.0f, 15.0f, 20,
+        0.0f, 5.0f, 1.2f, 3.0f, 15.0f, 20,
         27, 28, 5, 15, 15, 14,
         0, 15, 15, 15, &D_841871F0, &D_84187210,
         255, 255, 255, 50, 100, 100,
@@ -1163,7 +1153,7 @@ void BattleAnim_StartEffect70DoubleTextureTrail_Emit(void) {
     vz *= 10.0f;
     DoubleTextureTrail_Spawn(
         x, y, z, vx, vy, vz,
-        0.0f, 5.0f, D_8418C5C8, 3.0f, 15.0f, 20,
+        0.0f, 5.0f, 1.2f, 3.0f, 15.0f, 20,
         27, 24, 0, 20, 14, 15,
         0, 20, 15, 14, &D_84187230, &D_84187250,
         255, 255, 255, 150, 150, 255,
@@ -1201,8 +1191,6 @@ extern S1_unk_D_843C2C00_024 D_841872B0;
 extern S1_unk_D_843C2C00_024 D_841872D0;
 extern S1_unk_D_843C2C00_024 D_841872F0;
 extern S1_unk_D_843C2C00_024 D_84187310;
-extern f32 D_8418C5CC;
-extern f32 D_8418C5D0;
 extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 void BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture(void) {
     f32 x;
@@ -1217,7 +1205,7 @@ void BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture(void) {
     vz *= 12.0f;
     DoubleTextureTrail_Spawn(
         x, y, z, vx, vy, vz,
-        0.0f, 5.0f, D_8418C5CC, 2.0f, 10.0f, 20,
+        0.0f, 5.0f, 1.2f, 2.0f, 10.0f, 20,
         21, 22, 5, 30, 0, 13,
         -5, 30, 15, 13, &D_84187270, &D_84187290,
         255, 255, 0, 255, 150, 50,
@@ -1225,7 +1213,7 @@ void BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture(void) {
         200);
     DoubleTextureTrail_Spawn(
         x, y, z, vx, vy, vz,
-        0.0f, 5.0f, D_8418C5D0, 3.0f, 15.0f, 20,
+        0.0f, 5.0f, 1.2f, 3.0f, 15.0f, 20,
         27, 26, 6, 20, 14, 15,
         -3, 10, 0, 15, &D_841872B0, &D_841872D0,
         255, 255, 100, 150, 255, 255,
@@ -1235,8 +1223,6 @@ void BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture(void) {
 #endif
 
 #ifdef VERSION_US
-// Retained neighboring readonly value, not a function or instruction rewrite.
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/D_8418C5D0.s")
 extern f32 __cosf(f32);
 extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 void BattleAnim_StartEffect39CombinedTrail_EmitSixSlot(void) {
@@ -1247,8 +1233,8 @@ void BattleAnim_StartEffect39CombinedTrail_EmitSixSlot(void) {
     f32 vy;
     f32 vz;
     func_841569E0(&x, &y, &z, &vx, &vy, &vz);
-    vy += 0.4f * __cosf(((guRandom() % 10) * 3.141592741f) / 10.0f);
-    vz += 0.4f * __cosf(((guRandom() % 10) * 3.141592741f) / 10.0f);
+    vy += 0.4f * __cosf(((guRandom() % 10) * 3.1415927f) / 10.0f);
+    vz += 0.4f * __cosf(((guRandom() % 10) * 3.1415927f) / 10.0f);
     vx *= 12.0f;
     vy *= 12.0f;
     vz *= 12.0f;

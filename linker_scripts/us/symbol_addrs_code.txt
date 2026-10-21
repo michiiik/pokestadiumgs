@@ -10321,7 +10321,7 @@ BattleAnim_StartEffect7TexturedRibbonSheet_Emit = 0x84157128; // type:func
 BattleAnim_StartEffect7TexturedRibbonSheet_Init = 0x841572A0; // type:func
 BattleAnim_StartEffect7TexturedRibbonSheet_Update = 0x841572D4; // type:func
 BattleAnim_StartEffect7TexturedRibbonSheet_Draw = 0x84157344; // type:func
-func_84157398 = 0x84157398; // type:func
+BattleAnim_StartEffect33Radial20_Emit = 0x84157398; // type:func
 BattleAnim_StartEffect33Radial20_Init = 0x84157558; // type:func
 BattleAnim_StartEffect33Radial20_Update = 0x8415758C; // type:func
 BattleAnim_StartEffect33Radial20_Draw = 0x841575FC; // type:func
@@ -10899,6 +10899,3 @@ MysteryGift_SelectReward_fragment88 = 0x81C004E4; // type:func
 MysteryGift_BuildTeam_fragment88 = 0x81C00584; // type:func
 func_81C00740 = 0x81C00740; // type:func
 func_81C007A4 = 0x81C007A4; // type:func
-
-// Retained boundary data for fragment79_3C60B0's aligned rodata window.
-D_8418C5D0 = 0x8418C5D0; // type:f32 size:0x4 force_not_migration:true
