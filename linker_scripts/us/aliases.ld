@@ -678,3 +678,5 @@ func_84159A50 = BattleAnim_StartEffect39CombinedTrail_EmitSixSlot;
 func_84157398 = BattleAnim_StartEffect33Radial20_Emit;
 func_8415BBA0 = Strip400_Initialize;
 func_8415C644 = Radial20_StartStraight;
+func_8415C884 = Radial20_StartYVelocityWave;
+func_8415CC74 = Radial20_StartZVelocityWave;
