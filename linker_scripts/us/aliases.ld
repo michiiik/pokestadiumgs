@@ -683,3 +683,4 @@ func_8415CC74 = Radial20_StartZVelocityWave;
 func_8415BD48 = Strip400_Update;
 func_8415D074 = Radial20_StartPositionWaves;
 func_8415D4C4 = Radial20_UpdateNodes;
+func_8415C2E0 = Strip400_Draw;
