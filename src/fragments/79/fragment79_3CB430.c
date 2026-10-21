@@ -82,7 +82,118 @@ f32 func_8415BCD8(void) {
     return tmp;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CB430/func_8415BD48.s")
+typedef struct { f32 x; f32 y; f32 z; } Fragment79StripAnchor;
+extern f32 __sinf(f32);
+extern f32 __cosf(f32);
+extern void func_8410971C(s32);
+extern void func_84109B1C(s32);
+s32 Strip400_Update(s32 alternate_anchor) {
+    s32 section;
+    f32 vertex_x;
+    f32 center_y;
+    f32 primary_angle;
+    f32 secondary_angle;
+    f32 vertex_z;
+    f32 y_delta;
+    Strip400Node_79 * node;
+    Strip400State_79 *state = D_84187498;
+    f32 anchor_x;
+    f32 anchor_y;
+    f32 anchor_z;
+    f32 extent;
+    s16 age;
+    Fragment79StripAnchor anchor;
+
+    state->unk_00++;
+    if (state->unk_06 < state->unk_00) {
+        return -1;
+    }
+
+    if ((state->unk_06 - 40) < state->unk_00) {
+        state->unk_00 = state->unk_06 - 52;
+        state->unk_02++;
+        if (state->unk_02 >= 21) {
+            return -1;
+        }
+    } else if (state->unk_00 < 30) {
+        state->unk_2A += 10;
+        if (state->unk_2A > 200) {
+            state->unk_2A = 200;
+        }
+    }
+
+    if (alternate_anchor == 0) {
+        func_8410971C((s32)&anchor);
+    } else {
+        func_84109B1C((s32)&anchor);
+    }
+    anchor_x = anchor.x;
+    anchor_y = anchor.y;
+    anchor_z = anchor.z;
+
+    state->unk_28 += 6;
+    if (state->unk_28 > 200) {
+        state->unk_28 = 200;
+    }
+
+    if (((state->unk_06 - 52) < state->unk_00) && (state->unk_00 < (state->unk_06 - 40))) {
+        state->unk_24 -= 0.1;
+        if (state->unk_24 < 0.25) {
+            state->unk_24 = 0.25f;
+        }
+    }
+
+    node = state->nodes;
+
+    for (section = 0; section < state->unk_28; section++) {
+        age = state->unk_00;
+
+        if ((state->unk_06 - 40) < age) {
+            node->unk_0C -= 6.0;
+            if (node->unk_0C < state->unk_18) {
+                node->unk_0C = state->unk_18;
+            }
+            // M_PI * 80
+            y_delta = __sinf((((state->unk_00 + section) % 200) * 251.327419281005859) / 200.0) * 0.1;
+        } else if ((state->unk_06 - 45) < age) {
+            y_delta = __sinf((((state->unk_00 + section) % 200) * 251.327419281005859) / 200.0) + 2.0;
+            node->unk_0C += y_delta;
+        } else if ((state->unk_06 - 52) < age) {
+            node->unk_0C -= 8.0;
+            if (node->unk_0C < state->unk_18) {
+                node->unk_0C = state->unk_18;
+            }
+            y_delta = __sinf((((state->unk_00 + section) % 200) * 251.327419281005859) / 200.0) * 0.1;
+        } else {
+            // M_PI * 60
+            y_delta = __sinf((((state->unk_00 + section) % 200) * 188.495564460754395) / 200.0);
+            node->unk_0C += y_delta;
+        }
+
+        extent = node->unk_0C;
+
+        // M_PI * 22
+        primary_angle = (((age + section) % 200) * 69.1150403022766113) / 200.0;
+        // M_PI * 4
+        secondary_angle = (((age + section) % 200) * 12.566370964050293) / 200.0;
+
+        vertex_x = (__sinf(primary_angle) * extent) + anchor_x;
+        center_y = (__sinf(secondary_angle) * (0.7 * extent)) + anchor_y;
+        vertex_z = __cosf(primary_angle) * extent + anchor_z;
+
+        node->unk_08 = vertex_z;
+        node->unk_04 = center_y + y_delta;
+        node->unk_00 = vertex_x;
+        node++;
+
+        node->unk_00 = vertex_x;
+        node->unk_04 = (2.0 * __sinf(secondary_angle * 3.0)) + center_y + y_delta;
+        node->unk_08 = vertex_z;
+        node++;
+    }
+
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CB430/func_8415C2E0.s")
 
@@ -178,7 +289,6 @@ void Radial20_StartStraight(f32 x, f32 y, f32 z, f32 vx, f32 vy, f32 vz, s16 typ
     }
 }
 
-extern f32 __sinf(f32);
 extern u8 * D_84187530;
 void Radial20_StartYVelocityWave(
     f32 x, f32 y, f32 z, f32 vx, f32 vy, f32 vz,
@@ -306,7 +416,60 @@ void Radial20_StartZVelocityWave(
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CB430/func_8415D074.s")
+void Radial20_StartPositionWaves(
+    f32 x, f32 y, f32 z, f32 vx, f32 vy, f32 vz,
+    s16 type, u8 r, u8 g, u8 b, u8 alpha, f32 field_18,
+    f32 scale, f32 field_14, s16 duration) {
+    Fragment79RadialState *state;
+    Fragment79RadialNode *node;
+    s32 i;
+    s32 j;
+    Fragment79RadialVector position;
+    Fragment79RadialVector velocity;
+    s32 period2;
+    s32 seed1;
+    s32 seed2;
+    s32 period1;
+
+    position.x = x;
+    position.y = y;
+    position.z = z;
+    velocity.x = vx;
+    velocity.y = vy;
+    velocity.z = vz;
+    state = (Fragment79RadialState *)(D_84187530 + 0x3C8);
+    for (i = 0; i < 10; i++, state++) {
+        if (state->active == 0) {
+            node = state->nodes;
+            state->active = 1;
+            state->age = 0;
+            state->duration = duration;
+            state->type = type;
+            state->r = r;
+            state->g = g;
+            state->b = b;
+            state->field_14 = field_14;
+            state->field_18 = field_18;
+            seed1 = (guRandom() % 20) + 2;
+            period1 = (guRandom() % 10) + 4;
+            seed2 = (guRandom() % 20) + 2;
+            period2 = (guRandom() % 10) + 4;
+            for (j = 0; j < 20; j++) {
+                node->ordinal = j;
+                node->alpha = alpha;
+                node->scale = scale;
+                node->angle = 0.0f;
+                node->position = position;
+                node->position.y += 5.0 * __sinf((((seed1 + j) % period1) * 6.2831854820251465) / period1) * __sinf((((seed2 + j) % (period2 + 20)) * 6.2831854820251465) / (period2 + 20));
+                node->position.z += 5.0 * __cosf((((seed1 + j) % period1) * 6.2831854820251465) / period1) * __cosf((((seed2 + j) % (period2 + 20)) * 6.2831854820251465) / (period2 + 20));
+                node->velocity = velocity;
+                node->position.x += node->velocity.x * ((j * 0.5) - (s32)(j * 0.5));
+                node++;
+            }
+            break;
+        }
+    }
+}
 
 void Radial20_RotateVertexOffset(f32 arg0, f32 *arg1, f32 *arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
     UNUSED f32 pad[16];

@@ -680,3 +680,5 @@ func_8415BBA0 = Strip400_Initialize;
 func_8415C644 = Radial20_StartStraight;
 func_8415C884 = Radial20_StartYVelocityWave;
 func_8415CC74 = Radial20_StartZVelocityWave;
+func_8415BD48 = Strip400_Update;
+func_8415D074 = Radial20_StartPositionWaves;

@@ -72,16 +72,56 @@ controls cover known source, blank lines, declaration/readability cleanup,
 naming and named-source blank lines. No instruction rewrite, forced register,
 dummy local, arbitrary padding or manual unrolling is introduced.
 
-## Orbit allocator: requeue
+## Accepted position-wave allocator and strip updater
 
-`8415D074` remains assembly. Natural two-angle sine/cosine variants reproduce
-its 956-byte instruction count but retain a 232-byte frame versus 216 and
-31 raw differing words. Removing redundant phase seeds and reusing the slot
-index reduce the frame, but also alter allocation and instruction counts;
-the fully reused form has the right frame and 952 bytes, not a match.
-Next: inspect the stock compiler's real local reservations and phase lifetimes
-against the retained 956-byte parent before changing source topology again.
-Do not add padding or remove a live value to close the frame difference.
+`8415D074` / `Radial20_StartPositionWaves` replaces 956 original bytes. It
+allocates the first inactive twenty-node state, copies the supplied vectors,
+and offsets Y position with a product of two sines and Z position with a
+product of two cosines. Four random draws supply two seeds and two periods.
+The source expresses each phase as seed plus current node index; the compiler
+performs the phase induction and angle reuse. This recovers the original
+216-byte frame without explicit angle or advancing-phase locals. The
+fractional X offset uses the current index, and alpha is stored in each node
+rather than the state header. The analogous Stadium 1 `Radial20_VariantE`
+provided a source-shape witness; the GS assembly and ROM gate establish the
+actual target behavior and match.
+
+`8415BD48` / `Strip400_Update` replaces 1432 bytes. It advances the strip's
+age, growth and ending phases, chooses an anchor, and updates two distinct
+vertices per section. The second vertex has an additional vertical sine
+offset; this is paired geometry, not source-level loop unrolling. A signed
+16-bit age snapshot reproduces the original sign extension. The anchor flag
+selects `func_8410971C` or `func_84109B1C` in
+`src/fragments/79/fragment79_377F80.c`; both use `D_84190194` with different
+selector/transform behavior. The flag does not identify a third owner.
+
+Both owners passed recorded native-runner acceptance and the full-ROM gate.
+Each successful gate immediately froze source, the complete changed object,
+four distinct collateral objects, ROM, ELF and linked script, with external
+hash verification before further compilation. Five whole-original-object
+controls cover known source, blank lines, readable locals/declaration cleanup,
+naming and named-source blank lines. All original game sections, function
+extents, semantic relocation targets and the 288-byte readonly pool remain
+equal. No instruction rewrite, forced register, dummy local, arbitrary
+padding or manual unrolling is introduced.
+
+## Radial node updater: register-tie requeue
+
+`8415D4C4` remains assembly. Explicit cases 0 through 5 recover the original
+six-entry jump table: modes 0, 4 and 5 perform full node motion; mode 2 applies
+gravity and clamps velocity; modes 1 and 3 share the default anchor behavior.
+The best retained anchor-pointer candidate has the correct 1568-byte text,
+72-byte frame and anchor stack home. Independent linking to the retail text
+and readonly addresses leaves exactly 18 differing words, confined to this
+owner: a coherent exchange of `a0` (anchor address) and `a2` (constant 20).
+All other translation-unit text and all 288 linked readonly bytes match.
+
+Pointer declaration-order variants retain that tie. Introducing a local node
+count from the array size disables the original compiler unrolling and grows
+text to 2196 bytes, so that family is not a useful continuation. Next: use a
+calibrated allocator trace or a bounded semantics-preserving permutation of
+the retained anchor-pointer source. Any caller type changes must remain a
+paired runner transaction; no rejected candidate or caller edit is installed.
 
 ## Strip renderer: requeue
 
