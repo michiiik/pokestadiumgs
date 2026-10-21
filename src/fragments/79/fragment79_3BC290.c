@@ -2,6 +2,20 @@
 
 
 #ifdef VERSION_US
+typedef struct {
+    u8 unk_00;
+    u8 selected_side;
+    u8 moves[2];
+    u8 unk_04[6];
+    u16 amount_0A[2];
+    u16 amount_0E[2];
+    u16 amount_12[2];
+    u16 amount_16[2];
+    u16 amount_1A[2];
+    u8 unk_1E[0x34 - 0x1E];
+    u32 scale_34[2];
+} Fragment79EffectView;
+
 extern void func_84149D54(void *, u8, u8);
 extern void func_84149D0C(void *);
 void func_8414CA00(s32 arg0, u8 arg1, u8 arg2) {
@@ -17,7 +31,34 @@ void func_8414CA00(s32 arg0, u8 arg1, u8 arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414CA80.s")
+typedef struct {
+    u8 unk_00[12];
+    s32 amount;
+    const u8 *mon;
+    const u8 *opponent;
+    const u8 *side_record;
+    const u8 *other_record;
+} Fragment79DamageCalculation;
+void BattleEffects_PlanCalculatedRecovery(void *state, u8 side, u8 move) {
+    s32 half;
+    s32 missing;
+    Fragment79DamageCalculation calculation;
+    u8 *selected;
+
+    func_84149D54(&calculation, side, move);
+    func_84149D0C(&calculation);
+    half = calculation.amount >> 1;
+    if (*(u16 *)(calculation.opponent + 0x42) == 0) {
+        missing = *(u16 *)(calculation.mon + 0x2A) - *(u16 *)(calculation.mon + 0x28);
+        selected = (u8 *)((u32)state + side * 2 + 4);
+        *(u16 *)(selected + 0xA) = calculation.amount;
+        if (half < missing) {
+            *(u16 *)(selected + 0x12) = half;
+        } else {
+            *(u16 *)(selected + 0x12) = missing;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414CB10.s")
 
@@ -34,7 +75,47 @@ void func_8414CDB8(u8 *arg0, u8 arg1, u8 arg2) {
         func_84148560(*(u16 *)(value + 0x28), *(u16 *)(value + 0x2A), arg2);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414CE08.s")
+extern u8 * func_84154B64(u8);
+void BattleEffects_PlanSharedHP(void *state, u8 side) {
+    s32 own_hp;
+    s32 other_hp;
+    const u8 *opponent;
+    const u8 *mon;
+    Fragment79EffectView *view;
+    s32 average;
+    s32 target;
+    s32 own_delta;
+    s32 other_delta;
+
+    mon = func_84154B64(side);
+    opponent = func_84154B64((u8)(1 - side));
+    view = (Fragment79EffectView *)((u8 *)state + 4);
+    own_hp = *(u16 *)(mon + 0x28);
+    other_hp = *(u16 *)(opponent + 0x28);
+    average = (own_hp + other_hp) >> 1;
+    if (average < *(u16 *)(mon + 0x2A)) {
+        target = average;
+    } else {
+        target = *(u16 *)(mon + 0x2A);
+    }
+    own_delta = target - own_hp;
+    if (average < *(u16 *)(opponent + 0x2A)) {
+        target = average;
+    } else {
+        target = *(u16 *)(opponent + 0x2A);
+    }
+    other_delta = target - other_hp;
+    if (own_delta > 0) {
+        view->amount_12[side] = own_delta;
+    } else {
+        view->amount_1A[side] = -own_delta;
+    }
+    if (other_delta > 0) {
+        view->amount_0E[side] = other_delta;
+    } else {
+        view->amount_0A[side] = -other_delta;
+    }
+}
 
 void func_8414CEE0(s32 arg0, u8 arg1, u8 arg2) {
     u8 rec[0x20];
@@ -73,7 +154,6 @@ void func_8414CF74(s32 arg0, u8 arg1, u8 arg2) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414D348.s")
 
 extern u8 func_80062D20(u8 arg0);
-extern u8 * func_84154B64(u8);
 void func_8414D51C(s32 arg0, u8 arg1) {
     u8 *value;
     u8 move;
@@ -156,19 +236,6 @@ s32 func_8414D680(u8 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414D720.s")
 
-typedef struct {
-    u8 unk_00;
-    u8 selected_side;
-    u8 moves[2];
-    u8 unk_04[6];
-    u16 amount_0A[2];
-    u8 unk_0E[4];
-    u16 amount_12[2];
-    u8 unk_16[4];
-    u16 amount_1A[2];
-    u8 unk_1E[0x34 - 0x1E];
-    u32 scale_34[2];
-} Fragment79EffectView;
 extern u8 func_84154B24(void);
 extern void func_8414FC30(void *, u8);
 extern void func_84150268(void *, u8);
@@ -342,11 +409,22 @@ void BattleEffects_DoubleScaleForIncomingAmount(void *state) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414EA4C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414EB90.s")
+void BattleEffects_ApplyOpposingByteWeight(s32 state) {
+    u8 side;
+    u8 other;
+    s32 divisor;
+
+    side = func_84154B24();
+    other = 1 - side;
+    divisor = 255;
+    *((u8 *)(u32)state + side + 0xA) =
+        *((u8 *)(u32)state + side + 0xA) *
+        (divisor - *((u8 *)(u32)state + other + 0xC)) / divisor;
+}
 
 extern void func_8414DC58(s32, u8);
 extern void func_8414EA4C(s32);
-extern void func_8414EB90(s32);
+extern void BattleEffects_ApplyOpposingByteWeight(s32);
 void func_8414EC18(s32 arg0) {
     u8 current;
     u8 other;
@@ -357,7 +435,7 @@ void func_8414EC18(s32 arg0) {
     func_84154B64(other);
     switch (func_80062D20(*((u8 *)(u32)arg0 + other + 6))) {
     case 0x6F:
-        func_8414EB90(arg0);
+        BattleEffects_ApplyOpposingByteWeight(arg0);
         break;
     case 0x59:
     case 0x90:
@@ -372,7 +450,22 @@ void func_8414EC18(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BC290/func_8414ECE0.s")
+void BattleEffects_HalveAmountsForStatus(void *state) {
+    u8 side;
+    u8 other;
+    const u8 *opponent;
+    Fragment79EffectView *view;
+
+    side = func_84154B24();
+    other = 1 - side;
+    func_84154B64(side);
+    opponent = func_84154B64(other);
+    view = (Fragment79EffectView *)((u8 *)state + 4);
+    if (*(u16 *)(opponent + 0x26) & 0x27) {
+        view->amount_0A[side] >>= 1;
+        view->amount_16[side] >>= 1;
+    }
+}
 
 extern void func_8414D720(s32, u8);
 extern void func_8414E880(s32);
@@ -402,7 +495,7 @@ void func_8414EDB4(s32 arg0) {
     sp26 = 1 - temp_v0;
     func_8414E880(arg0);
     func_8414EC18(arg0);
-    func_8414ECE0(arg0);
+    BattleEffects_HalveAmountsForStatus(arg0);
     func_8414D720(arg0, sp27);
     func_8414D720(arg0, sp26);
 }
