@@ -422,14 +422,76 @@ void TexturedRibbonSheet_Init(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/func_84162798.s")
+extern f32 func_84109544(void);
+extern void func_8007D454(void *, f32, f32, f32);
+extern void *D_8418CABC;
+extern Gfx D_841878D8[], D_84187888[];
+void TexturedRibbonSheet_Start(f32 x, f32 y, f32 z, f32 velocity_x, f32 velocity_y, f32 velocity_z, u8 red, u8 green, u8 blue, u8 alpha,
+                   f32 phase_step, s16 duration) {
+    S1_TexturedRibbonSheet* record;
+    S1_TexturedRibbonSheetNode* node;
+    s32 record_index;
+    s32 node_index;
+    S1_Vec3f position;
+    S1_Vec3f velocity;
+    S1_Vec3f acceleration;
+    f32 model_scale;
 
-extern f64 D_8418C7A8;
-extern f64 D_8418C7B0;
+    if (D_841A4DA4 == 2) {
+        return;
+    }
+    model_scale = func_84109544();
+
+    position.x = x;
+    position.y = y + 10.0f + 25.0f;
+    position.z = z;
+
+    velocity.x = velocity_x;
+    velocity.y = velocity_y;
+    velocity.z = velocity_z;
+
+    acceleration.x = 0.0f;
+    acceleration.y = -1.0f;
+    acceleration.z = 0.0f;
+
+    record = &D_84187840[0];
+
+    for (record_index = 0; record_index < 14; record_index++, record++) {
+        if (record->unk_000 == 0) {
+            record->unk_000 = 1;
+            record->unk_002 = 0;
+            record->unk_004 = 0;
+            record->unk_006 = duration;
+            record->unk_00A.r = red;
+            record->unk_00A.g = green;
+            record->unk_00A.b = blue;
+            record->unk_010 = model_scale * 0.5f;
+            record->unk_014 = phase_step;
+
+            if (x > 0) {
+                record->unk_008 = -1;
+            } else {
+                record->unk_008 = 1;
+            }
+
+            node = &record->unk_038[0];
+            for (node_index = 0; node_index < 10; node_index++, node++) {
+                node->unk_00 = node_index;
+                node->unk_04 = (alpha * (9 - node_index)) / 10;
+                node->unk_08 = ((guRandom() % 100) * 6.2831854820251465) / 100.0;
+                node->unk_0C = position;
+                node->unk_18 = velocity;
+                node->unk_24 = acceleration;
+            }
+            break;
+        }
+    }
+}
+
 
 void TexturedRibbonSheet_Update(f32 arg0, f32 *arg1, f32 arg2) {
     f32 sp30[4][4];
-    f32 angle = (arg0 * D_8418C7A8) / D_8418C7B0;
+    f32 angle = (arg0 * 360.0) / 6.2831854820251465;
     guRotateRPYF(sp30, 90.0f, angle, angle);
     guMtxXFMF(sp30, 0.0f, 0.0f, arg2, &arg1[0], &arg1[1], &arg1[2]);
 }
@@ -523,5 +585,97 @@ s32 TexturedRibbonSheet_IsComplete(void) {
     return -1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D0D70/func_84162DE8.s")
+extern void TexturedRibbonSheet_Update(f32 arg0, f32 *arg1, f32 arg2);
+extern void * D_8418CABC;
+Gfx* TexturedRibbonSheet_Draw(Gfx* display_list) {
+    s32 record_index;
+    S1_TexturedRibbonSheet* record;
+    S1_TexturedRibbonSheetNode* node;
+    s32 edge;
+    s32 node_index;
+    Mtx* matrix;
+    S1_Vec3f offset;
+    Vtx* vertex;
+    Mtx rotation;
+    Mtx scale;
+    f32 rotation_degrees;
+    Vtx* cached_vertex;
+    f32 model_scale;
+
+    gDPLoadTextureBlock_4b(display_list++, D_8418CABC, G_IM_FMT_I, 32, 32, 0, G_TX_NOMIRROR | G_TX_WRAP,
+                           G_TX_NOMIRROR | G_TX_WRAP, 5, 5, G_TX_NOLOD, G_TX_NOLOD);
+
+    record = &D_84187840[0];
+    for (record_index = 0; record_index < 14; record_index++, record++) {
+        if (record->unk_000 == 1) {
+            node = &record->unk_038[0];
+            model_scale = record->unk_010;
+
+            matrix = Gfx_AllocDisplayList(sizeof(Mtx) * 1);
+
+            rotation_degrees = (node->unk_08 * 360.0) / 6.2831854820251465;
+            guTranslate(matrix, node->unk_0C.x, node->unk_0C.y, node->unk_0C.z);
+
+            if (record->unk_002 == 0) {
+                func_8007D454(&rotation, 90.0f, rotation_degrees, 0.0f);
+            } else {
+                func_8007D454(&rotation, 90.0f, rotation_degrees, rotation_degrees);
+            }
+
+            guMtxCatL(&rotation, matrix, matrix);
+            guScale(&scale, model_scale, model_scale, model_scale);
+            guMtxCatL(&scale, matrix, matrix);
+
+            gSPMatrix(display_list++, matrix, G_MTX_PUSH | G_MTX_MUL | G_MTX_MODELVIEW);
+            gSPDisplayList(display_list++, D_841878D8);
+            gSPPopMatrix(display_list++, G_MTX_MODELVIEW);
+
+            record->unk_018 = Gfx_AllocDisplayList(sizeof(Vtx) * 20);
+            vertex = record->unk_018;
+
+            for (node_index = 0; node_index < 10; node_index++, node++) {
+                if ((node_index == 0) || (record->unk_004 < 2)) {
+                    for (edge = 0, cached_vertex = &node->unk_30[0]; edge < 2; edge++) {
+                        if (node->unk_00 <= 0.0) {
+                            TexturedRibbonSheet_Update(node->unk_08 + ((2.0 * edge * 3.1415927410125732) / 2), &offset.x,
+                                          (10.0f * model_scale) * 0.8f);
+                        }
+
+                        vertex->v.ob[0] = node->unk_0C.x + offset.x;
+                        vertex->v.ob[1] = node->unk_0C.y + offset.y;
+                        vertex->v.ob[2] = node->unk_0C.z + offset.z;
+
+                        vertex->v.cn[0] = record->unk_00A.r;
+                        vertex->v.cn[1] = record->unk_00A.g;
+                        vertex->v.cn[2] = record->unk_00A.b;
+                        vertex->v.cn[3] = node->unk_04;
+
+                        *cached_vertex++ = *vertex++;
+                    }
+                } else {
+                    for (edge = 0, cached_vertex = &node->unk_30[0]; edge < 2; edge++) {
+                        *vertex = *cached_vertex++;
+                        vertex->v.cn[3] = node->unk_04;
+
+                        vertex++;
+                    }
+                }
+            }
+
+            if (record->unk_002 == 1) {
+                vertex = record->unk_018;
+
+                for (edge = 0; edge < 9; edge++) {
+                    gSPDisplayList(display_list++, D_84187888);
+                    gSPVertex(display_list++, vertex, 4, 0);
+                    gSP2Triangles(display_list++, 0, 1, 2, 0, 1, 3, 2, 0);
+
+                    vertex += 2;
+                }
+            }
+        }
+    }
+
+    return display_list;
+}
 #endif
