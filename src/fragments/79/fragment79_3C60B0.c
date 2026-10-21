@@ -37,8 +37,9 @@ void func_84156880(void) {
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_EffectSecondaryOwnerAnchorPosition() {
-    func_84109780();
+void BattleAnim_EffectSecondaryOwnerAnchorPosition(f32 *position) {
+    extern void func_84109780(s32);
+    func_84109780((s32)position);
 }
 #endif
 
@@ -63,9 +64,10 @@ f32 BattleAnim_EffectTertiaryOwnerModelScale(void) {
 #endif
 
 #ifdef VERSION_US
-  void BattleAnim_EffectSecondaryOwnerModelScale(void) {
-      func_84109544();
-  }
+f32 BattleAnim_EffectSecondaryOwnerModelScale(void) {
+    extern f32 func_84109544(void);
+    return func_84109544();
+}
 #endif
 
 #ifdef VERSION_US
@@ -163,19 +165,55 @@ void func_84156CC4(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156CCC.s")
+extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void func_8415CC74(f32, f32, f32, f32, f32, f32, s16, u8, u8, u8, u8, u8, u8, u8, f32, f32, f32, s16);
+extern void TrailEffectPool_Start(f32, f32, f32, f32, f32, f32, u8, u8, u8, u8, f32, f32, f32, s16);
+extern s32 TrailEffectPool_IsComplete(void);
+extern f32 D_8418C530;
+extern f32 D_8418C534;
+extern f32 D_8418C538;
+extern f32 D_8418C53C;
+extern f32 D_8418C540;
+extern f32 D_8418C558;
+extern f32 D_8418C55C;
+extern f32 D_8418C560;
+extern f32 D_8418C564;
+extern f32 D_8418C568;
+extern f32 D_8418C56C;
+extern f32 D_8418C570;
+
+void BattleAnim_StartEffect19Radial20_EmitVariantD(void) {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 vx;
+    f32 vy;
+    f32 vz;
+    f32 scale;
+    s32 randomZ;
+    s32 randomY;
+
+    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    vx *= 8.0f;
+    vy *= 4.0f;
+    vz = 0.0f;
+    vy += 6.0f;
+    scale = BattleAnim_EffectSecondaryOwnerModelScale();
+    randomY = guRandom();
+    func_8415CC74(x, y, z, vx, (((randomY % 4) * D_8418C530) + vy) - D_8418C534, (vz - (((randomZ = guRandom()) % 5) * D_8418C538)) + D_8418C53C, 2, 100, 200, 255, 200, 0, 100, 200, D_8418C540, scale, 4.0f * scale, 60);
+}
 #endif
 
 #ifdef VERSION_US
 extern u16 D_841A4D4A;
 extern void BattleAnim_ResetSharedEffectMatrix(void);
 extern void func_8415C530(void);
-extern void func_84156CCC(void);
+extern void BattleAnim_StartEffect19Radial20_EmitVariantD(void);
 void func_84156E58(void) {
     D_841A4D4A = 0;
     BattleAnim_ResetSharedEffectMatrix();
     func_8415C530();
-    func_84156CCC();
+    BattleAnim_StartEffect19Radial20_EmitVariantD();
 }
 #endif
 
@@ -184,10 +222,10 @@ extern u16 D_841A4D4A;
 extern u16 D_841A4D4C;
 extern u16 D_841A4D4E;
 extern u16 D_841A4D52;
-extern void func_84156CCC(void);
+extern void BattleAnim_StartEffect19Radial20_EmitVariantD(void);
 extern void func_84157128(void);
 extern void func_84157398(void);
-extern void func_8415782C(void);
+extern void BattleAnim_StartEffect98Radial20_EmitVariantD(void);
 extern s32 func_8415DAE4(void);
 s32 func_84156E8C(void) {
     (*(s16 *)&D_841A4D4A) = (*(s16 *)&D_841A4D4A) + 1;
@@ -195,7 +233,7 @@ s32 func_84156E8C(void) {
         return -1;
     }
     if (*(s16 *)&D_841A4D4A < 0x78 && (*(s16 *)&D_841A4D4A % 7) == 0) {
-        func_84156CCC();
+        BattleAnim_StartEffect19Radial20_EmitVariantD();
     }
     return func_8415DAE4();
 }
@@ -400,17 +438,36 @@ void BattleAnim_EndEffect33Radial20_Draw(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_8415782C.s")
+void BattleAnim_StartEffect98Radial20_EmitVariantD(void) {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 vx;
+    f32 vy;
+    f32 vz;
+    f32 scale;
+    s32 randomZ;
+    s32 randomY;
+
+    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    vx *= 8.0f;
+    vy *= 4.0f;
+    vz = 0.0f;
+    vy += 6.0f;
+    scale = BattleAnim_EffectSecondaryOwnerModelScale();
+    randomY = guRandom();
+    func_8415CC74(x, y, z, vx, (((randomY % 4) * D_8418C558) + vy) - D_8418C55C, (vz - (((randomZ = guRandom()) % 5) * D_8418C560)) + D_8418C564, 2, 255, 255, 100, 255, 150, 150, 0, D_8418C568, scale, 4.0f * scale, 60);
+}
 #endif
 
 #ifdef VERSION_US
 extern u16 D_841A4D52;
-extern void func_8415782C(void);
+extern void BattleAnim_StartEffect98Radial20_EmitVariantD(void);
 void BattleAnim_StartEffect98Radial20_Init(void) {
     D_841A4D52 = 0;
     BattleAnim_ResetSharedEffectMatrix();
     func_8415C530();
-    func_8415782C();
+    BattleAnim_StartEffect98Radial20_EmitVariantD();
 }
 #endif
 
@@ -421,7 +478,7 @@ s32 BattleAnim_StartEffect98Radial20_Update(void) {
         return -1;
     }
     if (*(s16 *)&D_841A4D52 < 0x78 && (*(s16 *)&D_841A4D52 % 7) == 0) {
-        func_8415782C();
+        BattleAnim_StartEffect98Radial20_EmitVariantD();
     }
     return func_8415DAE4();
 }
@@ -445,7 +502,36 @@ void BattleAnim_StartEffect11Trail50Alt_Init(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157ADC.s")
+extern u16 D_841A4D54;
+s32 BattleAnim_StartEffect11Trail50Alt_Update(void) {
+    f32 jitterX;
+    struct { f32 x; f32 y; f32 z; } anchor;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 jitterY;
+    f32 jitterZ;
+    f32 velocity;
+    f32 scale;
+
+    *(s16 *)&D_841A4D54 += 1;
+    if ((*(s16 *)&D_841A4D54 & 1) == 0) {
+        scale = BattleAnim_EffectSecondaryOwnerModelScale();
+        BattleAnim_EffectSecondaryOwnerAnchorPosition((f32 *)&anchor);
+        jitterX = ((guRandom() % 50) - 25) * scale;
+        x = jitterX + anchor.x;
+        jitterY = ((guRandom() % 60) - 30) * scale;
+        y = jitterY + anchor.y;
+        jitterZ = ((guRandom() % 50) - 25) * scale;
+        z = jitterZ + anchor.z;
+        velocity = 10.0f;
+        if ((f64)x > 0.0) {
+            velocity = -velocity;
+        }
+        TrailEffectPool_Start(x, y, z, velocity, 0.0f, 0.0f, 255, 255, 255, 100, D_8418C56C, 1.0f, 4.0f, 30);
+    }
+    return TrailEffectPool_IsComplete();
+}
 #endif
 
 #ifdef VERSION_US
@@ -469,7 +555,36 @@ void BattleAnim_StartEffect57Trail50_Init(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84157CDC.s")
+extern u16 D_841A4D56;
+s32 BattleAnim_StartEffect57Trail50_Update(void) {
+    f32 jitterX;
+    struct { f32 x; f32 y; f32 z; } anchor;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 jitterY;
+    f32 jitterZ;
+    f32 velocity;
+    f32 scale;
+
+    *(s16 *)&D_841A4D56 += 1;
+    if ((*(s16 *)&D_841A4D56 & 1) == 0) {
+        scale = BattleAnim_EffectSecondaryOwnerModelScale();
+        BattleAnim_EffectSecondaryOwnerAnchorPosition((f32 *)&anchor);
+        jitterX = ((guRandom() % 50) - 25) * scale;
+        x = jitterX + anchor.x;
+        jitterY = ((guRandom() % 60) - 30) * scale;
+        y = jitterY + anchor.y;
+        jitterZ = ((guRandom() % 50) - 25) * scale;
+        z = jitterZ + anchor.z;
+        velocity = 10.0f;
+        if ((f64)x > 0.0) {
+            velocity = -velocity;
+        }
+        TrailEffectPool_Start(x, y, z, velocity, 0.0f, 0.0f, 255, 255, 255, 100, D_8418C570, 1.0f, 4.0f, 30);
+    }
+    return TrailEffectPool_IsComplete();
+}
 #endif
 
 #ifdef VERSION_US

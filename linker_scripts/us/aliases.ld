@@ -661,3 +661,7 @@ func_8415A9E4 = BattleAnim_InitializeTerrainGrid;
 func_8415AD58 = BattleAnim_UpdateTerrainGrid;
 func_84159D30 = BattleAnim_BuildTerrainCameraBounds;
 func_84159FA8 = BattleAnim_SampleTerrainHeightAndSlope;
+func_84156CCC = BattleAnim_StartEffect19Radial20_EmitVariantD;
+func_8415782C = BattleAnim_StartEffect98Radial20_EmitVariantD;
+func_84157ADC = BattleAnim_StartEffect11Trail50Alt_Update;
+func_84157CDC = BattleAnim_StartEffect57Trail50_Update;
