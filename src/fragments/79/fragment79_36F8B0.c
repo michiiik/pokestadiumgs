@@ -113,8 +113,21 @@ s32 Particle_CountActive(void) {
     return var_v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_841005E0.s")
-
+s16 func_841005E0(s16 arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4)
+{
+  f32 temp_fa0;
+  f32 temp_fv0;
+  f32 new_var;
+  f32 new_var2;
+  f32 temp_fv1;
+  new_var = (f32) arg2;
+  temp_fv1 = (f32) arg0;
+  new_var2 = (f32) arg4;
+  temp_fa0 = new_var2;
+ do { if (temp_fv1 == temp_fa0) { return arg2; } } while (0);
+  temp_fv0 = new_var;
+  return (s16) ((s32) ((((((f32) arg3) - new_var) / (((f32) arg1) - temp_fv1)) * (temp_fa0 - temp_fv1)) + temp_fv0));
+}
 typedef struct {
     u8 pad_00[1];
     u8 mode;

@@ -32,7 +32,28 @@ void func_84105250(u16 *arg0, u16 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3749B0/func_841052AC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3749B0/func_8410545C.s")
+/* mkdraft:func_8410545C begin */
+extern s32 D_84190190;
+extern s32 D_8419018C;
+extern u8 D_84182A5C[];
+extern u16 *D_84162A30[];
+
+void func_8410545C(void) {
+    s32 idx;
+    s32 value;
+
+    if (D_84190190 != 0) {
+        idx = D_8419018C;
+        value = *(u16 *)(D_84182A5C + idx * 8);
+        if (value & 0x8000) {
+            func_84105250(D_84162A30[value], idx);
+        } else {
+            func_841051D8(*(u16 *)(D_84182A5C + idx * 8), idx);
+        }
+        D_84190190 = 0;
+    }
+}
+/* mkdraft:func_8410545C end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3749B0/func_841054D4.s")
 

@@ -36,8 +36,24 @@ void func_84107E08(void) {
     D_84190170 += 4;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377570/func_84107E20.s")
+extern s32 D_84190170;
+extern u8 D_8416A218[];
 
+void func_84107E20(void) {
+    u8 cmd;
+
+    D_84190170 += 4;
+    while (TRUE) {
+        cmd = *(u8 *)(u32)D_84190170;
+        if (cmd == 3) {
+            break;
+        }
+        if (cmd == 0) {
+            break;
+        }
+        D_84190170 += *(s32 *)(D_8416A218 + cmd * 8 + 4);
+    }
+}
 extern s32 D_8416A210;
 extern s16 D_8416A214;
 extern u8 D_8416A218[];
