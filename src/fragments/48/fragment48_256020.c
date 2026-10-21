@@ -329,10 +329,48 @@ void *func_87C00C80(void *arg0, void *arg1) {
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/48/fragment48_256020/func_87C00D14.s")
+/* mkdraft:MathUtil_Atan2d_fragment48 begin */
+f64 MathUtil_Atan2d_fragment48(f64 arg0, f64 arg1) {
+    extern f64 D_87C03DB8, D_87C03DC0, D_87C03DC8, D_87C03DD0, D_87C03DD8, D_87C03DE0;
+    f64 ratio;
+    f64 reduced;
+    f64 fraction;
+    s32 i;
+
+    if ((arg1 == 0.0) && (arg0 == 0.0)) {
+        return 0.0;
+    }
+    if (arg1 == 0.0) {
+        if (arg0 > 0.0) {
+            return D_87C03DB8;
+        }
+        return D_87C03DC0;
+    }
+    ratio = arg0 / arg1;
+    reduced = ((ratio > 0.0 ? ratio : -ratio) <= 1.0) ? ratio : 1.0 / ratio;
+    fraction = 0.0;
+    for (i = 14; i > 0; i--) {
+        fraction = (i * i) * reduced * reduced / ((2 * i + 1) + fraction);
+    }
+    reduced = reduced / (1.0 + fraction);
+    if (ratio > 1.0) {
+        reduced = D_87C03DC8 - reduced;
+    }
+    if (ratio < -1.0) {
+        reduced = D_87C03DD0 - reduced;
+    }
+    if (arg1 > 0.0) {
+        return reduced;
+    }
+    if (arg0 > 0.0) {
+        return reduced + D_87C03DD8;
+    }
+    return reduced - D_87C03DE0;
+}
+/* mkdraft:MathUtil_Atan2d_fragment48 end */
 
 extern f64 D_87C03DE8;
-extern f64 func_87C00D14(f64, f64);
+extern f64 MathUtil_Atan2d_fragment48(f64, f64);
 f64 func_87C00F9C(f64 arg0) {
     f64 root;
     f64 abs_value;
@@ -346,7 +384,7 @@ f64 func_87C00F9C(f64 arg0) {
     }
     root = (f64)sqrtf((f32)(1.0 - (arg0 * arg0)));
     if (root != 0.0) {
-        return -func_87C00D14(arg0, root);
+        return -MathUtil_Atan2d_fragment48(arg0, root);
     }
     if (arg0 > 0.0) {
         return 0.0;

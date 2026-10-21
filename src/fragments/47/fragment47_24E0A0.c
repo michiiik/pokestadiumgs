@@ -313,7 +313,33 @@ s32 func_8600A04C(void *arg0, void *arg1, void *arg2) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24E0A0/func_8600A0C8.s")
+/* mkdraft:func_8600A0C8 begin */
+f64 func_8600A0C8(void *arg0)
+{
+  f64 temp_fa0;
+  f64 temp_fv1;
+  s32 temp_v0;
+  s32 var_v0;
+  temp_v0 = *((s32 *) (((u8 *) arg0) + 0x48));
+  temp_fv1 = (*((f64 *) (((u8 *) arg0) + 8))) / temp_fa0;
+  if (temp_v0 != 0)
+  {
+    temp_fa0 = *((f64 *) (((u8 *) arg0) + 0));
+    temp_fv1 = (*((f64 *) (((u8 *) arg0) + 8))) / temp_fa0;
+    if (0, temp_v0)
+    {
+      var_v0 = 1;
+    }
+    else
+    {
+      var_v0 = -1;
+    }
+    return (*((f64 *) (((u8 *) arg0) + 0x18))) + (((f64) sqrtf((f32) (1.0 - (temp_fv1 * temp_fv1)))) * (((f64) var_v0) * temp_fa0));
+  }
+ if (1) { }
+  return (*((f64 *) (((u8 *) arg0) + 0x18))) - (*((f64 *) (((u8 *) arg0) + 0)));
+}
+/* mkdraft:func_8600A0C8 end */
 
 f64 func_8600A144(u8 *arg0) {
     f64 ratio;

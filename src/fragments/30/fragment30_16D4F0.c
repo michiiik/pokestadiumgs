@@ -54,8 +54,42 @@ void func_881000B8(void) {
     func_8810009C(3, 2);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_8810013C.s")
 
+void func_8810013C(void *arg0, void *arg1, s32 arg2)
+{
+  f32 temp_fa1;
+  f32 temp_fv0;
+  f32 temp_fv1;
+  u8 *new_var2;
+  u8 *new_var;
+  f32 var_fa0_2;
+  temp_fv0 = ((f32) (6 - (*(((u8 *) D_88104E80) + 7)))) / 6.0f;
+  temp_fv1 = ((f32) ((*((u16 *) (((u8 *) arg1) + 4))) - 0x20)) * temp_fv0;
+  if (temp_fv1 > 0.0f)
+  {
+    var_fa0_2 = 0.5f;
+  }
+  else
+  {
+    var_fa0_2 = -0.5f;
+  }
+  *((u16 *) (((u8 *) arg0) + 4)) = (u16) (((s32) (var_fa0_2 + temp_fv1)) + 0x20);
+  temp_fa1 = ((f32) ((*((u16 *) (((u8 *) arg1) + 6))) - 0x20)) * temp_fv0;
+  if (temp_fa1 > 0.0f)
+  {
+    var_fa0_2 = 0.5f;
+  }
+  else
+  {
+    var_fa0_2 = -0.5f;
+  }
+  temp_fv0 = var_fa0_2;
+  new_var = ((u8 *) arg0) + 6;
+  *((u16 *) new_var) = (u16) (((s32) (temp_fv0 + temp_fa1)) + 0x20);
+  new_var2 = (u8 *) arg0;
+  *((s16 *) (((u8 *) arg0) + 0)) = (s16) (((*((s16 *) (((u8 *) arg1) + 0))) + (((s32) (*((u16 *) (((u8 *) arg1) + 4)))) >> 1)) - (((s32) (*((u16 *) (new_var2 + 4)))) >> 1));
+  *((s16 *) (((u8 *) arg0) + 2)) = (s16) (((*((s16 *) (((u8 *) arg1) + 2))) + (((s32) (*((u16 *) (((u8 *) arg1) + 6)))) >> 1)) - (((s32) (*((u16 *) new_var))) >> 1));
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_88100264.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_88100C80.s")
@@ -98,7 +132,31 @@ void func_881014E4(f32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_8810179C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_88102234.s")
+/* mkdraft:func_88102234 begin */
+extern s32 func_80001FF0(void);
+extern void StageContext_SetClearColor(u16);
+extern void StageFade_StartFromOpaque(s32);
+extern void func_80064D28(void);
+extern void func_8810179C(s32);
+extern f32 D_88104E68;
+
+void func_88102234(void) {
+    s32 count;
+    s32 i;
+
+    count = (u32) (((f32)func_80001FF0() * D_88104E68) / 2) & 0xFFFF;
+    StageContext_SetClearColor(1);
+    StageFade_StartFromOpaque(count);
+    i = 0;
+    if (count != 0) {
+        do {
+            func_80064D28();
+            func_8810179C(0);
+            i += 1;
+        } while (i != count);
+    }
+}
+/* mkdraft:func_88102234 end */
 
 extern void func_800226C0(s32);
 extern void func_880040D4();
@@ -120,9 +178,92 @@ void func_88102338(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_881023CC.s")
+/* mkdraft:func_881023CC begin */
+extern s32 func_80001FF0(void);
+extern void func_80035424(s32);
+extern void StageContext_SetClearColor(u16);
+extern void StageFade_StartFromTransparent(s32);
+extern void func_80064D28(void);
+extern void func_8810179C(s32);
+extern f32 D_88104E6C;
+
+
+
+void func_881023CC(void) {
+    s32 count;
+    s32 i;
+
+    count = (u32) (((f32)func_80001FF0() * D_88104E6C) / 2) & 0xFFFF;
+    if (D_88006860 == 8) {
+        func_80035424(count);
+        StageContext_SetClearColor(0xFFFF);
+    }
+    *(s32 *)(D_88104E80 + 0x18) = 1;
+    StageFade_StartFromTransparent(count);
+    i = 0;
+    if (count != 0) {
+        do {
+            func_80064D28();
+            func_8810179C(2);
+            i += 1;
+        } while (i != count);
+    }
+}
+/* mkdraft:func_881023CC end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_881024F8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/30/fragment30_16D4F0/func_88102E78.s")
+#ifndef M2C_FIELD /* sweep: m2c --valid-syntax helpers (mirrors mkdraft.py) */
+#define M2C_UNK s32
+#define M2C_UNK8 s8
+#define M2C_UNK16 s16
+#define M2C_UNK32 s32
+#define M2C_UNK64 s64
+#define M2C_FIELD(expr, type, offset) (*(type)((u8*)(expr) + (offset)))
+#define M2C_BITWISE(type, expr) ((type)(expr))
+#define M2C_ERROR(desc) 0
+#define M2C_TRAP_IF(cond) ((void)0)
+#define M2C_BREAK() ((void)0)
+#define M2C_SYNC() ((void)0)
+#define M2C_CARRY 0
+#define M2C_STRUCT_COPY(dst, src) ((dst) = (src))
+#endif
+
+M2C_UNK Gfx_FreeDisplayListBuffers();               /* extern */
+M2C_UNK Gfx_InitDisplayListBuffers(M2C_UNK, M2C_UNK); /* extern */
+M2C_UNK Util_Free(u8 *);                            /* extern */
+s32 func_800082E0(M2C_UNK, M2C_UNK, M2C_UNK, M2C_UNK, s32, s32); /* extern */
+M2C_UNK func_80008514(s32);                         /* extern */
+M2C_UNK func_80008574();                            /* extern */
+s32 func_80047588(M2C_UNK, M2C_UNK);                /* extern */
+M2C_UNK func_80047610();                            /* extern */
+M2C_UNK func_8004C09C(M2C_UNK);                     /* extern */
+M2C_UNK func_8004C398();                            /* extern */
+void func_881023CC(void);                            /* extern */
+M2C_UNK func_881024F8(s32);                         /* extern */
+M2C_UNK main_pool_pop_state(M2C_UNK);               /* extern */
+M2C_UNK main_pool_push_state(M2C_UNK);              /* extern */
+extern s32 D_8800687C;
+
+s32 func_88102E78(s32 arg0, M2C_UNK arg1) {
+    s32 sp24;
+
+    main_pool_push_state(0x4C41424F);
+    Gfx_InitDisplayListBuffers(0x14000, 0);
+    sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    func_8004C09C(7);
+    D_8800687C = func_80047588(0xC, 0);
+    func_881024F8(arg0);
+    func_80008514(sp24);
+    func_88102234();
+    func_88102338();
+    func_881023CC();
+    func_80008574();
+    Util_Free(D_88104E80);
+    func_80047610();
+    func_8004C398();
+    Gfx_FreeDisplayListBuffers();
+    main_pool_pop_state(0x4C41424F);
+    return D_88006860;
+}
 #endif

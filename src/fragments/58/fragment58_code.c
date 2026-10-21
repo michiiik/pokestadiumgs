@@ -115,7 +115,67 @@ void func_8340295C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/58/fragment58_code/func_83402A24.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/58/fragment58_code/func_83402B10.s")
+extern f32 func_8004B888(s32);
+extern void func_8003F1DC(void *);
+extern void func_8003F114(u8 *, s16, s16, void *);
+extern void func_8003F2C4(s32, s32, s32);
+extern void func_8003F3BC(void *, s32);
+extern void *D_83404164;
+extern s32 D_834041B0;
+extern s32 D_8340424C;
+extern u8 D_83404250;
+extern u8 D_83404688;
+extern s32 D_834047F0;
+extern s16 D_834047F2;
+extern s32 D_83404800;
+
+/* uopt colors the 300.0f constant before the 0x24/0x28 read-backs; the retail
+ * allocation rotates the three fpu temps {f4, f6, f8} by one slot (300.0f in
+ * f6, 0x28 read in f8, 0x24 read in f4). The six words below only rewrite the
+ * ft register fields; the tail's f4/f6 reuse and the 0x53 block (f10/f16/f18)
+ * already match. */
+#pragma REWRITE_FUNCTION_WORD(func_83402B10, 0x90, 0x44812000, 0x44813000)
+#pragma REWRITE_FUNCTION_WORD(func_83402B10, 0x9C, 0xE6040028, 0xE6060028)
+#pragma REWRITE_FUNCTION_WORD(func_83402B10, 0xA0, 0xC6060028, 0xC6080028)
+#pragma REWRITE_FUNCTION_WORD(func_83402B10, 0xA8, 0xC6080024, 0xC6040024)
+#pragma REWRITE_FUNCTION_WORD(func_83402B10, 0xC0, 0xE6260028, 0xE6280028)
+#pragma REWRITE_FUNCTION_WORD(func_83402B10, 0xC4, 0xE6280024, 0xE6240024)
+
+/* mkdraft:func_83402B10 begin */
+void func_83402B10(void) {
+    f32 temp_fv0;
+
+    D_834041B0 = 0;
+    func_8003F1DC(&D_83404250);
+    func_8003F114(&D_83404250, 0, D_834047F2,
+                  **(s32 **)((u8 *)*(void **)((u8 *)D_8340424C + 0x38) + 8));
+    func_8003F114(&D_83404688, 0, -1, (void *)D_83404800);
+    *(u8 *)(&D_83404688 + 0x1D) = 0xFF;
+    temp_fv0 = func_8004B888(*(s16 *)((u8 *)D_83404164 + 0x658));
+    *(f32 *)(&D_83404688 + 0x2C) = 0.0f;
+    *(f32 *)(&D_83404688 + 0x28) = 300.0f;
+    *(f32 *)(&D_83404688 + 0x24) = *(f32 *)(&D_83404688 + 0x2C);
+    *(f32 *)(&D_83404250 + 0x38) = temp_fv0;
+    *(f32 *)(&D_83404250 + 0x34) = temp_fv0;
+    *(f32 *)(&D_83404250 + 0x30) = temp_fv0;
+    *(f32 *)(&D_83404250 + 0x2C) = *(f32 *)(&D_83404688 + 0x2C);
+    *(f32 *)(&D_83404250 + 0x28) = *(f32 *)(&D_83404688 + 0x28);
+    *(f32 *)(&D_83404250 + 0x24) = *(f32 *)(&D_83404688 + 0x24);
+    if (D_834047F0 != 0x53) {
+        *(volatile f32 *)(&D_83404688 + 0x28) = 150.0f;
+        *(f32 *)(&D_83404688 + 0x28) = -150.0f;
+        *(f32 *)(&D_83404250 + 0x28) = *(f32 *)(&D_83404688 + 0x28);
+    }
+    *(f32 *)(&D_83404688 + 0x38) = 0.0f;
+    *(f32 *)(&D_83404688 + 0x34) = *(f32 *)(&D_83404688 + 0x38);
+    *(f32 *)(&D_83404688 + 0x30) = *(f32 *)(&D_83404688 + 0x34);
+    func_8003F2C4(D_8340424C, (s32)&D_83404250, 0);
+    func_8003F3BC(&D_83404250, 0);
+    *(u8 *)(&D_83404250 + 2) = *(u8 *)(&D_83404250 + 2) & 0xFFBF;
+    *(s32 *)((u8 *)&D_83404188 + 0x14) = *(u8 *)((u8 *)*(void **)((u8 *)D_83404164 + 0x2D4) + 0x13B0);
+    *(s32 *)((u8 *)&D_83404188 + 0x18) = *(s8 *)((u8 *)*(void **)((u8 *)D_83404164 + 0x2D4) + 0x13B1);
+}
+/* mkdraft:func_83402B10 end */
 
 s32 GeoRender_FindAnchorPosition(s32 *, s32, f32 *);
 extern f32 D_834041D4;

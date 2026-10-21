@@ -579,7 +579,44 @@ void func_86B09378(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B09380.s")
+/* mkdraft:func_86B09380 begin */
+extern f64 D_86B0E000;
+extern f64 D_86B0E008;
+extern f32 D_86B0E010;
+
+
+
+void func_86B09380(void) {
+    s32 found;
+    s32 i;
+    s32 counter;
+
+    found = 0;
+    counter = *(s32 *)(D_86B17A78 + 0x284);
+    *(s32 *)(D_86B17A78 + 0x284) = counter + 1;
+    if (counter == 0) {
+        *(s32 *)D_86B181C0 = 10;
+        *(s32 *)(D_86B17A78 + 0x360) = 1;
+    }
+    i = 0;
+    do {
+        if (*(s32 *)(D_86B17A78 + i * 4 + 0x34) == 0x16) {
+            found = 1;
+        }
+        i += 1;
+    } while (D_86B17A88 != D_86B17A78 + i * 4);
+    if (found != 0) {
+        *(f32 *)(D_86B17A78 + 0xF8) = (f32)((f64)*(f32 *)(D_86B17A78 + 0xF8) - D_86B0E000);
+    } else {
+        *(f32 *)(D_86B17A78 + 0xF8) = (f32)((f64)*(f32 *)(D_86B17A78 + 0xF8) - D_86B0E008);
+    }
+    if (*(f32 *)(D_86B17A78 + 0xF8) < 0.0f) {
+        *(f32 *)(D_86B17A78 + 0xF8) += D_86B0E010;
+    }
+    func_86B057B0();
+    func_86B081B4();
+}
+/* mkdraft:func_86B09380 end */
 #endif
 
 void func_86B09478(void) {
@@ -622,7 +659,41 @@ void func_86B0952C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B09834.s")
+/* mkdraft:func_86B09834 begin */
+extern f64 D_86B0E038;
+extern f64 D_86B0E040;
+extern f32 D_86B0E048;
+
+void func_86B09834(void) {
+    s32 found;
+    s32 i;
+
+    found = 0;
+    if (*(s32 *)(D_86B17A78 + 0x360) != 0) {
+        // Index-driven scan: uopt strength-reduces `D_86B17A78 + i * 4` into a
+        // loop cursor with its own preheader lui/addiu of D_86B17A78, kept
+        // separate from the la that serves the 0x360/0xF8 field loads (a2).
+        // The reversed compare order produces the exit branch's `bnel v0, a0`.
+        i = 0;
+        do {
+            if (*(s32 *)(D_86B17A78 + i * 4 + 0x34) == 0x16) {
+                found = 1;
+            }
+            i += 1;
+        } while (D_86B17A88 != D_86B17A78 + i * 4);
+        if (found != 0) {
+            *(f32 *)(D_86B17A78 + 0xF8) = (f32)((f64)*(f32 *)(D_86B17A78 + 0xF8) - D_86B0E038);
+        } else {
+            *(f32 *)(D_86B17A78 + 0xF8) = (f32)((f64)*(f32 *)(D_86B17A78 + 0xF8) - D_86B0E040);
+        }
+        if (*(f32 *)(D_86B17A78 + 0xF8) < 0.0f) {
+            *(f32 *)(D_86B17A78 + 0xF8) += D_86B0E048;
+        }
+        func_86B057B0();
+        func_86B081B4();
+    }
+}
+/* mkdraft:func_86B09834 end */
 #endif
 
 #ifdef VERSION_US
@@ -689,7 +760,56 @@ void func_86B0B6CC(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/61/fragment61_code/func_86B0B7B4.s")
+s32 func_8003EC54(s32 *);
+extern s32 D_86B17910;
+extern s32 D_86B17ABC;
+
+void func_86B0B7B4(void)
+{
+  f32 temp_fa0;
+  f32 temp_fa0_2;
+  f32 temp_fv0;
+  f32 temp_fv1_2;
+  f64 temp_fv0_2;
+  f64 temp_fv0_3;
+  f64 temp_fv1;
+  int new_var;
+  switch (D_86B17ABC)
+  {
+    case 0:
+      *((f32 *) (((u8 *) D_87F119DC) + 0x5C)) = 7.0f;
+      temp_fv0 = *((f32 *) (((u8 *) D_87F119DC) + 0x5C));
+      *((f32 *) (((u8 *) D_87F119DC) + 0x58)) = temp_fv0;
+      *((f32 *) (((u8 *) D_87F119DC) + 0x54)) = temp_fv0;
+      new_var = 0xFF;
+      *((s8 *) (((u8 *) D_87F119DC) + 0x41)) = new_var;
+      return;
+
+    case 1:
+      temp_fv0_2 = (f64) (((f32) (func_8003EC54(&D_86B17910) - 1)) / 30.0f);
+      temp_fv1 = 1.0 - temp_fv0_2;
+      temp_fa0 = (f32) ((temp_fv1 * 7.0) + (3.5 * temp_fv0_2));
+      *((f32 *) (((u8 *) D_87F119DC) + 0x5C)) = temp_fa0;
+      *((f32 *) (((u8 *) D_87F119DC) + 0x58)) = temp_fa0;
+      *((f32 *) (((u8 *) D_87F119DC) + 0x54)) = temp_fa0;
+      *((s32 *) (((u8 *) D_87F119DC) + 0x38)) = (s32) ((temp_fv1 * 128.0) + (64.0 * temp_fv0_2));
+      return;
+
+    case 2:
+      temp_fv1_2 = ((f32) (func_8003EC54(&D_86B17910) - 1)) / 27.0f;
+      temp_fv0_3 = 1.0 - ((f64) temp_fv1_2);
+      temp_fa0_2 = (f32) ((temp_fv0_3 * 3.5) + ((f64) (7.0f * temp_fv1_2)));
+      *((f32 *) (((u8 *) D_87F119DC) + 0x5C)) = temp_fa0_2;
+      *((f32 *) (((u8 *) D_87F119DC) + 0x58)) = temp_fa0_2;
+      *((f32 *) (((u8 *) D_87F119DC) + 0x54)) = temp_fa0_2;
+      *((s8 *) (((u8 *) D_87F119DC) + 0x41)) = (s8) ((s32) ((temp_fv0_3 * 64.0) + ((f64) (128.0f * temp_fv1_2))));
+      return;
+
+  }
+
+}
+
+extern void func_86B0B7B4(void);
 #endif
 
 #ifdef VERSION_US

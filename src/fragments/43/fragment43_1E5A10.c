@@ -1250,7 +1250,44 @@ s32 func_8AC0665C(s16 *arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/43/fragment43_1E5A10/func_8AC0672C.s")
+/* mkdraft:func_8AC0672C begin */
+#pragma pack(1)
+#pragma pack(0)
+s32 func_8AC06490(s16 arg0, void *arg1);
+s32 func_8AC064F0(s16 arg0, s16 *arg1);
+s32 func_8AC06630(s16 arg0, void *arg1);
+
+s32 func_8AC0672C(void *arg0, s16 arg1)
+{
+  s32 res = 0;
+  unsigned int new_var;
+  s16 s1 = (s16) arg1;
+  s16 s2 = *((s16 *) (((u8 *) arg0) + 0x2));
+  while (func_8AC06630(s1, arg0) != 0)
+  {
+    s1++;
+    if (func_8AC06490(s1, arg0))
+    {
+      s2++;
+      new_var = func_8AC064F0((s16) ((*((s16 *) (((u8 *) arg0) + 0x8))) * ((0, s2))), arg0) != 0;
+      if (new_var)
+      {
+        res = 1;
+        break;
+      }
+    }
+  }
+
+  if (1 == 0)
+  {
+    s1++;
+    if (1)
+    {
+    }
+  }
+  return res;
+}
+/* mkdraft:func_8AC0672C end */
 #endif
 
 #ifdef VERSION_US

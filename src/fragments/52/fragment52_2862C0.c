@@ -39,7 +39,17 @@ void func_86408048(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_2862C0/func_86408148.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_2862C0/func_864081E8.s")
+/* mkdraft:func_864081E8 begin */
+void func_864081E8(void) {
+    u8 *temp = D_86416C00 + 0xCE00;
+    u8 *ptr;
+    s32 i;
+
+    for (i = 0x40, ptr = temp + 0xC; i != 0x110; i += 0x34, ptr += 0x20) {
+        func_86407E2C(ptr, (f32)i, 198.0f, 0x14);
+    }
+}
+/* mkdraft:func_864081E8 end */
 
 void func_8640826C(void) {
     u8 *temp = D_86416C00 + 0xCE00;

@@ -41,8 +41,27 @@ void func_88B00288(Func88B00288Rect *arg0, Func88B00288Rect *arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1DC1F0/func_88B003B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1DC1F0/func_88B00690.s")
 
+void func_88B00690(s16 *arg0) {
+    s32 temp_v1;
+    u8 *temp_v0;
+
+    temp_v0 = (u8 *)D_88B05F60 + 0x1C;
+    if (*(s32 *)((u8 *)D_88B05F60 + 0x460) != 0) {
+        temp_v1 = *(u8 *)(temp_v0 + 3);
+        if (temp_v1 >= 4 && temp_v1 < 0xA) {
+            *arg0 = 0x12;
+            return;
+        }
+        if (temp_v1 >= 0xA && temp_v1 < 0x12) {
+            *arg0 = 0x13;
+            return;
+        }
+        *arg0 = 0x14;
+        return;
+    }
+    *arg0 = 0x1C;
+}
 s32 func_88B044D0(s32);
 void func_88B00700(s16 *arg0) {
     u32 temp_v0;
