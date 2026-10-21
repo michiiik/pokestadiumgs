@@ -127,7 +127,17 @@ void func_82C00804(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C008BC.s")
+/* mkdraft:func_82C008BC begin */
+extern Gfx *D_800D0510;
+
+void func_82C008BC(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
+    s32 w = arg2;
+    if (w > 0 && arg3 > 0) {
+        func_82C003BC(0x102, 0);
+        gSPTextureRectangleFlip(D_800D0510++, arg0 * 4, arg1 * 4, (arg0 + w - 1) << 2, (arg1 + arg3 - 1) << 2, G_TX_RENDERTILE, 0, 0, (0x10000 / arg3) & 0xFFFF, 0);
+    }
+}
+/* mkdraft:func_82C008BC end */
 #endif
 
 #ifdef VERSION_US
@@ -140,7 +150,7 @@ void func_82C009F8(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-extern void func_82C008BC(s16, s16, s32, s32);
+extern void func_82C008BC(s16, s16, u16, u16);
 void func_82C00A70(s16 arg0, s16 arg1, u16 arg2, u16 arg3) {
     func_82C008BC((s16) (arg0 + 3), (s16) (arg1 + 3), (arg2 - 5) & 0xFFFF, (arg3 - 6) & 0xFFFF);
     func_82C00624(arg0, arg1, arg2, arg3);
