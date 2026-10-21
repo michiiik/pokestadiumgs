@@ -212,3 +212,53 @@ was changed for this owner. Earlier accepted helpers remain byte-identical.
   webs and their cached stack homes around the second lookup and effect call.
   The first void-pointer ABI drafts failed the existing prototype; those
   context failures are not evidence against the source algorithm.
+
+## 2026-10-21: matching residual-damage planner
+
+`8414D348` is now `BattleEffects_PlanResidualDamage`, 468 original bytes.
+It preserves both record lookups, all status/record-byte conditions, the
+original HP fractions and multiplier, each halfword accumulation, and the
+final current-HP override. The observed halfword lanes at view offsets 0x22
+and 0x26 are now part of the existing partial effect view. Its 60-byte C
+extent and every earlier field offset remain unchanged; it is not a complete
+enclosing-state allocation model.
+
+Compound accumulation produces the original operand/temp sequence. The last
+two differences were the saved own-record pointer at byte 28 instead of 24
+in the original 32-byte frame. Declaring the opposing pointer before the own
+pointer recovers that real home. Both records are read-only in cleaned C.
+No extra storage, padding, fake interface, or instruction rewrite is used.
+
+Native-runner acceptance passed the full-ROM gate. Its first successful gate
+immediately froze and independently rehashed the whole changed object, four
+distinct collateral objects, source, ROM, ELF, and linked script. This owner
+shares a four-owner, 836-byte batch with the state-query/snapshot helpers in
+`fragment79_3C40B0.c`. Fifteen complete-original-object cleanup controls cover
+both files; 28 emitted layout values include both new halfword arrays. No
+earlier accepted function changed its object bytes.
+
+### Further loop/status/weight requeues
+
+`8414CD18`: fifteen stock complete-object controls calibrated frontend and
+optimizer captures for the retained product and incremental drafts. The
+product draft's signed frontend loop test becomes equality in optimizer
+output, before assembly. Narrow counters reintroduce multiplication/narrowing;
+current-versus-next hit roles and constant-first comparisons do not close the
+exit. The original 156-byte product draft remains best; resume induction/exit
+tracing, not the now-tested width, increment-placement, or comparison families.
+
+`8414EA4C`: requeue. Two batches preserve both record calls, move-code groups,
+selected-side guard, flag masks, and the discarded effect lookup, but produce
+a 40-byte frame instead of 48. Shared versus branch-local views and address/
+guard spellings do not fix it. Next: trace actual pointer/source-slot lifetimes;
+do not add an unused record pointer merely to fill the frame.
+
+`8414D720`: requeue. The truthful draft retains both records, lethal-amount
+gate, selected/active-side checks, two signed divisions, narrowed byte weight,
+minimum-one behavior, conditional queries, and original HP amount stores.
+The existing `s32` address and real `u8` callee arguments are preserved.
+Thirty-two expression, old-weight, scope, store-order, index-width, and call-
+sequencing variants did not close it. A 496-byte/64-byte-frame spelling reaches
+0.9839 normalized similarity but only about 0.34 raw: it is not a match.
+Next: trace side/other/base carriers and expression/stack ownership around the
+second record lookup and the conditional calls before more source variants.

@@ -8,6 +8,11 @@
  * undefined_syms.ld, and the other hand-written scripts are.
  */
 Audio_ThreadEntry = Audio_ThreadMain;
+/* Fragment 79 residual planning, record queries, and state snapshots. */
+func_8414D348 = BattleEffects_PlanResidualDamage;
+func_841555B4 = BattleRecord_HasPoweredMoveOfType;
+func_8415565C = BattleRecord_HasMove;
+func_84155750 = BattleState_PushSnapshot;
 /* Fragment 79 calculated/shared HP and amount planning. */
 func_8414DB14 = BattleEffects_AddMoveTypeResponse;
 func_8414CA80 = BattleEffects_PlanCalculatedRecovery;
