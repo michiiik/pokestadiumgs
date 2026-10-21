@@ -226,11 +226,11 @@ void func_8410971C(s32 arg0) {
     func_84109630(D_84190194, arg0);
 }
 
-void func_84109780(s32 arg0) {
-    if (GeoRender_FindAnchorPosition(D_84190198, func_8411E21C(D_84190198), arg0) == 0) {
-        func_8411DCCC((s32) D_84190198, arg0);
+void func_84109780(void *position) {
+    if (GeoRender_FindAnchorPosition(D_84190198, func_8411E21C(D_84190198), (s32)position) == 0) {
+        func_8411DCCC((s32) D_84190198, (s32)position);
     }
-    func_84109630((s32) D_84190198, arg0);
+    func_84109630((s32) D_84190198, (s32)position);
 }
 
 extern s32 func_8411E22C(u8 *);
