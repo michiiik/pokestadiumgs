@@ -183,3 +183,59 @@ controls cover accepted source, blank-line stability, shared-type/extern
 cleanup, readable guards, semantic naming and named-source blank-line
 stability. All previously accepted camera/terrain owners and other neighbors
 remain object-identical.
+
+## Accepted radial emitters and trail updates
+
+Four owners replace1552 original bytes through recorded native runner accepts
+and full-ROM gates:84156CCC/8415782C are the396-byte effect19/effect98 radial
+variant-D emitters;84157ADC/84157CDC are the380-byte effect11/effect57 trail
+updates. Their semantic names retain old address-name linker aliases. Never
+re-probe these accepted owners.
+
+The real secondary-owner scale getter returns f32, as established by the
+accepted84109544 definition. Its wrapper now explicitly returns that value.
+The anchor-position wrapper now accepts a real float-position pointer and
+forwards its32-bit address to the actual84109780 callee. Both repairs preserve
+the wrappers' complete original object bytes; they do not invent interfaces
+to obtain a register allocation.
+
+The paired trail updates increment signed-halfword counters, emit on even
+frames, calculate three randomized offsets scaled by the actual owner scale,
+and choose horizontal velocity toward the origin. Return the genuine
+TrailEffectPool_IsComplete result. The Stadium1 source's hard-coded zero is
+not the GS behavior. A three-float local position record, live jitter terms
+and declaration placement reproduce the original112-byte frame without the
+donor's unused padding. Preserve the double-precision zero comparison on x.
+
+The radial emitters use the real six-output direction helper and18-argument
+variant-D backend, whose signed-halfword and byte arguments are established
+by the original callee loads. Preserve both random draws, signed remainder
+operations, float arithmetic grouping, colors and literal arg6=2 from GS
+assembly. Retaining the second draw in a live local recovers the original
+first draw's stack home, without an unused padding word. The two bodies have
+the same code shape but different independently checked colors and constants.
+
+Place a multi-owner batch in source order: the combined installer emits shared
+declarations only with its first winner. An initially out-of-source-order
+batch produced isolated exact hits but failed the combined compile because
+an earlier caller preceded those declarations. The source-ordered retry used
+the same matched bodies and passed the gate; it was a declaration-plumbing
+repair, not a new source hypothesis or an ungated installation.
+
+Both first-success transactions froze the whole changed TU, four distinct
+collateral objects, source, ROM, ELF and linked script. All nine artifacts per
+success were independently hashed before further compilation. Five complete
+original-object controls cover source/blank-line stability, declaration cleanup,
+readable guards, naming and named-source blank-line stability. Previous
+camera, sampler and terrain owners remain identical. No byte rewrite, forced
+register, dummy conditional, arbitrary padding or unused local was introduced.
+
+## Four-stream effect45 update: requeue
+
+841580C8 remains assembly after eight natural variants. Its original576-byte
+body includes mixed float/double phase construction and conversion around
+the sin/cos calls; the closest float-call form is560 bytes, while standard
+double-math forms are572 bytes. Neither is accepted. Scalar/phase/result
+declaration variants alone do not settle the call-lowering difference.
+Next: inspect authentic compiler intrinsic lowering and the original mixed
+precision expression lineage, rather than add identity casts or padding.
