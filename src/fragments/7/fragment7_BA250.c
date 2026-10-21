@@ -224,7 +224,7 @@ typedef struct {
     u8 unk_3B8[1168 - 952];
 } Fragment7TeamVisualRecord;
 typedef struct {
-    u8 unk_00;
+    u8 capacity;
     u8 count;
     u8 unk_02[2];
     Fragment7TeamVisualRecord records[6];
@@ -765,7 +765,79 @@ void func_83002424(s32 arg0, void *arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830025AC.s")
+typedef struct {
+    u8 unk_00[31];
+    u8 mode;
+    u8 unk_20[70 - 32];
+    u8 operation;
+    u8 unk_47[75 - 71];
+    u8 row;
+    u8 unk_4C[82 - 76];
+    u8 selection;
+    u8 unk_53[87 - 83];
+    u8 scroll, target_scroll;
+    u8 unk_59[0x3BDF4 - 89];
+    Fragment7TeamVisualBank bank;
+    u8 unk_3D958[0x4E03C - 0x3D958];
+    f32 progress;
+} Fragment7SecondTeamPanelState;
+extern Fragment7ListRect D_8300C3F4;
+extern u8 D_8300C2A2[], D_8300C3FC[], D_8300C41C[];
+extern void func_81800D70(s32, s32);
+extern void func_81801D04(u8 *);
+extern void func_818017A8(void);
+extern void WidgetResources_DrawSelection(s32, s32, s32);
+extern void func_830020CC(void *arg0, f32 arg1, s32 arg2, s32 arg3, f32 arg4);
+extern Gfx * D_800D0510;
+void Fragment7_DrawSecondTeamListPanel(s32 definition, void *memory, Fragment7DrawOrigin *origin) {
+    Fragment7SecondTeamPanelState *state = memory;
+    f32 weight;
+    f32 position;
+
+    weight = func_818055E0((void *)definition, (u8 *)state);
+    position = (f32)(state->target_scroll - state->scroll) * state->progress
+               + (f32)(u32)state->scroll;
+    WidgetResources_DrawRecords(definition, (s32)state, (s32)origin);
+    func_818006FC(origin->x + 13, origin->y + 37, 226, weight);
+    gSPDisplayList(D_800D0510++, D_80094E38);
+    gDPSetEnvColor(D_800D0510++, 0xFF, 0xFF, 0xFF, 255.0f * weight);
+    {
+        Fragment7ListRect clip;
+        s32 selected;
+        Fragment7ListRect rect;
+
+        func_81800C18(origin->x + 211, origin->y + 17, 1, state->bank.count);
+        func_81800D70(origin->x + 220, origin->y + 17);
+        func_81800C18(origin->x + 229, origin->y + 17, 1, state->bank.capacity);
+        clip = D_8300C3F4;
+        func_81801854(&clip, &clip, origin);
+        func_81801D04((u8 *)&clip);
+        if (weight > 0.01f) {
+            func_830020CC(&state->bank, position, origin->x, origin->y, weight);
+        }
+        selected = state->selection;
+        if (state->mode == 26 && state->operation == 4) {
+            selected = state->row + state->scroll;
+        }
+        if (state->mode == 26 && state->operation == 1 && func_8300B31C(&state->bank)) {
+            selected = state->row + state->scroll;
+        }
+        if (weight > 0.99f && selected >= 0) {
+            rect = *(Fragment7ListRect *)D_8300C2A2;
+            rect.y = (s16)((f32)rect.y + 71.0f * (((f32)selected - 1.0f) - position));
+            func_81801854(&rect, &rect, origin);
+            func_8004B2CC(rect.x, rect.y, rect.width, rect.height, 0x96, 0x96, 0x5A, 0);
+        }
+    }
+    func_818017A8();
+    WidgetResources_DrawSelection(definition, (s32)state, (s32)origin);
+    if (state->scroll > 0) {
+        WidgetTexture_DrawRecord(D_8300C3FC, (u8 *)origin, weight, 0);
+    }
+    if (state->scroll < 3) {
+        WidgetTexture_DrawRecord(D_8300C41C, (u8 *)origin, weight, 0);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -853,9 +925,7 @@ typedef struct {
     s32 saved_status[8];
 } Fragment7RuleDrawState;
 extern void *func_8004C874(s32, s32);
-extern void func_818017A8(void);
 extern void WidgetResources_DrawSelection(s32,s32,s32);
-extern Gfx * D_800D0510;
 void Fragment7_DrawRuleSelectionList(s32 definition, void *memory, void *origin_memory) {
     Fragment7DrawOrigin *origin = origin_memory;
     Fragment7RuleDrawState *state = memory;
@@ -2105,8 +2175,6 @@ typedef struct {
 } Fragment7ListIndicatorState;
 extern u8 D_8300F360[];
 extern u8 D_8300F380[];
-extern void WidgetResources_DrawSelection(s32, s32, s32);
-extern void func_81800D70(s32, s32);
 void Fragment7_DrawRecordListIndicators(s32 definition, void *memory, void *origin) {
     Fragment7ListIndicatorState *state = memory;
     f32 weight;

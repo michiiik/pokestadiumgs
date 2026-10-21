@@ -938,3 +938,75 @@ readable formatting, color literals, naming, and blank-line shifts. The
 named version retains the same 800-byte extent and 96-byte frame. Research
 scripts and compiler captures remain private artifacts, not repository
 helpers.
+
+#### Team-detail renderer: bounded pointer/part follow-up
+
+`func_830043F0` remains `requeue` after 24 additional recorded probes on
+`36572f7`. Logical part-index loops, individual per-phase row-pointer
+scopes, and typed cached-image views did not improve the retained
+2240-byte, 336-byte-frame parent. All tested logical-part variants retain
+zero `multu` sites. The text-only logical-part variant is 2220 bytes with
+the correct frame, but its string buffer still starts at stack byte 152,
+not the oracle's 128; its smaller size is not a new match.
+
+The cached-image view has a producer witness: `func_83000E40` writes six
+3200-byte slots from state `0x3FF38`, then advances 19200 bytes for the
+second 476-byte team part. Both late and early typed views of that real
+two-by-six region keep the unwanted title-address caching and grow the
+frame to 344 bytes. Per-phase pointer scopes likewise grow the frame or
+regress code shape. These negatives apply to this no-multiply source
+basin, not to every possible record representation.
+
+`func_80060D1C` decodes one byte per encoded character, except the leading
+`0x5D` trainer-name sentinel, which copies resource group 65/item 2. That
+consumer does not recover the original renderer-local buffer capacity.
+No new capacity, dummy local, artificial record anchor, or rewrite was
+installed. The Stadium 1 near-body lookup also found no witness above
+0.45 normalized similarity. Next return to the measured optimizer-owned
+title-address webs rather than repeating the rejected pointer/part forms.
+
+### Second team-list panel and rendering-pass local scopes
+
+`func_830025AC` / `Fragment7_DrawSecondTeamListPanel` is accepted from
+`36572f7`: 988 bytes, recorded candidate acceptance, and a byte-identical
+full US ROM, MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. The callback draws the
+team bank at state `0x3BDF4`, interpolates scroll bytes 87/88 using the float
+at `0x4E03C`, installs the clipping rectangle, draws the selected-row
+highlight, and shows the applicable scroll arrows.
+
+The existing `Fragment7TeamVisualBank` has six physical 1168-byte records
+after a four-byte header. Its first byte is now named `capacity`:
+`func_8300AEEC` clears 7012 bytes and writes either 3 or 6 at byte 0,
+depending on its initialization argument. Count remains byte 1. This panel
+reads both values. The clipping default is the aligned eight-byte rectangle
+at `D_8300C3F4`; the highlight default at `D_8300C2A2` requires the original
+unaligned copy. Twenty-two emitted target-compiler size/offset values verify
+the used bank, state, and rectangle layouts.
+
+The initial ordinary C draft reproduced the entire instruction sequence and
+relocation layout, but its clipping rectangle, selected-row spill, and
+highlight rectangle had different stack homes. Additional consumed scalar
+or command-pointer locals grew the frame and were not adopted. Keeping the
+three existing locals in their clipping/highlight rendering block, after
+the two SDK display-list macros, recovers stack bytes 68, 64, and 56 and the
+96-byte frame. No padding, extra parameter, fabricated layout, dummy local,
+or instruction rewrite is used. SDK macros remain intact.
+
+The first successful gate froze and independently hashed the whole changed
+object, four distinct collateral objects, source, ROM, ELF, and linked
+script before another compilation. Complete game section bytes, semantic
+relocations, and function extents agree with the original object. Eight
+further whole-object controls cover declaration cleanup, the capacity name,
+readable formatting, naming, and blank-line shifts.
+
+The same scope mechanism gives `func_830043F0` a useful partial result.
+Keep its unchanged `text[128]` after the real level-loop part-counter
+declaration, and extend that rendering block through the final text pass;
+the final text loop retains its own distinct inner part counter. This
+places the buffer at the oracle's stack byte 128 while keeping both
+rectangles at 308/312, the 336-byte frame, and zero `multu` instructions.
+The body remains 2240 bytes rather than 2252. Cached title addresses, alpha
+spill homes, and text-address induction still differ, so it remains
+`requeue` and assembly. This result establishes a scope mechanism, not the
+original buffer capacity. Resume from this buffer-correct source basin;
+do not restore the earlier buffer-at-152 parent or add stack padding.
