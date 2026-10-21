@@ -8,6 +8,8 @@
  * undefined_syms.ld, and the other hand-written scripts are.
  */
 Audio_ThreadEntry = Audio_ThreadMain;
+/* Fragment 7 profile-entry validation and compaction. */
+func_8300B54C = Fragment7_ValidateProfileEntries;
 /* Fragment 7 rule swapping, retained no-op, and profile loading. */
 func_8300AC8C = Fragment7_SwapRuleRecords;
 func_8300B260 = Fragment7_TeamBankNoOp;
