@@ -176,10 +176,7 @@ void func_83000F98(s32 arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-typedef struct {
-    u8 unk_00[96];
-    u8 content[8200 - 96];
-} Fragment7TeamVisualSlot;
+typedef struct { u8 bytes[8200]; } Fragment7TeamVisualSlot;
 typedef struct {
     u8 unk_00[11];
     u8 resource;
@@ -197,8 +194,9 @@ typedef struct {
     Fragment7TeamVisualRecord records[6];
 } Fragment7TeamVisualBank;
 typedef struct {
+    u8 unk_00[96];
     Fragment7TeamVisualSlot visuals[2][6][2];
-    u8 unk_300C0[0x3A290 - 2 * 6 * 2 * 8200];
+    u8 unk_30120[0x3A290 - 96 - 2 * 6 * 2 * 8200];
     Fragment7TeamVisualBank teams[2];
 } Fragment7TeamVisualState;
 extern u8 *func_8004E0F0(u8 *, s32, s32);
@@ -214,7 +212,7 @@ void Fragment7_LoadTeamVisualResources(Fragment7TeamVisualState *state) {
         for (row = 0; row < 6 && row < team->count; row++) {
             parts = team->records[row].parts;
             for (part = 0; part < 2; part++) {
-                func_8004E0F0(state->visuals[bank][row][part].content,
+                func_8004E0F0(state->visuals[bank][row][part].bytes,
                     parts[part].resource,
                     parts[part].entry);
             }
@@ -1135,8 +1133,10 @@ void func_830074C8(void *arg0, s32 arg1) {
 
 #ifdef VERSION_US
 typedef struct { u32 words[17]; } Fragment7ActionRule;
+typedef struct { u32 words[119]; } Fragment7SwapPart;
 typedef struct {
-    u8 unk_000[0x424];
+    Fragment7SwapPart parts[2];
+    u8 unk_3B8[0x424 - 952];
     Fragment7ActionRule rule;
     u8 unk_468[1168 - 0x468];
 } Fragment7ActionTeam;
@@ -1155,7 +1155,9 @@ typedef struct {
     u8 bank;
     u8 unk_3F;
     u8 row;
-    u8 unk_41[89 - 65];
+    u8 unk_41[78 - 65];
+    u8 side;
+    u8 unk_4F[89 - 79];
     u8 scroll;
     u8 unk_5A[0x3829C - 90];
     Fragment7ActionBank banks[2];
@@ -1243,7 +1245,44 @@ void Fragment7_BuildControllerTeam(Fragment7ExportTeam *destination, Fragment7Ex
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830078E4.s")
+typedef Fragment7ActionTeam Fragment7SwapTeam;
+extern s32 func_80071250(u8 *);
+void Fragment7_HandleTeamPartActions(void *memory, s32 selection) {
+    Fragment7TeamActionState *state = memory;
+    Fragment7SwapTeam *team;
+    Fragment7ActionRule *rule;
+    Fragment7ExportTeam *previous;
+    Fragment7ActionTeam *source;
+    switch (selection) {
+    case -1:
+    case 3:
+        state->mode = 12;
+        func_800226C0(3);
+        break;
+    case 2:
+        team = (Fragment7SwapTeam *)((u8 *)state->banks[state->bank].teams + state->row * (s32)sizeof(Fragment7ActionTeam) + state->scroll * sizeof(Fragment7ActionTeam));
+        previous = (Fragment7ExportTeam *)state->panel->team;
+        func_800226C0(140);
+        *state->panel->team = *(Fragment7ActionTeam *)team;
+        state->panel->changed = 2;
+        rule = &team->rule;
+        if (func_80071250((u8 *)rule) != 0) {
+            *(Fragment7SwapPart *)state->panel->team = team->parts[2 - state->side];
+        } else {
+            Fragment7_BuildControllerTeam(previous, (Fragment7ExportSource *)state, rule);
+        }
+        ((Fragment7SwapTeam *)state->panel->team)->parts[1] = team->parts[state->side - 1];
+        state->team_pending = 1;
+        break;
+    case 1:
+        source = (Fragment7ActionTeam *)((u8 *)state->banks[state->bank].teams + state->row * (s32)sizeof(Fragment7ActionTeam) + state->scroll * sizeof(Fragment7ActionTeam));
+        state->edit_rule = source->rule;
+        state->rule_flags = 0x700;
+        state->rule_pending = 1;
+        func_800226C0(210);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1448,7 +1487,75 @@ typedef struct {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83008494.s")
+typedef struct { u32 words[136]; } Fragment7OtherRecord;
+typedef Fragment7OtherRecord Fragment7ActionOtherRecord;
+typedef struct { u8 header[4]; Fragment7ActionOtherRecord records[8]; } Fragment7ActionOtherBank;
+typedef struct {
+    u8 unk_00[4];
+    void *profile;
+    Fragment7ActionOtherRecord *record;
+    Fragment7ActionRule *rule;
+    s32 changed;
+    u8 unk_14[4];
+    s32 side;
+} Fragment7OtherActionPanel;
+typedef struct {
+    u8 unk_00[30];
+    u8 mode;
+    u8 unk_1F[56 - 31];
+    Fragment7OtherActionPanel *panel;
+    u8 unk_3C[3];
+    u8 bank;
+    u8 unk_40[3];
+    u8 record;
+    u8 unk_44[81 - 68];
+    u8 selection;
+    u8 unk_52[0x3A070 - 82];
+    Fragment7ActionRule saved_rules[8];
+    u8 unk_3A290[0x3C854 - 0x3A290];
+    Fragment7ActionOtherBank banks[3];
+    u8 unk_3FB60[0x3FD74 - 0x3FB60];
+    Fragment7ActionRule fixed_rules[4];
+    u8 unk_3FE84[0x3FECD - 0x3FE84];
+    u8 team_pending;
+} Fragment7OtherActionState;
+extern void func_83008290(void *, void *);
+void Fragment7_HandleRecordActions(Fragment7OtherActionState *state, s32 selection) {
+    s32 bank;
+    s32 record;
+    s32 selected;
+    switch (selection) {
+    case -1:
+        state->mode = 18;
+        if (state->bank == 2) {
+            record = state->record - 1;
+        } else {
+            record = 0;
+        }
+        Fragment7_RefreshCollectionCompatibility((Fragment7RuleCheckState *)state,
+            (Fragment7RuleDeck *)&state->banks[state->bank].records[record]);
+        func_800226C0(3);
+        break;
+    case 1:
+    case 2:
+    case 3:
+        func_800226C0(147);
+        bank = state->bank;
+        record = bank == 2 ? state->record - 1 : 0;
+        *state->panel->record = state->banks[bank].records[record];
+        func_83008290(state->panel->profile, state);
+        selected = state->selection;
+        if (selected >= 5) {
+            *state->panel->rule = state->saved_rules[selected - 5];
+        } else {
+            *state->panel->rule = state->fixed_rules[selected - 1];
+        }
+        state->panel->side = 3 - selection;
+        state->panel->changed = 3;
+        state->team_pending = 1;
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1789,7 +1896,6 @@ void func_830094C8(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-typedef struct { u32 words[136]; } Fragment7OtherRecord;
 typedef struct {
     u8 unk_00;
     u8 count;
