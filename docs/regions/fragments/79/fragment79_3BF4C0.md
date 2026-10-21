@@ -287,11 +287,56 @@ padding, instruction rewriting or manual unrolling is used. First successes
 freeze source, complete objects, ROM, ELF, linked script, layouts and original
 ASM; external hashes are checked before any further compilation.
 
-`84153CB8` is a requeue after two eight-candidate families. Its natural
-seven-stage difference loop agrees through the loop body. The best 216-byte
-candidate retains the original 72-byte frame and stack home but folds the
-final header-address increment into the byte memory operands, leaving a
-220-versus-216-byte mismatch. Typed/byte stage views, index width, declaration
-order and a consumed late header local do not recover the final separate
-ADDIU. Next investigate parameter/header carrier reuse across the predicate
-and loop; preserve the original ASM until the full ROM gate accepts it.
+## Psych Up scoring and resisting move slots
+
+Two more genuine matches, 400 bytes, extend native revision `0895b6c2`.
+There are 21 ASM owners remaining in this file.
+
+- `84153CB8` / `BattlePlan_AddPsychUpBonus` resolves the previous requeue.
+  Initializing the consumed header address before the active-record lookups
+  recovers the separate final ADDIU and original 72-byte frame. The same
+  seven-stage loop adds only positive opposing-minus-own differences through
+  `84150B14`, passing move 244, slot `0xFF`, stage index and difference.
+  Move 244 has effect 143, routed through `.L841547F0`. The ordinary full-ROM
+  gate accepts the result; the isolated probe requires a sequential gate
+  because the call to the newly compiled local stage predicate changes its
+  relocation representation. Canonical whole-object comparison and an
+  independent retail link verify the resolved destination and every byte.
+- `841514F8` / `BattlePlan_CountResistingMoveSlots` checks four own move
+  slots with `84151420`. For each eligible move, it tests
+  `80063454(incoming_type, own_move_type, own_move_type, 0) < 10` and counts
+  the slot in a byte. `80063454` in `src/63CF0.c` computes type effectiveness
+  with neutral 10; passing the same defending type twice applies its table
+  entry once. The original ADDU operand order requires unsigned byte-address
+  provenance for the move-list read. Initializing the count before the
+  record getter preserves the original saved-register schedule. This probe
+  is directly link-verified and passes the normal full-ROM gate.
+
+The helper's consumer `841515AC` is the Conversion scorer: local move 160
+has effect 30, dispatched through `.L84154528`. It uses a planned opponent
+move or `84148C74` fallback, then multiplies the resisting-slot count by table
+byte 48 and `8414A2AC`. The helper name describes counted slots, including
+duplicate move types, rather than distinct types.
+
+Both first-success gates freeze complete objects, source, ROM, ELF, linked
+script, layouts and original ASM before any further compilation. Six native
+complete-object controls, including leading blanks and ABI checks, preserve
+all 66 original extents; nine independent links reproduce all 19,440 retail
+text bytes. No fake locals, forced registers/frames, padding, instruction
+rewrites or manual unrolling are used.
+
+`841515AC` remains a requeue after 32 explicit candidates covering local
+views, byte/word side-index origins, early header lifetime, parameter reuse,
+consumed type/count values and a shared integer-address phase carrier. The
+best 240-byte candidate has 16 raw differences: a 56-versus-48-byte frame,
+opponent-index register `v0` instead of `a2`, and corresponding stack homes.
+The early header lifetime recovers the original `s0` header / `s1` side
+ownership. Eight stock/off/on/blank controls calibrate a passive trace while
+preserving the complete retained object. Global coloring is procedure 25,
+while frame emission is procedure 24: the header web uses physical 16,
+side web physical 17, and short-lived index-related web physical 2. The
+measured emitted frame remains 56 bytes. Byte-carrier forms recover stack
+homes but add a mask and disturb the early index schedule; phase reuse does
+not close the mismatch. Next compare short-lived index web formation before
+coloring with the call-argument carrier, keeping the established two-argument
+interface. Do not invent a third parameter to obtain register `a2`.

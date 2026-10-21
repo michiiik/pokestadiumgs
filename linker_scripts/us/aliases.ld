@@ -726,3 +726,5 @@ func_84152EE8 = BattlePlan_AddPerishSongBonus;
 func_841537FC = BattlePlan_AddRainDanceBonus;
 func_84153930 = BattlePlan_AddSunnyDayBonus;
 func_84153B10 = BattlePlan_HasUnfavorableStages;
+func_84153CB8 = BattlePlan_AddPsychUpBonus;
+func_841514F8 = BattlePlan_CountResistingMoveSlots;
