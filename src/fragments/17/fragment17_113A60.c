@@ -62,7 +62,20 @@ void func_82204488(s16 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82204494.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82204744.s")
+/* mkdraft:func_82204744 begin */
+extern s16 D_822105E8;
+extern u8 D_822105DC[];
+extern u8 D_822105EA[];
+#pragma COALESCE_AT_LUI(func_82204744, D_822105E8, D_822105EA)
+
+void func_82204744(void) {
+    if (*(s16 *)(D_822105DC + 0xC) == 0) {
+        D_822105E8 = 1;
+        *(s16 *)D_822105EA = 0;
+        func_800226C0(0x3E);
+    }
+}
+/* mkdraft:func_82204744 end */
 
 s32 func_82204780(s32 arg0, s32 arg1) {
     return (arg1 / arg0) & ~1;
@@ -174,7 +187,39 @@ s32 func_82206124(s32 arg0, void *arg1) { s32 value; s32 result; value = *(s32 *
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206304.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_82206400.s")
+/* mkdraft:func_82206400 begin */
+u32 func_800060E8(void);
+
+s32 func_82206400(s32 arg0, void *arg1) {
+    u32 mask;
+    s32 index = *(s32 *)((u8 *)arg1 + 0x20);
+    s32 show = 0;
+
+    mask = func_800060E8();
+    if ((arg0 != 0) && (arg0 == 1)) {
+        if ((D_8220EC38 == 1) &&
+            (index == *(s16 *)((u8 *)*(u8 **)((u8 *)D_8220DA08 + 0x20) + 2))) {
+            show = 1;
+            {
+                s32 bit = ((mask & 0xFF & (1 << index)) != 0);
+                if (bit != 0) {
+                    *(u16 *)(*(u8 **)((u8 *)arg1 + 0x34) + 4) =
+                        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x34) + 4) | 1;
+                } else {
+                    *(u16 *)(*(u8 **)((u8 *)arg1 + 0x34) + 4) =
+                        *(u16 *)(*(u8 **)((u8 *)arg1 + 0x34) + 4) & 0xFFFE;
+                }
+            }
+        }
+        if (show != 0) {
+            *(u16 *)((u8 *)arg1 + 2) |= 2;
+        } else {
+            *(u16 *)((u8 *)arg1 + 2) &= 0xFFFD;
+        }
+    }
+    return 0;
+}
+/* mkdraft:func_82206400 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_822064DC.s")
 
@@ -701,7 +746,20 @@ s32 func_8220AA08(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220AA54.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220AC38.s")
+/* mkdraft:func_8220AC38 begin */
+extern u8 D_82210698[];
+#pragma COALESCE_AT_LUI(func_8220AC38, D_822106B2, D_822106B4)
+
+s32 func_8220AC38(void) {
+    s32 ret = 0;
+    if (*(s16 *)(D_82210698 + 0x1A) == 0) {
+        D_822106B2 = 1;
+        D_822106B4 = 0;
+        ret = 1;
+    }
+    return ret;
+}
+/* mkdraft:func_8220AC38 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_113A60/func_8220AC64.s")
 
