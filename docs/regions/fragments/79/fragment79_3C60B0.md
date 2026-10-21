@@ -295,3 +295,48 @@ explicit jitter/velocity carrier forms with two declaration positions.
 Explicit extra carriers changed frame or schedule and did not close the
 exchange. Next hypothesis is an allocator-web trace for vy versus the
 common spread constant, not another declaration permutation or dummy use.
+
+## Double-texture and six-slot trail emitters: accepted
+
+Five genuine C owners, 2860 bytes, accepted through the recorded native
+runner and full-ROM gates (retail MD5 1561c75d11cedf356a8ddb1a4a5f9d5d):
+
+- 84158914: BattleAnim_StartEffect26DoubleTextureTrail_Emit, 660 bytes.
+- 84158C4C: BattleAnim_StartEffect47SixSlotTrail_Emit, 472 bytes.
+- 84158F00: BattleAnim_StartEffect4DoubleTextureTrail_Emit, 664 bytes.
+- 8415923C: BattleAnim_StartEffect77DoubleTextureTrail_Emit, 676 bytes.
+- 84159584: BattleAnim_StartEffect70DoubleTextureTrail_Emit, 388 bytes.
+
+All use ordinary six-float geometry outputs in x/y/z/vx/vy/vz declaration
+order. Four emitters scale each velocity by10.0f and call the existing
+DoubleTextureTrail_Spawn backend, twice for effects26/4/77 and once for70.
+Keep each pair as distinct calls: float parameters, texture descriptors,
+signed animation controls, and color/alpha values differ between layers.
+Scalar and reversed-array forms matched; aggregate-record variants moved
+the original stack homes and are not used. No manual unrolling is involved.
+
+Effect47 adds independent cosine perturbations to vy/vz from signed RNG
+remainders modulo10, preserving multiply/divide order in the float angle.
+Use D_8418C5A8*cosf(angle) and D_8418C5B0*cosf(angle), then multiply all
+three velocities by12.0f. The initial468-byte draft incorrectly passed0
+as the s16 lifetime argument. Primary assembly stores60 to stack0x4C;
+correcting that actual value produces the472-byte match without changing
+locals or forcing instruction layout. Preserve lifetime60, not padding.
+
+Use real backend signatures from fragment79_3D4DA0.c and3D7DD0.c:
+DoubleTextureTrail_Spawn has11 float parameters, signed lifetime/controls,
+two32-byte texture-record pointers and13 u8 color/control fields.
+SixSlotTrail_Spawn has a leading s16 kind followed by six float geometry
+values, nine u8 fields, three float parameters, signed controls and two
+texture pointers. The shared S1_unk_D_843C2C00_024 record is eight s32
+fields; size32 and all eight offsets0..28 were compile-time checked in a
+complete-original-object control. Do not substitute integers for pointers
+or guess unprototyped parameter types from caller register occupancy.
+
+First-success gate evidence froze source, complete changed object, four
+distinct collateral objects, ROM/ELF/linker output and external hashes
+before another compilation. Five complete-original-object controls cover
+baseline/blank stability, consolidated declarations, readable grouped calls,
+texture layout, semantic names and named blank stability. Existing accepted
+neighbors remain unchanged. No byte/relocation rewrite, forced register,
+dummy local, arbitrary padding or private helper tooling is published.
