@@ -614,3 +614,7 @@ func_830098A0 = Fragment7_InitializeRecordPanel;
 func_83003000 = Fragment7_DrawRuleSelectionList;
 func_830025AC = Fragment7_DrawSecondTeamListPanel;
 func_83006B48 = Fragment7_HandleBankTransferActions;
+func_8300AA58 = Fragment7_InitializeRuleBank;
+func_8300AEEC = Fragment7_InitializeTeamBank;
+func_8300B284 = Fragment7_LoadTeamBank;
+func_8300B330 = Fragment7_InitializeProfileBank;
