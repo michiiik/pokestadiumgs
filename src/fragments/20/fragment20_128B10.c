@@ -311,8 +311,28 @@ void func_826037BC(void *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82603814.s")
+s32 func_82603814(void) {
+    s8 *q;
+    s32 result;
+    s8 *p;
 
+    q = *(s8 **)D_82615370;
+    result = 0;
+    p = *(s8 **)D_82615370;
+    if (p[0] == -1) {
+        result = 1;
+    }
+    if (p[1] == -1) {
+        result = 1;
+    }
+    if (p[2] == -1) {
+        result = 1;
+    }
+    if (p[3] == -1) {
+        result = 1;
+    }
+    return result;
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82603870.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_826039A0.s")

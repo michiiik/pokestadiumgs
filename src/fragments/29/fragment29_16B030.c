@@ -6,7 +6,7 @@ extern Gfx *D_800D0510;
 extern Gfx D_88006030[];
 extern u8 D_8800EF30[];
 extern s16 D_8800EF32;
-extern s32 func_88000080(void *);
+extern s32 Envelope_Advance(void *);
 extern s32 func_8004C8C0();
 extern s32 func_8004C990(s32, s32);
 extern s32 D_8800EF3C;
@@ -33,7 +33,7 @@ void func_8800528C(s32 mode) {
         gDPSetEnvColor(D_800D0510++, 150, D_8800EF32, 255, 128);
     } else {
         gDPSetRenderMode(D_800D0510++, 0x0F0A4000, 0);
-        gDPSetEnvColor(D_800D0510++, 150, func_88000080(D_8800EF30), 255, 255);
+        gDPSetEnvColor(D_800D0510++, 150, Envelope_Advance(D_8800EF30), 255, 255);
     }
 }
 

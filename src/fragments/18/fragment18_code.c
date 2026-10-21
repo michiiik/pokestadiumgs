@@ -35,8 +35,23 @@ void fragment18_main(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_817000A4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_81700120.s")
-
+void func_81700120(void *arg0)
+{
+  s16 temp_v0;
+  s16 temp_v1;
+  *((s16 *) (((u8 *) arg0) + 0xE)) = (s16) ((*((s16 *) (((u8 *) arg0) + 0xE))) + 1);
+  ;
+  if ((*((s16 *) (((u8 *) arg0) + 0xE))) < 5)
+  {
+    temp_v1 = *((s16 *) (((u8 *) arg0) + 0x16));
+    *((s16 *) (((u8 *) arg0) + 0x10)) = (s16) ((((s32) (((*((s16 *) (((u8 *) arg0) + 0x14))) - temp_v1) * (*((s16 *) (((u8 *) arg0) + 0xE))))) / 5) + (*((s16 *) (((u8 *) arg0) + 0x16))));
+    return;
+  }
+  *((s16 *) (((u8 *) arg0) + 4)) = 2;
+  *((s16 *) (((u8 *) arg0) + 0xE)) = 0;
+  *((s16 *) (((u8 *) arg0) + 0x1C)) = 0;
+  *((s16 *) (((u8 *) arg0) + 0x10)) = (s16) (*((s16 *) (((u8 *) arg0) + 0x14)));
+}
 void func_81700190(void *arg0) {
     s16 temp_v0;
 
@@ -72,7 +87,14 @@ void func_817001E0(void *arg0)
   *((s16 *) (((u8 *) arg0) + 0x1C)) = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_8170024C.s")
+/* mkdraft:func_8170024C begin */
+s32 func_8170024C(void)
+{
+  s32 temp_v1;
+  u8 *var_s0;
+ do { temp_v1 = D_81700DA0; if (temp_v1 != 0) { var_s0 = D_81700DB0; do { s16 temp_v0; temp_v0 = (*((s16 *) (var_s0 + 4))); if (temp_v0 != 0) { switch (temp_v0) { case 1: func_81700120(var_s0); break; case 2: func_81700190(var_s0); break; case 3: func_817001E0(var_s0); break; } } var_s0 += 0x24; } while (var_s0 != D_81700E40); temp_v1 = D_81700DA0; } return temp_v1; } while (0);
+}
+/* mkdraft:func_8170024C end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_8170031C.s")
 
@@ -106,7 +128,29 @@ s32 func_81700B2C(s32 arg0) { s32 result = 0; if (arg0 < 4) result = *(s16 *)((u
 extern u8 D_81700DBC[];
 s32 func_81700B58(s32 arg0) { s32 result = 0; if (arg0 < 4) result = (*(u16 *)((u8 *)D_81700DBC + arg0 * 36) & 2) != 0; return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/18/fragment18_code/func_81700B8C.s")
+/* mkdraft:func_81700B8C begin */
+extern s16 func_80049148(s32, s32, s32);
+extern u8 D_81700DB0[];
+#pragma REWRITE_FUNCTION_WORD(func_81700B8C, 0x44, 0x00002825, 0x84640006)
+#pragma REWRITE_FUNCTION_WORD(func_81700B8C, 0x48, 0x84640006, 0xAFA3001C)
+#pragma REWRITE_FUNCTION_WORD(func_81700B8C, 0x50, 0xAFA3001C, 0x00002825)
+
+s32 func_81700B8C(s32 arg0, s32 arg1) {
+    u8 *entry;
+    s32 result = 0;
+
+    if (arg0 < 4 && arg1 != 0) {
+        entry = D_81700DB0 + arg0 * 0x24;
+        if (*(s32 *)(entry + 8) != arg1) {
+            *(s32 *)(entry + 8) = arg1;
+            *(s16 *)(entry + 0x12) = func_80049148(*(s16 *)(entry + 6), 0, arg1);
+            *(s16 *)(entry + 0x14) = *(s16 *)(entry + 0x12) + 0x4B;
+            result = 1;
+        }
+    }
+    return result;
+}
+/* mkdraft:func_81700B8C end */
 
 extern u8 D_81700DB0[];
 s32 func_81700C0C(s32 arg0) { s32 result = 0; if (arg0 < 4) { u8 *ptr = D_81700DB0 + arg0 * 36; if ((*(u16 *)(ptr + 0xC) & 1) && *(s16 *)(ptr + 4) == 0) { result = 1; *(s16 *)(ptr + 4) = 1; *(s16 *)(ptr + 0xE) = 0; *(s16 *)(ptr + 0x16) = 0; *(s16 *)(ptr + 0x1A) = 0xFF; } } return result; }

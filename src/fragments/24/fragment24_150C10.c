@@ -2,7 +2,17 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B00E10.s")
+/* mkdraft:func_82B00E10 begin */
+extern s16 D_82B12450;
+
+void func_82B00E10(void) {
+    s32 i;
+
+    for (i = 0; i < 2; i++) {
+        *(s16 *)((u8 *)(&D_82B12450 + i) + 0xFF4) = 0;
+    }
+}
+/* mkdraft:func_82B00E10 end */
 #endif
 
 #ifdef VERSION_US
@@ -104,7 +114,36 @@ s16 func_82B01088(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B010BC.s")
+/* mkdraft:func_82B010BC begin */
+extern s16 D_82B13008;
+extern u16 D_82B12454;
+extern void *func_82B02800(s32, s32);
+
+s32 func_82B010BC(void) {
+    s32 index;
+    s32 var_a3;
+    u16 *var_v1;
+    u16 temp_v0_2;
+    u8 *temp_v0;
+
+    temp_v0 = func_82B02800(0xA, 0);
+    var_a3 = 0;
+    D_82B13008 = 0;
+    index = 0;
+    var_v1 = (u16 *)((u8 *)temp_v0 + 0x50); do {
+        temp_v0_2 = *(u16 *)((u8 *)(&D_82B12450 + index) + 0xBDC);
+        index++;
+        if (temp_v0_2 == 2) {
+            var_a3 = 1;
+            *var_v1 = temp_v0_2;
+        } else {
+            *var_v1 = 0;
+        }
+        var_v1 += 1;
+    } while ((u8 *)&D_82B12454 != (u8 *)(&D_82B12450 + index));
+    return var_a3;
+}
+/* mkdraft:func_82B010BC end */
 #endif
 
 #ifdef VERSION_US
@@ -182,7 +221,30 @@ void func_82B01850(s32 arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B018CC.s")
+/* mkdraft:func_82B018CC begin */
+void *func_82B018CC(void *arg0, s32 arg1) {
+    s32 i;
+    u8 *ptr;
+    void *result;
+    void *base;
+
+    result = NULL;
+    i = 0;
+    base = arg0;
+    if (arg1 > 0) {
+        ptr = base;
+        do {
+            i += 1;
+            if (*(s16 *)ptr == 0) {
+                result = ptr;
+                break;
+            }
+            ptr += 0x70;
+        } while (i != arg1);
+    }
+    return result;
+}
+/* mkdraft:func_82B018CC end */
 #endif
 
 #ifdef VERSION_US
@@ -1017,14 +1079,108 @@ void func_82B062F8(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B07A5C.s")
+extern s16 D_82B12450;
+extern s16 D_82B12456;
+extern s32 func_82B028CC(void);
+
+/* Ground truth shares the D_82B12450 store's delay-slot `lui $at` with the
+   D_82B12456 clear; IDO gives each extern its own lui, so the fold is required. */
+#pragma COALESCE_AT_LUI(func_82B07A5C)
+/* mkdraft:func_82B07A5C begin */
+void func_82B07A5C(void) {
+    s16 *counter = &D_82B12456;
+    if (func_82B028CC() != 0) {
+        if (++*counter >= 2) {
+            D_82B12450 = 9;
+            *counter = 0;
+        }
+    }
+}
+/* mkdraft:func_82B07A5C end */
 #endif
 
 void func_82B07AB4(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B07ABC.s")
+extern u16 D_82B12454;
+extern s16 D_82B12450;
+extern s16 D_82B12452;
+extern s16 D_82B12D10;
+extern void func_82B062BC(void);
+extern void func_82B0671C(void);
+extern void func_82B06C98(void);
+extern void func_82B072DC(void);
+extern void func_82B07454(void);
+extern void func_82B0760C(void);
+extern void func_82B07960(void);
+extern void func_82B07A5C(void);
+extern void func_82B07AB4(void);
+extern void func_82B02E50(void *);
+extern void func_82B00E10(void);
+
+/* mkdraft:func_82B07ABC begin */
+extern u16 D_82B12454;
+extern s16 D_82B12450;
+extern s16 D_82B12452;
+extern s16 D_82B12D10;
+extern void func_82B062BC(void);
+extern void func_82B0671C(void);
+extern void func_82B06C98(void);
+extern void func_82B072DC(void);
+extern void func_82B07454(void);
+extern void func_82B0760C(void);
+extern void func_82B07960(void);
+extern void func_82B07A5C(void);
+extern void func_82B07AB4(void);
+extern void func_82B02E50(void *);
+extern void func_82B00E10(void);
+
+s32 func_82B07ABC(void) {
+    u8 *var_s0;
+    u8 *end;
+    if (D_82B12454 & 1) {
+        func_82B00E10();
+        switch (D_82B12450) {
+        case 1:
+            func_82B062BC();
+            break;
+        case 2:
+            func_82B0671C();
+            break;
+        case 3:
+            func_82B06C98();
+            break;
+        case 4:
+            func_82B072DC();
+            break;
+        case 5:
+            func_82B07454();
+            break;
+        case 6:
+            func_82B0760C();
+            break;
+        case 7:
+            func_82B07960();
+            break;
+        case 8:
+            func_82B07A5C();
+            break;
+        case 9:
+            func_82B07AB4();
+            break;
+        }
+        var_s0 = (u8 *)&D_82B12452 - 2, end = (u8 *)&D_82B12D10;
+        do {
+            if (*(s16 *)(var_s0 + 0x258) != 0) {
+                func_82B02E50(var_s0 + 0x258);
+            }
+            var_s0 += 0x70;
+        } while (var_s0 != end);
+    }
+    return (*(u16 *)((u8 *)&D_82B12452 + 2) & 1) != 0;
+}
+/* mkdraft:func_82B07ABC end */
 #endif
 
 #ifdef VERSION_US
@@ -1071,7 +1227,54 @@ void func_82B07C88(void) { s32 var_s0; s32 var_s5; s32 temp_v0; s32 var_s1; s32 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/24/fragment24_150C10/func_82B07F84.s")
+/* mkdraft:func_82B07F84 begin */
+extern void func_80006F70(Gfx **, s16, s16, s16, s16);
+extern u16 D_82B12454;
+extern s16 D_82B1269E;
+
+void func_82B07F84(s32 arg0) {
+    s16 timer;
+    s32 str;
+    s32 width;
+    s32 pad1;
+    s32 pad2;
+    s32 x;
+
+    if (D_82B12454 & 4) {
+        timer = D_82B1269E;
+        if (timer < 0xFF) {
+            timer += 0x19;
+            if (timer > 0xFF) {
+                timer = 0xFF;
+            }
+        }
+    } else {
+        timer = D_82B1269E;
+        if (timer > 0) {
+            timer -= 0x19;
+            if (timer < 0) {
+                timer = 0;
+            }
+        }
+    }
+    D_82B1269E = timer;
+    if (timer > 0) {
+        str = func_8004C874(0x1B, 0x37);
+        width = func_80049148(0x10, 0, (void *)str);
+        x = 0x140 - width / 2;
+        if (arg0 == 0) {
+            func_80006F70(&D_800D0510, x, 0xCA, width, 0x18);
+            func_82B07C88();
+        }
+        func_800498C4();
+        func_800496A4(0x10, 0);
+        timer = D_82B1269E;
+        func_8004972C(0xFF, 0xFF, 0xFF, timer);
+        func_800495BC(x, 0xCA, str);
+        func_800499EC();
+    }
+}
+/* mkdraft:func_82B07F84 end */
 #endif
 
 #ifdef VERSION_US
