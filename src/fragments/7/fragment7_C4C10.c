@@ -26,9 +26,12 @@ typedef struct {
     u32 source : 2;
     u32 unk_13 : 13;
 } Fragment7BankHeader;
-typedef struct { Fragment7BankHeader header; u8 records[8][68]; } Fragment7RuleBank;
-typedef struct { Fragment7BankHeader header; u8 records[6][1168]; } Fragment7TeamBank;
-typedef struct { Fragment7BankHeader header; u8 records[8][544]; } Fragment7ProfileBank;
+typedef struct { u32 words[17]; } Fragment7RuleRecord;
+typedef struct { u32 words[292]; } Fragment7TeamRecord;
+typedef struct { u32 words[136]; } Fragment7ProfileRecord;
+typedef struct { Fragment7BankHeader header; Fragment7RuleRecord records[8]; } Fragment7RuleBank;
+typedef struct { Fragment7BankHeader header; Fragment7TeamRecord records[6]; } Fragment7TeamBank;
+typedef struct { Fragment7BankHeader header; Fragment7ProfileRecord records[8]; } Fragment7ProfileBank;
 extern u8 *func_8006218C(s32, s32, s32, s32);
 extern s32 Deck_ReadEntries(u8 *, s32, u8 *);
 extern s32 func_80062304(u8 *);
@@ -41,7 +44,6 @@ void Fragment7_InitializeRuleBank(void *bank, s32 expanded, s32 source) {
     func_8300A9E0(bank);
 }
 
-typedef struct Func8300AAD4Copy0 { s32 words[17]; } Func8300AAD4Copy0;
 void func_8300AAD4(void *arg0, void *arg1) {
     u8 index;
     u8 *dst;
@@ -49,24 +51,34 @@ void func_8300AAD4(void *arg0, void *arg1) {
     index = *(u8 *)((u8 *)arg0 + 1);
     if (index < *(u8 *)((u8 *)arg0 + 0)) {
         dst = (u8 *)((u32)arg0 + (index * 0x44));
-        *(Func8300AAD4Copy0 *)(dst + 4) = *(Func8300AAD4Copy0 *)arg1;
+        *(Fragment7RuleRecord *)(dst + 4) = *(Fragment7RuleRecord *)arg1;
         *(u8 *)((u8 *)arg0 + 1) = *(u8 *)((u8 *)arg0 + 1) + 1;
         func_8300A9E0(arg0);
     }
 }
 
-typedef struct Func8300AB58Copy0 { s32 words[17]; } Func8300AB58Copy0;
 void func_8300AB58(void *arg0, void *arg1, s32 arg2) {
     u8 *dst;
 
     if (arg2 < *(u8 *)((u8 *)arg0 + 1)) {
         dst = (u8 *)((u32)arg0 + (arg2 * 0x44));
-        *(Func8300AB58Copy0 *)(dst + 4) = *(Func8300AB58Copy0 *)arg1;
+        *(Fragment7RuleRecord *)(dst + 4) = *(Fragment7RuleRecord *)arg1;
         func_8300A9E0(arg0);
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300ABCC.s")
+void Fragment7_RemoveRuleRecord(void *bank, s32 selected) {
+    s32 index;
+
+    if (selected < (s32)((Fragment7RuleBank *)bank)->header.count) {
+        for (index = selected; index < (s32)((Fragment7RuleBank *)bank)->header.count - 1; index++) {
+            ((Fragment7RuleBank *)bank)->records[index] =
+                ((Fragment7RuleBank *)bank)->records[index + 1];
+        }
+        ((Fragment7RuleBank *)bank)->header.count--;
+        func_8300A9E0(bank);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300AC8C.s")
 
@@ -124,7 +136,6 @@ void Fragment7_InitializeTeamBank(void *bank, s32 expanded, s32 source) {
     ((Fragment7TeamBank *)bank)->header.source = source;
 }
 
-typedef struct Func8300AF68Copy { s32 words[292]; } Func8300AF68Copy;
 void func_8300AF68(void *arg0, void *arg1) {
     u8 index;
     u8 *dst;
@@ -132,23 +143,41 @@ void func_8300AF68(void *arg0, void *arg1) {
     index = *(u8 *)((u8 *)arg0 + 1);
     if (index < *(u8 *)((u8 *)arg0 + 0)) {
         dst = (u8 *)((u32)arg0 + (index * 0x490));
-        *(Func8300AF68Copy *)(dst + 4) = *(Func8300AF68Copy *)arg1;
+        *(Fragment7TeamRecord *)(dst + 4) = *(Fragment7TeamRecord *)arg1;
         *(u8 *)((u8 *)arg0 + 1) = *(u8 *)((u8 *)arg0 + 1) + 1;
     }
 }
 
-typedef struct Func8300AFD8Copy { s32 words[292]; } Func8300AFD8Copy;
 void func_8300AFD8(void *arg0, void *arg1, s32 arg2) {
     u8 *dst;
     if (arg2 < *(u8 *)((u8 *)arg0 + 1)) {
         dst = (u8 *)((u32)arg0 + (arg2 * 0x490));
-        *(Func8300AFD8Copy *)(dst + 4) = *(Func8300AFD8Copy *)arg1;
+        *(Fragment7TeamRecord *)(dst + 4) = *(Fragment7TeamRecord *)arg1;
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B038.s")
+void Fragment7_RemoveTeamRecord(void *bank, s32 selected) {
+    s32 index;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B0DC.s")
+    if (selected < (s32)((Fragment7TeamBank *)bank)->header.count) {
+        for (index = selected; index < (s32)((Fragment7TeamBank *)bank)->header.count - 1; index++) {
+            ((Fragment7TeamBank *)bank)->records[index] =
+                ((Fragment7TeamBank *)bank)->records[index + 1];
+        }
+        ((Fragment7TeamBank *)bank)->header.count--;
+    }
+}
+
+void Fragment7_SwapTeamRecords(void *bank, s32 first, s32 second) {
+    Fragment7TeamRecord temporary;
+
+    if (first < (s32)((Fragment7TeamBank *)bank)->header.count &&
+        second < (s32)((Fragment7TeamBank *)bank)->header.count) {
+        temporary = ((Fragment7TeamBank *)bank)->records[first];
+        ((Fragment7TeamBank *)bank)->records[first] = ((Fragment7TeamBank *)bank)->records[second];
+        ((Fragment7TeamBank *)bank)->records[second] = temporary;
+    }
+}
 
 void Fragment7_SaveTeamBank(void *bank) {
     u8 *handle = NULL;
@@ -196,28 +225,36 @@ void Fragment7_InitializeProfileBank(void *bank, s32 expanded, s32 source) {
     ((Fragment7ProfileBank *)bank)->header.source = source;
 }
 
-typedef struct Func8300B3A8Copy { s32 words[136]; } Func8300B3A8Copy;
 void func_8300B3A8(void *arg0, void *arg1) {
     u8 index;
     u8 *dst;
     index = *(u8 *)((u8 *)arg0 + 1);
     if (index < *(u8 *)((u8 *)arg0 + 0)) {
         dst = (u8 *)((u32)arg0 + (index * 0x220));
-        *(Func8300B3A8Copy *)(dst + 4) = *(Func8300B3A8Copy *)arg1;
+        *(Fragment7ProfileRecord *)(dst + 4) = *(Fragment7ProfileRecord *)arg1;
         *(u8 *)((u8 *)arg0 + 1) = *(u8 *)((u8 *)arg0 + 1) + 1;
     }
 }
 
-typedef struct Func8300B410Copy { s32 words[136]; } Func8300B410Copy;
 void func_8300B410(void *arg0, void *arg1, s32 arg2) {
     u8 *dst;
     if (arg2 < *(u8 *)((u8 *)arg0 + 1)) {
         dst = (u8 *)((u32)arg0 + (arg2 * 0x220));
-        *(Func8300B410Copy *)(dst + 4) = *(Func8300B410Copy *)arg1;
+        *(Fragment7ProfileRecord *)(dst + 4) = *(Fragment7ProfileRecord *)arg1;
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B468.s")
+void Fragment7_RemoveProfileRecord(void *bank, s32 selected) {
+    s32 index;
+
+    if (selected < (s32)((Fragment7ProfileBank *)bank)->header.count) {
+        for (index = selected; index < (s32)((Fragment7ProfileBank *)bank)->header.count - 1; index++) {
+            ((Fragment7ProfileBank *)bank)->records[index] =
+                ((Fragment7ProfileBank *)bank)->records[index + 1];
+        }
+        ((Fragment7ProfileBank *)bank)->header.count--;
+    }
+}
 
 s32 Fragment7_IsValidProfilePokemon(Fragment7ProfilePokemon *pokemon) {
     if (((pokemon->flags & 1) != 0) == 0 && pokemon->species > 0 && pokemon->species < 252 && pokemon->level > 0) {
@@ -228,7 +265,16 @@ s32 Fragment7_IsValidProfilePokemon(Fragment7ProfilePokemon *pokemon) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B54C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B728.s")
+void Fragment7_SwapProfileRecords(void *bank, s32 first, s32 second) {
+    Fragment7ProfileRecord temporary;
+
+    if (first < (s32)((Fragment7ProfileBank *)bank)->header.count &&
+        second < (s32)((Fragment7ProfileBank *)bank)->header.count) {
+        temporary = ((Fragment7ProfileBank *)bank)->records[first];
+        ((Fragment7ProfileBank *)bank)->records[first] = ((Fragment7ProfileBank *)bank)->records[second];
+        ((Fragment7ProfileBank *)bank)->records[second] = temporary;
+    }
+}
 
 void Fragment7_SaveProfileBank(void *bank) {
     u8 *handle = NULL;
