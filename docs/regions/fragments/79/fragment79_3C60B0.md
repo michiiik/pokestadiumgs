@@ -93,3 +93,50 @@ Separate whole-original-object controls also establish that both existing
 position wrappers can use a real `f32 *position` parameter and explicitly
 forward `(s32)position` to their actual callees without changing bytes.
 Those wrapper cleanups were not installed by the rejected geometry batch.
+
+The Stadium1 counterparts `BattleAnim_CalcVectorAtToDm` and
+`BattleAnim_CalcVectorAtToDm2` were inspected read-only. Their current decomp
+contains an empty zero-vector conditional and unused padding. This explains
+how that source retains a comparison, but is not evidence of genuine original
+source. Neither construct was copied. The geometry owners remain a requeue;
+no source-lineage impossibility claim is established.
+
+## Accepted camera bounds builder
+
+`84159D30` / `BattleAnim_BuildTerrainCameraBounds` replaces632 original bytes
+through native runner acceptance and a byte-identical full-ROM gate. Never
+re-probe the accepted owner.
+
+The original reads the camera pointer directly fromD_80094908, with eye/at/up
+floats at0xA8..0xC8 and projection floats at0x2C/0x30/0x34. It normalizes the
+view direction, writes a plane center20 units beyond the near distance,
+computes a guarded tangent radius from the field of view, and uses two cross
+products and two normalizations to build scaled plane axes. The output is
+nine floats. No additional camera fields or enclosing allocation are inferred.
+
+Natural live trig intermediates recover the original192-byte frame without
+padding locals. Write the plane center before computing the trig angle;
+otherwise IDO changes the instruction schedule. The eye-X carrier can be
+reused for the absolute radius after writing the center. Separating the sine,
+scaled sine and signed half-height preserves the original float allocation.
+Every scalar is initialized before use and participates in the calculation.
+
+The final two-word residual was exactly the angle's store/reload home,116
+versus72 bytes above the stack pointer. Exchanging the declarations of the
+live distance and angle locals resolved it without changing the calculations.
+The successful candidate has the original632-byte body, register sequence and
+relocation topology. No instruction rewrite, forced register, fake interface,
+dummy conditional, unused local or arbitrary padding was introduced.
+
+Fifteen complete-object controls calibrate passive frame observation against
+stock builds, observer-off/on builds and blank-line variants for the known TU
+and two retained parents. Both camera parents have frame192, saved24, temp0;
+the trace locates the observed frame addresses rather than inferring hidden
+spill bytes. The passive observer is diagnostic only and is not shipped.
+
+The first-success callback froze source, the complete changed object, four
+distinct collateral objects, ROM, ELF and linked script; all nine were
+independently hashed before further compilation. Five complete-original-object
+controls verify the accepted source, blank-line stability, readable local
+names, redundant forward-declaration cleanup and semantic function naming.
+Previously accepted terrain owners and all other neighbors remain identical.
