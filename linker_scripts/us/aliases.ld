@@ -611,3 +611,4 @@ func_830013A8 = Fragment7_DrawModeHeader;
 func_83003F40 = Fragment7_DrawProfileRecordRow;
 func_83004CBC = Fragment7_DrawTeamListRows;
 func_830098A0 = Fragment7_InitializeRecordPanel;
+func_83003000 = Fragment7_DrawRuleSelectionList;
