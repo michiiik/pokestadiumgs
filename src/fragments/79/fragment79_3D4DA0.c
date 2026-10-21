@@ -564,7 +564,7 @@ void DoubleTextureTrail_RotateVertexOffset(f32 arg0, f32 *arg1, f32 arg2) {
 }
 
 extern void func_841098FC(AnchorTrailVec3f *);
-extern void func_84109780(s32);
+extern void func_84109780(void *);
 extern u32 func_841094EC(void);
 // Blend the ten samples between owner anchors, then shrink them in phase 2.
 //@src/fragments/79/fragment79_377F80.c
@@ -579,7 +579,7 @@ void DoubleTextureTrail_Update(S1_DoubleTextureTrail *arg0) {
     f32 var_fv0;
     f32 var_fv1;
 
-    func_84109780((s32)&sp58);
+    func_84109780(&sp58);
     func_841098FC(&sp4C);
     if (sp4C.y > 200.0f) {
         sp4C.y = 200.0f;

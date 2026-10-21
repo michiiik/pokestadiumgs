@@ -479,26 +479,120 @@ void Radial20_RotateVertexOffset(f32 arg0, f32 *arg1, f32 *arg2, f32 arg3, f32 a
     guMtxXFMF(sp30, 0.0f, 0.0f, arg3, &arg2[0], &arg2[1], &arg2[2]);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CB430/func_8415D4C4.s")
+extern void func_84109780(void *);
+extern void Radial20_UpdateNodes(Fragment79RadialState *);
+void Radial20_UpdateNodes(Fragment79RadialState *state) {
+    Fragment79RadialVector *anchor_position;
+    Fragment79RadialNode *node;
+    s32 i;
+    Fragment79RadialVector anchor;
+
+    anchor_position = &anchor;
+    func_84109780(anchor_position);
+    switch (state->type) {
+    case 0:
+        node = state->nodes;
+        for (i = 0; i < 20; i++, node++) {
+            if (node->ordinal > 0.0) {
+                node->ordinal -= 1.0;
+            } else {
+                node->position.x += node->velocity.x;
+                node->position.y += node->velocity.y;
+                node->position.z += node->velocity.z;
+                node->angle += state->field_18;
+                node->scale += 1.0;
+                if (state->field_14 < node->scale) {
+                    node->scale = state->field_14;
+                }
+            }
+        }
+        break;
+    case 2:
+        node = state->nodes;
+        for (i = 0; i < 20; i++, node++) {
+            if (node->ordinal > 0.0) {
+                node->position = *anchor_position;
+                node->ordinal -= 1.0;
+            } else {
+                node->position.x += node->velocity.x;
+                node->position.y += node->velocity.y;
+                node->position.z += node->velocity.z;
+                node->angle += state->field_18;
+                if (node->velocity.x > 1.0) {
+                    node->velocity.x -= 0.1;
+                }
+                if (node->velocity.x < -1.0) {
+                    node->velocity.x += 0.1;
+                }
+                node->velocity.y -= 0.2;
+                if (node->velocity.y < -1.0) {
+                    node->velocity.y = -1.0f;
+                }
+                if (node->position.y < 0.0) {
+                    node->position.y = 0.0f;
+                }
+            }
+        }
+        break;
+    case 1:
+    case 3:
+    default:
+        node = state->nodes;
+        for (i = 0; i < 20; i++, node++) {
+            if (node->ordinal > 0.0) {
+                node->position = *anchor_position;
+                node->ordinal -= 1.0;
+            } else {
+                node->position.x += node->velocity.x;
+                node->position.y = anchor_position->y;
+                node->position.z = anchor_position->z;
+                node->angle += state->field_18;
+                node->scale += 1.0;
+                if (state->field_14 < node->scale) {
+                    node->scale = state->field_14;
+                }
+            }
+        }
+        break;
+    case 4:
+    case 5:
+        node = state->nodes;
+        for (i = 0; i < 20; i++, node++) {
+            if (node->ordinal > 0.0) {
+                node->ordinal -= 1.0;
+            } else {
+                node->position.x += node->velocity.x;
+                node->position.y += node->velocity.y;
+                node->position.z += node->velocity.z;
+                node->angle += state->field_18;
+                node->scale += 1.0;
+                if (state->field_14 < node->scale) {
+                    node->scale = state->field_14;
+                }
+            }
+        }
+        break;
+    }
+}
 
 typedef struct Radial20Complete_79 { s16 unk_000; s16 unk_002; s16 unk_004; s16 unk_006; s16 unk_008; u8 pad_00A[0x3E]; Radial20Node_79 unk_048[20]; } Radial20Complete_79;
-extern void func_8415D4C4(Radial20Complete_79 *); extern void func_84169DBC(s16);
+extern void func_84169DBC(s16);
 s32 func_8415DAE4(void) {
     s32 i;
     s32 var_s2 = 0;
-    Radial20Complete_79 *var_s0 = (Radial20Complete_79 *)(D_84187530 + 0x3C8);
+    Fragment79RadialState *var_s0 = (Fragment79RadialState *)(D_84187530 + 0x3C8);
     for (i = 0; i < 10; i++, var_s0++) {
-        if (var_s0->unk_000 == 1) {
-            var_s0->unk_004++;
-            if (var_s0->unk_006 < var_s0->unk_004) {
-                var_s0->unk_000 = 0;
-                if (var_s0->unk_008 == 5) {
+        if (var_s0->active == 1) {
+            var_s0->age++;
+            if (var_s0->duration < var_s0->age) {
+                var_s0->active = 0;
+                if (var_s0->type == 5) {
                 }
             } else {
-                func_8415D4C4(var_s0);
+                Radial20_UpdateNodes(var_s0);
                 var_s2++;
             }
-            func_84169DBC(var_s0->unk_002);
+            func_84169DBC(var_s0->resource);
         }
     }
     if (var_s2 > 0) return 0;

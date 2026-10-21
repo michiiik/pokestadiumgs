@@ -179,7 +179,7 @@ void BattleAnim_SixSlotTrail_Spawn(s16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 a
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84168C18.s")
 
-extern void func_84109780(s32);
+extern void func_84109780(void *);
 extern f32 __sinf(f32);
 void BattleAnim_SixSlotTrail_UpdateSlot(S1_unk_D_843C3508* trail) {
     S1_unk_D_843C3508_0A4* node;
@@ -208,7 +208,7 @@ void BattleAnim_SixSlotTrail_UpdateSlot(S1_unk_D_843C3508* trail) {
             vertical_offset =
                 __sinf((((phase + depth_shift) % (depth_period + 20)) * 6.2831854820251465) / (depth_period + 20)) * (10.0 * vertical_modulation);
             depth_offset = __sinf((((phase + depth_shift) % depth_period) * 6.2831854820251465) / depth_period) * 10.0;
-            func_84109780((s32)anchor_pointer);
+            func_84109780(anchor_pointer);
             node->unk_0C.x = anchor.x;
             node->unk_0C.y = anchor.y + vertical_offset;
             node->unk_0C.z = anchor.z + depth_offset;

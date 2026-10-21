@@ -105,23 +105,48 @@ extents, semantic relocation targets and the 288-byte readonly pool remain
 equal. No instruction rewrite, forced register, dummy local, arbitrary
 padding or manual unrolling is introduced.
 
-## Radial node updater: register-tie requeue
+## Accepted radial node updater and anchor output interface
 
-`8415D4C4` remains assembly. Explicit cases 0 through 5 recover the original
-six-entry jump table: modes 0, 4 and 5 perform full node motion; mode 2 applies
-gravity and clamps velocity; modes 1 and 3 share the default anchor behavior.
-The best retained anchor-pointer candidate has the correct 1568-byte text,
-72-byte frame and anchor stack home. Independent linking to the retail text
-and readonly addresses leaves exactly 18 differing words, confined to this
-owner: a coherent exchange of `a0` (anchor address) and `a2` (constant 20).
-All other translation-unit text and all 288 linked readonly bytes match.
+`8415D4C4` / `Radial20_UpdateNodes` replaces 1568 original bytes. Explicit
+cases 0 through 5 reproduce the six-entry jump table: modes 0, 4 and 5 perform
+full node motion; mode 2 applies gravity and clamps velocity; modes 1 and 3
+share the default anchor behavior. The twenty nodes retain their delay,
+position, velocity, angle and scale operations in ordinary counted loops.
+The existing state updater now calls this function through the same typed
+state view used by the accepted allocators.
 
-Pointer declaration-order variants retain that tie. Introducing a local node
-count from the array size disables the original compiler unrolling and grows
-text to 2196 bytes, so that family is not a useful continuation. Next: use a
-calibrated allocator trace or a bounded semantics-preserving permutation of
-the retained anchor-pointer source. Any caller type changes must remain a
-paired runner transaction; no rejected candidate or caller edit is installed.
+The remaining 18-word near-match was an anchor-address/loop-limit register
+exchange. Two passive compiler observers were calibrated with twenty
+whole-object controls. The color-cost trace showed `a0` was excluded for the
+anchor address, not merely more expensive. Moving pointer initialization
+around the call did not remove the exclusion, and a restricted 90-second
+local permutation search found no improvement. These are bounded negative
+results, not an exhaustion claim.
+
+The decisive source correction is `func_84109780`'s output parameter. It
+passes the supplied address to `GeoRender_FindAnchorPosition`, falls back to
+`func_8411DCCC` (which writes three floats), then calls `func_84109630` (whose
+assembly adds offsets to those three floats). Its `void *position` parameter
+expresses this output-buffer role without imposing one caller's local vector
+type. The helper definition and all three existing C callers now agree on
+that pointer interface. The helper's casts retain the legacy integer-address
+interfaces of its downstream declarations; callers pass their vector address
+directly. Evidence is in `src/fragments/79/fragment79_377F80.c`,
+`src/fragments/79/fragment79_38D510.c`, and the original `84109630` assembly.
+Sixteen known/blank/typed/typed-blank controls prove the helper and three
+existing caller objects remain unchanged in every game section, function
+extent and semantic relocation. A full-ROM gate verifies this four-file
+cleanup before the new updater is installed.
+
+The pointer-typed updater then passed recorded runner acceptance and the
+full-ROM gate. Its successful gate immediately froze all five changed sources
+and their complete objects, four distinct collateral objects, ROM, ELF and
+linked script: seventeen artifacts, externally hash-checked before further
+compilation. Five final whole-original-object controls cover known source,
+blank lines, declaration cleanup, naming and named-source blank lines.
+All 13616 original text bytes and the 288-byte readonly pool are preserved.
+No dummy use, forced register, arbitrary padding, instruction rewrite, fake
+ABI or manual unrolling is introduced.
 
 ## Strip renderer: requeue
 

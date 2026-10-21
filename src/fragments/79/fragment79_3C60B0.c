@@ -38,8 +38,8 @@ void func_84156880(void) {
 
 #ifdef VERSION_US
 void BattleAnim_EffectSecondaryOwnerAnchorPosition(f32 *position) {
-    extern void func_84109780(s32);
-    func_84109780((s32)position);
+    extern void func_84109780(void *);
+    func_84109780(position);
 }
 #endif
 
