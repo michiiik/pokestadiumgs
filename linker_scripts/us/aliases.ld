@@ -659,3 +659,4 @@ func_84155BD4 = BattleMoveState_ApplySelectedMoveEffects;
 func_8415AC64 = BattleAnim_SetTerrainGridPointValue;
 func_8415A9E4 = BattleAnim_InitializeTerrainGrid;
 func_8415AD58 = BattleAnim_UpdateTerrainGrid;
+func_84159D30 = BattleAnim_BuildTerrainCameraBounds;

@@ -865,7 +865,92 @@ void BattleAnim_StartEffect39CombinedTrail_Draw(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84159D30.s")
+extern u8 *D_80094908;
+extern f32 D_8418C5F0;
+extern f32 D_8418C5F4;
+extern void func_80070C14(f32 *, f32 *, f32 *);
+extern void Vec3f_CrossProductComponents(f32, f32, f32, f32, f32, f32, f32 *, f32 *, f32 *);
+extern f32 Math_AbsF32(f32);
+extern f32 __sinf(f32);
+extern f32 __cosf(f32);
+
+void BattleAnim_BuildTerrainCameraBounds(void *output) {
+    u8 *camera = D_80094908;
+    f32 eyeXOrHalfHeight;
+    f32 eyeY;
+    f32 eyeZ;
+    f32 scaledSine;
+    f32 atZ;
+    f32 atY;
+    f32 atX;
+    f32 halfWidth;
+    f32 sine;
+    f32 nearPlane;
+    f32 signedHalfHeight;
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    f32 upX;
+    f32 upY;
+    f32 upZ;
+    f32 distance;
+    f32 rightX;
+    f32 rightY;
+    f32 rightZ;
+    f32 planeUpX;
+    f32 planeUpY;
+    f32 planeUpZ;
+    f32 cosine;
+    f32 fovy;
+    f32 ratio;
+    f32 aspect;
+    f32 angle;
+
+    eyeXOrHalfHeight = *(f32 *)(camera + 0xA8);
+    eyeY = *(f32 *)(camera + 0xAC);
+    eyeZ = *(f32 *)(camera + 0xB0);
+    atX = *(f32 *)(camera + 0xB4);
+    atY = *(f32 *)(camera + 0xB8);
+    atZ = *(f32 *)(camera + 0xBC);
+    upX = *(f32 *)(camera + 0xC0);
+    upY = *(f32 *)(camera + 0xC4);
+    upZ = *(f32 *)(camera + 0xC8);
+    fovy = *(f32 *)(camera + 0x2C);
+    ratio = fovy / 30.0f;
+    nearPlane = *(f32 *)(camera + 0x34);
+    aspect = *(f32 *)(camera + 0x30);
+    dx = atX - eyeXOrHalfHeight;
+    dy = atY - eyeY;
+    dz = atZ - eyeZ;
+    func_80070C14(&dx, &dy, &dz);
+    distance = nearPlane + 20.0f;
+    ((f32 *)output)[0] = (distance * dx) + eyeXOrHalfHeight;
+    ((f32 *)output)[1] = (distance * dy) + eyeY;
+    ((f32 *)output)[2] = (distance * dz) + eyeZ;
+    /* The center no longer needs the eye-X carrier; reuse it for the radius. */
+    angle = (D_8418C5F0 * fovy) / 720.0f;
+    cosine = __cosf(angle);
+    if (cosine != 0.0f) {
+        sine = __sinf(angle);
+        scaledSine = sine * distance;
+        signedHalfHeight = scaledSine / cosine;
+        eyeXOrHalfHeight = signedHalfHeight;
+    } else {
+        eyeXOrHalfHeight = 0.0f;
+    }
+    eyeXOrHalfHeight = Math_AbsF32(eyeXOrHalfHeight);
+    halfWidth = aspect * eyeXOrHalfHeight * ratio * D_8418C5F4;
+    Vec3f_CrossProductComponents(dx, dy, dz, upX, upY, upZ, &rightX, &rightY, &rightZ);
+    Vec3f_CrossProductComponents(dx, dy, dz, rightX, rightY, rightZ, &planeUpX, &planeUpY, &planeUpZ);
+    func_80070C14(&rightX, &rightY, &rightZ);
+    func_80070C14(&planeUpX, &planeUpY, &planeUpZ);
+    ((f32 *)output)[3] = rightX * halfWidth;
+    ((f32 *)output)[4] = rightY * halfWidth;
+    ((f32 *)output)[5] = rightZ * halfWidth;
+    ((f32 *)output)[6] = planeUpX * eyeXOrHalfHeight;
+    ((f32 *)output)[7] = planeUpY * eyeXOrHalfHeight;
+    ((f32 *)output)[8] = planeUpZ * eyeXOrHalfHeight;
+}
 #endif
 
 #ifdef VERSION_US
@@ -891,7 +976,6 @@ extern s16 D_841A4D60;
 extern s16 D_841A4D62;
 extern s16 D_841A4D64;
 extern s32 func_8415A364(void);
-extern void func_84159D30(void *);
 
 void BattleAnim_InitializeTerrainGrid(s32 orientation, s16 warmup, s32 duration) {
     s32 i;
@@ -920,7 +1004,7 @@ void BattleAnim_InitializeTerrainGrid(s32 orientation, s16 warmup, s32 duration)
         for (i = 0; i < warmup; i++) {
             func_8415A364();
         }
-        func_84159D30(D_84187334);
+        BattleAnim_BuildTerrainCameraBounds(D_84187334);
     }
 }
 #endif
