@@ -888,7 +888,45 @@ void func_83003320(void *arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83003F40.s")
+typedef struct { u8 bytes[52]; } Fragment7ProfileRowDefinition;
+typedef struct { u8 name[12]; u16 trainer_id; u8 unk_0E[2]; Fragment7DeckEntry entries[6]; } Fragment7ProfileDisplayRecord;
+typedef struct { u8 capacity, count; u16 flags; Fragment7ProfileDisplayRecord records[8]; } Fragment7ProfileDisplayBank;
+typedef struct { u8 unk_00[31]; u8 mode; u8 unk_20[31]; u8 bank; u8 unk_40[0x3C854-64]; Fragment7ProfileDisplayBank banks[3]; } Fragment7ProfileDisplayState;
+extern u8 D_8300CD00[];
+extern u8 D_8300F8B0[], D_8300CEA0[];
+extern Gfx D_80094F50[];
+extern void func_830034C8(void *, void *, void *, f32);
+extern void func_818011EC(s16, s16, u16, u16, void *);
+extern Gfx * D_800D0510;
+void Fragment7_DrawProfileRecordRow(Fragment7ProfileRowDefinition *definition, void *memory, void *origin_memory) {
+    Fragment7ProfileDisplayState *state = memory;
+    Fragment7DrawOrigin *origin = origin_memory;
+
+    s32 row;
+    f32 weight;
+    Fragment7ProfileDisplayRecord *record;
+    weight = func_818055E0(definition, (u8 *)state);
+    row = definition - (Fragment7ProfileRowDefinition *)D_8300CD00 + 1;
+    record = (Fragment7ProfileDisplayRecord *)((u8 *)state + state->bank * sizeof(Fragment7ProfileDisplayBank) + row * sizeof(Fragment7ProfileDisplayRecord) + 0x3C638);
+    WidgetResources_DrawRecords((s32)definition, (s32)state, (s32)origin);
+    if (row <= state->banks[state->bank].count) {
+        if (state->mode < 17) {
+            func_800498C4();
+            func_8180351C(D_8300F8B0);
+            func_8004972C(255, 255, 255, (s32)(255.0f * weight));
+            func_800495F8(origin->x + 121, origin->y + 13, 3, record);
+            func_800499EC();
+            WidgetTexture_DrawRecord(D_8300CEA0, (u8 *)origin, weight, 0);
+            func_81800C18(origin->x + 104, origin->y + 37, 5, record->trainer_id);
+            gSPDisplayList(D_800D0510++, D_80094E38);
+            gDPSetEnvColor(D_800D0510++, 255, 255, 255, 255.0f * weight);
+            func_818011EC((s16)(origin->x + 11), (s16)(origin->y + 9), 44, 44, (u8 *)state + 0x32128);
+            gSPDisplayList(D_800D0510++, D_80094F50);
+        } else {
+            func_830034C8(state, record, origin, weight);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1541,7 +1579,6 @@ void func_83008070(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_830034C8(void *, void *, void *, f32);
 void func_830080AC(s32 arg0, void *arg1, void *arg2) { struct Locals { void *ptr; u32 pad; f32 value; }; struct Locals local; void *base = arg1; u8 index; local.value = func_818055E0((void *)arg0, (u8 *)arg1); index = *((u8 *)base + 0x48); if (index >= 2) local.ptr = (u8 *)base + index * 0x220 + 0x3E620; else local.ptr = (u8 *)base + 0x3D95C; func_818057D0(arg0, base, arg2); func_830034C8(base, local.ptr, arg2, local.value); }
 #endif
 
@@ -1606,7 +1643,7 @@ typedef struct {
 #endif
 
 #ifdef VERSION_US
-typedef struct { u32 words[136]; } Fragment7OtherRecord;
+typedef Fragment7ProfileDisplayRecord Fragment7OtherRecord;
 typedef Fragment7OtherRecord Fragment7ActionOtherRecord;
 typedef struct { u8 header[4]; Fragment7ActionOtherRecord records[8]; } Fragment7ActionOtherBank;
 typedef struct {
@@ -1959,7 +1996,6 @@ extern u8 D_8300F360[];
 extern u8 D_8300F380[];
 extern void WidgetResources_DrawSelection(s32, s32, s32);
 extern void func_81800D70(s32, s32);
-extern Gfx * D_800D0510;
 void Fragment7_DrawRecordListIndicators(s32 definition, void *memory, void *origin) {
     Fragment7ListIndicatorState *state = memory;
     f32 weight;
@@ -2115,7 +2151,73 @@ void Fragment7_InitializeRecordCollections(Fragment7RecordInitializeState *state
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_830098A0.s")
+extern s32 func_80057A1C(s32 arg0);
+typedef struct {
+    u8 controller;
+    u8 unk_01[21];
+    u8 unk_16;
+    u8 unk_17[3];
+    u8 mode;
+    u8 unk_1B;
+    u8 selection_scroll;
+    u8 team_scroll;
+    u8 target_team_scroll;
+} Fragment7PanelSavedSettings;
+typedef struct {
+    u8 unk_00[16]; s32 changed; u8 unk_14[8];
+    Fragment7PanelSavedSettings settings;
+} Fragment7ResumePanel;
+typedef struct {
+    u8 unk_00[28]; u8 previous_mode, target_mode, mode, mode_selector;
+    u8 unk_20[24]; Fragment7ResumePanel *panel;
+    Fragment7PanelSavedSettings settings;
+    u8 unk_5B[0x3FD74-91]; Fragment7ActionRule fixed_rules[4];
+    u8 unk_3FE84[0x3FECC-0x3FE84]; u8 rule_pending, team_pending;
+    u8 unk_3FECE[0x3FF2C-0x3FECE]; s32 pending;
+    u8 unk_3FF30[0x4E03C-0x3FF30]; f32 scroll_progress;
+    u8 unk_4E040[0x4E060-0x4E040]; s32 invalid_controller; u32 controller_flags; u32 controller_mask, result_mask;
+} Fragment7PanelInitializeState;
+extern s32 func_80057A80(s32);
+extern s32 func_80057A1C(s32);
+extern s32 func_800718B8(s32);
+extern void WidgetState_Initialize(void *, s32, s32, void *, s32);
+extern u8 D_8300F6C8[], D_8300F738[];
+
+void Fragment7_InitializeRecordPanel(void *memory, s32 parent, void *panel_memory, s32 controller) {
+    Fragment7PanelInitializeState *state;
+    Fragment7ResumePanel *panel;
+    state = memory;
+    panel = panel_memory;
+    _bzero(state, sizeof(*state));
+    if (!(controller >= 0 && controller < 4 && func_80057A80(controller) == 0 && func_80057A1C(controller) == 0)) {
+        state->invalid_controller = 1;
+        state->controller_mask = 7;
+        state->controller_flags = 1;
+        state->result_mask = 31;
+    }
+    WidgetState_Initialize(state, 0, 43, state->invalid_controller ? D_8300F6C8 : D_8300F738, parent);
+    state->panel = panel;
+    state->settings.unk_16 = 0;
+    panel->changed = 0;
+    state->mode = 1;
+    state->settings.controller = controller;
+    state->fixed_rules[0] = *(Fragment7ActionRule *)(u32)func_800718B8(5);
+    state->fixed_rules[1] = *(Fragment7ActionRule *)(u32)func_800718B8(12);
+    state->fixed_rules[2] = *(Fragment7ActionRule *)(u32)func_800718B8(10);
+    state->fixed_rules[3] = *(Fragment7ActionRule *)(u32)func_800718B8(0);
+    state->rule_pending = 0;
+    state->team_pending = 0;
+    state->pending = 0;
+    state->scroll_progress = 0.0f;
+    if (state->panel->settings.mode) {
+        state->settings = state->panel->settings;
+        state->mode_selector = state->settings.mode;
+        state->previous_mode = state->mode_selector;
+        state->target_mode = state->mode_selector;
+        state->mode = state->mode_selector;
+    }
+    Fragment7_InitializeRecordCollections((Fragment7RecordInitializeState *)state);
+}
 #endif
 
 #ifdef VERSION_US
@@ -2330,7 +2432,7 @@ extern u8 D_447D00[];
 extern u8 *Asset_LoadToSegment(s32, u8 *, u8 *, s32);
 extern void func_80055948(s32);
 extern void func_80047588(s32, s32);
-extern void func_830098A0(void *, s32, s32, s32);
+extern void Fragment7_InitializeRecordPanel(void *, s32, void *, s32);
 extern void func_80008624(void);
 extern void func_81801794(void);
 void func_8300A50C(arg0, arg1, arg2)
@@ -2342,7 +2444,7 @@ s32 arg2;
     Asset_LoadToSegment(((u32)D_1000000 & 0x0F000000) >> 24, D_446E30, D_447D00, 0);
     func_80055948(3);
     func_80047588(0x1C, 0);
-    func_830098A0(&D_8300FD00, 0, arg1, arg2);
+    Fragment7_InitializeRecordPanel(&D_8300FD00, 0, (void *)(u32)arg1, arg2);
     Fragment7_OpenRecordPanel(&D_8300FD00, 0xC7);
     func_80008624();
     func_81801794();

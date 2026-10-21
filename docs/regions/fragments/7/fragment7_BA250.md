@@ -664,3 +664,62 @@ twenty-blank-line controls preserve all original game section bytes,
 function extents, and semantic relocation targets. All nine target-compiler
 layout assertions passed. The linked US ROM remains byte-identical, MD5
 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+### Record-panel initialization and profile rows
+
+Two owners accepted natively from `61d2f6a`, totaling 1544 bytes:
+
+- `func_830098A0` / `Fragment7_InitializeRecordPanel` (816 bytes): clears the
+  actual `0x4E070`-byte state, checks the controller, initializes the 43 widget
+  definitions, copies four distinct 68-byte rule resources (IDs 5/12/10/0),
+  restores the saved configuration when present, and initializes the record
+  collections. The controller flags use an unsigned domain independently
+  from the signed invalid-controller boolean; combining their constant-one
+  stores loses an instruction and changes subsequent temporary allocation.
+  The cleared byte is state byte 82, not scroll byte 88.
+- The saved configuration is one real 31-byte, byte-aligned aggregate at
+  panel byte 28 and state byte 60. It contains the controller at byte 0,
+  cleared byte at 22, restored mode at 26, and three scroll bytes at 28--30.
+  One ordinary assignment emits seven unaligned word copies plus the three
+  trailing byte copies. A 28-byte copy followed by three independent scroll
+  assignments reproduces the instructions but leaves a temporary-register
+  residual; splitting this aggregate is the wrong source model. The panel
+  parameter's stale integer prototype is repaired in the same runner
+  transaction, and its accepted caller uses an explicit native-address view.
+- `func_83003F40` / `Fragment7_DrawProfileRecordRow` (728 bytes): derives the
+  one-based row from the 52-byte widget-definition stride, selects the
+  544-byte record from a 4356-byte bank, and draws its name, trainer ID,
+  texture record, and resource thumbnail. Later modes delegate to
+  `func_830034C8`. The one-based byte anchor `0x3C638` equals the bank start
+  `0x3C854` plus the four-byte header minus one 544-byte record. Its unsigned
+  row-byte stride keeps the actual row number distinct from the zero-based
+  array index; the signed form cancels the increment and changes the count
+  comparison and address shape.
+- Using opaque state/origin callback inputs with actual decoded local views
+  gives the original 80-byte frame. Direct typed parameters otherwise match
+  every instruction but use a 72-byte frame; the only four differences are
+  the frame entry/exit and incoming definition's store/load offsets. Extra
+  display-list cursor and shared-alpha variants do not repair that frame.
+  No unused locals, frame padding, forced registers, or fabricated interfaces
+  are needed. The 544-byte profile layout is shared with the existing other-
+  record copy type after complete-object verification.
+
+Both owners passed the recorded native runner and full US-ROM gate, MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Each first successful gate immediately
+froze the changed complete object, four distinct collateral objects, source,
+ROM, ELF, and linker output; independent SHA-256 checks finished before
+another compilation. Hoisting the real layouts, naming configuration bytes,
+sharing the profile record, fixing the caller address view, naming functions,
+and twenty-blank-line controls preserve every original game section byte,
+function extent, and semantic relocation. All 30 target-compiler layout
+values were verified from emitted object data, including the complete
+state extent, 31-byte settings, and panel size 60 including alignment. An
+intentional invalid-array control confirms that IDO only warns on negative
+array bounds; successful compilation alone is not a layout assertion gate.
+
+`func_83008290`: requeue. Eight character-signedness probes did not close the
+fallback byte-copy residual. Explicit signed-byte views produce `lb`, which
+is the wrong opcode; ordinary `char` views retain `lbu` but still allocate
+`t7` instead of `t8`. The destination text-byte signedness is inert here.
+Keep the calibrated UGEN emission/queue evidence above as the next diagnostic
+basis; do not repeat these character views or install the nonmatching body.
