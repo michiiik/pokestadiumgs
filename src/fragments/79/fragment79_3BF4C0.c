@@ -274,7 +274,26 @@ void func_84151F20(void *arg0, u8 arg1) {
     *(u8 *)(u32)base |= 2;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151F9C.s")
+void BattlePlan_AddLeechSeedBonus(u8 *plan, u8 side) {
+    u8 *own;
+    u8 *other;
+    s32 base;
+    u32 amount;
+    u8 *table;
+    own = func_84154B64(side);
+    other = func_84154B64((1 - (u32)side) & 0xFF);
+    base = (s32)(u32)plan + 4;
+    if ((other[24] & 0x90) == 0 && func_84155544(other, 22) == 0) {
+        *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+        table = func_8414A3A0(side);
+        amount = table[19] * func_8414A2A0();
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+        if (func_841556C4(own, 111) != 0) {
+            ((u32 *)(u32)base)[(u32)side + 13] += amount;
+        }
+        *(u8 *)(u32)base |= 2;
+    }
+}
 
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
@@ -416,7 +435,23 @@ void func_84152408(void *arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841524B4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_8415252C.s")
+extern s32 func_84154B9C(u8, u16);
+extern u8 func_841524B4(u8);
+void BattlePlan_AddHealBellBonus(u8 *plan, u8 side) {
+    u8 *own;
+    s32 base;
+    u32 amount;
+    u8 *table;
+    own = func_84154B64(side);
+    base = (s32)(u32)plan + 4;
+    if (func_84154B9C(side, 0xFF) != 0 || (own[23] & 0x80) != 0) {
+        *(u8 *)(u32)base |= 2;
+        *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+        table = func_8414A3A0(side);
+        amount = table[52] * func_8414A2AC();
+        ((u32 *)(u32)base)[(u32)side + 13] += amount * func_841524B4(side);
+    }
+}
 
 extern s32 func_80063754(s32);
 void BattlePlan_AddStealableItemBonus(u8 *plan, u8 side) {
@@ -579,7 +614,29 @@ void BattlePlan_AddHitObstacleBonus(u8 *plan, u8 side) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152EE8.s")
+void BattlePlan_AddPerishSongBonus(u8 *plan, u8 side) {
+    u8 *own;
+    s32 base;
+    s32 index;
+    u32 amount;
+    u8 *table;
+    own = func_84154B64(side);
+    index = side;
+    base = (s32)(u32)plan + 4;
+    if ((func_84154B64((1 - index) & 0xFF)[21] & 0x10) == 0 && ((u8 *)D_841951F8[side])[9] >= 2) {
+        *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+        table = func_8414A3A0(side);
+        amount = table[58] * func_8414A2AC();
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+        if ((*(u8 **)((u32)D_841951FC + -(s32)(index << 2)))[9] == 1) {
+            ((u32 *)(u32)base)[(u32)side + 13] += amount * 3;
+        }
+        if (func_841556C4(own, 111) != 0) {
+            ((u32 *)(u32)base)[(u32)side + 13] += amount;
+        }
+        *(u8 *)(u32)base |= 2;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153028.s")
 

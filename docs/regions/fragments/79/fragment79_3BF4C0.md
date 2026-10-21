@@ -198,3 +198,60 @@ preserves complete-object identity and identifies the sum's temporary-pool
 allocation. A bounded source-only search remains flat. Next compare the
 emission/free events of a materially different field-expression topology;
 retain ASM rather than forcing a register.
+
+## Leech Seed, Heal Bell and Perish Song option scoring
+
+Three more original owners, 768 bytes, are replaced by genuine C. The effect
+dispatcher `84153E28` indexes `jtbl_8418C198` by move effect minus one.
+Its entries 84, 102 and 114 route to the three owners below. The local move
+metadata used by `func_80062D20` independently maps moves 73, 215 and 195 to
+those effects; move 182 has effect 111, the Protect follow-up tested here.
+
+- `84151F9C` / `BattlePlan_AddLeechSeedBonus` rejects opponent record byte 24
+  mask `0x90` and type 22, marks the plan's side byte, and adds table byte 19
+  times `func_8414A2A0` to its score. An own move with effect 111 adds the
+  same amount again. A consumed integer header base initialized before the
+  guard preserves the saved-register lifetime and original 64-byte frame.
+- `8415252C` / `BattlePlan_AddHealBellBonus` tests the party-condition helper
+  with mask `0xFF` or own record byte 23 bit `0x80`. It marks the plan flag
+  and side byte, then adds table byte 52 times `func_8414A2AC` times the
+  existing `841524B4` party count. The helper `84154B9C` consumes a byte side
+  and a halfword mask; its original ASM confirms both argument widths.
+  The header base's lifetime across the guard recovers the 56-byte frame.
+- `84152EE8` / `BattlePlan_AddPerishSongBonus` checks opponent byte 21 bit
+  `0x10` and own header byte 9, then adds table byte 58 times
+  `func_8414A2AC`. Opponent header byte 9 equal to one adds three more times
+  that amount; an own effect-111 move adds one more. The precise meanings of
+  the header counts and flag remain limited to these inspected operations.
+  Removing the ephemeral opponent pointer and using a consumed side index,
+  header, amount and table recovers the original frame. The reverse-side
+  lookup uses a signed scaled byte displacement from `D_841951FC`, the
+  second side slot. Scaling before negation preserves the two original
+  instructions that array-negative indexing emitted in the opposite order.
+
+All three have recorded, directly link-verified runner acceptances and pass
+the ordinary host-syntax-enabled full-ROM gate. Their complete original
+66-function object and four collateral whole objects agree. Every first
+success freezes the source, objects, ROM, ELF, linked script, layout inputs
+and original ASM; external hashes are checked before further compilation.
+The changes use no dummy locals, forced registers or frames, padding,
+instruction rewriting, or manual unrolling.
+
+The `841524B4` requeue now includes eight typed-record-origin controls. All
+retain the same 120-byte, 14-word residual, including the missing row alias.
+Record type and count declaration order do not explain it. Next compare the
+alias web before and after induction rewriting; another width/cache grid is
+not supported by these results.
+
+`841537FC` is a requeue at 308 bytes with four raw differences: the score
+address's spill/reload uses stack offset 40 instead of 44. Thirty-two
+candidates cover weather/score views, base/score lifetimes, consumed carrier
+ordering, opposing move/type carriers and parameter reuse. Eight calibrated
+stock/off/on/blank controls preserve the entire retained object while a
+passive frame trace locates the temporary. Source-carrier reorderings keep
+the residual; other lifetime forms change frame or saved-register ownership.
+The permuter's default comparison ignores stack offsets and reports a false
+zero for this diagnostic. Enabling `--stack-diffs` gives base score 16; a
+bounded 45-second search remains flat. Next investigate reuse of a consumed
+pointer across the weather and score phases, with the normal ROM gate as the
+oracle. No stack-only near-match is installed.
