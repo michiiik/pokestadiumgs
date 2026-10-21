@@ -776,3 +776,165 @@ register residual remains unresolved. The team-list renderer is accepted
 and must not be sent as a new candidate. Continue with its remaining
 row-rendering sibling `func_830043F0`, using the proven real-bank and visual
 layouts rather than shifted array anchors.
+
+### Team-detail renderer: record layout and optimizer handoff
+
+`func_830043F0`: requeue from `455a87f`. This 2252-byte renderer draws two
+476-byte team parts, each with six 60-byte creature records. A part's
+trainer ID is at byte 36 and creatures begin at byte 40. Within a creature,
+species/item are bytes 0/1, level is byte 29, and the displayed encoded name
+begins at byte 36. The enclosing 1168-byte team has flags at `0x464` and
+display text at `0x468`. Held-item markers are enabled by flag `0x04000000`;
+`func_83000BC0` chooses their highlighted versus gray environment color.
+The level sprite cache uses 19200-byte part and 3200-byte creature strides
+from state byte `0x3FF38`.
+
+The title resources at `D_8300F8D8`, `D_8300F8E0`, `D_8300F8E8`, and
+`D_8300F8F0` are eight-byte text settings: word mode at byte 0 and spacing,
+line-spacing, and font bytes at 4/5/6, consumed by `func_8180351C`.
+Target-compiler emitted-data checks verify 20 record/style sizes and
+offsets. Their context and blank-line controls preserve the complete game
+object; the extra fixture data alone is excluded from the game comparison.
+These layout results do not establish a matching renderer.
+
+Forty-eight recorded game probes tried indexed/pointer creature walks,
+loop predicates, scalar versus complete title settings, direct/local
+argument views, shared versus separate grid scopes, coordinate lifetimes,
+signed/unsigned pixel strides, and unsigned-alpha hoisting. None accepted.
+The highest normalized score is 0.9396, but its raw bytes still differ
+substantially. A retained natural parent has raw 0.5808, 2200 bytes versus
+2252, and the original 336-byte frame. Text-buffer capacities 128/180 are
+draft hypotheses, not recovered bounds; obtaining a matching frame alone
+does not prove either capacity or the original local layout.
+
+The decisive structural residual is a shared multiplier: the draft keeps
+82 in a saved register and emits `multu`, while the oracle expands that
+stride separately at the grid sites. Early title-setting addresses are
+also kept across calls in the draft instead of independently rematerialized.
+Several remaining differences follow these choices, so declaration-only
+permutations are not a sufficient next hypothesis.
+
+A bounded 45-second native permuter search first reproduced all 550 masked
+instruction words and relocation topology of that exact parent. Its best
+score reduction used empty conditions, and another used a synthetic
+constant-one carrier in SDK macro expansions; both were rejected as fakes.
+The useful unsigned-alpha hoist was rewritten with ordinary SDK macros and
+tested through the recorded runner, but did not accept.
+
+Passive optimizer observation is now calibrated with ten complete-object
+controls: known accepted source and the exact retained parent, each under
+stock, stock-plus-blank-lines, observer-off, observer-on, and
+observer-on-plus-blank-lines. Procedure order was checked against the
+stock driver's complete listing. In the parent, procedure 52 / color event
+29 has the constant-82 expression and receives internal color 22. This is
+an optimizer color identifier, not an unverified MIPS register number.
+The logged stack extent is 220 at local-color exit and 244 at global-color
+entry/exit; it is not the final machine frame size.
+
+Next inspect this constant web's interference and the competing texture-
+address lifetimes, using the calibrated observer before trying another
+source family. No instruction/relocation rewrite, empty condition, dummy
+local, fixed-register constraint, or nonmatching C body was installed.
+
+#### Isolated part-counter scopes and remaining text-address residual
+
+Follow-up from `455a87f`: 56 additional recorded probes (104 total game
+probes for this owner) isolated a real source mechanism. Separating only
+the two part-counter locals used by the level and text loops removes all
+four promoted `multu` sites, while preserving the 336-byte frame. Splitting
+the creature index, pixel-column accumulator, or part pointer instead does
+not remove those sites. The earlier fully separate-scope variant had already
+removed them, but its larger frame obscured that useful partial result.
+
+The new natural parent is 2240 bytes versus 2252, normalized 0.9680 and raw
+0.7567. Both rectangle locals now use the oracle's stack bytes 308/312,
+without padding or extra locals. The text buffer still begins at 152 rather
+than 128, and its original capacity is not established. The remaining
+mechanisms include early title-address rematerialization, retained level-
+label coordinates, and the final text loop's independently advanced header
+and creature-name addresses. Indexed, byte-indexed, pointer-end, and actual
+header-string-field forms did not close these differences. Neither did
+truthful eight-byte byte/word/style views or snapshots of the text mode.
+
+`func_800495F8` is genuinely variadic, as its definition in `src/47580.c`
+shows. Repairing its local declaration to the real four fixed parameters
+plus ellipsis preserves the complete known object. Eight recorded companion-
+transaction probes in the new source basin did not accept. The declaration
+was therefore not installed separately, and the owner remains assembly.
+
+A second calibrated 45-second native source search disabled empty-condition,
+dummy-local, type/ABI, and other fake-producing mutation families. Its useful
+output moved the real part-origin declaration before the buffer. Bounded
+stack-order probes applied that finding with SDK macros intact and reached
+the matching rectangle offsets above; none reached a full object match.
+
+The older wide observer's speculative edge dump faults with SIGBUS on this
+new parent, although stock and observer-off builds preserve its complete
+object. A private narrowed logger reads only the known web fields and the
+primary expression prefix. Ten fresh stock/off/on/blank complete-object
+controls pass for accepted source and the exact new parent. In procedure 52,
+the constant-82 expression now appears at color events 30/44/45 with internal
+color 255, rather than the old parent's assigned color 22; the new object
+contains zero `multu` instructions. Logged extents are now 224 at local-color
+exit and 248 at global-color entry/exit, still distinct from frame size.
+
+Next use this new parent and narrowed observer to map the title-resource
+address webs and final text-address induction. Do not resume from the older
+2200-byte parent or repeat broad scope/stride/view permutations. All tracked
+source, symbol-name, and alias bytes remain identical to `455a87f`; only this
+handoff is pending for the next accepted batch.
+
+#### Stock title-address pass boundary
+
+Further investigation on `455a87f` retained stock compiler B/O streams after
+15 complete-object stock/keep/blank controls. For the first three title
+resources, the frontend emits separate address and value accesses; the
+optimizer introduces the cached address and indirect mode load. The residual
+therefore cannot be attributed to the frontend from the assembly alone.
+
+Small two-call fixtures using the same eight-byte settings layout emit the
+oracle's separate address/value loads through both stock IDO 7.1 and 5.3.
+Each driver also reproduces its known matching game-object control. Those
+fixtures do not prove that the full renderer can match, but exclude a claim
+that this address pattern alone requires a different compiler. Six valid
+game probes moving real coordinate and display-list lifetimes did not close
+the residual. Two malformed generated loops did not compile and provide no
+evidence against their intended hypotheses. The owner remains `requeue`;
+resume from the 2240-byte parent, preserving the isolated part scopes.
+
+### Rule selection list
+
+`func_83003000` / `Fragment7_DrawRuleSelectionList` is accepted from
+`455a87f`: 800 bytes, recorded runner acceptance, and a byte-identical full
+US ROM with MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+The callback draws four fixed rules followed by the saved rules counted at
+state byte `0x3A06D`. Selection byte 81 chooses their yellow highlight;
+compatibility status arrays at `0x3FED0` and `0x3FEE0` select gray for
+unavailable entries. These are the fields consumed by
+`Fragment7_RefreshCollectionCompatibility` and the selection handler
+`func_83003320`. Fixed records start at `0x3FD74`, saved records at
+`0x3A070`, both with a 68-byte stride. The signed halfword at fixed-record
+byte 62 selects text resource group 15; negative values use the record's
+own text. Fourteen emitted target-compiler size/offset values check this
+view, including both record strides and both status-array strides.
+
+The matching source uses one ordinary row index for all three loops.
+Coordinates are `index * 21`, including the eleven horizontal separators;
+IDO derives the original pixel and address induction. Separately maintained
+pixel counters change loop scheduling and live ranges. Keeping the fixed
+label choice inline also recovers the original independently advanced text
+and resource-ID addresses. The equality spelling with the selected byte on
+the left preserves the fixed-row successor across the draw call. No source
+padding, empty condition, instruction rewrite, register constraint, or
+manually unrolled loop is present.
+
+The first successful gate froze the complete changed object, four distinct
+collateral objects, source, ROM, ELF, and linked script before another
+compilation; independent hashes verified the copies. The entire original
+game object agrees in section bytes, function extents, and semantic
+relocations. Eight further whole-object controls cover declaration cleanup,
+readable formatting, color literals, naming, and blank-line shifts. The
+named version retains the same 800-byte extent and 96-byte frame. Research
+scripts and compiler captures remain private artifacts, not repository
+helpers.

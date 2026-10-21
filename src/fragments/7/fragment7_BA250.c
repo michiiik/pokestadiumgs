@@ -834,7 +834,72 @@ void func_83002F50(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_BA250/func_83003000.s")
+typedef struct {
+    u8 text[62];
+    s16 resource_id;
+    u8 unk_40[4];
+} Fragment7RuleDrawRecord;
+typedef struct {
+    u8 unk_00[81];
+    u8 selection;
+    u8 unk_52[0x3A06D - 82];
+    u8 saved_count;
+    u8 unk_3A06E[2];
+    Fragment7RuleDrawRecord saved[8];
+    u8 unk_3A290[0x3FD74 - 0x3A290];
+    Fragment7RuleDrawRecord fixed[4];
+    u8 unk_3FE84[0x3FED0 - 0x3FE84];
+    s32 fixed_status[4];
+    s32 saved_status[8];
+} Fragment7RuleDrawState;
+extern void *func_8004C874(s32, s32);
+extern void func_818017A8(void);
+extern void WidgetResources_DrawSelection(s32,s32,s32);
+extern Gfx * D_800D0510;
+void Fragment7_DrawRuleSelectionList(s32 definition, void *memory, void *origin_memory) {
+    Fragment7DrawOrigin *origin = origin_memory;
+    Fragment7RuleDrawState *state = memory;
+    f32 weight;
+    s32 index;
+    s32 alpha;
+
+    weight = func_818055E0((void *)definition, (u8 *)state);
+    WidgetResources_DrawRecords(definition, (s32)state, (s32)origin);
+    func_818017A8();
+    if (weight > 0.01f) {
+        func_800498C4();
+        func_800496A4(4, 1);
+        alpha = 255.0f * weight;
+        for (index = 0; index < 4; index++) {
+            if (state->fixed_status[index] == 0) {
+                func_8004972C(0x96, 0x96, 0x96, alpha);
+            } else if (state->selection == index + 1) {
+                func_8004972C(0xFF, 0xFF, 0, alpha);
+            } else {
+                func_8004972C(0xFF, 0xFF, 0xFF, alpha);
+            }
+            func_800495BC(origin->x + 13, origin->y + index * 21 + 10,
+                          state->fixed[index].resource_id >= 0 ? func_8004C874(15, state->fixed[index].resource_id)
+                                                               : state->fixed[index].text);
+        }
+        for (index = 0; index < state->saved_count; index++) {
+            if (state->saved_status[index] == 0) {
+                func_8004972C(0x96, 0x96, 0x96, alpha);
+            } else if (index + 5 == state->selection) {
+                func_8004972C(0xFF, 0xFF, 0, alpha);
+            } else {
+                func_8004972C(0xFF, 0xFF, 0xFF, alpha);
+            }
+            func_800495BC(origin->x + 13, origin->y + index * 21 + 94, state->saved[index].text);
+        }
+        func_800499EC();
+        gSPDisplayList(D_800D0510++, D_80094D90);
+        for (index = 0; index < 11; index++) {
+            Gfx_FillRectRgb((s16)(origin->x + 12), (s16)(origin->y + index * 21 + 28), 136, 1, 0x64, 0x64, 0x64);
+        }
+    }
+    WidgetResources_DrawSelection(definition, (s32)state, (s32)origin);
+}
 #endif
 
 #ifdef VERSION_US
@@ -897,7 +962,6 @@ extern u8 D_8300F8B0[], D_8300CEA0[];
 extern Gfx D_80094F50[];
 extern void func_830034C8(void *, void *, void *, f32);
 extern void func_818011EC(s16, s16, u16, u16, void *);
-extern Gfx * D_800D0510;
 void Fragment7_DrawProfileRecordRow(Fragment7ProfileRowDefinition *definition, void *memory, void *origin_memory) {
     Fragment7ProfileDisplayState *state = memory;
     Fragment7DrawOrigin *origin = origin_memory;
@@ -1419,7 +1483,6 @@ extern s32 func_8005DC48(s32, s32);
 extern u8 *func_80060D70(u8 *, s8 *);
 extern void func_80051864(s32, s32);
 extern s8 *HAL_Strcpy(s8 *, s8 *);
-extern void *func_8004C874(s32, s32);
 extern s8 D_8300F920[];
 void Fragment7_BuildControllerTeam(Fragment7ExportTeam *destination, Fragment7ExportSource *source, void *unused_rule) {
     s8 name[11];
@@ -1553,7 +1616,6 @@ extern u8 D_8300EA14[];
 extern u8 D_8300EA34[];
 extern u8 D_8300EA54[];
 extern void func_800503A4(void *);
-extern void func_818017A8(void);
 extern u16 D_8300F7BE[][2];
 void Fragment7_DrawSlidingRecordPanel(s32 definition, void *memory, void *origin) {
     Fragment7PanelPositionState *state = memory;
