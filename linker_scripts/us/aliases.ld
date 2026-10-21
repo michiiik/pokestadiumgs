@@ -720,3 +720,6 @@ func_84150268 = BattlePlan_UpdateMoveAccuracy;
 func_84152600 = BattlePlan_AddStealableItemBonus;
 func_84152D6C = BattlePlan_CountHitObstacles;
 func_84152E10 = BattlePlan_AddHitObstacleBonus;
+func_84151F9C = BattlePlan_AddLeechSeedBonus;
+func_8415252C = BattlePlan_AddHealBellBonus;
+func_84152EE8 = BattlePlan_AddPerishSongBonus;
