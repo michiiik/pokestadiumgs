@@ -25,20 +25,71 @@ previously accepted neighbors. Four emitted layout values verify point size20,
 field offset16, row stride320 and field width2. Existing unrelated source and
 declarations were preserved.
 
-## Phase/latch updater: requeue
+## Accepted terrain initializer and phase updater
 
-`8415AD58` remains assembly after16 genuine source variants. It tests the real
-u32 status getter against1, conditionally initializes the halfword at state+8
-from state+4 plus0x463C and sets the latch, calls8415A364, then advances two
-signed halfword phases by+2/-1 modulo0x4000.
+`8415A9E4` / `BattleAnim_InitializeTerrainGrid` (640 bytes) and
+`8415AD58` / `BattleAnim_UpdateTerrainGrid` (136 bytes) are recorded native
+runner accepts with byte-identical full-ROM gates. Do not re-probe either
+accepted owner.
 
-Using a signed32-bit local for the real status result recovers the original
-shared constant1 and matches the entire pre-call section. Equality against1
-is unchanged by this signed conversion. The best136-byte draft has only eight
-raw word differences, all in the post-call phase pointer registers: candidate
-v0/v1 versus original v1/a0. Nested guards, state-pointer caching and explicit
-phase pointers do not resolve it. Next: calibrated post-call register-availability
-trace and actual8415A364 declaration/return lineage. Do not invent a return
-type, dummy use or owner interface solely to reserve v0.
+The initializer clears the latch and state header, initializes a 16-by-16
+array of 20-byte points starting at state+0x1010, seeds the two phases, and
+optionally runs a positive signed-halfword warmup count before rebuilding the
+dependent geometry. Its second parameter is `s16`: the oracle stores its
+incoming argument home, sign-extends the incoming register, and retains the
+narrowed count across calls. A word parameter with a narrow local does not
+reproduce this shape. The declaration repair was independently controlled
+against the complete original object and full-ROM-gated before probing the
+typed owner. The existing third argument is retained; the original body does
+not use it. Ordinary nested loops with a continuously advancing point pointer
+reproduce IDO's inner-loop unrolling; no source-level unrolling is needed.
 
-No phase updater draft was installed. Other owners retain their assembly.
+The shared point view now names only the proven float offsets 0, 4, 8 and 12,
+the existing signed halfword at 16, and the remaining two unknown bytes.
+No enclosing allocation extent or additional fields are inferred. Emitted
+layout checks establish size20, offsets0/4/8/12/16, row stride320 and field
+width2. The previously accepted interior-point setter remains object-identical.
+
+The updater tests the real u32 status getter against1, conditionally initializes
+the halfword at state+8 from state+4 plus0x463C and sets the latch, calls
+8415A364, then advances two signed halfword phases by+2/-1 modulo0x4000.
+The former eight post-call register differences were caused by an incorrect
+void declaration of 8415A364. Primary assembly establishes its real signed
+status return: the expiry edge at8415A39C has `li v0,-1` in its delay slot;
+the normal path sets v0 to zero at8415A924, with no further v0 writes before
+the shared epilogue at8415A9D4. `extern s32 func_8415A364(void)` therefore
+repairs a real interface, rather than inventing one to reserve a register.
+A signed32-bit local for the u32 status getter preserves equality against1
+and recovers the original shared constant1.
+
+Both first-success callbacks froze the complete changed TU object, four
+distinct collateral objects, source, ROM, ELF and linked script. All nine
+artifacts per success were independently hashed before further compilation.
+Five complete-original-object controls cover known source, blank-line stability,
+shared-view/declaration cleanup, naming and named-source blank-line stability.
+No instruction rewrite, register forcing, padding local or byte replacement
+was introduced.
+
+## Geometry direction helpers: requeue
+
+`841569E0` and `84156AB4` remain assembly. Sixteen initial probe failures were
+a declaration-plumbing defect, not source-shape evidence: declaration synthesis
+injected a stale void prototype for the tertiary position wrapper alongside
+its typed companion definition. Explicit shared wrapper prototypes repair that
+probe context. Eight compiling natural variants per owner then tested array
+order, scalar declaration order and grouped/interleaved point snapshots.
+
+Best raw similarities were0.566 for the first owner (204 versus212 bytes)
+and0.4237 for the clamped-height owner (224 versus236 bytes). The original
+contains a floating equality compare before normalization without a surviving
+COP1 branch. These variants do not reproduce it and also differ in float
+register lifetimes; this is not merely a register tie. Do not add a dummy
+comparison or fake normalizer interface to emit the missing instruction.
+Next: inspect natural zero-length/direction handling in related original
+sources and establish the comparison's source/control-flow lineage before
+another candidate family. The genuine normalizer takes three float pointers.
+
+Separate whole-original-object controls also establish that both existing
+position wrappers can use a real `f32 *position` parameter and explicitly
+forward `(s32)position` to their actual callees without changing bytes.
+Those wrapper cleanups were not installed by the rejected geometry batch.
