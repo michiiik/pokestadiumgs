@@ -676,3 +676,5 @@ func_84159584 = BattleAnim_StartEffect70DoubleTextureTrail_Emit;
 func_841597AC = BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture;
 func_84159A50 = BattleAnim_StartEffect39CombinedTrail_EmitSixSlot;
 func_84157398 = BattleAnim_StartEffect33Radial20_Emit;
+func_8415BBA0 = Strip400_Initialize;
+func_8415C644 = Radial20_StartStraight;

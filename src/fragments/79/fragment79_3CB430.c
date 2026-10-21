@@ -2,8 +2,6 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CB430/func_8415BBA0.s")
-
 typedef struct Strip400Node_79 {
     f32 unk_00;
     f32 unk_04;
@@ -25,10 +23,49 @@ typedef struct Strip400State_79 {
     f32 unk_24;
     s16 unk_28;
     s16 unk_2A;
-    u8 unk_2C[0xC];
+    Vtx *vertices;
+    u8 color[3];
+    u8 environment_color[3];
+    u8 unknown_36[2];
     Strip400Node_79 nodes[400];
 } Strip400State_79;
 extern Strip400State_79 *D_84187498;
+void Strip400_Initialize(f32 x, f32 y, f32 z, f32 scale, u8 r, u8 g, u8 b, u8 er, u8 eg, u8 eb) {
+    Strip400State_79 *state;
+    Strip400Node_79 *node;
+    s32 i;
+
+    state = D_84187498;
+    state->unk_00 = 0;
+    state->unk_02 = 0;
+    state->unk_04 = 0;
+    state->unk_06 = 70;
+    state->unk_08 = x;
+    state->unk_0C = y;
+    state->unk_10 = z;
+    state->unk_14 = scale * 40.0;
+    state->unk_18 = scale * 20.0;
+    state->unk_1C = 0.0f;
+    state->unk_20 = scale;
+    state->unk_24 = 1.0f;
+    state->unk_28 = 0;
+    state->unk_2A = 0;
+    state->color[0] = r;
+    state->color[1] = g;
+    state->color[2] = b;
+    state->environment_color[0] = er;
+    state->environment_color[1] = eg;
+    state->environment_color[2] = eb;
+    node = state->nodes;
+    for (i = 0; i < 400; i++) {
+        node->unk_00 = x;
+        node->unk_04 = y;
+        node->unk_08 = z;
+        node->unk_0C = state->unk_14;
+        node++;
+    }
+}
+
 f32 func_8415BCD8(void) {
     Strip400State_79 *ptr;
     f32 tmp;
@@ -67,7 +104,79 @@ void func_8415C530(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CB430/func_8415C644.s")
+typedef struct { f32 x; f32 y; f32 z; } Fragment79RadialVector;
+typedef struct {
+    f32 ordinal;
+    u8 alpha;
+    u8 unknown_05[3];
+    f32 scale;
+    f32 angle;
+    Fragment79RadialVector position;
+    Fragment79RadialVector velocity;
+    u8 unknown_28[0x20];
+} Fragment79RadialNode;
+typedef struct {
+    s16 active;
+    s16 resource;
+    s16 age;
+    s16 duration;
+    s16 type;
+    u8 r, g, b, a, er, eg, eb;
+    u8 unknown_11[3];
+    f32 field_14;
+    f32 field_18;
+    u8 unknown_1C[0x1C];
+    s32 field_38[3];
+    u8 unknown_44[4];
+    Fragment79RadialNode nodes[20];
+} Fragment79RadialState;
+extern u8 *D_84187530;
+void Radial20_StartStraight(f32 x, f32 y, f32 z, f32 vx, f32 vy, f32 vz, s16 type, u8 r, u8 g, u8 b, u8 alpha, f32 field_18, f32 scale, f32 field_14, s16 duration) {
+    Fragment79RadialState *state;
+    Fragment79RadialNode *node;
+    s32 i;
+    s32 j;
+    Fragment79RadialVector position;
+    Fragment79RadialVector velocity;
+
+    position.x = x;
+    position.y = y;
+    position.z = z;
+    velocity.x = vx;
+    velocity.y = vy;
+    velocity.z = vz;
+    state = (Fragment79RadialState *)(D_84187530 + 0x3C8);
+    for (i = 0; i < 10; i++, state++) {
+        if (state->active == 0) {
+            state->active = 1;
+            state->age = 0;
+            state->duration = duration;
+            state->type = type;
+            state->r = r;
+            state->g = g;
+            state->b = b;
+            state->a = alpha;
+            state->field_14 = field_14;
+            state->field_18 = field_18;
+            for (j = 0; j < 3; j++) state->field_38[j] = 0;
+            node = state->nodes;
+            for (j = 0; j < 20; j++) {
+                node->ordinal = j;
+                if (j == 0) {
+                    node->alpha = 255;
+                } else {
+                    node->alpha = (alpha * (19 - j)) / 20;
+                }
+                node->scale = scale;
+                node->angle = 0.0f;
+                node->position = position;
+                node->velocity = velocity;
+                node++;
+            }
+            return;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3CB430/func_8415C884.s")
 
