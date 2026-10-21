@@ -1042,12 +1042,46 @@ void func_861054B0(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86105508.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861056C0.s")
+#pragma GLOBAL_ASM("hand_asm/fragments/49/func_861056C0_rodata_manual.s")
 
 extern f32 D_8610AC50;
 void func_86105928(f32 *arg0) { f32 zero; f32 value; zero = 0.0f; value = D_8610AC50; arg0[4] = zero; arg0[5] = zero; arg0[6] = zero; arg0[23] = value; arg0[22] = value; arg0[21] = value; }
 
-#pragma GLOBAL_ASM("hand_asm/fragments/49/func_86105950_rodata_manual.s")
+extern void *D_87F119D8;
+extern f32 D_8610AC54;
+extern f32 D_8610AC58;
+extern f32 __sinf(f32);
+extern void func_861056C0(void *, void *);
+void func_86105950(void) {
+    u8 *record;
+    u8 *pool;
+    s32 i;
+
+    pool = (u8 *)(u32)D_8610AD20 + 0x8DE0;
+    record = *(u8 **)((u8 *)D_87F119DC + 0x20);
+    (*(s32 *)record) += 1;
+    *(f32 *)((u8 *)D_87F119DC + 0x48) += *(f32 *)((u32)D_8610AD20 + 0x9774);
+    *(f32 *)((u8 *)D_87F119DC + 0x4C) = *(f32 *)(record + 4) + (__sinf((f32)(*(s32 *)record) * D_8610AC54) * 10.0f);
+    for (i = 0; i < 4; i++) {
+        func_861056C0(pool, D_87F119DC);
+        pool += 44;
+    }
+    if (*(f32 *)((u8 *)D_87F119DC + 0x48) < D_8610AC58) {
+        func_87F026E8((s32)D_87F119D8, (s32)D_87F119DC);
+    }
+    if (*(s32 *)((u8 *)D_87F119DC + 0xC) & 0x10000000) {
+        if (*(s32 *)((u8 *)D_87F119DC + 0x1C) >= 16) {
+            *(s32 *)((u8 *)D_87F119DC + 0xC) &= 0xEFFFFFFF;
+        }
+        if ((*(s32 *)((u8 *)D_87F119DC + 0x1C) % 3) != 0) {
+            *(s32 *)((u8 *)D_87F119DC + 0xC4) = 159;
+        } else {
+            *(s32 *)((u8 *)D_87F119DC + 0xC4) = -97;
+        }
+    } else {
+        *(s32 *)((u8 *)D_87F119DC + 0xC4) = -256;
+    }
+}
 
 extern u8 D_8610A0D0[];
 extern Gfx D_8610A970[];
@@ -1082,7 +1116,7 @@ void func_86105AD8(s32 arg0, s32 arg1) {
 }
 
 extern void *func_87F025B8(void *, void *);
-extern u8 func_86105950[];
+extern void func_86105950(void);
 extern f32 D_8610AC5C;
 extern void func_8003F114(void *, s32, s32, s32);
 extern void func_8003F1DC(void *);
