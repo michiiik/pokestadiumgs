@@ -51,19 +51,27 @@ section alignment. All original section bytes and relocations are preserved;
 only this function's ELF size excludes the verified eight-byte alignment.
 There is no explicit padding or object rewrite.
 
-## Unresolved initializer: requeue / register-tie
+## Initializer completion
 
-`func_8415F0D0` remains a 404-byte assembly owner. The best ordinary C spelling
-matches all instruction counts and opcode shapes but exchanges `a2` and `a3`
-across ten words in the row texture-coordinate carrier and column induction.
-Use the late node-pointer initialization, signed 16-bit row/column texture
-carriers, and literal 0.01f. The source initializes x as `row * 6.75 - 54`,
-z as `column * 5.25 - 42`, and y as 1.
+`func_8415F0D0` is accepted as `RippleGrid16_Initialize` (404 bytes), completing
+all six functions in this file. It initializes x as `row * 6.75 - 54`, z as
+`column * 5.25 - 42`, and y as 1, clears the fade latch, and assigns the initial
+amplitude and texture coordinates.
 
-Covered families: early/late node pointer, row UV outside/inside the inner
-loop, column-carrier removal, UV assignment order, pointer footer/body, signed
-and unsigned coordinate widths, and compiler-owned versus external literal.
-These did not close the ten-word tie. Next action: a calibrated allocation
-trace or bounded genuine-source permuter focused on the two UV carrier
-lifetimes, not another width sweep. No forced register, dead local, identity
-arithmetic, or hand-unrolled fallback is accepted.
+Its ten-word `a2`/`a3` allocation tie was resolved by moving the column UV
+calculation immediately before its store, after the row UV store. This keeps
+the two signed 16-bit carriers but shortens the column carrier's lifetime.
+The earlier families (pointer placement, UV hoisting, widths and assignment
+order) did not resolve it. A logging-only allocator trace was calibrated
+against stock, diagnostics-off/on, and blank-line whole-unit controls. A
+bounded native source permuter then found the single statement move in 44
+seconds; both its stripped parent and parser roundtrip reproduced the actual
+parent object, and a known matched sibling passed the same wrapper.
+
+The winning edit was reviewed for meaning, then accepted by the normal
+candidate runner with link verification and a full-ROM gate. Six further
+known/blank/readable/named/named-blank/layout controls preserve every game
+section, all six function extents, and normalized relocation targets. No new
+alignment or function-size exception is needed. There are no remaining
+`GLOBAL_ASM` owners in this file, and no forced register, dead local, identity
+arithmetic, or hand-unrolled fallback was introduced.
