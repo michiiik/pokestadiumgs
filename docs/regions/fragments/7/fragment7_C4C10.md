@@ -42,12 +42,47 @@ names, compatible interfaces, function naming, and blank-line shifts. Ten
 emitted layout values verify header/bank sizes, record offsets, and strides;
 two emitted header words verify the bit positions (`1234C000`, `00006000`).
 
-`func_8300B504`: `requeue` after sixteen recorded variants. This 72-byte
-predicate accepts species 1 through 251 with positive level and low flag bit
-clear. Its consumer `func_8300B54C` checks six 88-byte entries in a profile,
-clears unusable species slots, and compacts the remaining entries. Straight
-byte-mask and byte/word bitfield views produce a 68-byte body: the original
-boolean materialization (`sltu`) is absent, and the level branch form also
-differs. A named boolean preserves the extent but changes register carriers.
-Resume with the boolean-expression lifetime and branch topology; do not add
-a dummy local or force a register. The function remains assembly.
+## 2026-10-21: five matching provider and validity helpers
+
+| Owner | Name | Bytes |
+| --- | --- | --- |
+| `8300ADA4` | `Fragment7_SaveRuleBank` | 156 |
+| `8300AE40` | `Fragment7_LoadRuleBank` | 152 |
+| `8300B1CC` | `Fragment7_SaveTeamBank` | 148 |
+| `8300B504` | `Fragment7_IsValidProfilePokemon` | 72 |
+| `8300B818` | `Fragment7_SaveProfileBank` | 148 |
+
+The I/O helpers reuse the verified header. Rule providers are 24/38, team
+providers are 25/39, and profile writers use 27/40; the expanded flag picks
+the first provider, while the two-bit source selector chooses a controller
+for the second. The helpers pass open mode 0 for reads and 1 for writes.
+Reads request the bank
+capacity and store the returned count; writes supply the current count. All
+successful opens are closed through `func_80062304`. Rule saving first clears
+unused slots through `func_8300A9E0`.
+
+`Deck_ReadEntries`, `Deck_WriteEntries`, and the provider open/close functions
+in `src/615D0.c` establish these operations. Initialization calls the rule
+loader, and `func_83009EC4` calls the three writers when collections change
+relative to their snapshot. The four I/O interfaces remain `void *`; no call
+arity or return-type changes are needed.
+
+The validity predicate accepts species 1 through 251 with positive level and
+low flag bit clear. Its consumer `func_8300B54C` checks six 88-byte entries in
+a profile, clears unusable species slots, and compacts the remaining entries.
+The earlier requeue is resolved: an inline nonzero flag test compared with
+zero retains the original `sltu` and subsequent branch topology. Logical
+negation folds away that conversion and produces 68 bytes instead of 72;
+named booleans change register carriers. The accepted expression uses no
+dummy local, identity arithmetic, padding, or register forcing.
+
+The native runner accepted the I/O helpers together, then the predicate in a
+separate full-ROM-gated transaction. Each first-success gate froze and
+independently rehashed the complete changed object, four distinct collateral
+objects, source, ROM, ELF, and linked script before another compilation.
+Eight further complete-original-object controls cover declaration cleanup,
+profile type naming, handle initialization, readable call formatting,
+function naming, and blank-line shifts. Fifteen emitted layout values cover
+the bank layouts and the 88-byte profile entry, including species at 0,
+level at 29, flags at 30, and payload at 32. The two emitted header words
+still verify the flag positions.

@@ -70,9 +70,48 @@ void func_8300AB58(void *arg0, void *arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300AC8C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300ADA4.s")
+extern s32 Deck_WriteEntries(u8 *, s32, u8 *);
+typedef struct {
+    u8 species;
+    u8 unk_01[28];
+    u8 level, flags, unk_1F;
+    u32 payload[14];
+} Fragment7ProfilePokemon;
+extern u8 * func_8006218C(s32, s32, s32, s32);
+void Fragment7_SaveRuleBank(void *bank) {
+    u8 *handle = NULL;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300AE40.s")
+    func_8300A9E0(bank);
+    if (((Fragment7RuleBank *)bank)->header.expanded) {
+        handle = func_8006218C(24, 0, 0, 1);
+    } else {
+        if (((Fragment7RuleBank *)bank)->header.source < 4) {
+            handle = func_8006218C(38, ((Fragment7RuleBank *)bank)->header.source, 0, 1);
+        }
+    }
+    if (handle != NULL) {
+        Deck_WriteEntries((u8 *)((Fragment7RuleBank *)bank)->records,
+            ((Fragment7RuleBank *)bank)->header.count, handle);
+        func_80062304(handle);
+    }
+}
+
+void Fragment7_LoadRuleBank(void *bank) {
+    u8 *handle = NULL;
+
+    if (((Fragment7RuleBank *)bank)->header.expanded) {
+        handle = func_8006218C(24, 0, 0, 0);
+    } else {
+        if (((Fragment7RuleBank *)bank)->header.source < 4) {
+            handle = func_8006218C(38, ((Fragment7RuleBank *)bank)->header.source, 0, 0);
+        }
+    }
+    if (handle != NULL) {
+        ((Fragment7RuleBank *)bank)->header.count = Deck_ReadEntries((u8 *)((Fragment7RuleBank *)bank)->records,
+            ((Fragment7RuleBank *)bank)->header.capacity, handle);
+        func_80062304(handle);
+    }
+}
 
 s32 func_8300AED8(void *arg0) {
     return (s32) (*(u8 *)((u8 *)(arg0) + (1))) >= (s32) (*(u8 *)((u8 *)(arg0) + (0)));
@@ -111,7 +150,22 @@ void func_8300AFD8(void *arg0, void *arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B0DC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B1CC.s")
+void Fragment7_SaveTeamBank(void *bank) {
+    u8 *handle = NULL;
+
+    if (((Fragment7TeamBank *)bank)->header.expanded) {
+        handle = func_8006218C(25, 0, 0, 1);
+    } else {
+        if (((Fragment7TeamBank *)bank)->header.source < 4) {
+            handle = func_8006218C(39, ((Fragment7TeamBank *)bank)->header.source, 0, 1);
+        }
+    }
+    if (handle != NULL) {
+        Deck_WriteEntries((u8 *)((Fragment7TeamBank *)bank)->records,
+            ((Fragment7TeamBank *)bank)->header.count, handle);
+        func_80062304(handle);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B260.s")
 
@@ -165,13 +219,33 @@ void func_8300B410(void *arg0, void *arg1, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B468.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B504.s")
+s32 Fragment7_IsValidProfilePokemon(Fragment7ProfilePokemon *pokemon) {
+    if (((pokemon->flags & 1) != 0) == 0 && pokemon->species > 0 && pokemon->species < 252 && pokemon->level > 0) {
+        return 1;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B54C.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B728.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B818.s")
+void Fragment7_SaveProfileBank(void *bank) {
+    u8 *handle = NULL;
+
+    if (((Fragment7ProfileBank *)bank)->header.expanded) {
+        handle = func_8006218C(27, 0, 0, 1);
+    } else {
+        if (((Fragment7ProfileBank *)bank)->header.source < 4) {
+            handle = func_8006218C(40, ((Fragment7ProfileBank *)bank)->header.source, 0, 1);
+        }
+    }
+    if (handle != NULL) {
+        Deck_WriteEntries((u8 *)((Fragment7ProfileBank *)bank)->records,
+            ((Fragment7ProfileBank *)bank)->header.count, handle);
+        func_80062304(handle);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/7/fragment7_C4C10/func_8300B8AC.s")
 
