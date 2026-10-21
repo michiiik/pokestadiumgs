@@ -1168,7 +1168,39 @@ void func_86106044(f32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_861061B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106504.s")
+extern s32 func_861060F8(void *, void *);
+extern void func_861061B0(s32);
+s32 func_86106504(void *arg0)
+{
+  s32 next; // FAKE: unused local preserves the original stack frame.
+  s32 i;
+  s32 result;
+  u8 *other;
+  u8 *entry;
+  entry = ((u8 *) ((u32) D_8610AD20)) + 0x8DE0;
+  result = 0;
+ i = 0; do {
+    other = *((u8 **) entry);
+    if (((!((*((u32 *) (other + 0xC))) & 0x200000)) && (((other != (*((u8 **) (((u8 *) D_87F119DC) + 0x20)))) && (!((*((u32 *) (((u8 *) D_87F119DC) + 0xC))) & 0x1000000))) || ((*((s32 *) (((u8 *) D_87F119DC) + 0x1C))) >= 0x10))) && func_861060F8(D_87F119DC, other))
+    {
+      if ((*((s32 *) (((u8 *) ((u32) D_8610AD20)) + 0x3C))) == 4)
+      {
+        if ((++(*((s32 *) (entry + 4)))) >= 100)
+        {
+          *((s32 *) (entry + 4)) = 99;
+        }
+        func_861000B8(*((void **) entry), 0xF04);
+      }
+      result = 1;
+      func_861061B0(*((s32 *) ((*((u8 **) entry)) + 0x20)));
+      break;
+    }
+    i++;
+    entry += 0x2C;
+  }
+  while (i != 4);
+  return result;
+}
 
 void func_86106630(void *arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7) {
     typedef struct {
@@ -1227,7 +1259,7 @@ void func_86106710(void) {
 #pragma GLOBAL_ASM("hand_asm/fragments/49/func_86106784_rodata_manual.s")
 
 extern void func_86106688();
-extern void func_86106504();
+extern s32 func_86106504();
 void func_86106C28(void) { func_86106688(); func_86106504(D_87F119DC); }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/49/fragment49_code/func_86106C54.s")
