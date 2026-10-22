@@ -809,3 +809,7 @@ func_84136CA8 = BattleRecord_AdvanceWriteSlot;
 func_84127C88 = BattleDamage_RollCriticalHit;
 func_8412D950 = BattleEffect_ClearPartyStatus;
 func_82601A84 = RecordNames_LoadFourSlots;
+func_82601BB0 = RecordNames_FormatTwoSlots;
+func_82601D2C = RecordNames_LoadTwoSlots;
+func_82601E70 = RecordNames_LoadSelectedOrDefaultSlots;
+func_82601F90 = RecordText_SelectAndMeasure;
