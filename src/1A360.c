@@ -251,7 +251,41 @@ void *func_8001B058(void *arg0, void *arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_8001B0B0.s")
+/* mkdraft:func_8001B0B0 begin */
+void *func_8001B0B0(void *arg0, void *arg1) {
+    void *result1;
+    void *result2;
+    s32 size1;
+    s32 size2;
+
+    size2 = 0x10, size1 = 0x10;
+    result1 = func_8001ADE0((ListNode1A360 *)((u8 *)arg0 + 0x20),
+        *(u8 *)((u8 *)(*(void **)((u8 *)arg1 + 0x60)) + 5));
+    if (result1 != NULL) {
+        size1 = *(u8 *)((u8 *)result1 + 0x30);
+    }
+    result2 = func_8001ADE0((ListNode1A360 *)((u8 *)arg0 + 0x30),
+        *(u8 *)((u8 *)(*(void **)((u8 *)arg1 + 0x60)) + 5));
+    if (result2 != NULL) {
+        size2 = *(u8 *)((u8 *)result2 + 0x30);
+    }
+    if ((result1 == NULL) && (result2 == NULL)) {
+        return NULL;
+    }
+    if (size2 < size1) {
+        func_8001ADB4(result2);
+        func_8001AFAC(result2, (s32)arg1);
+        func_8001CB1C((u8 *)arg0 + 0x20, result2);
+        *(u8 *)((u8 *)result2 + 0x30) =
+            *(u8 *)((u8 *)(*(void **)((u8 *)arg1 + 0x60)) + 5);
+        return result2;
+    }
+    *(void **)((u8 *)result1 + 0x48) = arg1;
+    *(u8 *)((u8 *)result1 + 0x30) =
+        *(u8 *)((u8 *)(*(void **)((u8 *)arg1 + 0x60)) + 5);
+    return result1;
+}
+/* mkdraft:func_8001B0B0 end */
 
 void *func_8001B1A8(void *arg0, void *arg1) {
     void *result = func_8001ADE0((ListNode1A360 *)((u8 *)arg0 + 0x30),

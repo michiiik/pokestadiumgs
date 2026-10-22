@@ -39,10 +39,36 @@ s32 func_800103C8(s32 arg0, s32 arg1) { func_80019580(arg0); arg0 += 0x20000000;
 s32 func_800103C8(s32 arg0) { func_80019580(arg0); arg0 += 0x20000000; return arg0; }
 #endif
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_800103F0.s")
+extern u8 D_8011EBC0;
+extern s32 D_8011EBD0;
+s32 func_80010510();
+s32 func_800103F0(void *arg0, s32 arg1) {
+    s32 var_v1;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/10BB0/func_80010448.s")
+    var_v1 = 0;
+    if (D_8011EBD0 != 0) {
+        var_v1 = func_80010510((void *) ((u8 *) &D_8011EBC0 + 0x10));
+    }
+    if (var_v1 == 0) {
+        var_v1 = func_80010510(arg0, arg1);
+    }
+    return var_v1;
+}
+extern u8 D_8011EBC0;
+extern s32 D_8011EBD0;
+s32 GbApu_Alloc();
+s32 func_80010448(void *arg0, s32 arg1) {
+    s32 var_v1;
 
+    var_v1 = 0;
+    if (D_8011EBD0 != 0) {
+        var_v1 = GbApu_Alloc((void *) ((u8 *) &D_8011EBC0 + 0x10), arg1);
+    }
+    if (var_v1 == 0) {
+        var_v1 = GbApu_Alloc(arg0, arg1);
+    }
+    return var_v1;
+}
 s32 GbApu_Alloc();
 s32 func_80010510();
 s32 func_800104A0(void *arg0, s32 arg1) {

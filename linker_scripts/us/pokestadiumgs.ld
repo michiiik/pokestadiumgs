@@ -363,6 +363,8 @@ SECTIONS
         build/src/95C0.o(.data);
         _9E00 = .;
         build/src/9E00.o(.data);
+        _85DA0_data = .;
+        build/asm/us/data/85DA0.data.o(.data);
         AC80 = .;
         build/src/AC80.o(.data);
         BF50 = .;
@@ -427,8 +429,8 @@ SECTIONS
         build/src/4F800.o(.data);
         _517E0 = .;
         build/src/517E0.o(.data);
-        _85DA0_data = .;
-        build/asm/us/data/85DA0.data.o(.data);
+        _88A40_data = .;
+        build/asm/us/data/88A40.data.o(.data);
         _56F90 = .;
         build/src/56F90.o(.data);
         _585D0 = .;
@@ -593,8 +595,8 @@ SECTIONS
         build/src/585D0.o(.rodata);
         build/src/615D0.o(.rodata);
         build/src/638E0.o(.rodata);
-        build/src/63CF0.o(.rodata);
         build/asm/us/data/A5C80.rodata.o(.rodata);
+        build/src/63CF0.o(.rodata);
         build/src/641E0.o(.rodata);
         build/src/654A0.o(.rodata);
         build/asm/us/data/A5EA0.rodata.o(.rodata);
@@ -662,6 +664,8 @@ SECTIONS
         build/src/57C0.o(.bss);
         build/src/62E0.o(.bss);
         build/src/6670.o(.bss);
+        build/asm/us/data/unk_bss.bss.o(.bss);
+        build/asm/us/data/unk_bss2.bss.o(.bss);
         build/src/7140.o(.bss);
         build/src/78D0.o(.bss);
         build/src/7A50.o(.bss);
@@ -732,8 +736,7 @@ SECTIONS
         build/src/72C30.o(.bss);
         build/src/73C80.o(.bss);
         build/src/74020.o(.bss);
-        build/asm/us/data/unk_bss.bss.o(.bss);
-        build/asm/us/data/unk_bss2.bss.o(.bss);
+        build/asm/us/data/unk_bss3.bss.o(.bss);
         build/lib/libultra.a:sptask.o(.bss);
         build/lib/libultra.a:controller.o(.bss);
         build/lib/libultra.a:siacs.o(.bss);

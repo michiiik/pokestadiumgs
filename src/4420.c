@@ -72,8 +72,38 @@ void func_80003838(S1_JpegMarkerState4420 *arg0, u8 *arg1) {
     arg0->height = (arg0->start_of_frame[1] << 8) | arg0->start_of_frame[2];
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/4420/func_800039C8.s")
+typedef struct S1_UnkStruct80001380jpeg {
+    OSMesg mesg;
+    OSMesgQueue queue;
+    u16 state;
+    u16 notifyFlag;
+    OSTask task;
+} S1_UnkStruct80001380jpeg;
+extern u8 D_800851A0[];
+extern u8 D_80085270[];
+extern u8 D_800A7E20[];
+extern u8 D_800CCE00[];
 
+void func_800039C8(S1_UnkStruct80001380jpeg *arg0, void *arg1) {
+    arg0->task.t.type = 4;
+    arg0->task.t.flags = 0;
+    arg0->task.t.ucode_boot = (u64 *)D_800851A0;
+    arg0->task.t.ucode_boot_size = (u32)(D_800851A0 + 0xD0) - (u32)D_800851A0;
+    arg0->task.t.ucode = (u64 *)D_80085270;
+    arg0->task.t.ucode_size = 0x1000;
+    arg0->task.t.ucode_data = (u64 *)D_800A7E20;
+    arg0->task.t.ucode_data_size = 0x800;
+    arg0->task.t.dram_stack = NULL;
+    arg0->task.t.dram_stack_size = 0;
+    arg0->task.t.output_buff = NULL;
+    arg0->task.t.output_buff_size = NULL;
+    arg0->task.t.data_ptr = arg1;
+    arg0->task.t.data_size = 0x20;
+    arg0->task.t.yield_data_ptr = (u64 *)D_800CCE00;
+    arg0->task.t.yield_data_size = 0x200;
+
+    osCreateMesgQueue(&arg0->queue, &arg0->mesg, 1);
+}
 void func_80003A78(u8 *arg0, u8 *arg1, u8 *arg2) {
     *(u32 *)(arg0 + 0x00) = *(u32 *)(arg2 + 0x14);
     *(u8 *)(arg0 + 0x04) = *(u8 *)(arg2 + 0x00);

@@ -270,9 +270,57 @@ s32 func_800470B8(u16 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047104.s")
+s32 func_80047104(s32 arg0) {
+    s32 result = 0;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/47580/func_80047158.s")
+    switch (arg0) {
+        case 1:
+            break;
+        case 2:
+            result = 1;
+            break;
+        case 4:
+            result = 2;
+            break;
+        case 8:
+            result = 3;
+            break;
+        case 16:
+            result = 4;
+            break;
+        case 32:
+            result = 5;
+            break;
+    }
+    return result;
+}
+/* mkdraft:func_80047158 begin */
+s32 func_80047158(s32 arg0) {
+    s32 result = 0;
+
+    switch (arg0) {
+        case 10:
+            result = 1;
+            break;
+        case 12:
+            result = 2;
+            break;
+        case 16:
+            result = 4;
+            break;
+        case 20:
+            result = 8;
+            break;
+        case 24:
+            result = 16;
+            break;
+        case 32:
+            result = 32;
+            break;
+    }
+    return result;
+}
+/* mkdraft:func_80047158 end */
 
 extern void *memcpy(void *, const void *, s32); void *func_800471B4(void *dest, const void *src, s32 size) { return (u8 *)memcpy(dest, src, size) + size; }
 

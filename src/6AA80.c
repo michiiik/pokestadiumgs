@@ -113,7 +113,53 @@ s32 func_8006A4AC(void *arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6AA80/func_8006A51C.s")
+/* mkdraft:func_8006A51C begin */
+s32 func_8006A51C(s32 arg0) {
+    s32 result = 0;
+    switch (arg0) {
+    case 0:
+        result = 9;
+        break;
+    case 1:
+        result = 4;
+        break;
+    case 2:
+        result = 5;
+        break;
+    case 3:
+        result = 6;
+        break;
+    case 4:
+        result = 7;
+        break;
+    case 5:
+        result = 16;
+        break;
+    case 8:
+        result = 1;
+        break;
+    case 9:
+        result = 2;
+        break;
+    case 10:
+        result = 3;
+        break;
+    case 11:
+        result = 15;
+        break;
+    case 12:
+        result = 8;
+        break;
+    case 13:
+        result = 8;
+        break;
+    case 14:
+        result = 17;
+        break;
+    }
+    return result;
+}
+/* mkdraft:func_8006A51C end */
 
 s32 func_8006A5AC(s32 arg0) {
     s32 result = -1;

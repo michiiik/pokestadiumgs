@@ -143,7 +143,28 @@ void func_8006E7DC(f32 (*arg0)[4], void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006E944.s")
+/* mkdraft:func_8006E944 begin */
+typedef struct BlendWeight1F { f32 t; } BlendWeight1F;
+
+void func_8006E944(f32 (*arg0)[4], void *arg1, BlendWeight1F arg2) {
+    f32 x; f32 y; f32 z;
+    f32 dx; f32 dy; f32 dz;
+    x = (*(f32 *)((u8 *)(arg1) + (0)));
+    y = (*(f32 *)((u8 *)(arg1) + (4)));
+    z = (*(f32 *)((u8 *)(arg1) + (8)));
+    guMtxXFMF(arg0, x, y, z, &x, &y, &z);
+    if (arg2.t == 0.0f) { dx = (f32) 1; dy = (f32) 1; dz = (f32) 1; }
+    dx = x - (*(f32 *)((u8 *)(arg1) + (0xC)));
+    dy = y - (*(f32 *)((u8 *)(arg1) + (0x10)));
+    dz = z - (*(f32 *)((u8 *)(arg1) + (0x14)));
+    dx = dx * arg2.t;
+    dy = dy * arg2.t;
+    dz = dz * arg2.t;
+    (*(f32 *)((u8 *)(arg1) + (0x18))) += dx * (f32) 1;
+    (*(f32 *)((u8 *)(arg1) + (0x1C))) += dy * (f32) 1;
+    (*(f32 *)((u8 *)(arg1) + (0x20))) += dz * (f32) 1;
+}
+/* mkdraft:func_8006E944 end */
 #endif
 
 #ifdef VERSION_US
@@ -435,7 +456,76 @@ void Model_OffsetVertexHeightsByClass(u8 *arg0, u8 *arg1, f32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_8006F83C.s")
+void func_8006F83C(u8 *arg0, u8 *arg1, f32 arg2, BlendWeight1F arg3)
+{
+  s16 *classes;
+  s16 *indices;
+  s32 cls1;
+  s32 cls2;
+  float new_var2;
+  s32 i;
+  u16 count;
+  u8 *record;
+  f32 new_var3;
+  u8 *target;
+  int new_var;
+  classes = (s16 *) Memmap_GetSegmentVaddr(*((u32 *) (arg0 + 0x10)));
+  if (1)
+  {
+  }
+  if (1)
+  {
+    if (1)
+    {
+    }
+  }
+  if (1)
+  {
+  }
+  if (1)
+  {
+  }
+  if (1)
+  {
+  }
+  new_var2 = 0.25f;
+  new_var = 0x14;
+  indices = (s16 *) Memmap_GetSegmentVaddr(*((u32 *) (arg0 + new_var)));
+  count = *((u16 *) (arg0 + 4));
+  record = arg1;
+  i = 0;
+  new_var3 = arg2;
+  while (i < count)
+  {
+    cls1 = Model_GetVertexClass(classes, i);
+    if ((cls1 != 0) && (i == (*indices)))
+    {
+      cls2 = func_8006DE9C(classes, i);
+      switch (cls2)
+      {
+        case 1:
+          target = record + new_var;
+          *((f32 *) (target + 0xC)) += new_var3 * ((f32) 0);
+          *((f32 *) (target + 0x10)) += new_var3 * ((f32) 1);
+          *((f32 *) (target + 0x14)) += new_var3 * ((f32) 0);
+          break;
+
+        case 2:
+          target = record + new_var;
+          *((f32 *) (target + 0xC)) += (new_var3 * new_var2) * ((f32) 0);
+          *((f32 *) (target + 0x10)) += (new_var2 * arg2) * ((f32) 1);
+          *((f32 *) (target + 0x14)) += (new_var3 * new_var2) * ((f32) 0);
+          break;
+
+      }
+
+    }
+    i++;
+    record += 0x50;
+    indices++;
+  }
+
+}
 #endif
 
 #ifdef VERSION_US
@@ -622,7 +712,31 @@ void func_80070C14(f32 *arg0, f32 *arg1, f32 *arg2) { f32 x = *arg0; f32 y = *ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80070DEC.s")
+void func_80070DEC(f32 *arg0, f32 *arg1) {
+    f32 r0;
+    f32 r1;
+    f32 r2;
+
+    r0 = sqrtf((arg1[0] * arg1[0]) + (arg1[1] * arg1[1]) + (arg1[2] * arg1[2]));
+    r1 = sqrtf((arg1[4] * arg1[4]) + (arg1[5] * arg1[5]) + (arg1[6] * arg1[6]));
+    r2 = sqrtf((arg1[8] * arg1[8]) + (arg1[9] * arg1[9]) + (arg1[10] * arg1[10]));
+    arg0[0] = arg1[0] * r0;
+    arg0[1] = arg1[4] * r0;
+    arg0[2] = arg1[8] * r0;
+    arg0[3] = 0;
+    arg0[4] = arg1[1] * r1;
+    arg0[5] = arg1[5] * r1;
+    arg0[6] = arg1[9] * r1;
+    arg0[7] = 0;
+    arg0[8] = arg1[2] * r2;
+    arg0[9] = arg1[6] * r2;
+    arg0[10] = arg1[10] * r2;
+    arg0[11] = 0;
+    arg0[12] = 0;
+    arg0[13] = 0;
+    arg0[14] = 0;
+    arg0[15] = 1.0f;
+}
 #endif
 
 #ifdef VERSION_US
@@ -662,7 +776,7 @@ void func_80070FDC(f32 arg0[4][4]) {
 
 #ifdef VERSION_US
 extern u8 *D_80094908;
-extern void func_80070DEC(float [4][4], void *);
+extern void func_80070DEC(f32 *, f32 *);
 void func_80071068(float arg0[4][4]) {
     float temp[18];
     func_80070DEC((float (*)[4])(temp + 1), D_80094908 + 0x64);

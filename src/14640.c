@@ -200,11 +200,45 @@ s32 func_80014BD4(s32 arg0) {
     return func_80014E68(0, arg0, &sp20.value[0]);
 }
 
+s32 func_80014C48(s32 arg0, s32 arg1, s32 arg2);
+
 void func_80014C28(s32 arg0, s32 arg1) {
     func_80014C48(arg0, arg1, 1);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014C48.s")
+/* mkdraft:func_80014C48 begin */
+extern s32 func_80015148(s32, s32);
+
+s32 func_80014C48(s32 arg0, s32 arg1, s32 arg2) {
+    s32 result;
+    s32 base;
+    s32 index;
+    s8 mode;
+
+    index = func_8001510C(2, arg0);
+    base = func_8001519C(2);
+    result = func_80015148(2, index);
+    if (result != 0) {
+        if (((u8 *)&D_8011F190)[index] != 1) {
+            func_800143B8(index, 2);
+        }
+        *(s32 *)arg1 = 0;
+        return result;
+    }
+    mode = *(s8 *)((u8 *)base + arg0 * 0x10 + 0x19);
+    if (mode == 4 || arg2 == 1) {
+        *(s32 *)arg1 = *(s8 *)((u8 *)base + arg0 * 0x10 + 0x18);
+        return *(s32 *)((u8 *)base + index * 0x10 + 0x10);
+    }
+    result = func_80014E68(2, arg0, &arg2);
+    if (result != 0) {
+        *(s32 *)arg1 = 0;
+        return result;
+    }
+    *(s32 *)arg1 = *(s8 *)((u8 *)base + arg0 * 0x10 + 0x18);
+    return *(s32 *)((u8 *)base + index * 0x10 + 0x10);
+}
+/* mkdraft:func_80014C48 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014D64.s")
 
@@ -324,17 +358,50 @@ s32 func_80015E6C(s32 arg0, s32 arg1, u8 *arg2) {
 s32 func_8001603C(s32 arg0, s32 arg1) { s32 *ptr; s32 value; if (arg1 < 0x80) { ptr = func_8001A308(arg0, arg1); if (ptr == NULL) return 0; value = ptr[4]; goto done; } if (arg1 < 0x100) { ptr = func_8001A3DC(arg0, arg1 - 0x80); if (ptr == NULL) return 0; value = ptr[1]; goto done; } ptr = func_8001A4C0(arg0, arg1 - 0x100); if (ptr == NULL) return 0; value = ptr[0]; done: return value; }
 void func_8001603C_padding(void) {}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800160D4.s")
+/* mkdraft:func_800160D4 begin */
+typedef struct { s32 unk0; s32 unk4; s32 unk8; s32 unkC; } unk_func_800160D4;
+
+void func_800160D4(u8 *arg0) {
+    u8 *result;
+
+    if (*(s32 *)(arg0 + 0x24) == 0) {
+        return;
+    }
+    result = (u8 *)func_8001603C(arg0[1], *(u16 *)(arg0 + 2));
+    if (result != 0) {
+        *(unk_func_800160D4 *)(arg0 + 0x20) = *(unk_func_800160D4 *)result;
+        *(s32 *)(result + 4) = *(s32 *)(arg0 + 0x10);
+        result[0] &= ~0xC;
+    }
+}
+/* mkdraft:func_800160D4 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016148.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_800162D0.s")
-
+extern void func_80019540(void *, s32);
+extern void func_80015584(void *, s32, s32, s32, s32, s32, void *, s32, void *);
+const char D_800A1DC4[9] = "SLOWCOPY";
+void GbApu_InitSlowCopySlot(u8 *arg0, s32 arg1) {
+    void *queue[1];
+    func_80019540(*(void **)(arg0 + 0xC), arg1);
+    queue[0] = arg0 + 0x30;
+    osCreateMesgQueue(queue[0], arg0 + 0x48, 1);
+    func_80015584(arg0 + 0x4C, 0, 0, *(s32 *)(arg0 + 8), *(s32 *)(arg0 + 0xC), arg1, queue[0], *(u8 *)(arg0), (void *)D_800A1DC4);
+}
 void func_80016354(s32 a0, s32 a1, s32 a2, s32 a3) {}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80016368.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_8001644C.s")
+/* mkdraft:GbApu_ResetSlotFlags begin */
+extern u8 D_8011BE90[];
+
+void GbApu_ResetSlotFlags(void) {
+    s32 i;
+    for (i = 0; i < 32; i++) {
+        D_8011BE90[i * 0x58 + 0x14C0] = 0;
+    }
+}
+/* mkdraft:GbApu_ResetSlotFlags end */
 
 extern void *func_80016500(s32, s32, s32, s32, s32, s32, s32);
 extern OSMesgQueue D_8011DE50;
@@ -548,8 +615,16 @@ extern u8 D_8011F2E5;
 typedef unsigned char AccByte;
 s32 func_80018ACC(void) { struct { s32 msg; s32 spare; } local; if (osRecvMesg(D_801221B4, (OSMesg *)&local.msg, 0) == -1) return 0; if (local.msg != D_8011F2E5) return -1; return 1; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80018B24.s")
+extern u8 D_8011BE90[];
 
+void func_80018B24() {
+    s32 status;
+    OSMesg msg;
+
+    do {
+        status = -1;
+    } while (osRecvMesg(*(OSMesgQueue **)(D_8011BE90 + 0x6324), &msg, 0) != status);
+}
 extern void func_80018B24();
 extern void func_80018810(void);
 extern s32 func_800187AC(void);
