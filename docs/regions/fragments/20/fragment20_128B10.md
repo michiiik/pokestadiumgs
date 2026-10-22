@@ -100,12 +100,73 @@ their apparent gains. None of those variants was installed. The accepted
 matches came from the clean source families described above, not from the
 invalid mutations.
 
-## Unresolved neighboring owner
+## 2026-10-23: unassigned-owner text and name loading
 
-`82601968` remains a requeue. Earlier regional evidence records 56 variants
-and a best 284-byte candidate with seven allocation/operand differences.
-Do not replay its pointer/index, loop, width, or destination families.
-The old missing-toml obstacle no longer describes the calibrated native
-permuter. Resume its retained parent with a reviewed source search or the
-new owner-dispatch/allocation evidence; the historical C spelling must
-still be recovered and verified. This owner was not probed in this block.
+Three additional owners (792 bytes) passed the recorded native runner and
+ordinary host-syntax-enabled US full-ROM gate. A fourth function replaces
+an existing public C implementation without adding decompilation coverage.
+
+- `82601968` becomes `RecordText_CopyUnassignedEntries` (284 bytes),
+  resolving the requeue above. Signed owner -1 selects six text lookups
+  from entries 33 through 38 of group `row[3] + 76`. Non-null, nonempty
+  results copy 12 bytes into the corresponding record. The destination
+  identity `outer * 528 + inner * 88 + 196` is
+  `144 + (outer * 6 + inner) * 88 + 52`: four groups of six 88-byte
+  records with text at byte 52. The grid ends at 2256, where the accepted
+  four-slot name loaders begin. Compile-time size checks describe this
+  external state; no local array or runtime storage is added. The text's
+  game-facing label is unresolved. The historical parent used an `s32`
+  lookup return, while `func_8004C874` in `src/4CC20.c` returns `void *`.
+  Correcting that interface alone retained five instruction differences;
+  the typed grid destination closed the remaining address-expression chain.
+- `82602AC0` becomes `RecordNames_LoadUnassignedFourSlots` (220 bytes).
+  Each signed owner -1 loads the selected row's group-42 name into its
+  12-byte slot at state offset 2256; other owners and failed lookups preserve
+  their slots. The row is fixed across all four slots. Selection-before-table
+  initialization, a 152-byte row view, and the signed-state/byte-destination
+  distinction transfer from the accepted neighboring formatter.
+- `82602CF4` becomes `RecordNames_LoadSelectedOrDefaultPair` (288 bytes).
+  Its opcode shape is identical to `RecordNames_LoadSelectedOrDefaultSlots`
+  at `82601E70`; transferring that accepted C body matches this distinct
+  retail entry point too. Owner -1 selects the mapped row, -2 preserves
+  the slot, and other owners use the table's first row. Both entry points
+  remain separate definitions at their original addresses.
+- `82603814` becomes `RecordOwners_AnyUnassigned` (92 bytes). The public
+  implementation used an unused pointer read and four repeated tests.
+  A natural four-iteration loop matches the same retail bytes; IDO performs
+  the unrolling. All four owners are inspected, with result one if any is
+  -1. This is source cleanup, not a newly decompiled public owner.
+
+The first successful gates froze source, complete changed module, four
+collateral objects, ROM/ELF/linked script, layout inputs, and original assembly
+dependencies before further compilation. Independent external hashes,
+whole-module comparisons, and collateral checks passed. ROM MD5 remains
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Address aliases preserve callers.
+No instruction/relocation rewrite, padding, unused local, synthetic read,
+forced register/frame, fake interface, or source-level manual unroll is used.
+
+### Requeue: `82602FE8` descriptor validation
+
+Retail sums signed bytes starting at descriptor offset four, using the signed
+halfword at zero as its count. It then checks a halfword at
+`46 + index * 88` for every index below that sum. The result starts at one
+and becomes zero on any zero field; a nonpositive sum returns one. Older
+manually unrolled candidates that returned zero for an empty input change
+this behavior and must not be reused.
+
+A natural pointer sum loop followed by an indexed field-check loop reaches
+the original 252-byte size and near-identical opcode sequence, but remains
+unmatched. Logging-only allocator diagnostics passed known-sibling and
+stock/off/on/20-leading-blank complete-module controls. They identify the
+count temporary taking V0 while the sum takes A1, unlike retail's count A3
+and sum V0. Parameter-walk and inline-count families produced 248-byte
+objects with different bulk-loop induction. A calibrated 90-second source
+search improved its own score from 435 to 240 through ordinary initialization
+ordering but did not match. These scores are not acceptance evidence.
+
+Next: retain the natural 252-byte loop topology, compose the measured
+initialization-order improvement with a source-lifetime change for count,
+and inspect exact register/operand differences. Keep the known descriptor
+dimensions (8-byte header plus twelve 88-byte entries = 1064) without
+inventing the checked field's gameplay meaning. No candidate for this owner
+has been installed.
