@@ -94,8 +94,17 @@ s32 func_816021E8(u8 *arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602240.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816028E4.s")
+extern void func_80006F70(Gfx **, s16, s16, s16, s16);
 
+void Fragment11_SetClippedScissor(void *arg0, s16 arg1, s16 arg2, s16 arg3, s16 arg4) {
+    if (arg3 < 0) {
+        arg3 = 0;
+    }
+    if (arg4 < 0) {
+        arg4 = 0;
+    }
+    func_80006F70(arg0, arg1, arg2, arg3, arg4);
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602940.s")
 
 extern f32 D_8160C208;
@@ -393,8 +402,31 @@ void func_81603984(s32 arg0, s32 arg1) {
     func_8004D19C(arg0, arg1, D_8160BDB8, 0, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816039B0.s")
+extern void func_81602240(f32, f32, f32, f32, s32, s32, f32, f32);
+extern void func_8004D1FC(void *);
+extern u32 D_800D0510;
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+extern s32 D_8160BD54;
 
+void Fragment11_DrawThickPanelFrame(arg0, arg1, arg2, arg3)
+s32 arg0; s32 arg1; s32 arg2; s32 arg3;
+{
+    if (arg2 >= 0x10 && arg3 >= 0x10) {
+        gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094E38);
+        func_8004D1FC((void *)(u32)D_8160BD54);
+        gDPSetRenderMode((*(Gfx **)&D_800D0510)++, 0, 0x0F0A7008);
+        func_81602240(arg0, arg1, 16.0f, 16.0f, 0, 0, 1.0f, 1.0f);
+        func_81602240((arg0 + arg2) - 0x10, arg1, 16.0f, 16.0f, 0, 0x10, 1.0f, 1.0f);
+        func_81602240(arg0, (arg1 + arg3) - 0x10, 16.0f, 16.0f, 0, 0x20, 1.0f, 1.0f);
+        func_81602240((arg0 + arg2) - 0x10, (arg1 + arg3) - 0x10, 16.0f, 16.0f, 0, 0x30, 1.0f, 1.0f);
+        func_81602240(arg0, arg1 + 0xF, 15.0f, arg3 - 0x1E, 0, 0xC, 1.0f, 0.0f);
+        func_81602240(arg0 + 0xF, arg1, arg2 - 0x1E, 15.0f, 0, 0x10, 0.0f, 1.0f);
+        func_81602240((arg0 + arg2) - 0xF, arg1 + 0xF, 15.0f, arg3 - 0x1E, 1, 0x1E, 1.0f, 0.0f);
+        func_81602240(arg0 + 0xF, (arg1 + arg3) - 0xF, arg2 - 0x1E, 15.0f, 0, 0x31, 0.0f, 1.0f);
+        gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094F50);
+    }
+}
 extern s32 func_81602940(s32);
 extern void func_8004D1FC(void *);
 void func_81603C84(s32 arg0, s32 arg1, s32 arg2) {
@@ -404,33 +436,103 @@ void func_81603C84(s32 arg0, s32 arg1, s32 arg2) {
     func_8004D19C(arg0, arg1, (void *)value, 0, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81603CD0.s")
+/* mkdraft:Fragment11_DrawTexturedPanelBorder begin */
+extern void func_81602240(f32, f32, f32, f32, s32, s32, f32, f32);
+extern void func_8004D1FC(void *);
+extern u32 D_800D0510;
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+extern s32 D_8160BD58;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81604024.s")
+void Fragment11_DrawTexturedPanelBorder(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 *arg4, s32 *arg5) {
+    if (arg2 >= 0x10 && arg3 >= 0x10) {
+        gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094E38);
+        func_8004D1FC((void *)(u32)D_8160BD58);
+        gDPSetColor((*(Gfx **)&D_800D0510)++, G_SETPRIMCOLOR, (_SHIFTL(((u8 *)arg5)[1], 16, 8) | _SHIFTL(((u8 *)arg5)[2], 8, 8) | _SHIFTL(((u8 *)arg5)[0], 24, 8)));
+        gDPSetColor((*(Gfx **)&D_800D0510)++, G_SETENVCOLOR, (_SHIFTL(((u8 *)arg4)[1], 16, 8) | _SHIFTL(((u8 *)arg4)[2], 8, 8) | _SHIFTL(((u8 *)arg4)[0], 24, 8) | _SHIFTL(0xFF, 0, 8)));
+        gDPSetCombine((*(Gfx **)&D_800D0510)++, 0x50D2A1, 0x33A5B6DB);
+        gDPSetRenderMode((*(Gfx **)&D_800D0510)++, 0, 0x0F0A7008);
+        func_81602240(arg0, arg1, 8.0f, 8.0f, 0, 0, 1.0f, 1.0f);
+        func_81602240((arg0 + arg2) - 8, arg1, 8.0f, 8.0f, 8, 0, 1.0f, 1.0f);
+        func_81602240(arg0, (arg1 + arg3) - 8, 8.0f, 8.0f, 0x10, 0, 1.0f, 1.0f);
+        func_81602240((arg0 + arg2) - 8, (arg1 + arg3) - 8, 8.0f, 8.0f, 0x18, 0, 1.0f, 1.0f);
+        func_81602240(arg0, arg1 + 8, 8.0f, arg3 - 0x10, 0, 7, 1.0f, 0.0f);
+        func_81602240(arg0 + 8, arg1, arg2 - 0x10, 8.0f, 8, 0, 0.0f, 1.0f);
+        func_81602240((arg0 + arg2) - 8, arg1 + 8, 8.0f, arg3 - 0x10, 8, 7, 1.0f, 0.0f);
+        func_81602240(arg0 + 8, (arg1 + arg3) - 8, arg2 - 0x10, 8.0f, 0x18, 0, 0.0f, 1.0f);
+        gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094F50);
+    }
+}
+/* mkdraft:Fragment11_DrawTexturedPanelBorder end */
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816044AC.s")
+void func_81604024(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 *arg5, s32 *arg6)
+{
+  Gfx *gfx;
+  int new_var;
+ do { if ((arg3 > 0) && (arg4 > 0)) { new_var = ((s16) (arg2 * 4)) * ((s16) ((u32) (65536.0f / ((f32) arg4)))); gSPDisplayList((*((Gfx **) (&D_800D0510)))++, D_80094E38); func_8004D1FC((void *) ((u32) D_8160BD5C)); gDPSetColor((*((Gfx **) (&D_800D0510)))++, 0xfa, (((unsigned int) ((((unsigned int) ((u8 *) arg6)[1]) & ((0x01 << 8) - 1)) << 16)) | ((unsigned int) ((((unsigned int) ((u8 *) arg6)[2]) & ((0x01 << 8) - 1)) << 8))) | ((unsigned int) ((((unsigned int) ((u8 *) arg6)[0]) & ((0x01 << 8) - 1)) << 24))); gDPSetColor((*((Gfx **) (&D_800D0510)))++, 0xfb, ((((unsigned int) (((((unsigned int) ((u8 *) arg5)[1]) ^ 0) & ((0x01 << 8) - 1)) << 16)) | ((unsigned int) ((((unsigned int) ((u8 *) arg5)[2]) & ((0x01 << 8) - 1)) << 8))) | ((unsigned int) ((((unsigned int) ((u8 *) arg5)[0]) & ((0x01 << 8) - 1)) << 24))) | ((unsigned int) ((((unsigned int) 0xFF) & ((0x01 << 8) - 1)) << 0))); gDPSetRenderMode((*((Gfx **) (&D_800D0510)))++, 0, 0x0F0A4000); gDPSetCombine((*((Gfx **) (&D_800D0510)))++, 0x50D2A1, 0x33A5B6DB); if (arg0 != 0) { gfx = (*((Gfx **) (&D_800D0510)))++; gfx->words.w0 = (((unsigned int) ((((unsigned int) 0xe5) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((((s16) ((arg1 + arg3) * 4)) > 0) ? ((s16) ((arg1 + arg3) * 4)) : (0))) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((((s16) ((arg2 + arg4) * 4)) > 0) ? ((s16) ((arg2 + arg4) * 4)) : (0))) & ((0x01 << 12) - 1)) << 0)); gfx->words.w1 = (((unsigned int) ((((unsigned int) G_TX_RENDERTILE) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((((s16) (arg1 * 4)) > 0) ? ((s16) (arg1 * 4)) : (0))) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((((s16) (arg2 * 4)) > 0) ? ((s16) (arg2 * 4)) : (0))) & ((0x01 << 12) - 1)) << 0)); { Gfx *_g = (Gfx *) ((*((Gfx **) (&D_800D0510)))++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe1) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) (0 - ((((s16) (arg2 * 4)) < 0) ? ((((s16) ((u32) (65536.0f / ((f32) arg4)))) < 0) ? ((((((s16) (arg2 * 4)) * ((s16) ((u32) (65536.0f / ((f32) arg4))))) >> 7) > 0) ? ((((s16) (arg2 * 4)) * ((s16) ((u32) (65536.0f / ((f32) arg4))))) >> 7) : (0)) : (((new_var >> 7) < 0) ? (new_var >> 7) : (0))) : (0)))) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) (0 - (((arg1 * 4) < 0) ? ((((s16) 0) < 0) ? ((((((s16) (arg1 * 4)) * ((s16) 0)) >> 7) > 0) ? ((((s16) (arg1 * 4)) * ((s16) 0)) >> 7) : (0)) : ((((((s16) (arg1 * 4)) * ((s16) 0)) >> 7) < 0) ? ((((s16) (arg1 * 4)) * ((s16) 0)) >> 7) : (0))) : (0)))) & (((0x01 << 11) << 5) - 1)) << 0))); } ; { Gfx *_g = (Gfx *) ((*((Gfx **) (&D_800D0510)))++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xf1) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) ((u32) (65536.0f / ((f32) arg4)))) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 16) - 1)) << 0))); } ; } else { func_81602240(arg1, arg2, arg3, arg4, 0, 0, 64.0f / ((f32) arg3), 0.0f); } gSPDisplayList((*((Gfx **) (&D_800D0510)))++, D_80094F50); } } while (0);
+}
 
-extern void func_816039B0();
+/* mkdraft:Fragment11_DrawBorderedPanelFill begin */
+extern void func_81602240(f32, f32, f32, f32, s32, s32, f32, f32);
+extern void func_81609344(s32, s32, s32, s32, s32);
+extern void func_81607408(void);
+extern void func_8004D1FC(void *);
+extern u32 D_800D0510;
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+extern s32 D_8160BDBC;
+extern s32 D_8160BDC0;
+
+void Fragment11_DrawBorderedPanelFill(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, u8 *arg5) {
+    if (arg2 >= 0x10 && arg3 >= 0x10) {
+        gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094E38);
+        gDPPipeSync((*(Gfx **)&D_800D0510)++);
+        gDPSetRenderMode((*(Gfx **)&D_800D0510)++, 0x504240, 0);
+        gDPSetColor((*(Gfx **)&D_800D0510)++, G_SETENVCOLOR, (_SHIFTL(arg5[1], 16, 8) | _SHIFTL(arg5[2], 8, 8) | _SHIFTL(arg5[0], 24, 8) | _SHIFTL(0xFF, 0, 8)));
+        if (arg4 == 0) {
+            func_81609344(arg0, arg1, arg2 - 4, arg3 - 4, 1);
+        }
+        func_8004D1FC((void *)(u32)D_8160BDBC);
+        func_81602240(arg0, arg1, 8.0f, 8.0f, 0, 0, 1.0f, 1.0f);
+        func_81602240((arg0 + arg2) - 8, arg1, 8.0f, 8.0f, 0, 8, 1.0f, 1.0f);
+        func_81602240(arg0, (arg1 + arg3) - 8, 8.0f, 8.0f, 0, 0x10, 1.0f, 1.0f);
+        func_81602240((arg0 + arg2) - 8, (arg1 + arg3) - 8, 8.0f, 8.0f, 0, 0x18, 1.0f, 1.0f);
+        func_81602240(arg0, arg1 + 8, 8.0f, arg3 - 0x10, 0, 7, 1.0f, 0.0f);
+        func_81602240(arg0 + 8, arg1, arg2 - 0x10, 8.0f, 7, 0, 0.0f, 1.0f);
+        func_81602240((arg0 + arg2) - 8, arg1 + 8, 8.0f, arg3 - 0x10, 0, 0xE, 1.0f, 0.0f);
+        func_81602240(arg0 + 8, (arg1 + arg3) - 8, arg2 - 0x10, 8.0f, 7, 0x10, 0.0f, 1.0f);
+        gDPSetRenderMode((*(Gfx **)&D_800D0510)++, 0x504240, 0);
+        func_8004D1FC((void *)(u32)D_8160BDC0);
+        func_81602240(arg0 + 3, arg1 + 3, arg2 - 0xA, arg3 - 0xA, 0, 0, (f32)(u32)*(u16 *)(u8 *)(u32)D_8160BDC0 / (f32)(arg2 - 6), (f32)(u32)*(u16 *)((u8 *)(u32)D_8160BDC0 + 2) / (f32)(arg3 - 6));
+        if (arg4 == 0) {
+            func_81607408();
+        }
+        gSPDisplayList((*(Gfx **)&D_800D0510)++, D_80094F50);
+    }
+}
+/* mkdraft:Fragment11_DrawBorderedPanelFill end */
+
+extern void Fragment11_DrawThickPanelFrame();
 extern void func_81608044(s32, s32, s32, s32, f32, s32 *);
 extern u8 D_8160BE50;
 void func_816048E0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, f32 arg4) {
-    func_816039B0();
+    Fragment11_DrawThickPanelFrame();
     func_81608044(arg0 + 8, arg1 + 8, arg2 - 0x13, arg3 - 0x13, 0.0f, &D_8160BE50);
 }
 
-extern void func_81603CD0(s32, s32, s32, s32, s32 *, s32 *);
+extern void Fragment11_DrawTexturedPanelBorder(s32, s32, s32, s32, s32 *, s32 *);
 extern void func_81604024(s32, s32, s32, s32, s32, s32 *, s32 *);
 void func_81604944(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 *arg4, s32 *arg5) {
-    func_81603CD0(arg0, arg1, arg2, arg3, arg4, arg5);
+    Fragment11_DrawTexturedPanelBorder(arg0, arg1, arg2, arg3, arg4, arg5);
     func_81604024(0, arg0 + 5, arg1 + 5, arg2 - 0xD, arg3 - 0xD, arg4, arg5);
 }
 
 extern u8 D_8160BDC4;
 extern u8 D_8160BDC8;
-extern void func_81603CD0(s32, s32, s32, s32, s32 *, s32 *);
+extern void Fragment11_DrawTexturedPanelBorder(s32, s32, s32, s32, s32 *, s32 *);
 extern void func_81604024(s32, s32, s32, s32, s32, s32 *, s32 *);
 void func_816049BC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    func_81603CD0(arg0, arg1, arg2, arg3, (s32 *)&D_8160BDC4, (s32 *)&D_8160BDC8);
+    Fragment11_DrawTexturedPanelBorder(arg0, arg1, arg2, arg3, (s32 *)&D_8160BDC4, (s32 *)&D_8160BDC8);
     func_81604024(0, arg0 + 5, arg1 + 5, arg2 - 0xD, arg3 - 0xD, (s32 *)&D_8160BDC4, (s32 *)&D_8160BDC8);
 }
 
@@ -445,21 +547,44 @@ void func_816054FC(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     func_81604A44(arg0, arg1, arg2, arg3, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_8160551C.s")
+/* mkdraft:func_8160551C begin */
+extern u8 *func_8004CA60(u8 *);
+extern void func_800459AC(u8 *, u8, u8, u16, u16, s32, s32, s32, s32, s32, s32, s32, s32);
+extern s32 D_8160BD64;
+
+void func_8160551C(void) {
+    func_800459AC(
+        func_8004CA60((u8 *)(u32)D_8160BD64),
+        ((u8 *)(u32)D_8160BD64)[4],
+        ((u8 *)(u32)D_8160BD64)[5],
+        *(u16 *)(u8 *)(u32)D_8160BD64,
+        *(u16 *)((u8 *)(u32)D_8160BD64 + 2),
+        1, 0, 1, 1, 5, 5, 0, 0
+    );
+}
+/* mkdraft:func_8160551C end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81605598.s")
 
-extern void func_8160551C(s32, s32, s32, s32);
+extern void func_8160551C(void);
 extern void func_81605598(s32, s32, s32, s32, s32);
-void func_81605908(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { func_8160551C(arg0, arg1, arg2, arg3); func_81605598(arg0, arg1, arg2, arg3, arg4); }
+void func_81605908(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { func_8160551C(); func_81605598(arg0, arg1, arg2, arg3, arg4); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81605950.s")
-
+void func_81605950(void) {
+    func_800459AC(
+        func_8004CA60((u8 *)(u32)D_8160BD68),
+        ((u8 *)(u32)D_8160BD68)[4],
+        ((u8 *)(u32)D_8160BD68)[5],
+        *(u16 *)(u8 *)(u32)D_8160BD68,
+        *(u16 *)((u8 *)(u32)D_8160BD68 + 2),
+        1, 0, 1, 1, 4, 4, 0, 0
+    );
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_816059CC.s")
 
-extern void func_81605950(s32, s32, s32, s32);
+extern void func_81605950(void);
 extern void func_816059CC(s32, s32, s32, s32, s32);
-void func_81605CDC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { func_81605950(arg0, arg1, arg2, arg3); func_816059CC(arg0, arg1, arg2, arg3, arg4); }
+void func_81605CDC(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) { func_81605950(); func_816059CC(arg0, arg1, arg2, arg3, arg4); }
 
 extern void *D_8160BD6C;
 extern void func_81602240(f32, f32, f32, f32, s32, s32, f32, f32);
@@ -527,12 +652,12 @@ f32 func_81606E14(f32 arg0, s32 arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81606E84.s")
 
 extern void func_81606E84(s16 *, s32, s32, f32, s32);
-extern void func_816039B0();
+extern void Fragment11_DrawThickPanelFrame();
 void func_81606F88(s32 arg0, s32 arg1, f32 arg2, s32 arg3) {
     s16 sp20[4];
 
     func_81606E84(sp20, arg0, arg1, arg2, arg3);
-    func_816039B0(sp20[0], sp20[1], sp20[2], sp20[3]);
+    Fragment11_DrawThickPanelFrame(sp20[0], sp20[1], sp20[2], sp20[3]);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81606FE0.s")
@@ -577,18 +702,18 @@ void func_8160732C(void *arg0, void *arg1) {
     (*(s16 *)((u8 *)(arg0) + (6))) = (s16) ((*(s16 *)((u8 *)(arg1) + (6))) - 0x13);
 }
 
-extern void func_816028E4(void *, s32, s32, s32, s32);
+extern void Fragment11_SetClippedScissor(void *, s16, s16, s16, s16);
 extern u32 D_800D0510;
 void func_81607360(s32 arg0) {
-    func_816028E4(&D_800D0510, (s32) (*(s16 *)((u8 *)(arg0) + (0))), (s32) (*(s16 *)((u8 *)(arg0) + (2))), (s32) (*(s16 *)((u8 *)(arg0) + (4))), (s32) (*(s16 *)((u8 *)(arg0) + (6))));
+    Fragment11_SetClippedScissor(&D_800D0510, *(s16 *)((u8 *)(arg0) + (0)), *(s16 *)((u8 *)(arg0) + (2)), *(s16 *)((u8 *)(arg0) + (4)), *(s16 *)((u8 *)(arg0) + (6)));
 }
 
 void func_816073A0(void *arg0) {
-    func_816028E4(&D_800D0510, (s32) (s16) ((*(s16 *)((u8 *)(arg0) + (0))) + 8), (s32) (s16) ((*(s16 *)((u8 *)(arg0) + (2))) + 8), (s32) (s16) ((*(s16 *)((u8 *)(arg0) + (4))) - 0x13), (*(s16 *)((u8 *)(arg0) + (6))) - 0x13);
+    Fragment11_SetClippedScissor(&D_800D0510, (s16) ((*(s16 *)((u8 *)(arg0) + (0))) + 8), (s16) ((*(s16 *)((u8 *)(arg0) + (2))) + 8), (s16) ((*(s16 *)((u8 *)(arg0) + (4))) - 0x13), (*(s16 *)((u8 *)(arg0) + (6))) - 0x13);
 }
 
 void func_81607408(void) {
-    func_816028E4(&D_800D0510, 0, 0, 640, 480);
+    Fragment11_SetClippedScissor(&D_800D0510, 0, 0, 640, 480);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81607440.s")
@@ -822,9 +947,9 @@ f32 func_816092FC(void) {
     return ((f32) sp1C * 60.0f) / (f32) func_80001FF0();
 }
 
-extern void func_816028E4(void *, s32, s32, s32, s32);
+extern void Fragment11_SetClippedScissor(void *, s16, s16, s16, s16);
 extern u32 D_800D0510;
-void func_81609344(s32 arg0,s32 arg1,s32 arg2,s32 arg3,s32 arg4){s32 width=arg4?0x280:0x140; s32 height=arg4?0x1E0:0xF0; if(arg0<0){arg2+=arg0;arg0=0;} if(arg1<0){arg3+=arg1;arg1=0;} if(arg0+arg2>=width)arg2=width-arg0; if(arg1+arg3>=height)arg3=height-arg1; if(arg2<=0||arg3<=0||arg0>=width||arg1>=height||arg0+arg2<=0||arg1+arg3<=0)func_816028E4(&D_800D0510,0,0,0,0); func_816028E4(&D_800D0510,(s16)arg0,(s16)arg1,(s16)arg2,arg3);}
+void func_81609344(s32 arg0,s32 arg1,s32 arg2,s32 arg3,s32 arg4){s32 width=arg4?0x280:0x140; s32 height=arg4?0x1E0:0xF0; if(arg0<0){arg2+=arg0;arg0=0;} if(arg1<0){arg3+=arg1;arg1=0;} if(arg0+arg2>=width)arg2=width-arg0; if(arg1+arg3>=height)arg3=height-arg1; if(arg2<=0||arg3<=0||arg0>=width||arg1>=height||arg0+arg2<=0||arg1+arg3<=0)Fragment11_SetClippedScissor(&D_800D0510,0,0,0,0); Fragment11_SetClippedScissor(&D_800D0510,(s16)arg0,(s16)arg1,(s16)arg2,arg3);}
 
 void func_8160945C(s16 *arg0, s16 *arg1, s16 *arg2, f32 arg3) { arg0[0] = arg1[0] + (arg2[0] - arg1[0]) * arg3; arg0[1] = arg1[1] + (arg2[1] - arg1[1]) * arg3; arg0[2] = arg1[2] + (arg2[2] - arg1[2]) * arg3; arg0[3] = arg1[3] + (arg2[3] - arg1[3]) * arg3; }
 
