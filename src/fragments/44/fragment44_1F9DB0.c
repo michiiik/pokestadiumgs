@@ -80,8 +80,26 @@ s32 func_8AF0C5BC(s16 arg0, s16 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F9DB0/func_8AF0C6F8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F9DB0/func_8AF0C758.s")
+extern void _bzero(s32 *, s32);
+extern s16 func_8AF0C6F8(u8 *);
+extern u8 D_8AF2D5C8[];
+extern u8 D_8AF2D758[];
+extern u8 D_8AF2D8E8[];
+extern u8 D_8AF2E8F8[];
 
+s16 func_8AF0C758(void) {
+    s16 total;
+    s16 temp;
+
+    _bzero((s32 *)D_8AF2E8F8, 0x100);
+    /* Two statements per source line: as1 breaks the jal delay-slot fill tie by
+     * .loc line, and each spill of the previous call's result belongs in the
+     * next call's delay slot. */
+    total = func_8AF0C6F8(D_8AF2D5C8); temp = func_8AF0C6F8(D_8AF2D758);
+    total += temp; temp = func_8AF0C6F8(D_8AF2D8E8);
+    total += temp;
+    return total;
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F9DB0/func_8AF0C7C8.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F9DB0/func_8AF0C96C.s")

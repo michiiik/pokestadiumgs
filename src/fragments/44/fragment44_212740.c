@@ -126,7 +126,26 @@ void func_8AF25DF0(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_212740/func_8AF25EA0.s")
+/* mkdraft:func_8AF25EA0 begin */
+extern u8 D_8AF3A660;
+extern void func_8AF24628(void);
+extern s32 func_8AF25F40(s32);
+
+void func_8AF25EA0(void) {
+    (*(s16 *)((u8 *)(D_8AF3A3C0) + (0x30))) = 0x36;
+    (*(s16 *)((u8 *)(D_8AF3A3C0) + (0x32))) = 0x4B;
+    if (D_8AF3A6E6 >= 0x15) {
+        func_800547F4(D_8AF3A660);
+        func_80051D64(0x13, 0);
+        func_80054E48(3);
+        func_8AF24628();
+        D_8AF3A662 = 3;
+        func_8AF25F40(0);
+        func_8AF00130(0xC2);
+    }
+    D_8AF3A6E6 += 1;
+}
+/* mkdraft:func_8AF25EA0 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_212740/func_8AF25F40.s")
 

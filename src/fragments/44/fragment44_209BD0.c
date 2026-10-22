@@ -25,7 +25,49 @@ s32 func_8AF1B960(s32 arg0, u8 *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_209BD0/func_8AF1BA18.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_209BD0/func_8AF1BAE8.s")
+#ifndef M2C_FIELD /* mkdraft: m2c --valid-syntax helpers */
+#define M2C_UNK s32
+#define M2C_UNK8 s8
+#define M2C_UNK16 s16
+#define M2C_UNK32 s32
+#define M2C_UNK64 s64
+#define M2C_FIELD(expr, type, offset) (*(type)((u8*)(expr) + (offset)))
+#define M2C_BITWISE(type, expr) ((type)(expr))
+#define M2C_ERROR(desc) 0
+#define M2C_TRAP_IF(cond) ((void)0)
+#define M2C_BREAK() ((void)0)
+#define M2C_SYNC() ((void)0)
+#define M2C_CARRY 0
+#define M2C_STRUCT_COPY(dst, src) ((dst) = (src))
+#endif
+extern s32 D_8AF27480;
+extern s32 D_8AF27484;
+extern s32 D_8AF27488;
+extern s32 D_8AF2748C;
+extern void Ui_DrawGradientQuad(s32, s32, s32, s32, u8 *, u8 *);
+extern s16 D_8AF27490;
+
+s32 func_8AF1BAE8(s32 arg0, void *arg1) {
+    s16 temp_a0;
+    s16 sp24;
+    s16 temp_a2;
+    s16 temp_a3;
+
+    if ((arg0 != 0) && (arg0 == 1)) {
+        temp_a0 = M2C_FIELD(arg1, s16 *, 8);
+        sp24 = M2C_FIELD(arg1, s16 *, 0xA);
+        temp_a2 = M2C_FIELD(arg1, s16 *, 0xC);
+        temp_a3 = M2C_FIELD(arg1, s16 *, 0xE);
+        if (D_8AF27490 != 0x27) {
+            if (D_8AF27490 == 0x46) {
+                Ui_DrawGradientQuad((s32) temp_a0, (s32) sp24, (s32) temp_a2, (s32) temp_a3, &D_8AF27480, &D_8AF27484);
+            }
+        } else {
+            Ui_DrawGradientQuad((s32) temp_a0, (s32) sp24, (s32) temp_a2, (s32) temp_a3, &D_8AF27488, &D_8AF2748C);
+        }
+    }
+    return 0;
+}
 
 extern s16 D_8AF27490;
 void func_8AF1BB84(s16 arg0) {
