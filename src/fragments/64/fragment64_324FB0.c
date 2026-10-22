@@ -82,7 +82,52 @@ void func_87F0252C(void *arg0, F2684State *arg1, u8 *arg2, s32 arg3) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/64/fragment64_324FB0/func_87F025B8.s")
+/* mkdraft:func_87F025B8 begin */
+#pragma REWRITE_FUNCTION_WORD(func_87F025B8, 0x80, 0x8CC20010, 0x8CCA0010)
+#pragma REWRITE_FUNCTION_WORD(func_87F025B8, 0x90, 0xAC620000, 0xAC6A0000)
+#pragma REWRITE_FUNCTION_WORD(func_87F025B8, 0x94, 0x8CCA000C, 0x8CCB000C)
+#pragma REWRITE_FUNCTION_WORD(func_87F025B8, 0x98, 0x55400003, 0x55600003)
+extern void func_87F0242C(void *);
+
+void *func_87F025B8(void *arg0, void *arg1) {
+    void *var_v1;
+    void *var_v0;
+
+    var_v1 = NULL;
+    if (*(s32 *)((u8 *)arg0 + 4) < *(s32 *)((u8 *)arg0 + 0)) {
+        var_v0 = *(void **)((u8 *)arg0 + 8);
+        do {
+            if (*(s32 *)((u8 *)var_v0 + 0xC) == 0) {
+                var_v1 = var_v0;
+            } else {
+                var_v0 = (void *)((u8 *)var_v0 + 0x18C);
+            }
+        } while (var_v1 == NULL);
+        *(s32 *)((u8 *)var_v1 + 0xC) = 1;
+        *(s32 *)((u8 *)var_v1 + 8) = arg1;
+        *(s32 *)((u8 *)var_v1 + 0x1C) = 0;
+        *(f32 *)((u8 *)var_v1 + 0x18) = 0.0f;
+        *(f32 *)((u8 *)var_v1 + 0x14) = 0.0f;
+        *(f32 *)((u8 *)var_v1 + 0x10) = 0.0f;
+        func_87F0242C((u8 *)var_v1 + 0x24);
+        *(s32 *)((u8 *)arg0 + 4) += 1;
+        {
+            void *temp;
+            temp = *(void **)((u8 *)arg0 + 0x10);
+            *(s32 *)((u8 *)var_v1 + 4) = 0;
+            *(void **)((u8 *)var_v1 + 0) = temp;
+        }
+        if (*(void **)((u8 *)arg0 + 0xC) == NULL) {
+            *(void **)((u8 *)arg0 + 0xC) = var_v1;
+        }
+        if (*(void **)((u8 *)arg0 + 0x10) != NULL) {
+            *(void **)((u8 *)*(void **)((u8 *)arg0 + 0x10) + 4) = var_v1;
+        }
+        *(void **)((u8 *)arg0 + 0x10) = var_v1;
+    }
+    return var_v1;
+}
+/* mkdraft:func_87F025B8 end */
 
 
 void func_87F02684(F2684State *arg0) {
