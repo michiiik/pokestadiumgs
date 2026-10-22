@@ -480,15 +480,13 @@ with the same trailing alignment bytes. This change preserves that metadata.
 
 ### Remaining evidence
 
-`84130380` remains a requeue. Eight stock/off/on/blank controls on a known
-matching command dispatcher and the retained 256-byte candidate preserve
-the complete objects. Passive allocator trees identify the scan/copy stage
-local as web 6, byte slot -6, allocated physical register 3 in the candidate;
-direct post-increment loads instead introduce explicit boolean materialization
-and do not match. The original 37-word residual remains the best recorded
-advance-before-test/copy-temporary candidate. Next: separate the expression
-web from the flag and loop-cursor roles using the calibrated observation,
-without adding unused state.
+`84130380` is already C in current master `737f43b`. Independent signed
+scan/copy cursors, explicit byte wrapping, and direct indexed accesses
+supersede the private cached-value candidate's 37-word residual. Earlier
+stock/off/on/blank controls and the byte-local allocator observation describe
+that private candidate, not an unresolved owner in the public tree. Do not
+schedule this owner again; consult the current-master source when refreshing
+an older native checkout.
 
 `8412D950` is a requeue. Its active status is a byte at offset 36, saved in a
 real halfword local across the existing calls; party rows have an 88-byte
