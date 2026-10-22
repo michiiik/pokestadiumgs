@@ -36,6 +36,7 @@ func_81804720 = WidgetResources_Release;
 func_818048A4 = WidgetDefinitions_Initialize;
 func_81804A2C = WidgetState_AdvanceTransition;
 func_81804B74 = WidgetResources_UseTransitionWeight;
+GbSave_GetMapObjectPtr = GbSave_GetMapObject;
 /* Fragment 4 state construction and rectangle/resource drawing. */
 func_81804954 = WidgetState_Initialize;
 func_81805308 = WidgetDefinitions_Draw;
@@ -130,6 +131,10 @@ D_80128C5C = D_80128C54 + 0x8;
 /* Attachment scales retain their original addresses inside this C data block. */
 D_86409C4C = fragments_52_fragment52_285F60 + 0xC;
 D_86409C50 = fragments_52_fragment52_285F60 + 0x10;
+
+/* Fragment16 fade-state fields retain their original addresses inside the
+ * C-owned data block (func_82000794's mode/counter/alpha words; the three
+ * still-asm fade users and the in-file C externs keep these spellings). */
 func_87D00020 = fragment65_main;
 func_8F2007B4 = fragment70_main;
 func_8F0007E8 = fragment68_main;
@@ -726,24 +731,7 @@ func_84152EE8 = BattlePlan_AddPerishSongBonus;
 func_841537FC = BattlePlan_AddRainDanceBonus;
 func_84153930 = BattlePlan_AddSunnyDayBonus;
 func_84153B10 = BattlePlan_HasUnfavorableStages;
-func_84153CB8 = BattlePlan_AddPsychUpBonus;
-func_841514F8 = BattlePlan_CountResistingMoveSlots;
-func_841515AC = BattlePlan_AddConversionBonus;
-func_84151E44 = BattlePlan_AddMimicBonus;
-func_8415169C = BattlePlan_AddFlinchBonus;
-func_84152980 = BattlePlan_ScoreCurse;
-func_84151270 = BattlePlan_AddRampageBonus;
-func_84151128 = BattlePlan_ScoreHaze;
-func_84150538 = BattlePlan_ScorePoison;
-func_841506D0 = BattlePlan_ScoreBurn;
-func_84150878 = BattlePlan_ScoreFreeze;
-func_841503B0 = BattlePlan_ScoreSleep;
-func_841509E0 = BattlePlan_ScoreParalysis;
-func_84153028 = BattlePlan_AddSandstormBonus;
-func_841531D4 = BattlePlan_ScoreEndure;
-func_84150B14 = BattlePlan_ScoreStatIncrease;
-func_84150EA4 = BattlePlan_ScoreStatReduction;
-func_84153554 = BattlePlan_AddBatonPassBonus;
+
 /* Campaign rename aliases (branch-relative): forward aliases resolve
    old-name externs against included C; reverse aliases resolve our new-name
    references against origin's still-asm definitions. */
@@ -775,3 +763,21 @@ BattleAnim_InitSwayOffset = func_84120464;
 Audio_LookupScaledRatio_fragment79 = func_84124514;
 MoveDamage_ComputeBase_fragment79 = func_84149568;
 Gfx_DrawTexturedFrame16 = func_8FC00218;
+func_84153CB8 = BattlePlan_AddPsychUpBonus;
+func_841514F8 = BattlePlan_CountResistingMoveSlots;
+func_841515AC = BattlePlan_AddConversionBonus;
+func_84151E44 = BattlePlan_AddMimicBonus;
+func_8415169C = BattlePlan_AddFlinchBonus;
+func_84152980 = BattlePlan_ScoreCurse;
+func_84151270 = BattlePlan_AddRampageBonus;
+func_84151128 = BattlePlan_ScoreHaze;
+func_84150538 = BattlePlan_ScorePoison;
+func_841506D0 = BattlePlan_ScoreBurn;
+func_84150878 = BattlePlan_ScoreFreeze;
+func_841503B0 = BattlePlan_ScoreSleep;
+func_841509E0 = BattlePlan_ScoreParalysis;
+func_84153028 = BattlePlan_AddSandstormBonus;
+func_841531D4 = BattlePlan_ScoreEndure;
+func_84150B14 = BattlePlan_ScoreStatIncrease;
+func_84150EA4 = BattlePlan_ScoreStatReduction;
+func_84153554 = BattlePlan_AddBatonPassBonus;
