@@ -657,6 +657,11 @@
     - [0x10D470, textbin, fragments/16/fragment16_header]
     - [0x10D490, c,       fragments/16/fragment16_code]
     - [0x10F080, data,    fragments/16/fragment16_data]
+    - [0x10F310, .data, fragments/16/fragment16_code] # fade-state static: 16 bytes at 0x82001EA0
+                                                     # (func_82000CB0/CE0 wave-7 migration; IDO
+                                                     # # pads the section, so the old blob's first
+                                                     # # word rides in C to keep the range aligned)
+    - [0x10F320, data]
   
   - name: fragment17
     type: code

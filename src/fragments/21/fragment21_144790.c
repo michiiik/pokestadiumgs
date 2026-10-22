@@ -149,8 +149,14 @@ void func_82504CC8(void *arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82504D40.s")
-
+void func_82504D40(void *arg0, void *arg1) {
+    if ((arg0 != NULL) && ((*(s16 *)((u8 *)arg0 + 8) == 0) || (*(s16 *)((u8 *)arg0 + 8) == 2))) {
+        *(s16 *)((u8 *)arg0 + 8) = 4;
+        *(s16 *)((u8 *)arg0 + 0xC) = 0;
+        *(struct Fragment21PackedWord *)((u8 *)arg0 + 0x1C) = *(struct Fragment21PackedWord *)((u8 *)arg0 + 0x18);
+        *(struct Fragment21PackedWord *)((u8 *)arg0 + 0x20) = *(struct Fragment21PackedWord *)arg1;
+    }
+}
 extern u16 D_82508FF6;
 void func_82504D94(void *arg0, s32 arg1) {
     if ((arg0 != NULL) && ((*(s16 *)((u8 *)(arg0) + (8))) == 2)) {
@@ -391,7 +397,24 @@ s32 func_82507BBC(void) {
     return D_82508FF0 == 4;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82507BD0.s")
+extern s16 D_82508FF0;
+extern s16 D_82508FF2;
+extern s16 D_82508FF4;
+
+/* Ground truth shares one delay-slot `lui $at` across the D_82508FF0/FF2/FF4
+   stores; IDO gives each extern symbol its own lui, so the fold is required. */
+#pragma COALESCE_AT_LUI(func_82507BD0)
+/* mkdraft:func_82507BD0 begin */
+void func_82507BD0(void) {
+    s16 *state = &D_82508FF0;
+    if (*state != 4) {
+        return;
+    }
+    *state = 5;
+    D_82508FF2 = 0;
+    D_82508FF4 = 0;
+}
+/* mkdraft:func_82507BD0 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/21/fragment21_144790/func_82507BFC.s")
 

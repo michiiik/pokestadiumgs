@@ -40,5 +40,65 @@ void func_8280018C(u8 *arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D4C50/func_828001FC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D4C50/func_82800490.s")
+/* mkdraft:fragment10_main begin */
+extern s32 main_pool_push_state(s32);
+extern s32 main_pool_pop_state(s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
+extern void Gfx_FreeDisplayListBuffers(void);
+extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern s32 func_8004C09C(s32);
+extern u8 *func_80047588(s32, s32);
+extern u8 *Asset_LoadToSegment(s32, u8 *, u8 *, s32);
+extern u8 D_1000000[], D_446E30[], D_447D00[];
+extern void func_80008514(s32);
+extern void func_80008624(void);
+extern void func_800086A4(s32);
+extern void StageLoader_WaitForRetrace(void);
+extern void func_80008574(void);
+extern void func_80047610(void);
+extern void func_8004C398(void);
+extern void func_816031AC(void);
+extern s32 func_828001FC(u8 *);
+extern void func_828027C0(u8 *);
+extern u8 D_828029A0[];
+extern u8 D_828029AC[];
+extern s32 D_82802A5C;
+
+s32 fragment10_main(s32 arg0, s16 *arg1) {
+    s32 configuration;
+    s32 result;
+
+    main_pool_push_state(0x43535050);
+    if ((*(s32 *)(arg1 + 2) << 5) >= 0) {
+        Gfx_InitDisplayListBuffers(0x10000, 0);
+        configuration = func_800082E0(1, 0, 2, 0, 2, 1);
+    }
+    func_8004C09C(0x107);
+    func_816031AC();
+    func_8004C8C0(0x154);
+    func_80047588(0x1C, 0);
+    Asset_LoadToSegment(((u32)D_1000000 & 0x0F000000) >> 24, D_446E30, D_447D00, 0);
+    func_82800020(D_828029A0, arg1, arg0);
+    if ((*(s32 *)(arg1 + 2) << 5) < 0) {
+        func_80008624();
+    } else {
+        func_80008514(configuration);
+    }
+    result = func_828001FC(D_828029A0);
+    if (D_82802A5C != 0) {
+        func_800086A4(2);
+    }
+    func_828027C0(D_828029AC);
+    func_80047610();
+    func_8004C398();
+    if ((*(s32 *)(arg1 + 2) << 5) < 0) {
+        StageLoader_WaitForRetrace();
+    } else {
+        func_80008574();
+        Gfx_FreeDisplayListBuffers();
+    }
+    main_pool_pop_state(0x43535050);
+    return result;
+}
+/* mkdraft:fragment10_main end */
 #endif

@@ -2,8 +2,22 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82604390.s")
+extern u32 osSetIntMask(u32 arg0);
+extern s32 D_B0000800;
 
+s32 func_82604390(s32 arg0) {
+    OSIntMask old_mask;
+
+    old_mask = osSetIntMask(OS_IM_NONE);
+    // FAKE: the u-suffixed second mask is codegen load-bearing - a single & 0xFFFF
+    // on the s32-typed global emits a lui+and pair, while the doubled form emits the
+    // target's single andi.
+    if (!(IO_READ(PI_STATUS_REG) & 0x3) && ((D_B0000800 & 0xFFFF) & 0xFFFFu) != 1) {
+        arg0 = -0x80;
+    }
+    osSetIntMask(old_mask);
+    return arg0;
+}
 void func_826043F8(s16 *arg0, s16 *arg1, s32 arg2, s32 arg3) {
     s16 result;
     s16 subresult;
@@ -797,7 +811,38 @@ void func_82609938(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260B424.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_8260B8CC.s")
+/* mkdraft:func_8260B8CC begin */
+extern s32 func_8004C990(s32, s32);
+extern void GfxRect_DrawTextured(s16, s16, s16, s16, s16, s16, s16, s16, s32);
+
+void func_8260B8CC(s32 x, s32 y, s32 width, s32 height) {
+    s32 resource;
+    s32 tile_width;
+    s32 tile_height;
+
+    resource = func_8004C990(81, 0);
+    tile_width = ((u16 *)resource)[0];
+    tile_height = ((u16 *)resource)[1];
+    tile_width /= 4;
+    GfxRect_DrawTextured(x, y, tile_width, tile_height, 0, 0, 1024, 1024, 0);
+    GfxRect_DrawTextured(x + tile_width, y, width - tile_width * 2, tile_height,
+                  tile_width << 5, 0, 0, 1024, 0);
+    GfxRect_DrawTextured(x + width - tile_width, y, tile_width, tile_height,
+                  tile_width << 5, 0, 1024, 1024, 0);
+    GfxRect_DrawTextured(x, y + tile_height, tile_width, height - tile_height * 2,
+                  (tile_width * 2) << 5, 0, 1024, 0, 0);
+    GfxRect_DrawTextured(x, y + height - tile_height, tile_width, tile_height,
+                  (tile_width * 2) << 5, 0, 1024, 1024, 0);
+    GfxRect_DrawTextured(x + tile_width, y + height - tile_height,
+                  width - tile_width * 2, tile_height,
+                  (tile_width * 3) << 5, 0, 0, 1024, 0);
+    GfxRect_DrawTextured(x + width - tile_width, y + height - tile_height,
+                  tile_width, tile_height, (tile_width * 3) << 5, 0, 1024, 1024, 0);
+    GfxRect_DrawTextured(x + width - tile_width, y + tile_height,
+                  tile_width, height - tile_height * 2,
+                  (tile_width * 3) << 5, 0, 1024, 0, 0);
+}
+/* mkdraft:func_8260B8CC end */
 
 extern s32 func_8004D1FC(u8 *);
 extern void func_82607BF4(s16, u8 *, u8 *, s16, s32);

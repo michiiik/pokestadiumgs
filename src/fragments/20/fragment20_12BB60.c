@@ -6,8 +6,27 @@ void func_82603A90(s16 *arg0) {
     *arg0 = -1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12BB60/func_82603A9C.s")
+s16 *func_82603A9C(s16 *arg0, s32 arg1) {
+    s16 *new_var;
+    s16 *current;
+    s16 *result;
+    s32 index;
 
+    result = 0;
+    index = 0;
+    if (arg1 > 0) {
+        current = (new_var = arg0);
+        do {
+            index += 1;
+            if ((*current) == -1) {
+                result = current;
+                break;
+            }
+            current += 0x40A;
+        } while (index != arg1);
+    }
+    return result;
+}
 typedef struct {
     u32 words[2];
 } Pair_82603AD8;
