@@ -744,3 +744,6 @@ func_841531D4 = BattlePlan_ScoreEndure;
 func_84150B14 = BattlePlan_ScoreStatIncrease;
 func_84150EA4 = BattlePlan_ScoreStatReduction;
 func_84153554 = BattlePlan_AddBatonPassBonus;
+func_8412F49C = BattleEffect_HealByWeather;
+func_841315C4 = BattleCommand_RunSequence;
+func_84136CA8 = BattleRecord_AdvanceWriteSlot;

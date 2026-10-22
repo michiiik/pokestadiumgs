@@ -389,3 +389,56 @@ The first trial kept the stale word second formal and cast only at the helper ca
 History audit: fleet main `afee707ab78d3f63f2f9deeadc7551ec0080eeed` has no exact owner attempt. References to this owner in other failed candidates are caller references. The full regional notes provide the record-stride clamp-wrapper recipe and warn about incoming-home and rodata dead ends. The helper's unrelated plateau (normalized 0.8788, raw 0.5455) was read and not retried; no historical owner raw score is available. All open PR scopes were checked before both trials.
 
 Independent validation against master `47055da7fbdf7bda1f80f70fbd626c5d8233ab94`: full US ROM build with default host syntax checks and `COMPARE=1`, followed by successful `md5sum -c baseroms/us/checksum.md5`. Retail MD5: `1561c75d11cedf356a8ddb1a4a5f9d5d`. All 194 previously matched US owners, including merged #915, remained present. This local result does not substitute for the current-head and merge-result Public PR ROM Gate.
+
+## 2026-10-22: weather healing, command sequence, and record write slot
+
+Three owners were accepted by the recorded native candidate runner with the
+ordinary host-syntax-enabled full-ROM comparison, totaling 512 bytes:
+
+| Owner | Name | Bytes |
+| --- | --- | --- |
+| `8412F49C` | `BattleEffect_HealByWeather` | 264 |
+| `841315C4` | `BattleCommand_RunSequence` | 160 |
+| `84136CA8` | `BattleRecord_AdvanceWriteSlot` | 88 |
+
+The healing effect reads current/max HP at offsets 38/40 of the selected
+`D_84195200` record. Weather byte 2500 of `D_841951F0` selects a right shift
+of 1, 0, or 2; the heal is capped by missing HP. Its real helpers are
+`func_84136AF8(u8, s16, s16, u8)` and `func_841366C4(u8, s16)`.
+The shift byte follows the meaningful halfword amount local, recovering
+retail's stack home without padding. Maximum-first equality recovers the
+original branch operands. Weather values outside 0..3 leave the shift
+unspecified in the original owner; the matching source adds no default.
+
+The command sequence dispatches bytes through `D_84185EB0`, stopping at a
+byte at least 254 or a global cursor at least 27. Advancing `D_841951B8` as
+a statement before loading the next command recovers the original temporary
+sequence; pre-increment inside the subscript instead leaves six register
+differences. The slot advance increments byte 19841 of `D_84195280`, wraps
+at 30, and clears the selected 640-byte record. The neighboring record
+writers provide the same stride and index evidence. Array-address spelling
+recovers the original address-add operand order.
+
+Every first successful gate immediately froze the complete changed object,
+four collateral objects, source, ROM, ELF, linked script, layout inputs,
+and original assembly dependencies. External hashes were checked before
+further compilation. Full original-module comparison and the four unchanged
+collateral objects were checked independently. No byte rewrite, artificial
+local, padding, manual unroll, extra argument, or generated coverage edit
+was used. Address aliases preserve the existing callers.
+
+### `84130380`: requeue, scan/copy value lifetimes
+
+The original scans seven stage bytes at record offset 30, advancing its byte
+cursor before checking the current value against 7. If any differs, it copies
+all seven stages from `D_841951BD` to `D_841951BC`, updates the target, and
+emits message 73; otherwise it uses the existing failure helper. Five
+eight-cell families tested cached/inline records, for/do loops, independent
+scan/copy indices and byte values, advance-before-test ordering, promoted
+wrapped cursors, and byte/word flags. The advance-before-test/copy-temporary
+family reaches the original 256-byte size, but still has 37 raw word
+differences, including a v1/a0 and a1/a2 role shift and differing relocation
+positions. This is not a proven register-only residual. Next: capture the
+first scan-value web and determine why it survives in v1 rather than an
+uncolored byte temporary; preserve the two original loop roles. The owner
+remains assembly, with no near-match installed.

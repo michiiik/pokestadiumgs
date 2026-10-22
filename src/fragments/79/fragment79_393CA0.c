@@ -2690,7 +2690,52 @@ void func_8412F39C(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412F49C.s")
+extern void func_841366C4(u8, s16);
+extern void func_84135B40(u16);
+extern void func_84136AF8(u8, s16, s16, u8);
+extern u8 D_841951BC;
+extern void * D_841951F0;
+extern u8 * D_84195200[];
+void BattleEffect_HealByWeather(void) {
+    u16 amount;
+    u8 shift;
+    s32 missing;
+    s32 healing;
+    u16 maximum_hp;
+    u16 current_hp;
+    u8 *pokemon;
+    pokemon = D_84195200[D_841951BC];
+    maximum_hp = *(u16 *)(pokemon + 40);
+    current_hp = *(u16 *)(pokemon + 38);
+    if (maximum_hp == current_hp) {
+        func_841366C4(D_841951BC, -1);
+        func_84135B40(118);
+        return;
+    }
+    switch (((u8 *)D_841951F0)[2500]) {
+    case 0:
+        shift = 1;
+        break;
+    case 2:
+        shift = 0;
+        break;
+    case 1:
+    case 3:
+        shift = 2;
+        break;
+    }
+    missing = maximum_hp - current_hp;
+    healing = maximum_hp >> shift;
+    if (missing < healing) {
+        amount = missing;
+    } else {
+        amount = healing;
+    }
+    *(u16 *)(pokemon + 38) = current_hp + amount;
+    func_84136AF8(D_841951BC, -1, amount, 1);
+    func_841366C4(D_841951BC, -1);
+    func_84135B40(80);
+}
 #endif
 
 #ifdef VERSION_US
@@ -3479,7 +3524,18 @@ void BattleAnim_Table_84186004_082(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841315C4.s")
+extern void (*D_84185EB0[])(void);
+extern u8 D_84195198[];
+extern s32 D_841951B8;
+void BattleCommand_RunSequence(void) {
+    s32 command = D_84195198[0];
+    D_841951B8 = 0;
+    while (command < 254 && D_841951B8 < 27) {
+        D_84185EB0[command]();
+        D_841951B8++;
+        command = D_84195198[D_841951B8];
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -4765,7 +4821,14 @@ void func_84136C48(u8 arg0, u8 arg1, s32 arg2, u16 arg3) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84136CA8.s")
+extern u8 D_84195280[];
+void BattleRecord_AdvanceWriteSlot(void) {
+    D_84195280[19841] += 1;
+    if (D_84195280[19841] >= 30) {
+        D_84195280[19841] = 0;
+    }
+    _bzero(&D_84195280[D_84195280[19841] * 640], 640);
+}
 #endif
 
 #ifdef VERSION_US
