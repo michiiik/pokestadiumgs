@@ -516,7 +516,13 @@ extern void Fragment11_DrawThickPanelFrame();
 extern void func_81608044(s32, s32, s32, s32, f32, s32 *);
 extern u8 D_8160BE50;
 void func_816048E0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, f32 arg4) {
+#ifdef CC_CHECK
+    /* Retail calls this with the caller's registers untouched; the K&R definition above reads as a
+       prototype to clang, so the host check needs the argument-less call spelled through a cast. */
+    ((void (*)(void))Fragment11_DrawThickPanelFrame)();
+#else
     Fragment11_DrawThickPanelFrame();
+#endif
     func_81608044(arg0 + 8, arg1 + 8, arg2 - 0x13, arg3 - 0x13, 0.0f, &D_8160BE50);
 }
 
