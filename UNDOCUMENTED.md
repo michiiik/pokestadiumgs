@@ -3,11 +3,11 @@
 # Undocumented code
 
 <!-- AUTO_UNDOCUMENTED:START -->
-- Functions defined in `src/` with a `/* ... */` comment: **22 / 7,018 (0.3%)**
-- Functions with a real name: **1,458 / 10,901 (13.4%)** (9,443 still `func_XXXXXXXX`)
+- Functions defined in `src/` with a `/* ... */` comment: **22 / 7,036 (0.3%)**
+- Functions with a real name: **1,476 / 10,901 (13.5%)** (9,425 still `func_XXXXXXXX`)
 - Variables with a real name: **248 / 4,041 (6.1%)** (3,793 still `D_XXXXXXXX` / `jtbl_XXXXXXXX`)
 - Functions still using m2c `temp_*` / `var_*` locals: **804**
-- Functions with generic `arg0`, `arg1`, ... parameters: **4,363 / 7,018 (62.2%)**
+- Functions with generic `arg0`, `arg1`, ... parameters: **4,363 / 7,036 (62.0%)**
 - Structs with generic fields (`unk_XX`, `pad`, `field_XX`): **686 / 1,268**
 - Struct fields with a real name: **3,595 / 5,567 (64.6%)**
 - Raw `*(T *)(base + 0xNN)` offset accesses that bypass a struct field: **5,897**
@@ -61,7 +61,7 @@ Generic fields are named unk/pad/field/filler with an optional hex suffix; neste
 | `src/fragments/45/fragment45_2251A0.c` | 43 | 43 | 102 | 53 | 8 | 22 | 16 |
 | `src/47580.c` | 71 | 71 | 82 | 23 | 5 | 39 | 11 |
 | `src/fragments/6/fragment6_code.c` | 37 | 37 | 83 | 29 | 10 | 31 | 37 |
-| `src/fragments/79/fragment79_3BF4C0.c` | 43 | 43 | 77 | 2 | 0 | 30 | 69 |
+| `src/fragments/79/fragment79_3BF4C0.c` | 61 | 61 | 64 | 2 | 0 | 30 | 69 |
 | `src/fragments/17/fragment17_10FFC0.c` | 33 | 33 | 68 | 40 | 7 | 21 | 43 |
 | `src/fragments/47/fragment47_24E0A0.c` | 31 | 31 | 82 | 19 | 4 | 30 | 44 |
 | `src/fragments/14/fragment14_F81B0.c` | 47 | 47 | 86 | 2 | 7 | 46 | 18 |
