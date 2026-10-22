@@ -37,7 +37,100 @@ void func_82600CF4(void *arg0) {
     (*(u16 *)((u8 *)(arg0) + (0x26))) = (u16) (*(u16 *)((u8 *)(arg0) + (0x28)));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82600D38.s")
+// Stat experience consumed by Pokemon_CalculateStat through func_80071E48.
+//@src/615D0.c
+//@src/728D0.c
+typedef struct {
+    u8 unk_00[12];
+    u16 hp_stat_exp;
+    u16 attack_stat_exp;
+    u16 defense_stat_exp;
+    u16 speed_stat_exp;
+    u16 special_stat_exp;
+    u8 unk_16[66];
+} RecordSelectionWorkingEntry;
+typedef struct {
+    u8 unk_00[144];
+    RecordSelectionWorkingEntry groups[4][6];
+} RecordSelectionWorkingGrid;
+typedef char RecordSelectionWorkingEntrySize[sizeof(RecordSelectionWorkingEntry) == 88 ? 1 : -1];
+typedef char RecordSelectionWorkingGridSize[sizeof(RecordSelectionWorkingGrid) == 2256 ? 1 : -1];
+extern void func_80035700(u32);
+extern s32 func_8006AED4(s32, void *);
+extern void func_80071E48(void *, void *);
+// func_80071B58 indexes 152-byte rows; func_80071BB8 reads count and Pokemon.
+//@src/72720.c
+typedef struct {
+    u8 bytes[24];
+} RecordPartyPackedPokemon;
+typedef struct {
+    u8 metadata[4];
+    u8 count;
+    u8 unk_05[3];
+    RecordPartyPackedPokemon pokemon[6];
+} RecordPartyPackedRow;
+typedef char RecordPartyPackedRowSize[sizeof(RecordPartyPackedRow) == 152 ? 1 : -1];
+void RecordSelection_PrepareTwoParties(u8 *context, s32 randomize) {
+    u8 row_count;
+    u8 *direct_first;
+    u8 *direct_second;
+    u8 *profiles[3];
+    s32 side;
+    s32 record;
+    s32 selected[6];
+    s32 pair_choices[6][2];
+    s32 permutation[3];
+    u8 divisor;
+    RecordPartyPackedRow *row;
+    RecordSelectionWorkingEntry *entry;
+    row_count = (*(u8 **)(context + 12))[0];
+    direct_first = *(u8 **)(context + 12) + 4;
+    direct_second = *(u8 **)(context + 12) + 156;
+    profiles[0] = *(u8 **)(context + 12) + 308;
+    profiles[1] = *(u8 **)(context + 12) + 460;
+    profiles[2] = *(u8 **)(context + 12) + 612;
+    if (randomize != 0) {
+        if (*(u32 *)(context + 152) != 0) func_80035700(*(u32 *)(context + 152));
+        RecordSelection_ChooseSortedIndices(selected, 6, row_count);
+        for (record = 0; record < 6; record++) {
+            func_82600A40(permutation, 3, 3);
+            pair_choices[record][0] = permutation[0];
+            pair_choices[record][1] = permutation[1];
+        }
+    }
+    side = 0;
+    do {
+        if (randomize != 0) {
+            record = 0;
+            do {
+                row = (RecordPartyPackedRow *)(selected[record] * 152 + *(u8 **)(context + 12) + 4);
+                entry = &((RecordSelectionWorkingGrid *)*(u8 **)context)->groups[side][record];
+                func_80071E48(entry, &row->pokemon[pair_choices[record][side]]);
+                if ((*(s8 **)context)[side] == -1) {
+                    switch ((*(s16 *)(*(u8 **)context + 12))) {
+                    case 0: divisor = 4; break;
+                    case 1: divisor = 2; break;
+                    default: divisor = 1; break;
+                    }
+                    entry->hp_stat_exp /= divisor;
+                    entry->attack_stat_exp /= divisor;
+                    entry->defense_stat_exp /= divisor;
+                    entry->speed_stat_exp /= divisor;
+                    entry->special_stat_exp /= divisor;
+                    func_82600CF4(entry);
+                }
+                record++;
+            } while (record != 6);
+        }
+        if (side == 0) {
+            func_8006AED4(side, direct_first);
+        } else {
+            if ((*(s16 *)(*(u8 **)context + 12)) == -1) func_8006AED4(side, direct_second);
+            else func_8006AED4(side, profiles[(*(s16 *)(*(u8 **)context + 12))]);
+        }
+        side++;
+    } while (side != 2);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82601070.s")
 

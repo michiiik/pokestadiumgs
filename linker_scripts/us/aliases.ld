@@ -820,3 +820,4 @@ func_82603814 = RecordOwners_AnyUnassigned;
 func_82602B9C = RecordNames_LoadTwoSlotsOptionalDefaults;
 func_826039A0 = RecordSelection_RunPhaseLoop;
 func_82600BA0 = RecordSelection_ChooseSortedIndices;
+func_82600D38 = RecordSelection_PrepareTwoParties;

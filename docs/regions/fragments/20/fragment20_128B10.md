@@ -378,3 +378,54 @@ array stack homes, divisor branch topology, and temporary order still differ.
 Next: test selector/divisor lifetime reuse and inspect the real local-area
 layout; do not inflate the permutation or selected arrays, add padding,
 invent reads, or force allocation.
+
+The next eight candidates reuse the profile selector as the divisor and vary
+the placement of the three real arrays relative to used scalar locals. They
+remain rejected at 820 bytes (best reported raw 0.8010); neither family fixes
+the stack homes or the missing instruction. A logging-only frame trace then
+passes eight stock/off/on/leading-blank complete-object controls for the
+accepted sorted-selector sibling and this retained parent. The parent has a
+216-byte frame: 48 bytes at the saved-register phase, a 16-byte local area,
+and a 152-byte area added before entry/exit emission. The frame total already
+matches retail; this is an internal-home ordering problem, not evidence for
+additional storage. The same trace identifies the packed-row and destination
+induction webs in S1/S2. Next inspect their expression lifetimes and the
+profile-to-divisor branch before changing the declarations again.
+
+### Resolved: `82600D38` two-party preparation
+
+`RecordSelection_PrepareTwoParties` is accepted at 824 bytes through the
+recorded native runner and normal host-syntax-enabled full-US-ROM gate.
+With randomization enabled it selects six distinct sorted table rows and
+uses an independent three-element permutation for each row to choose one
+packed Pokemon for each of two parties. An optional nonzero seed initializes
+the deterministic RNG. Unassigned sides scale HP, Attack, Defense, Speed,
+and Special stat experience by the selected profile's divisor and refresh
+their calculated stats. Metadata loading runs for both sides even when
+randomization is disabled.
+
+The final source mechanisms are independently explainable. The divisor is
+unsigned and only takes one, two, or four; the profile selector remains a
+signed halfword. Placing the three real arrays after the two loop indices
+matches their stack locations without changing their sizes or introducing
+storage. Evaluating the selected row index before its table pointer restores
+the temporary lifetime. This leaves exactly one swapped-source `addu` at
+owner offset 308; eight byte-pointer arithmetic spellings do not fix it.
+
+The last instruction resolves with the actual packed-row model: an eight-
+byte header followed by six 24-byte Pokemon records. `func_80071B58` in
+`src/72720.c` establishes the 152-byte row stride; `func_80071BB8` reads
+the count at offset four and records at offset eight, bounded to six.
+`func_80071E48` supplies the unpacked record and stat-experience evidence.
+Ordinary `row->pokemon[index]` member indexing produces the exact operand
+order. A pointer-addition spelling on the same member remains one word off.
+The implementation has no instruction rewrite, padding, unused variable,
+extra read, fabricated ABI, or manually unrolled generic array loop.
+
+The first successful gate froze source, complete module, four collateral
+objects, layout/assembly dependencies, linked script, ROM, and ELF before
+further compilation. Independent external hashes, complete-module game
+sections/bytes/extents/semantic relocations, unchanged collateral and foreign
+files, and US ROM MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d` passed. The
+earlier requeue entries above describe the rejected parents, not the final
+accepted body.
