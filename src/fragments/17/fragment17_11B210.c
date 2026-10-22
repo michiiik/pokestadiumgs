@@ -203,9 +203,70 @@ void func_8220BE84(s16 *arg0) {
     arg0[2] = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220BE94.s")
+/* mkdraft:func_8220BE94 begin */
+extern s32 D_8220E070;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/17/fragment17_11B210/func_8220BF68.s")
+void func_8220BE94(void *arg0) {
+    Fragment17Panel *panel = (Fragment17Panel *)arg0;
+    s32 counter;
+    s32 divisor;
+
+    panel->counter = panel->counter + (counter = panel->counter, divisor = D_8220E070, 1);
+    if (panel->counter < divisor) {
+        panel->pair_0A.x = (panel->pair_0E.x * panel->counter) / divisor;
+        panel->pair_0A.y = (panel->pair_0E.y * panel->counter) / divisor;
+        return;
+    }
+    panel->state = 0;
+    panel->counter = 0;
+    panel->pair_0A.x = panel->pair_0E.x;
+    panel->pair_0A.y = panel->pair_0E.y;
+}
+/* mkdraft:func_8220BE94 end */
+
+/* mkdraft:func_8220BF68 begin */
+s32 func_80054E10(void);
+extern s16 D_82210C30;
+extern s16 D_82210C32;
+extern s16 D_82210C34;
+extern s16 D_82210C36;
+extern s16 D_82210C38;
+extern s32 D_82210C40;
+extern u8 D_82210C44;
+
+#pragma COALESCE_AT_LUI(func_8220BF68, D_82210C32, D_82210C34, D_82210C36)
+#pragma REWRITE_FUNCTION_WORD(func_8220BF68, 0x20, 0x340FFFFF, 0x240FFFFF)
+#pragma SWAP_FUNCTION_WORDS(func_8220BF68, 0x68, 0x00008025, 0x24120002)
+
+
+void func_8220BF68(s32 arg0) {
+    u8 *var_s1;
+    s32 var_s0;
+
+    if (func_80054E10() != 0) {
+        D_82210C30 = 1;
+    } else {
+        D_82210C30 = 0;
+    }
+    D_82210C32 = 0;
+    D_82210C34 = 0;
+    *(u16 *)&D_82210C36 = -1;
+    D_82210C38 = -1;
+    D_82210C40 = arg0;
+    var_s1 = &D_82210C44;
+    var_s0 = 0;
+    do {
+        func_8220BD00(var_s1, var_s0);
+        var_s0 += 1;
+        var_s1 += 0x16;
+    } while (var_s0 != 2);
+    func_8004C8C0(0x52);
+    func_8004C8C0(0x51);
+    func_8004C8C0(0x11D);
+    func_8004C8C0(0x79);
+    func_8004C4B0(0x12);
+}
+/* mkdraft:func_8220BF68 end */
 
 extern void func_8220BD90(s16 *);
 extern void func_800226C0(s32);
