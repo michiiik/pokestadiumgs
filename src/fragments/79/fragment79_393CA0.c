@@ -1186,7 +1186,7 @@ void BattleDamage_RollCriticalHit(void) {
 #ifdef VERSION_US
 extern s32 D_841951C8;
 
-// Same function as func_84125080 (aliases.ld); this caller declares the return as
+// Same function as func_84125080 (undefined_syms.ld); this caller declares the return as
 // unsigned short because that type puts the result in a separate temp, which IDO
 // colors v1 via `move v1,v0` in both loop delay slots. The callee returns an lbu byte.
 extern unsigned short func_84125080_u16();
