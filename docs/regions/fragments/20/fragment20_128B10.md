@@ -170,3 +170,146 @@ and inspect exact register/operand differences. Keep the known descriptor
 dimensions (8-byte header plus twelve 88-byte entries = 1064) without
 inventing the checked field's gameplay meaning. No candidate for this owner
 has been installed.
+
+## 2026-10-23: optional default names and remaining selection phases
+
+`82602B9C` is accepted as `RecordNames_LoadTwoSlotsOptionalDefaults`
+(344 bytes). It uses the two real direct-row pointers and three real profile
+pointers of `RecordNames_LoadTwoSlots` at `82601D2C`. Owner -1 selects the
+profile indexed by the state halfword at offset 12; owner -2 preserves its
+name; other owners copy their direct-row name only when `use_defaults` is
+nonzero. A failed lookup also preserves the destination. Both destinations
+are 12-byte slots at state offset 2256.
+
+Transferring the accepted sibling's switch and declaration order recovers
+the allocation and real array homes. The conditional default row must be
+expressed as a conditional expression: an equivalent initial-zero/conditional
+assignment retained 14 instruction differences. Initializing state before
+the first direct-row expression matches; reversing those statements retained
+two instruction differences. Every array entry is initialized and used.
+No extra array capacity, unused local, artificial read, padding, instruction
+rewrite, or forced frame/register is introduced.
+
+The recorded native runner accepted this owner through the ordinary
+host-syntax-enabled US full-ROM gate. Its first successful gate immediately
+froze source, complete changed module, four collateral objects, ROM/ELF,
+linked script, layout inputs, and original assembly dependencies. External
+hashes, whole-module equality, unchanged collateral objects, and ROM MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d` passed independently before further
+compilation. This is the first accepted owner of the next publication batch.
+
+### Requeue: `82602FE8` count and descriptor views
+
+Follow-up count-lifetime variants reach 252 bytes with 30 differing instruction
+words and an allocation-only diagnostic. Keeping a bound pointer initialized
+at the descriptor, then extending it only inside the positive-count guard,
+recovers retail's count A3 and scan-end A1 in one parent. Its preserved base
+and byte cursor remain swapped. Moving the actual incoming argument instead
+of a separate cursor changes bulk-loop induction and emits 248 bytes.
+Resetting that argument for the second scan does not close the difference.
+
+A second calibrated 90-second source search improves its own score from
+225 to 180, without matching. Review finds its base-to-unchanged-context
+substitution semantically valid; a same-line initialization group improves
+the score further. Neither is acceptance evidence, and the packed source
+is not installed. Keep both the original 252-byte parent and this measured
+partial improvement. Next: compare their exact allocation webs before
+another source-lifetime family; do not replay parameter-walk, count-width,
+byte-view, declaration-only, or cursor-reset families unchanged.
+
+### Requeue: `82603870` phase dispatcher
+
+The natural four-case switch reaches 304 bytes with the correct frame,
+state-pointer home, result home, and branch/call body. The best parent has
+raw similarity 0.9474; nine to ten instruction words differ in its opening
+global counter address/update sequence. IDO retains the counter's address
+in V1 while retail uses separate high/low load and store references.
+Plain `++`, `+= 1`, explicit addition in either operand order, and a named
+tick snapshot do not close it. Changing the snapshot into a new local
+worsens allocation and sometimes the frame; it is not installed.
+
+Required interface evidence: `StageContext_GetFadeMode` returns `u8`
+in `src/8470.c`; `Audio_RequestIfChanged` (alias `800355E4`) returns `s32`
+in `src/229E0.c`; `82614F0C` returns `s32` in
+`src/fragments/20/fragment20_12C460.c`; assembly `80044144` dereferences
+its argument, so its argument is a pointer. Prototypes must precede their
+first uses in the existing `82602930` sibling, not only this new candidate.
+Companion edits can hoist them without changing that sibling's object.
+The runner synthesizes declarations before applying companions: explicitly
+supply these same interfaces in the batch declarations as well, or its
+cross-file fallback injects conflicting void-return/integer-argument forms.
+These context failures are not source-shape rejections.
+
+Next: obtain a calibrated logging-only allocation/expression trace for the
+global address common subexpression. The ordinary source-level counter
+families above are already measured; do not add volatile qualifiers or
+instruction rewrites to suppress the commoning.
+
+### Resolved: `826039A0` enclosing phase loop
+
+`RecordSelection_RunPhaseLoop` is accepted through the recorded runner and
+ordinary host-syntax-enabled US full-ROM gate. It advances `82603870` until
+phase four while updating the background, UI, and selection view. After the
+loop, `826058CC` classifies the saved state's byte-seven mode: modes zero
+and four return zero, one and three return one, and other modes return -1
+(`src/fragments/20/fragment20_12C460.c`). Category zero permits the two
+finishing actions selected by the saved high byte at state offset eight:
+`0x300` invokes `826036DC`, and `0x600` invokes `826037BC`.
+
+The first natural loop retained six frame/home instruction differences.
+Calibrated logging-only UGEN frame diagnostics passed stock/off/on/20-leading-
+blank controls for both the accepted `82602A0C` sibling and retained parent.
+They locate the missing space in the local area, not extra saved registers
+or invented arguments. Keeping the actual mode-category query result as a
+named, used local resolves it: category, state pointer, mode group, next
+phase, and current phase are all initialized and used. The 48-byte frame
+places the pointer at stack offset 40 and the mode group at 38. There is
+no unused local or artificial storage.
+
+First-success artifact verification distinguishes instruction extent from
+terminal section alignment. The assembly owner reports 240 bytes, including
+two trailing zero words. IDO reports 232 instruction bytes ending in the
+retail `jr ra` / stack-restore epilogue, followed by the same eight natural
+section-alignment bytes outside its function symbol. The entire text section
+has the same length and bytes; every other function extent and all semantic
+relocations agree. The initial strict symbol-size comparison correctly
+surfaced this metadata difference; the follow-up audit checks exactly this
+single terminal 240-versus-232 case, its epilogue, and its eight-byte tail.
+No source padding, helper, or object modification produces these bytes.
+
+The first successful gate froze source, complete module, four collateral
+objects, layout/assembly inputs, linked script, ROM, and ELF before further
+compilation. External hashes, whole-module byte/relocation equality with the
+explicit terminal-alignment audit, unchanged collateral objects, and a full
+`cmp` against the US baserom passed. ROM MD5 remains
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. This is the second accepted owner in
+the current publication batch: 576 instruction bytes plus eight natural
+terminal alignment bytes across the two original owner extents.
+
+### Phase-dispatcher diagnostic follow-up
+
+The calibrated `82603870` trace passes known-owner and retained-parent
+stock/off/on/20-leading-blank complete-object controls. It identifies the
+counter address as an allocator web selected into V1 in phase one, rather
+than a delay-slot or post-link issue. A stock IDO 5.3 versus 7.1 control also
+produces the same candidate prefix and the same known complete module.
+Neither stock C driver resolves this parent; no compiler selection changed.
+The next experiment must change that address-expression web through genuine
+source structure, not add register pressure or alter instruction bytes.
+
+### Requeue: `82602710` viewport border fill
+
+The signed halfwords at context offsets 160 and 164 through 170 select
+full-screen fill or four border rectangles around a 640-by-480 viewport.
+`GfxImage_FillRectangle` in `src/7A50.c` takes a display-list pointer,
+four signed 32-bit geometry arguments, and a 16-bit color. The initial
+natural geometry family compiles to 332 bytes versus retail's 376, with
+S0/S1 saved rather than retail's caller-saved geometry. Separate, used
+left/right border heights and a pointer initialized only in the draw
+branch improve the structural size to 360/364 bytes, but still save S0
+and retain operand/scheduling differences (best reported raw similarity
+0.3085). Typed/raw views, width/height ordering, and moving the constants
+to the end of the subtraction do not resolve it. No candidate is installed.
+Next: inspect the retained branch-local pointer's allocation/liveness and
+the independent border geometry, preserving the reloads after drawing
+calls rather than retaining stale viewport fields across them.
