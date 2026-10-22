@@ -30,7 +30,7 @@ void func_8410878C(s32 arg0, s32 arg1, s32 arg2) {
     D_841901B8 = 1;
 }
 
-extern void func_8410874C(arg0, arg1, arg2);
+extern void func_8410874C();
 extern u8 *D_84193DD0;
 void func_841089D8(s32 arg0);
 void func_841087B8(s32 arg0, s32 arg1, s32 arg2) {
