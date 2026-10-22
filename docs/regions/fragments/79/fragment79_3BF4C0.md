@@ -737,3 +737,148 @@ compilation. Six cleanup/naming/ABI controls and eleven independent links
 preserve all 66 original extents and 19,440 retail text bytes. Scoped cleanup
 removes 22 redundant declarations. Eight assembly owners remain; the earlier
 party-count and Protect/Detect checkpoints are still unresolved.
+
+## Accepted Baton Pass stage scoring
+
+On native revision `4df0ebbe`, `84153554` accepts as 452 bytes of genuine
+C. Baton Pass (226) has effect 127 in the local move table; the original
+effect dispatcher routes it through `.L841547A0` to this owner. The intended
+name is `BattlePlan_AddBatonPassBonus`. It requires header byte 2 at least
+2, computes table byte 46 times `8414A2AC`, and compares header byte 1 to
+the side's `D_841951F8` header byte 10. On equality, each of the record's
+seven stage bytes at least 8 adds one quarter of that signed amount to the
+plan score. The plan flag is marked even when the IDs differ; the outer
+header-count guard still exits without marking it.
+
+The exact source uses an ID-mismatch guard leading to the common flag
+write, an integer header base, and a natural seven-iteration `do/while`
+loop. IDO performs the original three-plus-four unroll; the C source is not
+manually unrolled. A real signed `stage_index = i + 13`, initialized before
+its array read in each iteration, reproduces the final address-operand
+order. Every local is consumed by actual loads, comparisons, calls or
+arithmetic. No extra argument, dummy read/local, forced frame/register,
+volatile access, padding or instruction rewrite is present.
+
+The retained winner is `native-f79-plan-stage-loop-entry` candidate 5.
+Ordinary positive-ID blocks initially give different prologues and loop
+address lifetimes. The ID-mismatch guard first reproduces all positional
+opcodes, the 40-byte frame and relocation topology, leaving a coherent
+three-register rotation. Eight stock/off/on/leading-blank whole-object
+controls calibrate the allocation trace at procedure 63. A restricted,
+calibrated 45-second source-only permuter improves its score from 180 to
+170 by proposing the real field-index local; direct runner tests retain
+that one-operand improvement but do not yet close the rotation. Reopening
+loop entry changes the basin: `do/while` fixes the rotation, and composing
+the independently measured field-index local fixes its remaining operand
+order. Ninety-six source cells are prepared across the recorded families;
+the accepted body is directly link-verified and passes the ordinary
+host-syntax-enabled full-ROM gate.
+
+Its first-success source, whole module object, four collateral objects,
+ROM, ELF, linked script, layouts and original assembly are frozen and
+externally hashed before any further compilation. Independent verification
+preserves all original text, extents and collateral objects and all foreign
+dirty paths. Seven assembly owners remain. This acceptance starts the next
+batch; scoped cleanup and semantic naming remain pending.
+
+The read-only rodata planner identifies the next layout prerequisite for
+`84150B14`, `84150EA4` and `84153E28`: assign the complete file-owned run
+at ROM `0x3FB9D0..0x3FBCA0`, including its constants and three jump tables,
+to `.rodata, fragments/79/fragment79_3BF4C0`. The start is earlier than the
+first jump table at `0x3FBA00`; moving only the tables would omit the file's
+constants. No layout file is changed at this checkpoint. Re-splitting and
+an ordinary full-ROM gate with all three assembly owners still intact must
+precede switch candidates. Preserve the existing linker aliases and the
+following `fragment79_3C50B0` rodata boundary at `0x3FBCA0`.
+
+## Verified scoring read-only subsegment
+
+The layout prerequisite above is now closed on native revision `4df0ebbe`
+plus this batch. The file owns the 720-byte range at ROM
+`0x3FB9D0..0x3FBCA0` / VRAM `0x8418C140..0x8418C410`: five double
+constants and the complete tables `jtbl_8418C170`, `jtbl_8418C184` and
+`jtbl_8418C198`. The existing next-file boundary is unchanged. The linker
+places the shortened `3FB010.rodata.o` before the new file-owned range;
+all separate symbol aliases remain intact.
+
+Pinned spimdisasm `1.35.0-dev0` re-splits a private staged tree before
+installation. Independent ordinary and leading-blank object links preserve
+all 19,440 retail text bytes and all 720 read-only bytes. Four affected
+assembly owners (`8414FC30`, `84150B14`, `84150EA4`, `84153E28`) retain
+their original instruction words while receiving their local data.
+
+The ordinary host-syntax-enabled full-ROM gate passes with those four
+assembly owners still intact, producing ROM MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Its first-success freeze contains
+33 distinct externally hashed artifacts, including fourteen complete
+objects. Independent checks preserve all 66 defined function extents,
+twelve unchanged collateral objects and every unrelated dirty path.
+The three switch owners are eligible for C probes; this layout change
+does not itself count as a decompiled function.
+
+## Accepted opposing-stage reduction scorer
+
+`84150EA4` now accepts as 644 bytes of genuine C, with intended name
+`BattlePlan_ScoreStatReduction`. Its existing `BattlePlan_ScoreHaze`
+caller supplies each of the seven stage indices and the amount needed to
+return a boosted opposing stage to neutral. The original effect dispatcher
+also calls it with constant stat indices and one- or two-stage reductions.
+It rejects opposing flags `0x10` and 2, a stage below 2, and a primary stat
+below 2. Damaging moves additionally require a nonzero result from
+`84155574` for the move type. The reduction is clamped above the minimum,
+then scales the stage coefficient, table byte `30 + stage`, and chance.
+Five primary-stat switch cases apply physical/special-move bonuses or a
+speed comparison before the common score and flag update.
+
+The exact source uses the existing typed plan and stage views, a real
+move-type local, and a direct `switch (stage)`. Removing redundant named
+stage and opposing-side carriers eliminates extra spill homes. Constructing
+the header after both state lookups orders the remaining expression spills
+correctly: opposing side at stack 40, header at 36, stage at 28. Before that
+last lifetime change, five instruction words differed solely because the
+header and opposing-side slots were exchanged. All locals serve actual
+calculations; no artificial storage or instruction rewriting is involved.
+
+`native-f79-plan-lower-stage-header-lifetime` candidate 4 passes the normal
+host-syntax-enabled full-ROM gate. Its probe has relocation-field-only
+differences and is explicitly **not** reported link-verified; acceptance
+comes from the subsequent authoritative ROM comparison. The first-success
+freeze is independently externally hashed, and its complete object,
+original function extents, four collateral objects and unrelated dirty
+paths pass independent checks before another compilation. Six assembly
+owners remain in this file.
+
+## Accepted own-stage increase scorer
+
+`84150B14` accepts as 912 bytes of genuine C, with intended name
+`BattlePlan_ScoreStatIncrease`. Existing Haze, Curse, Belly Drum and
+Psych Up callers provide the own-stage indices and increments. The scorer
+clamps each increase below stage 14 and rejects a primary stat already at
+999. Defense Curl (111) has a separate Rollout (205) bonus when own flag
+22 bit 0 is clear. The normal stage bonus scales table byte `23 + stage`,
+`8414A270`, the byte-sized clamped factor, and chance. Four primary-stat
+cases add half the bonus when the corresponding side has a physical or
+special move. The speed case clears the entire accumulated side score
+when the opposing speed is lower, as the original store explicitly does.
+Baton Pass (226) adds another full bonus when the side header's byte 9 is
+at least 2; the common tail marks the plan flag.
+
+The winner `native-f79-plan-raise-stage-product` candidate 0 uses one
+integer header base after the two state lookups, a natural five-case C
+switch, and a shared opposing-side expression instead of a redundant
+local. The header declaration precedes the coefficient-table pointer and
+amount, reproducing their original stack homes. After those changes, only
+one commuted multiply operand remained; writing the table coefficient
+before the returned stage weight reproduces that operand order.
+
+Three stale prototypes described the callee's byte arguments as signed
+words. A recorded companion transaction corrects all three to the genuine
+six-argument interface. Independent whole-object controls prove that this
+correction preserves every existing caller before the candidate is tested.
+The accepted transaction passes the ordinary host-syntax-enabled full-ROM
+gate after a relocation-masked probe; the probe alone is not link proof.
+Frozen first-success artifacts, the complete original object, four
+collateral objects and unrelated dirty paths are independently verified
+before further compilation. No padding, extra argument, unused local,
+forced register/frame, volatile access or byte rewrite is used. Five
+assembly owners remain; the three accepted owners total 2,008 text bytes.
