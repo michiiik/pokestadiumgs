@@ -343,16 +343,16 @@ s32 func_84300858(u8 arg0) {
     return 1;
 }
 
-s32 func_800630F0(s32);
+s32 Type_IdToChartIndex(s32);
 extern s32 D_84302C98;
 u8 func_8006397C(u8 arg0);
 u8 func_800639C0(u8 arg0);
 s32 func_843008B0(u8 arg0) {
     s32 var_v1;
 
-    var_v1 = ((1 << func_800630F0(func_8006397C(arg0) & 0xFF)) & D_84302C98) != 0;
+    var_v1 = ((1 << Type_IdToChartIndex(func_8006397C(arg0) & 0xFF)) & D_84302C98) != 0;
     if (var_v1 == 0) {
-        var_v1 = ((1 << func_800630F0(func_800639C0(arg0) & 0xFF)) & D_84302C98) != 0;
+        var_v1 = ((1 << Type_IdToChartIndex(func_800639C0(arg0) & 0xFF)) & D_84302C98) != 0;
     }
     return var_v1;
 }
@@ -464,7 +464,7 @@ typedef struct Fragment81MovePoolsPrefix {
     u8 group2_special[90];
 } Fragment81MovePoolsPrefix;
 extern Fragment81MovePoolsPrefix D_84302CA0;
-extern s32 func_800630F0(s32);
+extern s32 Type_IdToChartIndex(s32);
 extern u8 func_8006397C(u8 arg0);
 extern u8 func_800639C0(u8 arg0);
 extern u8 func_84300348(u8 *arg0);
@@ -479,8 +479,8 @@ u8 func_84300BE8(void) {
     else if (func_84300348(D_84303108) > 0) result = ByteList_ChooseRandom_fragment81(D_84303108);
     if (result != 0) {
         D_84302CA0.base_stat_total = func_84300648(result);
-        D_84302C88.used_types |= 1 << func_800630F0(func_8006397C(result) & 0xFF);
-        D_84302C88.used_types |= 1 << func_800630F0(func_800639C0(result) & 0xFF);
+        D_84302C88.used_types |= 1 << Type_IdToChartIndex(func_8006397C(result) & 0xFF);
+        D_84302C88.used_types |= 1 << Type_IdToChartIndex(func_800639C0(result) & 0xFF);
     }
     return result;
 }

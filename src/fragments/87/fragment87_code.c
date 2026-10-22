@@ -262,7 +262,7 @@ typedef struct Fragment87ActorTemplate {
 } Fragment87ActorTemplate;
 extern Fragment87MapObjectTemplate D_81B00FB0, D_81B00FC0, D_81B00FD0, D_81B00FE0;
 extern Fragment87ActorTemplate D_81B00FF0, D_81B01018, D_81B01040, D_81B01068;
-extern u8 *func_8005FF0C(s32, u8);
+extern u8 *GbSave_GetMapObjectPtr(s32, u8);
 extern void _bzero(void *, s32);
 extern void func_800649E0(void);
 extern void func_80064A10(u8, u8);
@@ -294,7 +294,7 @@ void RoomDecor_RebuildObjects_fragment87(u8 slot) {
         map_slot = 2;
     }
     actors = func_8005FE58(save_index, 1);
-    map_objects = func_8005FF0C(save_index, map_slot);
+    map_objects = GbSave_GetMapObjectPtr(save_index, map_slot);
     _bzero(actors, 160);
     func_800649E0();
     func_80064A10(1, 1);

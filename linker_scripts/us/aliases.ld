@@ -761,6 +761,7 @@ func_885096E0 = TradeCable_SpawnBallTrailGhost;
 func_87C00D14 = MathUtil_Atan2d_fragment48;
 func_86706874 = GeoCallback_OrientToCamera;
 func_86900020 = GeoCallback_InitCamera;
+func_8FC00218 = Gfx_DrawTexturedFrame16;
 Rect_Contains = func_81600450;
 Fragment11_SetClippedScissor = func_816028E4;
 Fragment11_DrawThickPanelFrame = func_816039B0;
