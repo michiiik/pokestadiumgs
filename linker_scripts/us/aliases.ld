@@ -806,3 +806,4 @@ func_84153554 = BattlePlan_AddBatonPassBonus;
 func_8412F49C = BattleEffect_HealByWeather;
 func_841315C4 = BattleCommand_RunSequence;
 func_84136CA8 = BattleRecord_AdvanceWriteSlot;
+func_84127C88 = BattleDamage_RollCriticalHit;
