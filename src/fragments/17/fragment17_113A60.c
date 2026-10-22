@@ -66,7 +66,6 @@ void func_82204488(s16 *arg0) {
 extern s16 D_822105E8;
 extern u8 D_822105DC[];
 extern u8 D_822105EA[];
-#pragma COALESCE_AT_LUI(func_82204744, D_822105E8, D_822105EA)
 
 void func_82204744(void) {
     if (*(s16 *)(D_822105DC + 0xC) == 0) {
@@ -748,7 +747,6 @@ s32 func_8220AA08(s32 arg0, s32 arg1) {
 
 /* mkdraft:func_8220AC38 begin */
 extern u8 D_82210698[];
-#pragma COALESCE_AT_LUI(func_8220AC38, D_822106B2, D_822106B4)
 
 s32 func_8220AC38(void) {
     s32 ret = 0;
