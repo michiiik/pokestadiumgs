@@ -741,3 +741,6 @@ func_841503B0 = BattlePlan_ScoreSleep;
 func_841509E0 = BattlePlan_ScoreParalysis;
 func_84153028 = BattlePlan_AddSandstormBonus;
 func_841531D4 = BattlePlan_ScoreEndure;
+func_84150B14 = BattlePlan_ScoreStatIncrease;
+func_84150EA4 = BattlePlan_ScoreStatReduction;
+func_84153554 = BattlePlan_AddBatonPassBonus;
