@@ -1514,10 +1514,12 @@ SECTIONS
         fragment16_DATA_START = .;
         fragments_16_fragment16_header = .;
         build/asm/us/data/fragments/16/fragment16_header.o(.data);
-        fragments_16_fragment16_code = .;
-        build/src/fragments/16/fragment16_code.o(.data);
         fragments_16_fragment16_data_data = .;
         build/asm/us/data/fragments/16/fragment16_data.data.o(.data);
+        fragments_16_fragment16_code = .;
+        build/src/fragments/16/fragment16_code.o(.data);
+        _10F320_data = .;
+        build/asm/us/data/10F320.data.o(.data);
         fragment16_DATA_END = .;
         fragment16_DATA_SIZE = ABSOLUTE(fragment16_DATA_END - fragment16_DATA_START);
         fragment16_RODATA_START = .;
@@ -4609,9 +4611,10 @@ SECTIONS
         build/src/fragments/67/fragment67_342DB0.o(.rodata);
         build/src/fragments/67/fragment67_343510.o(.rodata);
         build/src/fragments/67/fragment67_344D70.o(.rodata);
+        build/asm/us/data/353F80.rodata.o(.rodata);
         build/src/fragments/67/fragment67_34AB40.o(.rodata);
         build/src/fragments/67/fragment67_34B0F0.o(.rodata);
-        build/asm/us/data/353F80.rodata.o(.rodata);
+        build/asm/us/data/354240.rodata.o(.rodata);
         build/src/fragments/67/fragment67_34C8B0.o(.rodata);
         build/asm/us/data/3542F0.rodata.o(.rodata);
         fragment67_RODATA_END = .;

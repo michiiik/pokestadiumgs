@@ -21,8 +21,27 @@ void func_81402978(void *arg0, f32 arg1, s32 arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_814029AC.s")
+void func_814029AC(void *arg0, f32 arg1) {
+    f32 temp_fs0;
+    s32 var_s0;
+    u8 *var_s1;
+    u8 *var_s2;
 
+    *(s8 *)((u8 *)arg0 + 0xCB0) = 0;
+    var_s0 = 0;
+    var_s1 = arg0;
+    var_s2 = (u8 *)arg0 + 0xC60;
+    *(f32 *)((u8 *)arg0 + 0xCAC) = arg1;
+    *(f32 *)((u8 *)arg0 + 0xCA8) = 0.0f;
+    do {
+        temp_fs0 = arg1 + 180.0f + (f32)var_s0;
+        func_81402930(var_s1, temp_fs0, -1, 0);
+        func_81402978(var_s2, temp_fs0, -1);
+        var_s0 += 22;
+        var_s1 += 528;
+        var_s2 += 12;
+    } while (var_s0 != 132);
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81402A64.s")
 
 void func_81402CD8(void *arg0, f32 arg1) {
@@ -75,7 +94,7 @@ void func_81403828(void *arg0, void *arg1) {
     (*(s16 *)((u8 *)(arg1) + (6))) = temp_v0;
 }
 
-extern void func_814029AC();
+extern void func_814029AC(void *, f32);
 void func_81403894(void *arg0, s32 arg1) {
     void *temp_a0;
     *(s32 *)((u8 *)arg0 + 0xCC4) = arg1;
@@ -85,7 +104,7 @@ void func_81403894(void *arg0, s32 arg1) {
     *(u8 *)((u8 *)arg0 + 0xCC2) = 0;
     temp_a0 = (u8 *)arg0 + 8;
     *(f32 *)((u8 *)temp_a0 + 0xCB4) = 0.0f;
-    func_814029AC(temp_a0, 0x41B00000);
+    func_814029AC(temp_a0, 22.0f);
 }
 
 void func_814038D4(void *arg0, void *arg1) {

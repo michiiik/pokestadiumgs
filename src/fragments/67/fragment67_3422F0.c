@@ -33,7 +33,27 @@ s32 func_82905F00(s32 arg0, u8 *arg1) { if (arg0 == 0) *(s16 *)(arg1 + 0x1A) = 0
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_82905F40.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_3422F0/func_829060BC.s")
+/* mkdraft:func_829060BC begin */
+extern s32 D_82919DC8;
+extern u8 D_800D0510[];
+extern void func_8000766C(u8 *, s32, s32, s32, s32);
+extern void GfxImage_FillCurrent(u8 *, s32);
+extern s32 func_82905F40(s32);
+
+void func_829060BC(void) {
+    s32 value = D_82919DC8;
+    if (value == 0) {
+        func_8000766C(D_800D0510, 0, 0, 0x140, 0xF0);
+    } else if (value == -1) {
+        GfxImage_FillCurrent(D_800D0510, 1);
+    } else if ((u32)value < 0x10000) {
+        s32 converted = func_82905F40(value & 0xFFFF);
+        GfxImage_FillCurrent(D_800D0510, converted & 0xFFFF);
+    } else {
+        GfxImage_FillCurrent(D_800D0510, 1);
+    }
+}
+/* mkdraft:func_829060BC end */
 
 extern f32 D_80128C54[];
 

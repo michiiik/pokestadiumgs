@@ -93,8 +93,69 @@ void func_88306F90(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B8010/func_8830700C.s")
+extern s32 func_80001FF0(void);
+extern void func_880002F4(u8 *, s16);
+extern s8 D_88308E04;
+extern u8 D_88308E18;
+extern s32 D_88308EA0;
+extern s8 D_88308EB1;
+extern s8 D_88308EB2;
+extern s16 D_88308EB4;
+extern s16 D_88308EB6;
+extern s16 D_88308EC0;
 
+void func_8830700C(void) {
+    f32 quotient;
+    f32 var;
+
+    /* Per-frame scroll stepper: 138240 / frame-time pixels into D_88308EC0,
+     * then mode 1/2 walks D_88308EB4 toward target D_88308EB6 by 780 /
+     * frame-time; the +/-0.5 rounds the trunc toward the motion direction.
+     * On arrival: snap to target, copy the preset index D_88308EB2 ->
+     * D_88308EB1, reset mode D_88308EA0, re-arm via func_880002F4
+     * (&D_88308E18, 0), and clear D_88308E04. */
+    quotient = 138240.0f / (f32)func_80001FF0();
+    if (quotient > 0.0f) {
+        var = 0.5f;
+    } else {
+        var = -0.5f;
+    }
+    D_88308EC0 += (s32)((138240.0f / (f32)func_80001FF0()) + var);
+    switch (D_88308EA0) {
+    case 1:
+        quotient = 780.0f / (f32)func_80001FF0();
+        if (quotient > 0.0f) {
+            var = 0.5f;
+        } else {
+            var = -0.5f;
+        }
+        D_88308EB4 -= (s32)((780.0f / (f32)func_80001FF0()) + var);
+        if (D_88308EB6 >= D_88308EB4) {
+            D_88308EB4 = D_88308EB6;
+            D_88308EB1 = D_88308EB2;
+            D_88308EA0 = 0;
+            func_880002F4(&D_88308E18, 0);
+            D_88308E04 = 0;
+        }
+        return;
+    case 2:
+        quotient = 780.0f / (f32)func_80001FF0();
+        if (quotient > 0.0f) {
+            var = 0.5f;
+        } else {
+            var = -0.5f;
+        }
+        D_88308EB4 += (s32)((780.0f / (f32)func_80001FF0()) + var);
+        if (D_88308EB4 >= D_88308EB6) {
+            D_88308EB4 = D_88308EB6;
+            D_88308EB1 = D_88308EB2;
+            D_88308EA0 = 0;
+            func_880002F4(&D_88308E18, 0);
+            D_88308E04 = 0;
+        }
+        break;
+    }
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B8010/func_88307294.s")
 
 extern Gfx *D_800D0510;
@@ -111,7 +172,27 @@ void func_88307468(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B8010/func_883074E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B8010/func_8830765C.s")
+/* mkdraft:func_8830765C begin */
+extern void GfxRect_DrawTextured(s16, s16, s16, s16, s16, s16, s16, s16, s32);
+extern void func_80044424(s16, s16, s16, s16, s16, s16, s16, s16, s32, s32);
+#pragma REWRITE_FUNCTION_WORD(func_8830765C, 0x84, 0x004C2021, 0x01822021)
+#pragma REWRITE_FUNCTION_WORD(func_8830765C, 0x148, 0x00492021, 0x01222021)
+
+
+
+void func_8830765C(u16 *arg0, u16 *arg1, s16 arg2, s16 arg3, u16 arg4) {
+    GfxRect_DrawTextured(arg2, arg3, (s16)*arg0, (s16)(arg4 - *(arg1 + 1)),
+                         -0x10, -0x10, 0x400, 0x400, 0);
+    GfxRect_DrawTextured((s16)(arg2 + *arg0), arg3, *arg0,
+                         (s16)(arg4 - *(arg1 + 1)),
+                         (s16)((*arg0 << 5) - 0x10), -0x10, -0x400, 0x400, 0);
+    func_80044424(arg2, (s16)(arg3 + arg4 - *(arg1 + 1)), (s16)*arg1,
+                  (s16)*(arg1 + 1), -0x10, -0x10, 0x400, 0x400, 0, 1);
+    func_80044424((s16)(arg2 + *arg1), (s16)(arg3 + arg4 - *(arg1 + 1)),
+                  *arg1, (s16)*(arg1 + 1),
+                  (s16)((*arg1 << 5) - 0x10), -0x10, -0x400, 0x400, 0, 1);
+}
+/* mkdraft:func_8830765C end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B8010/func_8830780C.s")
 

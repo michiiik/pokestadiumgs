@@ -49,7 +49,7 @@ extern u8 D_8AB126A8[];
 extern s16 D_8AB16950;
 extern s32 D_8AB16A14;
 extern void func_87F005F0(f32, f32);
-extern void func_8004C8A0(void *, s32, s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
 extern void func_87F006BC(void);
 extern u32 func_87F006AC(void);
 extern void func_8AB00BA4();
@@ -166,7 +166,7 @@ extern s16 D_8AB16A36;
 extern s32 func_80025D44(void);
 extern s32 func_8AB07E6C(s32);
 extern void func_80021ED8(s32);
-extern void func_8004C8A0(void *, s32, s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
 extern u8 D_8AB126A8[];
 s32 func_8AB07DC4(s32 arg0)
 {
@@ -241,8 +241,64 @@ s32 func_8AB08D3C(s32 arg0) {
     return sp1C;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB08DBC.s")
+extern void *D_80087200;
+extern s32 func_800279C4(s32);
+extern s32 func_8AB00548(void);
+extern s32 func_8AB00B78(s32);
+extern s32 func_8AB08F58(s32);
+extern void func_8AC063AC(void *, u16);
+extern void func_8AC06400(void *, void *);
+extern s32 D_8AB11280;
+extern void *D_8AB11D00;
+extern void *D_8AB12688;
+extern u16 D_8AB1268E;
+extern s16 D_8AB1269C;
+extern s32 D_8AB12BA8;
+extern s32 D_8AB12CBC;
+extern s32 D_8AB12D50;
+extern s32 D_8AB12DE4;
+extern s32 D_8AB12E78;
+extern void *D_8AB16B9C;
+extern s32 D_8AB16BA0;
 
+s32 func_8AB08DBC(s32 arg0) {
+    u16 temp_v0; /* unused; its 0x1C home slot places result at 0x18 as in the original frame */
+    s32 result;
+
+    result = 0x16;
+    switch (arg0) {
+    case 0:
+        func_8004C8A0(D_8AB126A8, 0x100, 0x3A, 3);
+        *(u16 *)((u8 *)D_8AB11D00 + 2) = (u16)(*(u16 *)((u8 *)D_8AB11D00 + 2) | 1);
+        func_8004C8A0(&D_8AB12BA8, 0x100, 0x39, 8);
+        *(u16 *)((u8 *)D_8AB12688 + 2) = (u16)(*(u16 *)((u8 *)D_8AB12688 + 2) | 1);
+        func_8AB00B98(D_8AB12688, -1U);
+        func_8AB04AE4();
+        func_8AC06400(&D_8AB16BA0, D_8AB16B9C);
+        *(u16 *)((u8 *)D_8AB16B9C + 2) = (u16)(*(u16 *)((u8 *)D_8AB16B9C + 2) | 1);
+        D_8AB12CBC = 0;
+        D_8AB12D50 = 0;
+        D_8AB12DE4 = 0;
+        D_8AB12E78 = 0;
+        D_8AB11280 = 0;
+        D_8AB1269C = 0x14;
+        func_8AB00548();
+        break;
+    case 1:
+        func_8AC063AC(&D_8AB16BA0, D_8AB1268E);
+        if (*(u16 *)((u8 *)D_80087200 + 8) & 0x8000) {
+            *(u16 *)((u8 *)D_8AB16B9C + 2) = (u16)(*(u16 *)((u8 *)D_8AB16B9C + 2) & 0xFFFE);
+            *(u16 *)((u8 *)D_8AB12688 + 2) = (u16)(*(u16 *)((u8 *)D_8AB12688 + 2) & 0xFFFE);
+            func_800279C4(0xCF0B);
+            result = func_8AB08F58(0);
+        } else if (*(u16 *)((u8 *)D_80087200 + 8) & 0x4000) {
+            result = func_8AB08D3C(0);
+            func_8AB00B78(3);
+        }
+        break;
+    }
+    return result;
+}
 extern u8 *D_8AB16CB0;
 extern s16 D_8AB16C18;
 extern s32 D_8AB16CC4;
@@ -250,7 +306,7 @@ extern s32 func_8AB090B8(s32);
 extern void func_80021ED8(s32);
 extern void func_800225C4(s32);
 extern void Geo_RenderRootNode(s32);
-extern void func_8004C8A0(void *, s32, s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
 extern void func_87F005F0(f32, f32);
 extern u32 func_87F006AC(void);
 extern void func_87F006BC(void);
@@ -322,7 +378,86 @@ s32 func_8AB099BC(s32 arg0) {
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB09A28.s")
+/* mkdraft:func_8AB09A28 begin */
+extern void func_8AB03394(void);
+extern void func_8AB02438(void);
+extern void func_8AB04BD4(void);
+extern void func_8AB092F4(void);
+extern void func_8AB09428(void);
+extern s32 func_8AB00548(void);
+extern void _bzero(void *, s32);
+extern void func_8004C594(s32, s32);
+extern s32 func_8AB09BD8(s32);
+extern s32 func_8AB09E28(s32);
+extern s32 func_8AB099BC(s32);
+extern s16 D_8AB16CCC;
+extern s16 D_8AB16CCE;
+extern s16 D_8AB16CD0;
+extern s32 D_8AB16CB4;
+extern void *D_8AB16A58;
+extern u8 D_8AB16A60[];
+
+s32 func_8AB09A28(s32 arg0) {
+    s32 result;
+    s32 new_var;
+    u8 **ptr;
+    u8 **end;
+    u8 **ptr2;
+    u8 **end2;
+    u8 *temp;
+
+    new_var = 1;
+    result = 0x19;
+    switch (arg0) {
+        case 0:
+            func_8AB03394();
+            func_8AB02438();
+            new_var = 1;
+            D_8AB16CCC = new_var;
+            D_8AB16CCE = 0;
+            _bzero(&D_8AB16A60, 0x100);
+            *(u16 *)((u8 *)D_8AB16A58 + 2) = (u16)(*(u16 *)((u8 *)D_8AB16A58 + 2) | 1);
+            *(u16 *)((u8 *)D_8AB11D00 + 2) &= 0xFFFE;
+            func_8AB04BD4();
+            // &D_8AB12668[4] is D_8AB12678 spelled through a different symbol: uopt CSE-merges
+            // two D_8AB12678 address loads into one shared register here, which the retail
+            // code does not do. The linked address is identical either way.
+            // The comma expressions keep as1's lui/addiu ordering of both loop-preheader pairs.
+            ptr2 = &D_8AB12668[4], end2 = (u8 **)&D_8AB12688;
+            do {
+                temp = *ptr2;
+                ptr2++;
+                *(u16 *)((u8 *)temp + 2) = (u16)(*(u16 *)((u8 *)temp + 2) | 1);
+            } while (ptr2 < end2);
+            ptr = D_8AB12668, end = D_8AB12678;
+            do {
+                func_8AB00B98(*ptr, -1U);
+                ptr++;
+            } while (ptr != end);
+            func_8004C594(2, D_8AB12694 + 1);
+            D_8AB16CB4 = 0;
+            func_8AB00548();
+            break;
+        case 1:
+            func_8AB09428();
+            func_8AB092F4();
+            if (D_8AB16CCE == new_var) {
+                result = func_8AB09BD8(0);
+            }
+            if (new_var == D_8AB16CD0) {
+                result = func_8AB09E28(0);
+                if (D_8AB16CCE == 0) {
+                    func_8004C8A0(D_8AB16A60, 0x100, *(u16 *)((u8 *)D_8AB11D00 + 0x30), *(u16 *)((u8 *)D_8AB11D00 + 0x32));
+                }
+            }
+            result = func_8AB099BC(result);
+            break;
+        case 2:
+            break;
+    }
+    return result;
+}
+/* mkdraft:func_8AB09A28 end */
 
 extern s16 D_8AB1269C;
 extern s16 D_8AB16CD0;

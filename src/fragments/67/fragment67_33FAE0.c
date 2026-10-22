@@ -341,7 +341,28 @@ void func_829042A4(f32 *arg0, f32 arg1, f32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_8290430C.s")
+typedef struct Rec28_82912DB8 {
+    /* 0x00 */ char pad0[8];
+    /* 0x08 */ s16 unk_08;
+    /* 0x0A */ s16 unk_0A;
+    /* 0x0C */ f32 unk_0C;
+    /* 0x10 */ char pad10[4];
+    /* 0x14 */ f32 unk_14;
+    /* 0x18 */ f32 unk_18;
+} Rec28_82912DB8;
+
+extern Rec28_82912DB8 D_82912DB8[];
+extern f32 D_82919CE4;
+
+/* mkdraft:func_8290430C begin */
+void func_8290430C(u8 *arg0) {
+    (*(s16 *)((u8 *)&D_82919C38 + 0x3C)) = D_82912DB8[arg0[0x1070]].unk_08;
+    (*(s16 *)((u8 *)&D_82919C38 + 0x3E)) = (*(s16 *)((u8 *)arg0 + 0x24)) + D_82912DB8[arg0[0x1070]].unk_0A * -1;
+    (*(f32 *)((u8 *)&D_82919C38 + 0x40)) = D_82912DB8[arg0[0x1070]].unk_0C * D_82919CE4;
+    (*(f32 *)((u8 *)&D_82919C38 + 0x4C)) = D_82912DB8[arg0[0x1070]].unk_14;
+    (*(f32 *)((u8 *)&D_82919C38 + 0x48)) = D_82912DB8[arg0[0x1070]].unk_18;
+}
+/* mkdraft:func_8290430C end */
 #endif
 
 #ifdef VERSION_US
@@ -664,7 +685,64 @@ void func_82905488(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_829054F8.s")
+/* mkdraft:func_829054F8 begin */
+extern s32 func_8004DDF4(s32);
+extern s32 WidgetTree_RunMessagePanelSilent(s32, s32);
+extern s32 func_80055948(s32);
+extern void ModelRenderer_InitDisplayRoots(void);
+extern s32 D_82911FD8[];
+extern s32 D_82919D1C;
+
+void func_829054F8(void) {
+    s32 sp1C;
+    s32 temp_v0;
+
+    if (*(u16 *)D_82919C14 == 0) {
+        D_82919C10 = 0;
+    }
+    if (*(u16 *)D_82919C14 == 3) {
+        D_82919C10 = 1;
+    }
+    if (*(u16 *)D_82919C14 == 1) {
+        if (*(s16 *)((u8 *)D_82919C14 + 2) == 1) {
+            D_82919C10 = 2;
+        }
+        if (*(s16 *)((u8 *)D_82919C14 + 2) == 2) {
+            D_82919C10 = 3;
+        }
+        if (*(s16 *)((u8 *)D_82919C14 + 2) == 3) {
+            D_82919C10 = 4;
+        }
+        if (*(s16 *)((u8 *)D_82919C14 + 2) == 4) {
+            D_82919C10 = 5;
+        }
+    }
+    if (*(u16 *)D_82919C14 == 2) {
+        if (*(s16 *)((u8 *)D_82919C14 + 2) == 1) {
+            D_82919C10 = 6;
+        }
+        if (*(s16 *)((u8 *)D_82919C14 + 2) == 2) {
+            D_82919C10 = 7;
+        }
+        if (*(s16 *)((u8 *)D_82919C14 + 2) == 3) {
+            D_82919C10 = 8;
+        }
+        if (*(s16 *)((u8 *)D_82919C14 + 2) == 4) {
+            D_82919C10 = 9;
+        }
+    }
+    func_8004DDF4(*(s32 *)((u8 *)D_82911FD8 + (D_82919C10 * 0x14)));
+    D_82919D24 = *(s16 *)((u8 *)D_82919C14 + 4);
+    temp_v0 = MainPool_AllocState(main_pool_get_available(), 0);
+    sp1C = temp_v0;
+    D_82919D1C = WidgetTree_RunMessagePanelSilent(temp_v0, *(s32 *)((u8 *)D_82911FD8 + (D_82919C10 * 0x14)));
+    MainPool_FinalizeAllocation(sp1C);
+    func_82903444();
+    ModelRenderer_InitDisplayRoots();
+    func_8290379C(&D_82918990);
+    func_80055948(3);
+}
+/* mkdraft:func_829054F8 end */
 #endif
 
 #ifdef VERSION_US

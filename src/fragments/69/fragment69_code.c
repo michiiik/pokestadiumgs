@@ -40,7 +40,17 @@ s32 func_8F1000F4(s32 arg0, void *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F100160.s")
+extern u8 D_8F1DF270[];
+
+void func_8F100160(void) {
+    s32 i;
+
+    for (i = 0; i < 3; i++) {
+        *(s16 *)(D_8F1DF270 + i * 6) = 0;
+        *(s16 *)(D_8F1DF270 + i * 6 + 2) = 0;
+        *(s16 *)(D_8F1DF270 + i * 6 + 4) = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -538,7 +548,67 @@ void func_8F1027F8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/69/fragment69_code/func_8F10282C.s")
+void func_8F1027F8(void);
+extern void *D_80094BB0;
+extern s32 D_8F1DEE60;
+
+void func_8F10282C(void)
+{
+  void *temp_v0;
+  if (((D_80094BB0 != NULL) && (D_8F1DEE24 >= 0x98)) && (D_8F1DEE24 < 0xFC))
+  {
+    temp_v0 = ((D_8F1DEE24 * 8) - 0x4C0) + (&D_8F1DEE68);
+    if ((*((u16 *) (((u8 *) D_80087200) + 8))) & 2)
+    {
+      D_8F1DEE60 ^= 1;
+    }
+    if (D_8F1DEE60 == 0)
+    {
+      if ((*((u16 *) (((u8 *) D_80087200) + 0xC))) & 0x200)
+      {
+        *((s16 *) (((u8 *) temp_v0) + 4)) = (s16) ((*((s16 *) (((u8 *) temp_v0) + 4))) - 0xA);
+        if ((*((s16 *) (((u8 *) temp_v0) + 4))) < 0)
+        {
+          *((s16 *) (((u8 *) temp_v0) + 4)) = 0;
+        }
+      }
+      if ((*((u16 *) (((u8 *) D_80087200) + 0xC))) & 0x100)
+      {
+        *((s16 *) (((u8 *) temp_v0) + 4)) = (s16) ((*((s16 *) (((u8 *) temp_v0) + 4))) + 0xA);
+        if ((*((s16 *) (((u8 *) temp_v0) + 4))) >= 0xFA1)
+        {
+          *((s16 *) (((u8 *) temp_v0) + 4)) = 0xFA0;
+        }
+      }
+    }
+    else
+    {
+      if ((*((u16 *) (((u8 *) D_80087200) + 0xC))) & 0x200)
+      {
+        *((s16 *) (((u8 *) temp_v0) + 6)) = (s16) ((*((s16 *) (((u8 *) temp_v0) + 6))) - 0xA);
+        if ((*((s16 *) (((u8 *) temp_v0) + 6))) < 0)
+        {
+          *((s16 *) (((u8 *) temp_v0) + 6)) = 0;
+        }
+      }
+      if ((*((u16 *) (((u8 *) D_80087200) + 0xC))) & 0x100)
+      {
+        *((s16 *) (((u8 *) temp_v0) + 6)) = (s16) ((*((s16 *) (((u8 *) temp_v0) + 6))) + 0xA);
+        if ((*((s16 *) (((u8 *) temp_v0) + 6))) >= 0xFA1)
+        {
+          *((s16 *) (((u8 *) temp_v0) + 6)) = 0xFA0;
+        }
+      }
+    }
+    if ((*((u16 *) (((u8 *) D_80087200) + 8))) & 0x8000)
+    {
+      temp_v0 = temp_v0;
+      func_8F1027F8();
+    }
+    *((s16 *) (((u8 *) D_80094BB0) + 0x1A)) = (s16) (*((s16 *) (((u8 *) temp_v0) + 4)));
+    *((s16 *) (((u8 *) D_80094BB0) + 0x1C)) = (s16) (*((s16 *) (((u8 *) temp_v0) + 6)));
+  }
+}
 #endif
 
 #ifdef VERSION_US

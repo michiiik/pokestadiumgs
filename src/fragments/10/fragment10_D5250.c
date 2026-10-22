@@ -2,8 +2,22 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82800620.s")
+extern Gfx *D_800D0510;
+extern s32 func_8004C990(s32, s32);
+extern void func_8004D19C(s32, s32, s32, s32, s32);
+extern s16 D_82802890[][4][2];
 
+void func_82800620(s32 arg0, s32 arg1, f32 arg2) {
+    gDPPipeSync(D_800D0510++);
+    if (arg1 != 0) {
+        gDPSetPrimColor(D_800D0510++, 0xFF, 0xFF, 0xFF, 0x64, 0x64, (u32)(255.0f * arg2));
+        gDPSetEnvColor(D_800D0510++, 0x40, 0x0A, 0x0A, 0);
+    } else {
+        gDPSetPrimColor(D_800D0510++, 0xFF, 0xFF, 0x64, 0xFF, 0x64, (u32)(255.0f * arg2));
+        gDPSetEnvColor(D_800D0510++, 0x0A, 0x40, 0x0A, 0);
+    }
+    func_8004D19C(D_82802890[arg1][arg0][0], D_82802890[arg1][arg0][1], func_8004C990(0x36, 0), 0, 0);
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82800864.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82800984.s")
@@ -34,10 +48,24 @@ s32 func_82800BB4(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_82800E94.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D5250/func_8280105C.s")
+extern f32 (*D_8160BD08)(f32);
+extern s16 D_828028F4[][4][2];
 
+void func_8280105C(u8 *arg0, s16 *arg1, s32 arg2) {
+    f32 ratio;
+
+    ratio = D_8160BD08(*(f32 *)(arg0 + 4) / 12.0f);
+    if (func_82800BB4(arg0) != 0) {
+        ratio = 1.0f;
+    }
+    arg1[0] = (s16)((((f32)(D_828028F4[0][arg2][0] - D_828028F4[1][arg2][0])) * ratio) + ((f32)D_828028F4[1][arg2][0]));
+    arg1[1] = (s16)((((f32)(D_828028F4[0][arg2][1] - D_828028F4[1][arg2][1])) * ratio) + ((f32)D_828028F4[1][arg2][1]));
+}
+// Unreferenced static empty function: the trailing jr ra; nop at 0x8280113C
+// that IDO keeps because statics are never dead-stripped.
+static void func_8280113C(void) {}
 extern s32 func_8004C874(s32, s32);
-extern void func_816044AC(s32, s32, s32, s32, s32, void *);
+extern void Fragment11_DrawBorderedPanelFill(s32, s32, s32, s32, s32, void *);
 extern void func_800498C4(void);
 extern void func_800496A4(s32, s32);
 extern void func_8004989C(s32);
@@ -51,7 +79,7 @@ void func_82801144(void) {
 
     result1 = func_8004C874(0x19, 0xE);
     result2 = func_8004C874(0x19, 0x12);
-    func_816044AC(0x63, 0xDC, 0x1BC, 0x92, 1, &D_82802838);
+    Fragment11_DrawBorderedPanelFill(0x63, 0xDC, 0x1BC, 0x92, 1, &D_82802838);
     func_800498C4();
     func_800496A4(0x10, 1);
     func_8004989C(0x20);

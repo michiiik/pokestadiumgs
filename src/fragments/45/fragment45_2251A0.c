@@ -29,6 +29,8 @@ extern u8 D_8AB12CB0[];
 extern u32 D_8AB11D00;
 extern u32 D_8AB11D04;
 extern u32 D_8AB11D08;
+// Word loaded with lw and passed as func_8AB02240's third argument (a2).
+extern s32 D_8AB16794;
 extern u8 *D_8AB11D0C;
 extern u32 D_8AB12688;
 extern u32 D_8AB1268C;
@@ -609,7 +611,30 @@ void func_8AB01FBC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB0234C.s")
+void func_8AB0234C(void)
+{
+  int new_var;
+  if (((D_8AB14678 == 4) || (D_8AB14678 == 2)) && (D_8AB126A0 == 2))
+  {
+    if (D_8AB14678)
+    {
+    }
+    new_var = D_8AB14678;
+    if (new_var != 2)
+    {
+      new_var = D_8AB14678;
+      if (new_var == 4)
+      {
+        func_8AB02240(*((s16 *) (((u8 *) D_8AB11D04) + 8)), *((s16 *) (((u8 *) D_8AB11D04) + 0xA)), D_8AB16794, 0);
+      }
+    }
+    else
+    {
+      func_8AB02240(*((s16 *) (((u8 *) D_8AB11D04) + 8)), *((s16 *) (((u8 *) D_8AB11D04) + 0xA)), D_8AB16794, 0xFF);
+    }
+    D_8AB126A0 = 1;
+  }
+}
 #endif
 
 #ifdef VERSION_US
@@ -677,7 +702,38 @@ s32 func_8AB02BA8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB02C20.s")
+extern u8 *D_8AB11D0C;
+extern s16 D_8AB12696;
+
+s32 func_8AB02C20(void) {
+    u8 state;
+    s32 result;
+
+    state = D_8AB11D0C[2];
+    switch (state) {
+    default:
+        D_8AB12696 = 0x17;
+        result = 0x1C8;
+        break;
+    case 1:
+        D_8AB12696 = 0x17;
+        result = 0x1C8;
+        break;
+    case 2:
+        D_8AB12696 = 0x2F;
+        result = 0x1DF;
+        break;
+    case 3:
+        D_8AB12696 = 0x48;
+        result = 0x20E;
+        break;
+    case 4:
+        result = 0x20E;
+        D_8AB12696 = 0x48;
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -717,7 +773,23 @@ s32 func_8AB02CB4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB02EF8.s")
+void *func_8AB02EF8(void) {
+    s16 idx;
+    void *result;
+
+    if (func_8AB01340(D_8AB12694) != 0) {
+        do {
+            func_8AB012A4();
+        } while (func_8AB01340(D_8AB12694) != 0);
+    }
+    D_8AB12692 += 1;
+    if (D_8AB12692 >= 0x3E8) {
+        D_8AB12692 = 0x3E7;
+    }
+    idx = ((s16 *)D_8AB14680)[D_8AB12694];
+    result = *(void **)(D_8AB11D10 + idx * 4);
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -725,7 +797,17 @@ s32 func_8AB02CB4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB02FE0.s")
+/* mkdraft:func_8AB02FE0 begin */
+extern void *func_8004C8A0(void *, s32, s32, s32);
+
+void func_8AB02FE0(u16 arg0, u8 *arg1, u16 arg2) {
+    *(u16 *)((u8 *)((void **)D_8AB12668)[arg0] + 0x30) = *(u16 *)(arg1 + (arg2 << 2));
+    *(u16 *)((u8 *)((void **)D_8AB12668)[arg0] + 0x32) = *(u16 *)(arg1 + (arg2 << 2) + 2);
+    func_8004C8A0(&D_8AB127A8[arg0 * 0x100], 0x100,
+                  *(u16 *)((u8 *)((void **)D_8AB12668)[arg0] + 0x30),
+                  *(u16 *)((u8 *)((void **)D_8AB12668)[arg0] + 0x32));
+}
+/* mkdraft:func_8AB02FE0 end */
 #endif
 
 #ifdef VERSION_US
@@ -947,7 +1029,38 @@ s32 func_8AB051AC(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB05254.s")
+/* mkdraft:func_8AB05254 begin */
+extern u8 D_8AB11210[];
+extern u16 D_8AB11208;
+
+void func_8AB05254(void) {
+    s16 temp_a0;
+    s16 temp_a0_2;
+    u16 mask;
+    u16 var_v0;
+
+    var_v0 = *(u16 *)(D_8AB13F28 + 6);
+    if ((D_8AB1269E == 4) || (D_8AB1269E == 6)) {
+        temp_a0 = *(s16 *)(D_8AB13F28 + 2);
+        if (temp_a0 >= 6) {
+            var_v0 |= 0x200;
+        }
+        if (temp_a0 < -5) {
+            var_v0 |= 0x100;
+        }
+        temp_a0_2 = *(s16 *)(D_8AB13F28 + 4);
+        if (temp_a0_2 >= 6) {
+            var_v0 |= 0x800;
+        }
+        if (temp_a0_2 < -5) {
+            var_v0 |= 0x400;
+        }
+        mask = (*(u16 *)(D_8AB11210 - 8) ^ var_v0) & var_v0;
+        D_8AB11208 = var_v0;
+        *(u16 *)(D_8AB13F28 + 8) = *(u16 *)(D_8AB13F28 + 8) | mask;
+    }
+}
+/* mkdraft:func_8AB05254 end */
 #endif
 
 #ifdef VERSION_US

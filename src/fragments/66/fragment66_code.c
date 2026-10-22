@@ -383,7 +383,53 @@ void func_82E028D0(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/66/fragment66_code/func_82E0292C.s")
+/* mkdraft:func_82E0292C begin */
+extern s32 func_80055948(s32);
+extern void func_80055EF0(void *, s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
+extern void Gfx_FreeDisplayListBuffers(void);
+extern s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+extern s32 func_8004C09C(s32);
+extern s32 func_8004C4B0(s32);
+extern u8 *func_80047588(s32, s32);
+extern u8 *Asset_LoadToSegment(s32, u8 *, u8 *, s32);
+extern u8 D_1000000[], D_446E30[], D_447D00[];
+extern void func_80008514(s32);
+extern void func_80008574(void);
+extern void func_80047610(void);
+extern void func_8004C398(void);
+extern s32 D_82E07610;
+extern u8 *D_82E05930;
+
+s32 func_82E0292C(s32 arg0, s16 *arg1) {
+    s32 configuration;
+    u8 data[0x20];
+
+    func_80055948(3);
+    func_80055EF0(data, *arg1 ? 1 : 0);
+    if (data[0xD] == 0) {
+        D_82E07610 = 1;
+    } else {
+        D_82E07610 = 0;
+    }
+    main_pool_push_state(0x454E4447);
+    Gfx_InitDisplayListBuffers(0x10000, 0);
+    configuration = func_800082E0(1, 1, 2, 0, 2, 1);
+    func_8004C09C(0x107);
+    func_8004C4B0(0x35);
+    D_82E05930 = func_80047588(0x3F, 0);
+    Asset_LoadToSegment(((u32)D_1000000 & 0x0F000000) >> 24, D_446E30, D_447D00, 0);
+    func_82E02508();
+    func_80008514(configuration);
+    func_82E028D0();
+    func_80008574();
+    func_80047610();
+    func_8004C398();
+    Gfx_FreeDisplayListBuffers();
+    main_pool_pop_state(0x454E4447);
+    return D_82E07610;
+}
+/* mkdraft:func_82E0292C end */
 #endif
 
 #ifdef VERSION_US

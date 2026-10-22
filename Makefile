@@ -380,7 +380,7 @@ $(ROM): $(ELF)
 # TODO: avoid using auto/undefined
 $(ELF): $(O_FILES) $(LIBULTRA_LIB) $(LDSCRIPT) $(BUILD_DIR)/linker_scripts/$(VERSION)/hardware_regs.ld $(BUILD_DIR)/linker_scripts/$(VERSION)/undefined_syms.ld $(BUILD_DIR)/linker_scripts/$(VERSION)/unused_syms.ld $(BUILD_DIR)/linker_scripts/common_undef_syms.ld $(BUILD_DIR)/linker_scripts/$(VERSION)/auto/undefined_syms_auto.ld $(BUILD_DIR)/linker_scripts/$(VERSION)/auto/undefined_funcs_auto.ld $(BUILD_DIR)/linker_scripts/$(VERSION)/aliases.ld
 	@$(PRINT) "$(GREEN)Linking ELF file:  $(BLUE)$@ $(NO_COL)\n"
-	$(V)$(LD) $(LDFLAGS) -T $(LDSCRIPT) \
+	$(V)$(LD) $(LDFLAGS) -T linker_scripts/$(VERSION)/datamig_bss.ld -T $(LDSCRIPT) \
 		-T $(BUILD_DIR)/linker_scripts/$(VERSION)/hardware_regs.ld -T $(BUILD_DIR)/linker_scripts/$(VERSION)/undefined_syms.ld \
 		-T $(BUILD_DIR)/linker_scripts/$(VERSION)/unused_syms.ld -T $(BUILD_DIR)/linker_scripts/common_undef_syms.ld \
 		-T $(BUILD_DIR)/linker_scripts/$(VERSION)/auto/undefined_syms_auto.ld -T $(BUILD_DIR)/linker_scripts/$(VERSION)/auto/undefined_funcs_auto.ld \

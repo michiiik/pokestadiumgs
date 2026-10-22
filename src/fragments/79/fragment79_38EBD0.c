@@ -2,7 +2,40 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EBD0/func_8411F340.s")
+/* mkdraft:func_8411F340 begin */
+extern void func_80007328(Gfx **, void *);
+extern void GfxImage_FillCurrent(Gfx **, u16);
+extern void func_8003C6B8(u8 *);
+extern Gfx *D_800D0510;
+
+typedef struct {
+    s32 unk00;
+    s16 unk04;
+    s16 unk06;
+    s16 unk08;
+    s16 unk0A;
+} UnkStruct8411F340;
+
+
+
+void func_8411F340(u8 *arg0, void *arg1) {
+    u8 *sub = *(u8 **)(arg0 + 0xC);
+    UnkStruct8411F340 saved;
+
+    if (sub[1] & 0x10) {
+        saved = *(UnkStruct8411F340 *)(sub + 0x18);
+        *(s16 *)(sub + 0x1C) = 0;
+        *(s16 *)(sub + 0x1E) = 0;
+        *(s16 *)(sub + 0x20) = 0x20;
+        *(s16 *)(sub + 0x22) = 0x20;
+        func_80007328(&D_800D0510, arg1);
+        GfxImage_FillCurrent(&D_800D0510, 0x4A53);
+        func_8003C6B8(arg0);
+        sub[1] &= ~0x10;
+        *(UnkStruct8411F340 *)(sub + 0x18) = saved;
+    }
+}
+/* mkdraft:func_8411F340 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EBD0/func_8411F400.s")
 

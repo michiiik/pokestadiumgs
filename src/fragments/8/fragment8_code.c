@@ -107,7 +107,52 @@ void func_82F00818(s32 arg0, s32 arg1, s32 arg2) {
     GfxImage_FillRectangle(D_800D0510, 0, 0, 0x280, 0x1E0, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/8/fragment8_code/func_82F00860.s")
+/* mkdraft:func_82F00860 begin */
+extern f32 func_818055E0(void *, u8 *);
+extern u8 *func_818054D0(void *, u8);
+extern void func_818057D0(s32, void *, void *);
+extern void func_8180567C(s32, void *, void *);
+extern void func_800498C4(void);
+extern void func_800496A4(s32, s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800495BC(s32, s32, s32);
+extern void func_800499EC(void);
+
+void func_82F00860(s32 arg0, void *arg1, void *arg2) {
+    u8 *entry;
+    u8 *base;
+    f32 fade;
+    s32 alpha;
+    s32 i;
+    u8 *text;
+
+    base = arg1;
+    fade = func_818055E0(arg0, base);
+    entry = func_818054D0(arg0, *(u8 *)(base + 0x1F));
+    func_818057D0(arg0, base, arg2);
+    func_800498C4();
+    func_800496A4(8, 1);
+    alpha = (s32)(255.0f * fade);
+    func_8004972C(0xFF, 0xFF, 0xFF, alpha);
+    for (i = 0; i != 6; i++) {
+        if (*(u8 *)(base + i * 0x58 + 0x38) == 0) {
+            continue;
+        }
+        text = base + i * 0x58 + 0x6C;
+        if ((*(s32 *)((u8 *)entry + 0x20) != 0) && ((i + 1) == *(u8 *)(base + 0xECE))) {
+            func_8004972C(0xFF, 0xFF, 0, alpha);
+        }
+        func_800495BC(*(s16 *)((u8 *)arg2 + 0) + ((i % 2) * 0x6C) + 0xC,
+                      *(s16 *)((u8 *)arg2 + 2) + ((i / 2) * 0x1A) + 0xA,
+                      text);
+        if ((*(s32 *)((u8 *)entry + 0x20) != 0) && ((i + 1) == *(u8 *)(base + 0xECE))) {
+            func_8004972C(0xFF, 0xFF, 0xFF, alpha);
+        }
+    }
+    func_800499EC();
+    func_8180567C(arg0, base, arg2);
+}
+/* mkdraft:func_82F00860 end */
 
 extern void func_800226C0(s32);
 void func_82F00A3C(void *arg0, s32 arg1) {

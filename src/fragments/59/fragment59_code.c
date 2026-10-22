@@ -2,7 +2,23 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/59/fragment59_code/func_86900020.s")
+/* mkdraft:GeoCallback_InitCamera begin */
+extern void GeoCamera_SetPerspective(void *, f32, f32, f32);
+extern f32 __sinf(f32);
+extern f32 __cosf(f32);
+extern void func_80038E14(void *, f32, f32, f32, f32, f32, f32, u16);
+extern f32 D_8690EB3C;
+extern f32 D_8690EB40;
+extern f32 D_8690EB44;
+extern f32 D_8690EB48;
+
+s32 GeoCallback_InitCamera(s32 arg0, void *arg1) {
+    s16 pad;
+    GeoCamera_SetPerspective(arg1, D_8690EB48, 100.0f, 12800.0f);
+    func_80038E14(arg1, 0, (__sinf(D_8690EB40) * D_8690EB3C) + 400.0f + D_8690EB44, __cosf(D_8690EB40) * D_8690EB3C, 0.0f, D_8690EB44, 0.0f, 0);
+    return 1;
+}
+/* mkdraft:GeoCallback_InitCamera end */
 #endif
 
 #ifdef VERSION_US
@@ -349,5 +365,30 @@ void func_8690DF18(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/59/fragment59_code/func_8690DF90.s")
+/* mkdraft:func_8690DF90 begin */
+extern Gfx* D_800D0510;
+extern s32 func_8004C990(s32, s32);
+extern s32 func_8004CA60(s32);
+extern void func_8003CD84(void);
+extern Gfx* D_86911440;
+
+
+
+void func_8690DF90(s32 arg0, s32 arg1) {
+    s32 texture;
+
+    if (arg0 == 5) {
+        gDPPipeSync(D_800D0510++);
+        gDPSetPrimColor(D_800D0510++, 0, 0, 0xFF, 0xBE, 0xF0, 0xFF);
+        gDPSetEnvColor(D_800D0510++, 0x46, 0x00, 0x28, 0xFF);
+        gDPSetCombineLERP(D_800D0510++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, 0, 0, 0, TEXEL0, K5, K5, 0, COMBINED, 0, 0, 0, COMBINED);
+        texture = func_8004C990(0x1A0, 0x13);
+        { Gfx* segment = D_800D0510++;
+        segment->words.w0 = 0xDB06003C;
+        segment->words.w1 = (u32)func_8004CA60(texture); }
+        gSPDisplayList(D_800D0510++, D_86911440);
+        func_8003CD84();
+    }
+}
+/* mkdraft:func_8690DF90 end */
 #endif

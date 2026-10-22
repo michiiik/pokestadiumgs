@@ -22,11 +22,11 @@ void func_860002A0(void) {
 
 #ifdef VERSION_US
 extern void * func_87C00160(void *, void *, void *);
-extern f64 func_87C00D14(f64,f64);
+extern f64 MathUtil_Atan2d_fragment48(f64,f64);
 f32 func_860004C8(void *arg0, void *arg1) {
     u8 value[0x18];
     func_87C00160(value, arg1, arg0);
-    return (f32)func_87C00D14(*(f64 *)value, *(f64 *)(value + 0x10));
+    return (f32)MathUtil_Atan2d_fragment48(*(f64 *)value, *(f64 *)(value + 0x10));
 }
 void func_860004C8_padding(void) {}
 void func_860004C8_padding2(void) {}
@@ -313,7 +313,7 @@ void func_8600297C_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-extern void func_86003EFC(); extern f64 func_87C00090(f64,f64,f64); extern f64 func_87C00D14(f64,f64); extern f64 D_8600E028;
+extern void func_86003EFC(); extern f64 func_87C00090(f64,f64,f64); extern f64 MathUtil_Atan2d_fragment48(f64,f64); extern f64 D_8600E028;
 void func_860029D0(u8 *arg0) {
     u8 *obj = *(u8 **)(arg0 + 0x1870);
     if (*(s32 *)(obj + 0x7518) == 3) {
@@ -323,7 +323,7 @@ void func_860029D0(u8 *arg0) {
     *(f64 *)(arg0 + 0x1860) = func_87C00090(
         *(f64 *)(arg0 + 0x1860), 0.0,
         *(f64 *)(obj + 0x6890) * D_8600E028);
-    *(f64 *)(arg0 + 0x1858) = func_87C00D14(
+    *(f64 *)(arg0 + 0x1858) = MathUtil_Atan2d_fragment48(
         -*(f64 *)(arg0 + 0), -*(f64 *)(arg0 + 0x10));
 }
 #endif
@@ -338,7 +338,7 @@ extern f64 fragment48_main(f64);
 extern void func_860032DC(u8 *arg0);
 extern void func_86003EFC(void *, s32);
 extern f64 func_87C00090(f64,f64,f64);
-extern f64 func_87C00D14(f64,f64);
+extern f64 MathUtil_Atan2d_fragment48(f64,f64);
 extern u8 D_8600DE30[];
 void func_86002B20(u8 *arg0) {
     u8 *temp_v0;
@@ -358,7 +358,7 @@ void func_86002B20(u8 *arg0) {
                 *(f64 *)(arg0 + 0x1860) + *(f64 *)(arg0 + 0x1858));
         } else {
             *(f64 *)(arg0 + 0x1860) = D_8600D690;
-            *(f64 *)(arg0 + 0x1858) = func_87C00D14(
+            *(f64 *)(arg0 + 0x1858) = MathUtil_Atan2d_fragment48(
                 -*(f64 *)(arg0 + 0), -*(f64 *)(arg0 + 0x10));
         }
     }
@@ -585,7 +585,7 @@ extern f64 D_8600E020;
 extern void func_86001924(void *);
 extern void func_8002781C(s32, u8, void *);
 extern void func_87C01E30(void *, void *, s32);
-extern f64 func_87C00D14(f64, f64);
+extern f64 MathUtil_Atan2d_fragment48(f64, f64);
 extern void func_86001FCC(void *);
 void func_86003A98(u8 *arg0) {
     *(s32 *)(arg0 + 0x1868) = 0;
@@ -594,7 +594,7 @@ void func_86003A98(u8 *arg0) {
     func_8002781C(0x4F06, arg0[0x1813], arg0 + 0x1890);
     func_87C01E30(arg0 + 0x17A0, &D_8600D5F0, 0);
     *(f64 *)(arg0 + 0x17D0) = D_8600E020;
-    *(f64 *)(arg0 + 0x17D8) = func_87C00D14(*(f64 *)arg0, *(f64 *)(arg0 + 0x10));
+    *(f64 *)(arg0 + 0x17D8) = MathUtil_Atan2d_fragment48(*(f64 *)arg0, *(f64 *)(arg0 + 0x10));
     func_86001FCC(arg0);
 }
 #endif
@@ -604,12 +604,12 @@ void func_86003A98(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_87C01DB8(); extern void func_87C00120(void *,f64,f64,f64); extern f64 func_87C00D14(f64,f64); extern f64 D_8600DE68; extern f64 D_8600DE78;
+extern void func_87C01DB8(); extern void func_87C00120(void *,f64,f64,f64); extern f64 MathUtil_Atan2d_fragment48(f64,f64); extern f64 D_8600DE68; extern f64 D_8600DE78;
 void func_86003C68(u8 *arg0) {
     *(s32 *)(arg0+0x1868)=1;
     *(s32 *)(arg0+0x186C)=0;
     func_87C01DB8(arg0+0x17A0,0,0);
-    *(f64 *)(arg0+0x1858)=func_87C00D14(-*(f64 *)arg0,-*(f64 *)(arg0+0x10));
+    *(f64 *)(arg0+0x1858)=MathUtil_Atan2d_fragment48(-*(f64 *)arg0,-*(f64 *)(arg0+0x10));
     func_87C00120(arg0+0x30,0.0,D_8600DE78,0.0);
     *(f64 *)(arg0+0x17D0)=D_8600DE68;
     arg0[0x13D]=0x64;

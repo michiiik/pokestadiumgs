@@ -153,13 +153,136 @@ s32 func_88300A78(void) { s32 value = D_88308E04; s32 result; if (value < 5) { r
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_88301C00.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_88304E60.s")
+/* mkdraft:func_88304E60 begin */
+extern s32 func_80001FF0(void);
+extern void StageFade_StartFromOpaque(s32);
+extern void func_80064D28(void);
+extern void func_88301C00(s32);
+extern f32 D_88308920;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_88304F5C.s")
+void func_88304E60(void) {
+    u16 count;
+    s32 i;
+    count = (u16)((f32)func_80001FF0() * D_88308920 / 2);
+    StageFade_StartFromOpaque(count);
+    if (count != 0) {
+        i = 0;
+        do {
+            func_80064D28();
+            func_88301C00(0);
+            i++;
+        } while (i != count);
+    }
+}
+/* mkdraft:func_88304E60 end */
 
+#ifndef M2C_FIELD /* sweep: m2c --valid-syntax helpers (mirrors mkdraft.py) */
+#define M2C_UNK s32
+#define M2C_UNK8 s8
+#define M2C_UNK16 s16
+#define M2C_UNK32 s32
+#define M2C_UNK64 s64
+#define M2C_FIELD(expr, type, offset) (*(type)((u8*)(expr) + (offset)))
+#define M2C_BITWISE(type, expr) ((type)(expr))
+#define M2C_ERROR(desc) 0
+#define M2C_TRAP_IF(cond) ((void)0)
+#define M2C_BREAK() ((void)0)
+#define M2C_SYNC() ((void)0)
+#define M2C_CARRY 0
+#define M2C_STRUCT_COPY(dst, src) ((dst) = (src))
+#endif
+
+M2C_UNK func_88300B48();                            /* extern */
+extern s32 D_88006860;
+extern u8 *D_88308DE8;
+extern s32 D_886017AC;
+
+void func_88304F5C(void) {
+    D_886017AC = 1;
+    M2C_FIELD(D_88308DF0, u16 *, 0) = (u16) (M2C_FIELD(D_88308DF0, u16 *, 0) | 4);
+    M2C_FIELD(D_88308DE8, u16 *, 0) = (u16) (M2C_FIELD(D_88308DE8, u16 *, 0) | 4);
+    M2C_FIELD(D_88308DE8, u16 *, 0) = (u16) (M2C_FIELD(D_88308DE8, u16 *, 0) | 2);
+    M2C_FIELD(M2C_FIELD(D_88308DF0, u8 **, 0x1C), s32 *, 0x4C) = 0x10000;
+    M2C_FIELD(M2C_FIELD(D_88308DE8, u8 **, 0x1C), s32 *, 0x4C) = 0x10000;
+    if (D_88006860 == 1) {
+        do {
+            func_80064D28();
+            func_88300B48();
+            func_88301C00(1);
+        } while (D_88006860 == 1);
+    }
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_88305020.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_883051E4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B1330/func_883059F0.s")
+#ifndef M2C_FIELD /* sweep: m2c --valid-syntax helpers (mirrors mkdraft.py) */
+#define M2C_UNK s32
+#define M2C_UNK8 s8
+#define M2C_UNK16 s16
+#define M2C_UNK32 s32
+#define M2C_UNK64 s64
+#define M2C_FIELD(expr, type, offset) (*(type)((u8*)(expr) + (offset)))
+#define M2C_BITWISE(type, expr) ((type)(expr))
+#define M2C_ERROR(desc) 0
+#define M2C_TRAP_IF(cond) ((void)0)
+#define M2C_BREAK() ((void)0)
+#define M2C_SYNC() ((void)0)
+#define M2C_CARRY 0
+#define M2C_STRUCT_COPY(dst, src) ((dst) = (src))
+#endif
+
+M2C_UNK Font_EnableLineBreak();                     /* extern */
+M2C_UNK Gfx_FreeDisplayListBuffers();               /* extern */
+M2C_UNK Gfx_InitDisplayListBuffers(M2C_UNK, M2C_UNK); /* extern */
+M2C_UNK Util_Free(s32);                             /* extern */
+s32 func_800082E0(M2C_UNK, M2C_UNK, M2C_UNK, M2C_UNK, s32, s32); /* extern */
+M2C_UNK func_80008514(s32);                         /* extern */
+M2C_UNK func_80008574();                            /* extern */
+M2C_UNK func_8002602C();                            /* extern */
+s32 func_80047588(M2C_UNK, M2C_UNK);                /* extern */
+M2C_UNK func_80047610();                            /* extern */
+M2C_UNK func_8004C09C(M2C_UNK);                     /* extern */
+M2C_UNK func_8004C398();                            /* extern */
+void func_88304F5C(void);
+M2C_UNK func_88305020();                            /* extern */
+M2C_UNK func_883051E4(s32, s32);                    /* extern */
+M2C_UNK main_pool_pop_state(M2C_UNK);               /* extern */
+M2C_UNK main_pool_push_state(M2C_UNK);              /* extern */
+extern s32 D_80128C60;
+extern s32 D_88006860;
+extern s32 D_8800687C;
+extern s32 D_88601890;
+extern s32 D_88601898;
+
+s32 func_883059F0(s32 arg0, s32 arg1) {
+    s32 sp24;
+    s32 sp20;
+
+    main_pool_push_state(0x424F4F4B);
+    Gfx_InitDisplayListBuffers(0x14000, 0);
+    sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    func_8004C09C(7);
+    D_8800687C = func_80047588(0x1C, 0);
+    Font_EnableLineBreak();
+    func_883051E4(arg0, arg1);
+    func_80008514(sp24);
+    func_88304E60();
+    func_88304F5C();
+    func_88305020();
+    func_80008574();
+    main_pool_pop_state(0x70617274);
+    func_80047610();
+    func_8004C398();
+    Gfx_FreeDisplayListBuffers();
+    if (D_88006860 == 7) {
+        Util_Free(D_88601898);
+        func_8002602C();
+        Util_Free(D_88601890);
+    }
+    sp20 = (s32) *D_88308DF8;
+    main_pool_pop_state(0x424F4F4B);
+    D_80128C60 = D_88006860;
+    return sp20;
+}
 #endif

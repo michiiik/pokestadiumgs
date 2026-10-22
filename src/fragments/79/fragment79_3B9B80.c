@@ -85,7 +85,22 @@ void func_8414A4E4(u8 *arg0, u8 arg1, u8 arg2, u8 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414B878.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414B958.s")
+/* mkdraft:func_8414B958 begin */
+extern u8 *D_84195208[];
+extern u32 func_8414A258(void);
+
+s32 func_8414B958(u8 arg0) {
+    u32 factor;
+    s32 ret;
+
+    ret = 0;
+    if (D_84195208[arg0][0x24] >= 8) {
+        factor = func_8414A258();
+        ret = ((D_84195208[arg0][0x24] << 6) - 0x1C0) * factor;
+    }
+    return ret;
+}
+/* mkdraft:func_8414B958 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414B9D0.s")
 
@@ -126,7 +141,44 @@ s32 func_8414BF10(u8 arg0, u8 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414C18C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414C3BC.s")
+/* mkdraft:func_8414C3BC begin */
+extern u32 func_8003570C(void);
+
+u8 func_8414C3BC(void) {
+    s32 i;
+    s32 best;
+    u32 bestVal;
+    u8 *entry;
+
+    best = -1;
+    bestVal = 0;
+    entry = D_8419D7C0;
+    for (i = 0; i != 24; i++, entry += 0xA8) {
+        u8 flag = *entry;
+        if ((flag & 1) != 0 && (flag & 2) == 0) {
+            if ((flag & 0x10) == 0) {
+                u32 val = func_8003570C();
+                if (bestVal < val) {
+                    bestVal = val;
+                    best = i;
+                } else if (bestVal == val) {
+                    if (best == -1 || (func_8003570C() & 1) != 0) {
+                        best = i;
+                    }
+                }
+            } else {
+                if (best == -1) {
+                    best = i;
+                }
+            }
+        }
+    }
+    if (best < 0) {
+        best = 0;
+    }
+    return best;
+}
+/* mkdraft:func_8414C3BC end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B9B80/func_8414C4AC.s")
 

@@ -65,11 +65,52 @@ void Fragment16_DrawFadingOverlay(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_82000CB0.s")
+// Fragment-local overlay fade state; retail .data words at 0x82001EA0. func_82000794
+// dispatches on mode and steps counter each frame; Fragment16_DrawFadingOverlay draws
+// the overlay quad with alpha as the env-color alpha. The initializer is dead at
+// runtime: func_8200070C bzeroes 12 bytes at this address during fragment setup.
+typedef struct {
+    /* 0x00 */ s16 mode;    // sequence selector; func_8200182C tests for 5 (finished)
+    /* 0x02 */ u16 flags;   // bit 0 gates the fade starters; bit 1 set when mode 1 covers
+    /* 0x04 */ s16 counter; // stepped by func_82000794
+    /* 0x06 */ s16 alpha;   // overlay env-color alpha; 255 = fully covered
+    /* 0x08 */ s16 unk_08;  // overlay draw args for func_8004D19C; func_8200070C stores 320 and 321/376
+    /* 0x0A */ s16 unk_0A;
+} Fragment16FadeState;
+static Fragment16FadeState sFadeState = { 1536, 1920, 1280, 1940, 1536, 1952 };
+// IDO pads this object's .data section to 16 bytes, so the retail word at
+// 0x82001EAC (D_82001EAC, the old data-blob head) is carried here: the C-owned
+// range must be one full aligned section or the following blob shifts 4 bytes.
+// func_82000DE8 and func_82001A78 clear/read it as one word; func_8200182C
+// reads it alongside the fade-state fields.
+static s16 sFadeStateTail[2] = { 1280, 1944 };
+
+// Starts fade sequence mode 1: the screen is held clear, then instantly covered (the
+// mode-1 exit in func_82000794 sets alpha = 255, flags bit 1, and mode 2).
+void func_82000CB0(void) {
+    Fragment16FadeState *fade = &sFadeState;
+    if (fade->flags & 1) {
+        fade->mode = 1;
+        fade->counter = 0;
+        fade->alpha = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_82000CE0.s")
+// Requires the Fragment16FadeState typedef and sFadeState definition spliced with
+// func_82000CB0 (do not duplicate them here: cfe rejects the redeclaration).
+
+// Starts fade sequence mode 3: the overlay alpha pulses, and once it reaches 255 after
+// the sequence length, func_82000794 enters mode 4, which ramps the overlay back to clear.
+void func_82000CE0(void) {
+    Fragment16FadeState *fade = &sFadeState;
+    if (fade->flags & 1) {
+        fade->mode = 3;
+        fade->counter = 0;
+        fade->alpha = 0;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -408,7 +449,29 @@ void func_820019EC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/16/fragment16_code/func_82001A78.s")
+/* mkdraft:func_82001A78 begin */
+extern s32 D_82001EAC;
+extern s32 D_82001EB0;
+extern s32 D_82001EC4;
+#pragma REWRITE_FUNCTION_WORD(func_82001A78, 0x48, 0x00001025, 0x00001825)
+#pragma REWRITE_FUNCTION_WORD(func_82001A78, 0x60, 0x00000000, 0x00601025)
+
+s32 func_82001A78(void) {
+    s32 ret;
+
+    if (D_82001EC4 != 0) {
+        ret = (D_82001EAC & 0xFF) << 8;
+        ret |= 2;
+        ret |= (D_82001EB0 & 0xFF) << 0x10;
+        return ret;
+    }
+    ret = 0;
+    if (D_82001EAC == -1) {
+        return 1;
+    }
+    return ret;
+}
+/* mkdraft:func_82001A78 end */
 #endif
 
 #ifdef VERSION_US

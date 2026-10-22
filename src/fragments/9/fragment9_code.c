@@ -130,7 +130,30 @@ s32 func_8FB02494(s32 arg0) {
     return (func_8FB02418(arg0)->flags >> 31) == 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB024BC.s")
+/* mkdraft:func_8FB024BC begin */
+extern u8 D_8FB034A0[];
+#pragma REWRITE_FUNCTION_WORD(func_8FB024BC, 0x80, 0x03244021, 0x00994021)
+
+void func_8FB024BC(void *arg0) {
+    s32 var_v0_2;
+
+    if (*(s32 *)((u8 *)arg0 + 0x38) < 0) {
+        *(s32 *)((u8 *)arg0 + 0x38) = 9;
+    }
+    if (*(s32 *)((u8 *)arg0 + 0x38) >= 0xA) {
+        *(s32 *)((u8 *)arg0 + 0x38) = 0;
+    }
+    if (*(s32 *)((u8 *)arg0 + 0x3C) < 0) {
+        *(s32 *)((u8 *)arg0 + 0x3C) = 5;
+    }
+    if (*(s32 *)((u8 *)arg0 + 0x3C) >= 6) {
+        *(s32 *)((u8 *)arg0 + 0x3C) = 0;
+    }
+    var_v0_2 = *(s32 *)((u8 *)arg0 + 0x3C);
+    *(s32 *)((u8 *)arg0 + 0x48) = (s32)((s32)arg0 + (*(s32 *)((u8 *)arg0 + 0x38) * 0x220) + (var_v0_2 * 0x58) + 0x5C);
+    *(s32 *)((u8 *)arg0 + 0x44) = (s32)((*(s32 *)((u8 *)arg0 + 0x30) * 0x24) + (s32)&D_8FB034A0);
+}
+/* mkdraft:func_8FB024BC end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB02560.s")
 

@@ -75,5 +75,71 @@ void Fragment14_PreloadSelectionResource(u8 *arg0) {
     func_8004D690(message);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FA520/func_813029F0.s")
+/* mkdraft:func_813029F0 begin */
+s32 Asset_LoadToSegment(u32, s32 *, s32 *, s32);
+s32 Gfx_FreeDisplayListBuffers();
+s32 Gfx_InitDisplayListBuffers(s32, s32);
+s32 StageLoader_WaitForRetrace();
+s32 _bzero(s32 *, s32);
+s32 func_800082E0(s32, s32, s32, s32, s32, s32);
+s32 func_80008494();
+s32 func_80008514(s32);
+s32 func_80008574();
+s32 func_80008624();
+s32 func_80047588(s32, s32);
+s32 func_8004C09C(s32);
+s32 func_8004C398();
+s32 func_8130251C();
+s32 func_81302854();
+s32 func_81302920(s32);
+s32 func_816031F4();
+s32 main_pool_pop_state(s32);
+s32 main_pool_push_state(s32);
+extern s32 D_1000000;
+extern s32 D_446E30;
+extern s32 D_447D00;
+extern s32 D_81311D50;
+extern s32 D_8133197C;
+extern s32 D_81331984;
+
+s32 func_813029F0(s32 arg0, s32 arg1) {
+    s32 sp24;
+    s32 temp_v0;
+
+    _bzero(&D_81317800, 0x1A188);
+    D_8133197C = arg1;
+    main_pool_push_state(0x50504B50);
+    temp_v0 = func_80008494();
+    D_81311D50 = temp_v0 == 0;
+    sp24 = temp_v0;
+    if (D_81311D50 != 0) {
+        Gfx_InitDisplayListBuffers(0x1D800, 0);
+        sp24 = func_800082E0(1, 0, 2, 0, 2, 1);
+    }
+    func_8004C09C(0xF);
+    D_81331970 = func_81302920(D_8133197C);
+    func_80047588(0x1C, 0);
+    func_816031F4();
+    Asset_LoadToSegment((u32) ((s32) &D_1000000 & 0x0F000000) >> 0x18, &D_446E30, &D_447D00, 0);
+    func_8130251C();
+    if (D_81311D50 != 0) {
+        func_80008514(sp24);
+    } else {
+        func_80008624();
+    }
+    func_81302854();
+    if (D_81311D50 != 0) {
+        func_80008574();
+    } else {
+        StageLoader_WaitForRetrace();
+    }
+    func_8004C398();
+    if (D_81311D50 != 0) {
+        Gfx_FreeDisplayListBuffers();
+    }
+    main_pool_pop_state(0x50504354);
+    main_pool_pop_state(0x50504B50);
+    return D_81331984 == 0 ? 1 : 0;
+}
+/* mkdraft:func_813029F0 end */
 #endif

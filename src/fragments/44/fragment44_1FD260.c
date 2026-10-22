@@ -2,14 +2,14 @@
 
 
 #ifdef VERSION_US
-extern void func_8004A858(s32, s32, u16, u16, s32 *, s32 *);
+extern void Ui_DrawGradientQuad(s32, s32, u16, u16, s32 *, s32 *);
 extern u8 D_8AF26450;
 extern u8 D_8AF26454;
 s32 func_8AF0EFF0(void *arg0) {
     void *temp_v0;
 
     temp_v0 = (*(void **)((u8 *)(arg0) + (0x18)));
-    func_8004A858(0, 0, (*(u16 *)((u8 *)(temp_v0) + (4))), (*(u16 *)((u8 *)(temp_v0) + (6))), &D_8AF26450, &D_8AF26454);
+    Ui_DrawGradientQuad(0, 0, (*(u16 *)((u8 *)(temp_v0) + (4))), (*(u16 *)((u8 *)(temp_v0) + (6))), &D_8AF26450, &D_8AF26454);
     return 0;
 }
 
@@ -907,8 +907,30 @@ void func_8AF12A4C(u8 *record) {
     func_8004C54C(0x30, (s32)D_8AF311A0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1FD260/func_8AF12E30.s")
+extern u16 *D_8AF2BA9C;
 
+s32 func_8AF12E30(s16 arg0) {
+    u16 *entry;
+    s32 result;
+
+    /* Byte-scaled base with an explicit shift; D_8AF2BA9C + arg0 would scale the
+     * index first and swap the base-load/scale temp colors (t6/t7). Same idiom as
+     * func_8AF16EB0's family of checks against D_8AF2BAA4.
+     * //@src/fragments/44/fragment44_204950.c */
+    entry = (u16 *)((u8 *)D_8AF2BA9C + (arg0 << 1));
+    result = 0;
+    if (*--entry & 1) {
+        return 1;
+    }
+    return result;
+}
+
+/* Standalone empty function: the retail ROM has a lone jr ra; nop at 0x8AF12E74
+ * between func_8AF12E30 and func_8AF12E7C with no symbol in the map file, so it
+ * had static linkage and its body compiled out. Keeping it here preserves the
+ * fragment's byte layout. */
+static void func_8AF12E74(void) {
+}
 extern s32 D_8AF26F30;
 extern s16 D_8AF316A4;
 extern s16 D_8AF316A6;

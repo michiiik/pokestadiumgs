@@ -95,8 +95,67 @@ s32 func_8AB0B74C(s32 arg0) {
     return sp1C;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B7CC.s")
+extern void *func_8004C8A0(void *, s32, s32, s32);
+extern void func_8AB00B98(u8 *, u32);
+extern s32 func_800279C4(s32);
+extern s32 func_8AB00548(void);
+extern s32 func_8AB00B78(s32);
+extern s32 func_8AB0B96C(s32);
+extern void func_8AC063AC(void *, u16);
+extern void func_8AC06400(void *, void *);
+extern u8 D_8AB126A8[];
+extern void *D_8AB11D00;
+extern void *D_8AB12688;
+extern u16 D_8AB1268E;
+extern s16 D_8AB1269C;
+extern s32 D_8AB12BA8;
+extern s32 D_8AB12CBC;
+extern s32 D_8AB12D50;
+extern s32 D_8AB12DE4;
+extern s32 D_8AB12E78;
+extern void *D_8AB13F28;
+extern void *D_8AB16E4C;
+extern s32 D_8AB16E50;
+extern s16 D_8AB16F6C;
 
+s32 func_8AB0B7CC(s32 arg0) {
+    u16 temp_v0; /* unused; its 0x1C home slot places result at 0x18 as in the original frame */
+    s32 result;
+
+    result = 0x31;
+    switch (arg0) {
+    case 0:
+        func_8004C8A0(D_8AB126A8, 0x100, 0x39, 0x276);
+        *(u16 *)((u8 *)D_8AB11D00 + 2) = (u16)(*(u16 *)((u8 *)D_8AB11D00 + 2) | 1);
+        func_8004C8A0(&D_8AB12BA8, 0x100, 0x39, 0x277);
+        *(u16 *)((u8 *)D_8AB12688 + 2) = (u16)(*(u16 *)((u8 *)D_8AB12688 + 2) | 1);
+        func_8AB00B98(D_8AB12688, -1U);
+        func_8AB04AE4();
+        D_8AB16F6C = 0x64;
+        func_8AC06400(&D_8AB16E50, D_8AB16E4C);
+        *(u16 *)((u8 *)D_8AB16E4C + 2) = (u16)(*(u16 *)((u8 *)D_8AB16E4C + 2) | 1);
+        D_8AB12CBC = 0;
+        D_8AB12D50 = 0;
+        D_8AB12DE4 = 0;
+        D_8AB12E78 = 0;
+        D_8AB1269C = 0x14;
+        func_8AB00548();
+        break;
+    case 1:
+        func_8AC063AC(&D_8AB16E50, D_8AB1268E);
+        if (*(u16 *)((u8 *)D_8AB13F28 + 8) & 0x8000) {
+            *(u16 *)((u8 *)D_8AB16E4C + 2) = (u16)(*(u16 *)((u8 *)D_8AB16E4C + 2) & 0xFFFE);
+            *(u16 *)((u8 *)D_8AB12688 + 2) = (u16)(*(u16 *)((u8 *)D_8AB12688 + 2) & 0xFFFE);
+            func_800279C4(0xCF0B);
+            result = func_8AB0B96C(0);
+        } else if (*(u16 *)((u8 *)D_8AB13F28 + 8) & 0x4000) {
+            result = func_8AB0B74C(0);
+            func_8AB00B78(3);
+        }
+        break;
+    }
+    return result;
+}
 typedef struct {
     u8 pad[8];
     s16 x;
@@ -109,7 +168,7 @@ extern u8 D_8AB126A8[];
 extern void func_87F005F0(f32, f32);
 extern void func_87F006BC(void);
 extern u32 func_87F006AC(void);
-extern void func_8004C8A0(void *, s32, s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
 extern void func_800225C4(s32);
 extern void func_8AB00BA4();
 extern void func_80021ED8(s32);
@@ -165,7 +224,55 @@ void func_8AB0BF70(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0C414.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0C5CC.s")
+/* mkdraft:func_8AB0C5CC begin */
+extern s16 D_8AB1269C;
+extern s16 D_8AB16F86;
+extern s16 D_8AB16F88;
+extern s32 D_8AB16F8C;
+extern void func_8AB01728(void);
+extern void func_8AB0BF80(void);
+extern s32 func_8AB0C7FC(s32);
+
+s32 func_8AB0C5CC(s32 arg0) {
+    s16 n;
+    s32 result;
+    result = 0x35;
+    switch (arg0) {
+    case 0:
+        D_8AB1269C = 0x14;
+        D_8AB16F8C = 0;
+        break;
+    case 1:
+        func_8AB01728();
+        func_8AB0BF80();
+        if (D_8AB16F8C % (func_80001FF0() / 4) == 0) {
+            D_8AB1269C--;
+            if (D_8AB1269C < 0) {
+                D_8AB1269C = 0;
+                if (D_8AB16F86 == 0) {
+                    func_8AB00BA4(0x65, 0, 0);
+                }
+                D_8AB16F86 = 1;
+            }
+        }
+        if (D_8AB16F8C % ((func_80001FF0() / 4) * 2) == 0) {
+            n = D_8AB1269C / 2 + 1;
+            if (D_8AB16F86 == 0) {
+                func_8AB00BA4(0x65, n, 0);
+            }
+        }
+        if (D_8AB16F88 == 0 || D_8AB16F86 == 1) {
+            result = func_8AB0C7FC(0);
+        }
+        result = func_8AB0B5E0(result);
+        D_8AB16F8C++;
+        break;
+    case 2:
+        break;
+    }
+    return result;
+}
+/* mkdraft:func_8AB0C5CC end */
 
 void func_8AB0C7C0(void *arg0, s32 arg1) {
     if ((*(s32 *)((u8 *)(arg0) + (0xC))) == 1) {

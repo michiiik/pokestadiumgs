@@ -735,8 +735,15 @@ void func_810034C0(s32 arg0, Func810034C0StateD *state) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_15EA30/func_81003510.s")
+void func_81003510(s32 arg0) {
+    // FAKE: uopt deletes a lone `if (arg0 == 5) {}`; the mixed signed/unsigned
+    // literal spellings split the compares into two CSE classes (s32 singleton +
+    // u32 pair) so the surviving branch reaches as1 as a pseudo `bne a0, 5`,
+    // which it expands to `li at, 5; bne a0, at`.
+    if (arg0 == 5 && arg0 == 5U && arg0 == 5U) {
 
+    }
+}
 void func_81003524(s32 arg0, s32 arg1) { if (arg0 == 5) { arg1 = arg1; } }
 
 typedef union { s16 packed; struct { s8 red, green, blue; u8 alpha; } color; } ParticleVertexTail26;

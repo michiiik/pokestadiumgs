@@ -657,6 +657,11 @@
     - [0x10D470, textbin, fragments/16/fragment16_header]
     - [0x10D490, c,       fragments/16/fragment16_code]
     - [0x10F080, data,    fragments/16/fragment16_data]
+    - [0x10F310, .data, fragments/16/fragment16_code] # fade-state static: 16 bytes at 0x82001EA0
+                                                     # (func_82000CB0/CE0 wave-7 migration; IDO
+                                                     # # pads the section, so the old blob's first
+                                                     # # word rides in C to keep the range aligned)
+    - [0x10F320, data]
   
   - name: fragment17
     type: code
@@ -1418,6 +1423,8 @@
     - [0x353F30, rodata] # D_82917430 through D_82917438
     - [0x353F40, .rodata, fragments/67/fragment67_33FAE0] # D_82917440 through jtbl_8291744C and D_82917478
     - [0x353F80, rodata]
+    - [0x354230, .rodata, fragments/67/fragment67_34AB40] # spline trio literals (datamig)
+    - [0x354240, rodata]
     - [0x3542C0, .rodata, fragments/67/fragment67_34C8B0] # format strings and jtbl_829177CC
     - [0x3542F0, rodata]
 

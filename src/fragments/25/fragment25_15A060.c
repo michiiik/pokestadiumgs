@@ -141,7 +141,40 @@ void func_82100D20(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82100D9C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82100F68.s")
+/* mkdraft:func_82100F68 begin */
+extern s32 func_800468A0(s32);
+extern s32 func_800503A4(s32);
+extern void func_800088DC(void);
+extern void func_81801420(void);
+extern s32 func_82100764(f32);
+extern s32 func_82100CD8(void *);
+extern s32 func_821023F4(s32);
+extern void func_82101A30(void *);
+extern void func_80008648(void);
+
+
+void func_82100F68(void *arg0) {
+    u8 temp_v0;
+
+    func_800088DC();
+    func_800468A0(*(s32 *)((u8 *)arg0 + 0xC));
+    func_82101A30(*(void **)((u8 *)arg0 + 0x1C));
+    func_800503A4(*(s32 *)((u8 *)arg0 + 0x14));
+    func_81801420();
+    if (*(s32 *)((u8 *)arg0 + 0x38) != 0) {
+        temp_v0 = *(u8 *)((u8 *)arg0 + 0x3D);
+        if (temp_v0 >= 0x51) {
+            func_82100764((f32) (0xA0 - temp_v0) / 80.0f);
+        } else {
+            func_82100764((u32) temp_v0 / 80.0f);
+        }
+    }
+    if (func_82100CD8(arg0) != 0) {
+        func_821023F4(*(s32 *)((u8 *)arg0 + 0x0));
+    }
+    func_80008648();
+}
+/* mkdraft:func_82100F68 end */
 
 extern void func_82100D9C(void *);
 extern void func_82100F68(void *);
@@ -226,8 +259,40 @@ void *func_821019AC(void *arg0, void *arg1) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/25/fragment25_15A060/func_82101A30.s")
-
+void func_82101A30(void *arg0)
+{
+  s32 new_var;
+  s32 var_a1;
+  void *temp_a2;
+  void *temp_v0;
+  new_var = *((s32 *) (((u8 *) arg0) + 8));
+  var_a1 = 0;
+  if (new_var > 0)
+  {
+    do
+    {
+      temp_v0 = (*((s32 *) (((u8 *) arg0) + 0))) + var_a1;
+      var_a1 += 0x20;
+      if (temp_v0 == NULL)
+      {
+      }
+      else
+      {
+        temp_a2 = *((void **) (((u8 *) temp_v0) + 0));
+        if (temp_a2 == NULL)
+        {
+        }
+        else
+        {
+          *((u16 *) (((u8 *) temp_a2) + 2)) = (u16) ((*((u16 *) (((u8 *) temp_a2) + 2))) | 2);
+          *((u16 *) (((u8 *) (*((void **) (((u8 *) temp_v0) + 0)))) + 0x24)) = (u16) (*((u16 *) (((u8 *) (*((void **) (((u8 *) temp_v0) + 8)))) + 0x18)));
+          *((u16 *) (((u8 *) (*((void **) (((u8 *) temp_v0) + 0)))) + 0x26)) = (u16) (*((u16 *) (((u8 *) (*((void **) (((u8 *) temp_v0) + 8)))) + 0x1A)));
+        }
+      }
+    }
+    while (var_a1 < ((*((s32 *) (((u8 *) arg0) + 8))) << 5));
+  }
+}
 f32 func_82101AB4(u8 *arg0) {
     return ((f32)*(s16 *)(*(u8 **)(arg0 + 0) + 0x0C) *
             (*(f32 *)(*(u8 **)(arg0 + 8) + 0x2C) + 1.0f) * 0.5f) +

@@ -15,8 +15,12 @@ s32 func_81306EE0(u8 *arg0, s32 arg1) {
     return v1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81306F20.s")
+extern f32 (*D_8160BD1C)(f32);
 
+s32 func_81306F20(void *arg0) {
+    struct S { u8 pad[0x137D0]; f32 value; };
+    return (s32)(D_8160BD1C((16 - ((struct S *)arg0)->value) / 16) * 23.0f);
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_FF070/func_81306F74.s")
 
 extern void func_81306F74(void *, void *);
@@ -661,7 +665,7 @@ void func_8130A8E0(void *arg0, s32 arg1) {
 }
 
 
-extern void (*D_8160BD1C)(f32);
+extern f32 (*D_8160BD1C)(f32);
 void func_8130A98C(void *arg0) {
     D_8160BD1C(*(f32 *)((u8 *)arg0 + 0xE8FC) / 16);
 }
