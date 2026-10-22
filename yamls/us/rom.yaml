@@ -1589,6 +1589,7 @@
     - [0x3FAA50, rodata]
     - [0x3FAA60, .rodata, fragments/79/fragment79_3ADCA0] # jtbl_8418B1D0 (+13 more, incl. jtbl_8418B738/jtbl_8418B74C)
     - [0x3FB010, rodata]
+    - [0x3FB9D0, .rodata, fragments/79/fragment79_3BF4C0] # Scoring constants and all three jump tables,720 bytes.
     - [0x3FBCA0, .rodata, fragments/79/fragment79_3C50B0] # Both selected-state jump tables,176 bytes.
     - [0x3FBD50, rodata]
     - [0x3FBDC0, .rodata, fragments/79/fragment79_3C60B0] # Per-file float constants,192 bytes.
