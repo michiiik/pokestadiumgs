@@ -2,14 +2,43 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_1077C0/func_8130F630.s")
+/* mkdraft:func_8130F630 begin */
+s32 func_8130F630(u8 *arg0) {
+    return (*(s32 *)(arg0 + 0x44) == 0 && arg0[0x38] == 1) ||
+           (*(s32 *)(arg0 + 0x48) != -1 && *(s32 *)(arg0 + 0x48) != 4 && *(s32 *)(arg0 + 0x48) != 5 && arg0[0x38] >= 4);
+}
+/* mkdraft:func_8130F630 end */
 #endif
 
 void func_8130F69C(void) {
 }
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_1077C0/func_8130F6A4.s")
+/* mkdraft:func_8130F6A4 begin */
+extern f32 (*D_8160BD08)(f32);
+extern f32 (*D_8160BD1C)(f32);
+extern void func_8160945C(s16 *, s16 *, s16 *, f32);
+
+
+f32 func_8130F6A4(u8 *arg0, u8 *arg1, u8 *arg2) {
+    u8 *ptr = arg2 + 8;
+    f32 temp = 0.0f;
+
+    if (func_8130F630(arg0) != 0) {
+        ptr = arg2 + 0x18;
+        if (*(f32 *)(arg0 + 0x30) >= 9.0f) {
+            temp = D_8160BD1C((*(f32 *)(arg0 + 0x30) - 9.0f) / 7.0f);
+        }
+    } else {
+        temp = D_8160BD08(*(f32 *)(arg0 + 0x30) / 16);
+        if (arg0[0x38] == 4) {
+            ptr = arg2 + 0x10;
+        }
+    }
+    func_8160945C(arg1, ptr, arg2, temp);
+    return temp;
+}
+/* mkdraft:func_8130F6A4 end */
 #endif
 
 #ifdef VERSION_US
@@ -120,7 +149,28 @@ void func_8130FBC0(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_1077C0/func_8130FC80.s")
+/* mkdraft:func_8130FC80 begin */
+extern s32 func_8130FA0C(u8 *);
+extern s32 func_81311CFC(void);
+
+void func_8130FC80(u8 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    func_81311CFC();
+    *(s8 *)(arg0 + 0x38) = 0;
+    *(s8 *)(arg0 + 0x39) = 0;
+    *(f32 *)(arg0 + 0x30) = 0.0f;
+    *(s32 *)(arg0 + 0x4C) = arg3;
+    *(s32 *)(arg0 + 0x50) = arg4;
+    *(s32 *)(arg0 + 0x3C) = 0;
+    *(s32 *)(arg0 + 0xA0) = 0;
+    *(f32 *)(arg0 + 0x34) = 0.0f;
+    *(s32 *)(arg0 + 0x40) = arg1;
+    *(s32 *)(arg0 + 0xA8) = 1;
+    *(s32 *)(arg0 + 0xAC) = arg2;
+    func_8130FA0C(arg0);
+    func_8130FB58(arg0);
+    func_8130FBC0(arg0);
+}
+/* mkdraft:func_8130FC80 end */
 #endif
 
 #ifdef VERSION_US
@@ -218,7 +268,45 @@ void func_8130FFE0(f32 arg0, f32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_1077C0/func_8131001C.s")
+/* mkdraft:MathUtil_Atan2d_fragment14 begin */
+f64 MathUtil_Atan2d_fragment14(f64 arg0, f64 arg1) {
+    extern f64 D_81312998, D_813129A0, D_813129A8, D_813129B0, D_813129B8, D_813129C0;
+    f64 ratio;
+    f64 reduced;
+    f64 fraction;
+    s32 i;
+
+    if ((arg1 == 0.0) && (arg0 == 0.0)) {
+        return 0.0;
+    }
+    if (arg1 == 0.0) {
+        if (arg0 > 0.0) {
+            return D_81312998;
+        }
+        return D_813129A0;
+    }
+    ratio = arg0 / arg1;
+    reduced = ((ratio > 0.0 ? ratio : -ratio) <= 1.0) ? ratio : 1.0 / ratio;
+    fraction = 0.0;
+    for (i = 14; i > 0; i--) {
+        fraction = (i * i) * reduced * reduced / ((2 * i + 1) + fraction);
+    }
+    reduced = reduced / (1.0 + fraction);
+    if (ratio > 1.0) {
+        reduced = D_813129A8 - reduced;
+    }
+    if (ratio < -1.0) {
+        reduced = D_813129B0 - reduced;
+    }
+    if (arg1 > 0.0) {
+        return reduced;
+    }
+    if (arg0 > 0.0) {
+        return reduced + D_813129B8;
+    }
+    return reduced - D_813129C0;
+}
+/* mkdraft:MathUtil_Atan2d_fragment14 end */
 #endif
 
 #ifdef VERSION_US

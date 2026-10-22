@@ -753,6 +753,7 @@ func_800631B4 = Type_ChartIndexToId;
 Gfx_SetupOrthoProjection = func_81800A90;
 fragment10_main = func_82800490;
 func_88000080 = Envelope_Advance;
+func_8131001C = MathUtil_Atan2d_fragment14;
 Rect_Contains = func_81600450;
 Fragment11_SetClippedScissor = func_816028E4;
 Fragment11_DrawThickPanelFrame = func_816039B0;

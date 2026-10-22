@@ -8,7 +8,7 @@ s32 func_8130CE30(u8 *arg0) {
 
 extern s32 func_81601FA0(u8);
 extern s32 func_81601980(s32 *, s32);
-extern void func_81601D24(void *, u8, void *, void *);
+extern void func_81601D24(s32, s32);
 extern f32 func_816092FC(void);
 extern s32 func_8130CE30(u8 *);
 s32 func_8130CE3C(u8 *arg0) {
@@ -30,7 +30,7 @@ s32 func_8130CE3C(u8 *arg0) {
 
 extern s32 func_81601FA0(u8);
 extern s32 func_81601980(s32 *, s32);
-extern void func_81601D24(void *, u8, void *, void *);
+extern void func_81601D24(s32, s32);
 extern f32 func_816092FC(void);
 extern s32 func_8130CE30(u8 *);
 s32 func_8130CEAC(u8 *arg0) {
@@ -115,8 +115,17 @@ void func_8130E99C(u8 *arg0, s32 arg1, s32 arg2, u8 *arg3) {
     func_80042D54(*(u8 **)(arg0 + 0x68), color);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130EA8C.s")
-
+void func_8130EA8C(u8 *arg0, u8 *arg1) {
+    if ((*(u8 **)(arg0 + 0x6C) != arg1) || (*(s32 *)(arg1 + 0x58) != *(s32 *)(arg0 + 0x24))) {
+        *(u8 **)(arg0 + 0x6C) = arg1;
+        *(s32 *)(arg0 + 0x24) = *(s32 *)(arg1 + 0x58);
+        *(s32 *)(arg0 + 0x00) = 1;
+        *(u8 *)(arg0 + 0x39) = arg1[1];
+        func_81601D24((s32)(arg0 + 0x3C), arg1[0]);
+        *(s32 *)(arg0 + 0x70) = 2;
+        *(s32 *)(arg0 + 0x60) = 0;
+    }
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130EB04.s")
 
 void func_8130EC94(u8 *arg0) {
