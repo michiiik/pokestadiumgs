@@ -39,8 +39,35 @@ void func_87E05874(s32 arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E05944.s")
+extern void func_87F0B4AC(void *, f32 *, f32 *, s16 *);
+extern void *D_87E1EB90;
+extern void *D_87F119DC;
 
+void func_87E05944(void) {
+    s32 temp_t0;
+    s32 var_a0;
+    u8 *var_v1;
+
+    temp_t0 = *(s32 *)((u8 *)D_87F119DC + 0x20);
+    var_v1 = (u8 *)temp_t0 + 0x90;
+    for (var_a0 = 0; var_a0 != 0xC; var_a0 += 1, var_v1 += 8) {
+        if (var_a0 == *(s32 *)((u8 *)D_87E1EB90 + 8)) {
+            if (*(u8 *)(var_v1 + 4) >= 0xE7) {
+                *(u8 *)(var_v1 + 4) = 0xFF;
+            } else {
+                *(u8 *)(var_v1 + 4) = *(u8 *)(var_v1 + 4) + 0x19;
+            }
+        } else {
+            if (*(u8 *)(var_v1 + 4) < 0x19) {
+                *(u8 *)(var_v1 + 4) = 0;
+            } else {
+                *(u8 *)(var_v1 + 4) = *(u8 *)(var_v1 + 4) - 0x19;
+            }
+        }
+    }
+    func_87F0B4AC((u8 *)temp_t0 + 8, (f32 *)((u8 *)D_87F119DC + 0x48),
+                  (f32 *)((u8 *)D_87F119DC + 0x54), (s16 *)((u8 *)D_87F119DC + 0x42));
+}
 extern Gfx *D_800D0510;
 extern void *D_8009491C;
 extern void GeoRender_ApplyMaterialState();
@@ -63,7 +90,30 @@ void func_87E059F4(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E05AB0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E05BF0.s")
+/* mkdraft:func_87E05BF0 begin */
+extern Gfx *D_800D0510;
+extern void *D_8009491C;
+extern void func_8003CD84(void);
+typedef struct { u8 pad_60[0x60]; u8 red; u8 green; u8 blue; } Func87E0375CColor;
+
+void func_87E05BF0(s32 arg0, s32 arg1) {
+    u8 *context;
+    Func87E0375CColor *temp_a0;
+    void *temp_a1;
+    if (arg0 == 5) {
+        context = (u8 *)D_8009491C;
+        temp_a0 = *(Func87E0375CColor **)(context + 0x14);
+        temp_a1 = *(void **)((u8 *)temp_a0 + 0x20);
+        gDPPipeSync(D_800D0510++);
+        gDPSetCombine(D_800D0510++, 0x50FFFF, -0xDC8);
+        gDPSetEnvColor(D_800D0510++, temp_a0->red, temp_a0->green,
+                       temp_a0->blue, 0xFF);
+        gSPSegment(D_800D0510++, 0xF,
+                   *(void **)((u8 *)(*(void **)((u8 *)temp_a1 + 0x90)) + 8));
+        gSPDisplayList(D_800D0510++, *(void **)((u8 *)temp_a1 + 0x8C));
+        func_8003CD84();
+    }}
+/* mkdraft:func_87E05BF0 end */
 
 typedef union { s32 word; s8 bytes[4]; } Func80041FA0State;
 extern Func80041FA0State D_87E1A174;
@@ -171,7 +221,38 @@ void func_87E06B54(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E06BCC.s")
+/* mkdraft:func_87E06BCC begin */
+extern s32 main_pool_get_available(void);
+extern s32 MainPool_AllocState(s32, s32);
+extern void MainPool_FinalizeAllocation(s32);
+extern s32 func_80040E80(s32, void *);
+extern u8 D_87E19AE4;
+extern s32 func_87F08E7C(u16, u16, u8, u8, s32);
+
+
+
+void func_87E06BCC(u8 *arg0) {
+    s32 state;
+    s32 unk;
+    s32 i;
+    s32 temp;
+    u8 *record;
+
+    state = MainPool_AllocState(main_pool_get_available(), 0);
+    *(s32 *)((u8 *)arg0 + 0x164) = func_80040E80(state, &D_87E19AE4);
+    MainPool_FinalizeAllocation(state);
+    *(s32 *)((u8 *)arg0 + 0x150) = main_pool_alloc(0x750, 0);
+    unk = func_87F08E7C(0x40, 0x40, 0, 2, 0xF000000);
+    record = *(u8 **)((u8 *)arg0 + 0x150);
+    for (i = 0; i != 12; i++, record += 0x9C, *(s32 *)(record - 0xC) = temp) {
+        *(u8 *)(record + 0x98) = i;
+        *(s32 *)(record + 0x88) = 0;
+        *(s32 *)(record + 0x8C) = unk;
+        *(f32 *)(record + 0x94) = 0.0f;
+        temp = func_800071A4(0, 2, 0x40, 0x40, 0);
+    }
+}
+/* mkdraft:func_87E06BCC end */
 
 extern s32 main_pool_get_available(void);
 extern s32 MainPool_AllocState(s32, s32);
@@ -384,8 +465,51 @@ void func_87E079FC(s32 arg0) {
     BgStage_DrawFrame();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_308D70/func_87E07A2C.s")
+/* mkdraft:func_87E07A2C begin */
+#pragma REWRITE_FUNCTION_WORD(func_87E07A2C, 0x6C, 0x00994024, 0x00991024)
+#pragma REWRITE_FUNCTION_WORD(func_87E07A2C, 0x70, 0x5500FFF9, 0x5440FFF9)
 
+s32 func_87E07A2C(u8 *arg0)
+{
+  s32 sp1C[2];
+  s32 var_a1;
+  u32 temp_a0;
+  s32 var_v1;
+  void *temp_a1;
+  sp1C[1] = 0;
+  temp_a0 = func_8003570C() % 145U;
+  temp_a1 = *((void **) (((u8 *) arg0) + 0x170));
+  var_v1 = sp1C[1];
+  if ((*((u16 *) (((u8 *) temp_a1) + 0x21F4))) == 0xFFF)
+  {
+    *((u16 *) (((u8 *) temp_a1) + 0x21F4)) = 0U;
+  }
+  var_a1 = 0;
+  if (((s32) temp_a0) > ((var_a1 != temp_a0) * 0))
+  {
+    do
+    {
+      loop_4:
+      var_v1 += 1;
+
+      if (var_v1 >= 0xC)
+      {
+        var_v1 = 0;
+        if (temp_a0 && temp_a0)
+        {
+        }
+      }
+      if ((*((u16 *) (((u8 *) (*((void **) (((u8 *) arg0) + 0x170)))) + 0x21F4))) & (1 << var_v1))
+      {
+        goto loop_4;
+      }
+      var_a1 += 1;
+    }
+    while (var_a1 != temp_a0);
+  }
+  return var_v1;
+}
+/* mkdraft:func_87E07A2C end */
 extern void func_87E06290(u8 *);
 extern s32 func_87E07A2C(u8 *);
 extern u32 func_8003570C(void);

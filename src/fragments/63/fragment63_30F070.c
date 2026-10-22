@@ -54,8 +54,51 @@ void func_87E0B834(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0B884.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0B9F0.s")
+extern s32 func_8004C990(s32, s32);
 
+void func_87E0B9F0(void *arg0) {
+    s32 var_s1;
+    s32 var_s2;
+    s32 var_s3;
+    s8 temp_v1;
+    void *temp_s0;
+
+    var_s1 = 0;
+    var_s2 = 0;
+    var_s3 = 0;
+    do {
+        temp_s0 = *(void **)((u8 *)(*(s32 *)((u8 *)arg0 + 0x20) + var_s2) + 0xC);
+        *(void **)temp_s0 = (void *)(*(s32 *)((u8 *)arg0 + 0x24) + var_s3);
+        *(s32 *)((u8 *)temp_s0 + 8) = func_8004C990(0x162, var_s1);
+        temp_v1 = *(s8 *)((u8 *)*(void **)temp_s0 + 1);
+        switch (temp_v1) {
+        case 0:
+            *(s32 *)((u8 *)temp_s0 + 4) = func_8004C990(0x15E, 1);
+            *(s32 *)((u8 *)temp_s0 + 0xC) = 0;
+            break;
+        case 1:
+            *(s32 *)((u8 *)temp_s0 + 4) = func_8004C990(0x15E, 0);
+            *(s32 *)((u8 *)temp_s0 + 0xC) = func_8004C990(0x15F, 0);
+            break;
+        case 2:
+            *(s32 *)((u8 *)temp_s0 + 4) = func_8004C990(0x15E, 2);
+            *(s32 *)((u8 *)temp_s0 + 0xC) = func_8004C990(0x15F, 1);
+            break;
+        }
+        temp_v1 = *(s8 *)((u8 *)*(void **)temp_s0 + 2);
+        switch (temp_v1) {
+        case 0:
+            *(s32 *)((u8 *)temp_s0 + 0x10) = func_8004C990(0x163, 0);
+            break;
+        case 1:
+            *(s32 *)((u8 *)temp_s0 + 0x10) = func_8004C990(0x163, 1);
+            break;
+        }
+        var_s1 += 1;
+        var_s2 += 0x10;
+        var_s3 += 3;
+    } while (var_s1 != 6);
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_30F070/func_87E0BB5C.s")
 
 extern void func_87F02684(s32);
