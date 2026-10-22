@@ -57,7 +57,62 @@ void func_826018BC(void *arg0) {
     } while (i != 2);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82601968.s")
+typedef struct {
+    s8 *owners;
+    u8 unk_04[8];
+    u8 *table;
+} RecordTextCopyContext;
+typedef struct {
+    u8 unk_00[136];
+    s16 selection;
+} RecordTextSelectionView;
+extern void *func_8004C874(s32, s32);
+extern void _bcopy(void *, void *, s32);
+typedef struct {
+    u8 unk_00[52];
+    s8 text[12];
+    u8 unk_40[24];
+} RecordTextEntry88;
+typedef struct {
+    u8 unk_00[144];
+    RecordTextEntry88 groups[4][6];
+} RecordTextGridState;
+typedef char RecordTextEntrySizeCheck[sizeof(RecordTextEntry88) == 88 ? 1 : -1];
+typedef char RecordTextGridSizeCheck[sizeof(RecordTextGridState) == 2256 ? 1 : -1];
+
+void RecordText_CopyUnassignedEntries(void *arg0) {
+    RecordTextCopyContext *context = (RecordTextCopyContext *)arg0;
+    RecordTextSelectionView *selection;
+    s8 *records;
+    s8 *record;
+    u8 *base;
+    u8 *table;
+    s8 *result;
+    s32 inner;
+    s32 outer;
+    records = context->owners;
+    base = context->table;
+    selection = (RecordTextSelectionView *)records;
+    outer = 0;
+    table = base;
+    table += *(s16 *)((u8 *)context + selection->selection * 2 + 24) * 152;
+    table += 4;
+    record = records;
+    do {
+        inner = 0;
+        if (*record == -1) {
+            do {
+                result = (s8 *)func_8004C874(table[3] + 76, inner + 33);
+                if (result != 0 && *result != 0) {
+                    _bcopy(result, ((RecordTextGridState *)records)->groups[outer][inner].text, 12);
+                }
+                inner++;
+            } while (inner != 6);
+        }
+        outer++;
+        record++;
+    } while (outer != 4);
+}
 
 extern void *func_8004C874(s32, s32);
 extern void _bcopy(void *, void *, s32);
@@ -370,11 +425,74 @@ void func_82602A0C(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82602AC0.s")
+void RecordNames_LoadUnassignedFourSlots(u8 *context) {
+    s32 index;
+    s32 selection;
+    s8 *state;
+    s8 *cursor;
+    u8 *base;
+    u8 *record;
+    void *name;
+    state = *(s8 **)context;
+    selection = *(s16 *)((u8 *)state + 136);
+    base = *(u8 **)(context + 12);
+    index = 0;
+    cursor = state;
+    record = ((u8 (*)[152])base)[((s16 *)context)[selection + 12]] + 4;
+    do {
+        if (*cursor == -1) {
+            name = func_8004C874(42, record[1] - 1);
+            if (name != 0) {
+                _bcopy(name, (u8 *)state + index * 12 + 2256, 12);
+            }
+        }
+        index++;
+        cursor++;
+    } while (index != 4);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82602B9C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82602CF4.s")
+void RecordNames_LoadSelectedOrDefaultPair(u8 *context) {
+    s32 index;
+    s32 selection;
+    s8 *state;
+    u8 *selected_row;
+    u8 *default_row;
+    s8 *cursor;
+    s8 slot;
+    u8 *row;
+    void *name;
+    default_row = *(u8 **)(context + 12) + 4;
+    state = *(s8 **)context;
+    index = 0;
+    selection = *(s16 *)((u8 *)state + 136);
+    selected_row = ((u8 (*)[152])(*(u8 **)(context + 12)))[((s16 *)context)[selection + 12]] + 4;
+    cursor = state;
+    do {
+        slot = *cursor;
+        name = 0;
+        switch (slot) {
+        case -1:
+            row = selected_row;
+            break;
+        case -2:
+            row = 0;
+            break;
+        default:
+            row = default_row;
+            break;
+        }
+        if (row != 0) {
+            name = func_8004C874(42, row[1] - 1);
+        }
+        if (name != 0) {
+            _bcopy(name, (u8 *)state + index * 12 + 2256, 12);
+        }
+        index++;
+        cursor++;
+    } while (index != 2);
+}
 
 extern s32 D_82615390[];
 extern s32 D_82615384[];
@@ -492,25 +610,16 @@ void func_826037BC(void *arg0) {
     }
 }
 
-s32 func_82603814(void) {
-    s8 *q;
+s32 RecordOwners_AnyUnassigned(void) {
     s32 result;
-    s8 *p;
-
-    q = *(s8 **)D_82615370;
+    s32 index;
+    s8 *owners;
+    owners = *(s8 **)D_82615370;
     result = 0;
-    p = *(s8 **)D_82615370;
-    if (p[0] == -1) {
-        result = 1;
-    }
-    if (p[1] == -1) {
-        result = 1;
-    }
-    if (p[2] == -1) {
-        result = 1;
-    }
-    if (p[3] == -1) {
-        result = 1;
+    for (index = 0; index < 4; index++) {
+        if (owners[index] == -1) {
+            result = 1;
+        }
     }
     return result;
 }
