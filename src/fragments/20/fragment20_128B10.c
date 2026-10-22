@@ -94,13 +94,161 @@ void RecordNames_LoadFourSlots(u8 *context, s32 override_names) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82601BB0.s")
+extern s32 func_8004C594(s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
+void RecordNames_FormatTwoSlots(u8 *context) {
+    s32 index;
+    s32 selection;
+    s8 *state;
+    u8 *table;
+    u8 *record;
+    s8 *descriptor;
+    u8 *slot_context;
+    void *name;
+    state = *(s8 **)context;
+    selection = *(s16 *)((u8 *)state + 136);
+    table = *(u8 **)(context + 12);
+    index = 0;
+    descriptor = (s8 *)(context + 176);
+    slot_context = context;
+    record = ((u8 (*)[152])table)[((s16 *)context)[selection + 12]] + 4;
+    do {
+        if (*(s16 *)(slot_context + 176) < 2) {
+            if (descriptor[2] >= 0) {
+                func_8004C594(1, descriptor[2] + 1);
+                func_8004C8A0((u8 *)state + index * 12 + 2256, 12, 18, 29);
+            } else {
+                name = func_8004C874(42, record[1] - 1);
+                if (name != 0) {
+                    _bcopy(name, (u8 *)state + index * 12 + 2256, 12);
+                }
+            }
+        } else {
+            func_8004C594(1, descriptor[2] + 1);
+            func_8004C594(2, descriptor[3] + 1);
+            func_8004C8A0((u8 *)state + index * 12 + 2256, 12, 18, 28);
+        }
+        index++;
+        slot_context += 1064;
+        descriptor += 1064;
+    } while (index != 2);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82601D2C.s")
+void RecordNames_LoadTwoSlots(u8 *context) {
+    s8 slot;
+    u8 *row;
+    void *name;
+    u8 *teams[2];
+    u8 *profiles[3];
+    s32 index;
+    s8 *state;
+    s8 *cursor;
+    state = *(s8 **)context;
+    teams[0] = *(u8 **)(context + 12) + 4;
+    index = 0;
+    teams[1] = *(u8 **)(context + 12) + 156;
+    profiles[0] = *(u8 **)(context + 12) + 308;
+    profiles[1] = *(u8 **)(context + 12) + 460;
+    cursor = state;
+    profiles[2] = *(u8 **)(context + 12) + 612;
+    do {
+        slot = *cursor;
+        name = 0;
+        switch (slot) {
+        case -1:
+            row = profiles[*(s16 *)(*(u8 **)context + 12)];
+            break;
+        case -2:
+            row = 0;
+            break;
+        default:
+            row = teams[index];
+            break;
+        }
+        if (row != 0) {
+            name = func_8004C874(42, row[1] - 1);
+        }
+        if (name != 0) {
+            _bcopy(name, (u8 *)state + index * 12 + 2256, 12);
+        }
+        index++;
+        cursor++;
+    } while (index != 2);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82601E70.s")
+void RecordNames_LoadSelectedOrDefaultSlots(u8 *context) {
+    s32 index;
+    s32 selection;
+    s8 *state;
+    u8 *selected_row;
+    u8 *default_row;
+    s8 *cursor;
+    s8 slot;
+    u8 *row;
+    void *name;
+    default_row = *(u8 **)(context + 12) + 4;
+    state = *(s8 **)context;
+    index = 0;
+    selection = *(s16 *)((u8 *)state + 136);
+    selected_row = ((u8 (*)[152])(*(u8 **)(context + 12)))[((s16 *)context)[selection + 12]] + 4;
+    cursor = state;
+    do {
+        slot = *cursor;
+        name = 0;
+        switch (slot) {
+        case -1:
+            row = selected_row;
+            break;
+        case -2:
+            row = 0;
+            break;
+        default:
+            row = default_row;
+            break;
+        }
+        if (row != 0) {
+            name = func_8004C874(42, row[1] - 1);
+        }
+        if (name != 0) {
+            _bcopy(name, (u8 *)state + index * 12 + 2256, 12);
+        }
+        index++;
+        cursor++;
+    } while (index != 2);
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82601F90.s")
+extern s32 D_82615348[];
+extern void func_80049C70(s32 *, s32 *, void *);
+void RecordText_SelectAndMeasure(void *context, u8 records[][152]) {
+    s32 index;
+    s32 width;
+    s32 height;
+    s32 text_id;
+    u8 *cursor;
+    u8 *record;
+    u8 *dimensions;
+    void *resource;
+    index = 0;
+    cursor = (u8 *)context;
+    while (index < *(s16 *)((u8 *)context + 20)) {
+        record = records[*(s16 *)(cursor + 24)] + 4;
+        if (index < *(s16 *)(*(u8 **)context + 136)) {
+            text_id = 39;
+        } else {
+            text_id = D_82615348[(u32)guRandom() % 3];
+        }
+        resource = func_8004C874(record[3] + 76, text_id);
+        if (resource != 0) {
+            *(s16 *)(cursor + 56) = text_id;
+            dimensions = (u8 *)context + index * 4;
+            func_80049C70(&width, &height, resource);
+            *(s16 *)(dimensions + 88) = width;
+            *(s16 *)(dimensions + 90) = height;
+        }
+        index++;
+        cursor += 2;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_826020C0.s")
 

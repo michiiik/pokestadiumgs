@@ -29,21 +29,83 @@ External hashes, the complete original module, and unchanged collateral
 objects were checked before more compilation. The ROM MD5 remains
 `1561c75d11cedf356a8ddb1a4a5f9d5d`. The address alias preserves callers.
 
-## Unresolved neighboring owners
+## 2026-10-23: two-slot record-name family
 
-`82601968`: retain the historical requeue. Earlier regional evidence records
-56 variants and a best 284-byte candidate with seven allocation/operand
-differences. Do not replay its pointer/index, loop, width, or destination
-families. Its old missing-toml obstacle no longer describes the calibrated
-native permuter used for the four-slot owner; a retained-parent source search
-is an available follow-up. This owner was not probed in this block.
+Four more owners are accepted through the recorded native runner and
+ordinary host-syntax-enabled US full-ROM gate: 1296 matching bytes total.
 
-`82601D2C`: requeue after an eight-cell ordinary-array family. The original
-has two direct row pointers and three selectable row pointers; all five
-entries are initialized and used in the draft. Scalar/array declaration
-order, counted for/do loops, and direct/cursor slot reads leave 332/336-byte
-candidates against retail's 324 bytes, with about 70 raw instruction-word
-differences. The state pointer spills and the row-array homes differ.
-Next: inspect the state and array-address alias/lifetime webs or use a
-measured state-record view; do not enlarge arrays with unused slots to move
-the frame. No candidate was installed.
+- `82601BB0` becomes `RecordNames_FormatTwoSlots` (380 bytes). Two
+  1064-byte context descriptors select between formatting one or two signed
+  byte values and copying an existing record name. The mode at descriptor
+  offset zero is a signed halfword; the signed bytes are at offsets two
+  and three. The destination slots are 12 bytes at state offset 2256.
+  `func_8004C594` supplies values and `func_8004C8A0` formats asset group
+  18 entries 29 or 28; the copy fallback uses group 42. Their real
+  interfaces are defined in `src/4CC20.c`. Loading selection before the
+  table and using the 152-byte array view recover the record-address
+  sequence. A signed state pointer with an explicit destination byte view
+  recovers the three remaining address-add operand orders.
+- `82601D2C` becomes `RecordNames_LoadTwoSlots` (324 bytes). The two
+  direct row pointers and three profile choices are all initialized and
+  used. Signed owner -1 chooses the profile indexed by the state halfword
+  at offset 12; -2 preserves the destination; every other owner chooses
+  the direct row for that slot. A two-case `switch`, with -1 before -2
+  and default last, recovers the original allocation without a jump table
+  or rodata change. Placing the three used loop locals after the two real
+  arrays recovers their original stack homes. No array capacity is added.
+- `82601E70` becomes `RecordNames_LoadSelectedOrDefaultSlots` (288
+  bytes). The same owner cases choose a selected record or the table's
+  first record for either slot. Selection uses state offset 136 and the
+  context halfword map at offset 24. Independent selected/default row
+  expressions avoid retaining the raw table pointer throughout the loop.
+  The same two-case switch fixes the allocation class; initializing the
+  default row before the state snapshot resolves the final row-register
+  swap. No transient pointer-copy chain is needed.
+- `82601F90` becomes `RecordText_SelectAndMeasure` (304 bytes). Each
+  selected 152-byte record chooses text group `record[3] + 76`. Entry 39
+  is used below the state threshold at offset 136; later rows choose from
+  the three `D_82615348` entries. Successful lookups store the chosen ID
+  and measured width/height as halfwords. The SDK declares `guRandom`
+  as returning `int` in `lib/ultralib/include/PR/gu.h`; an explicit
+  `u32` conversion before modulo three reproduces retail's unsigned
+  division without changing that interface. Initializing the real index
+  first and placing its declaration before the two used measurement outputs
+  recover the initialization order and output homes. An opaque context
+  parameter with explicit byte addressing recovers the final address add.
+
+All four first successful gates immediately froze the source, complete
+changed module, four collateral objects, ROM/ELF/linked script, layout
+inputs, and original assembly dependencies. External hashes, complete
+original-module equality, and unchanged collateral objects passed before
+further compilation. ROM MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+Address aliases preserve existing callers. No instruction/relocation
+rewrite, padding, unused local, synthetic read, forced register/frame,
+fake argument/interface, or manual unroll is used.
+
+### Resolved requeue and source-search safeguards
+
+The earlier `82601D2C` requeue is resolved. Typed views and a unified
+five-entry table had removed the spill but retained 22/23 instruction-word
+differences. Calibrated logging-only allocation/frame diagnostics passed
+stock/off/on/20-leading-blank whole-module controls and localized the
+table-base/state competition. The decisive change was the owner switch,
+which left only seven stack-home words; relocating three already-used
+local declarations closed them.
+
+A later two-array source search returned deceptively close variants.
+Review rejected a last-row load from the state buffer instead of the
+context table, an uninitialized state pointer, a changed captured-state
+read, and a cursor reset on every iteration. Corrected forms did not retain
+their apparent gains. None of those variants was installed. The accepted
+matches came from the clean source families described above, not from the
+invalid mutations.
+
+## Unresolved neighboring owner
+
+`82601968` remains a requeue. Earlier regional evidence records 56 variants
+and a best 284-byte candidate with seven allocation/operand differences.
+Do not replay its pointer/index, loop, width, or destination families.
+The old missing-toml obstacle no longer describes the calibrated native
+permuter. Resume its retained parent with a reviewed source search or the
+new owner-dispatch/allocation evidence; the historical C spelling must
+still be recovered and verified. This owner was not probed in this block.
