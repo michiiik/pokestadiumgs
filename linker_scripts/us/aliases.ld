@@ -737,3 +737,7 @@ func_84151128 = BattlePlan_ScoreHaze;
 func_84150538 = BattlePlan_ScorePoison;
 func_841506D0 = BattlePlan_ScoreBurn;
 func_84150878 = BattlePlan_ScoreFreeze;
+func_841503B0 = BattlePlan_ScoreSleep;
+func_841509E0 = BattlePlan_ScoreParalysis;
+func_84153028 = BattlePlan_AddSandstormBonus;
+func_841531D4 = BattlePlan_ScoreEndure;

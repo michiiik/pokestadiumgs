@@ -47,14 +47,41 @@ void BattlePlan_ApplyPursuitMultiplier(u8 *state, u8 side) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150330.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841503B0.s")
-
-extern u8 func_8414A264(void);
-extern s32 func_84155574(u8 *, u8);
-extern u8 func_80062D98(u8);
+extern s32 BattleRecord_HasMove(u8 *, u8);
 extern u8 func_80063660(u8);
+extern u8 func_8414A264(void);
 extern void * func_8414A3A0(u8);
 extern u8 * func_84154B30(u8);
+extern s32 func_84154B9C(u8, u16);
+void BattlePlan_ScoreSleep(void *plan, u8 side, u8 chance) {
+    u8 *other;
+    u8 *own;
+    s32 base;
+    s32 amount;
+    u8 *table;
+    base = (s32)(u32)plan + 4;
+    other = func_84154B30(1 - side);
+    own = func_84154B64(side);
+    if (*(u16 *)(other + 46) != 0) return;
+    if ((other[3] & 4) != 0) return;
+    if ((other[32] & 0x10) != 0) return;
+    if (func_80063660(other[9]) == 23) return;
+    if (func_84154B9C(1 - side, 7) != 0) return;
+    *(u8 *)(u32)base |= 2;
+    table = func_8414A3A0(side);
+    amount = table[12] * func_8414A264() * chance / 255;
+    ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    if (BattleRecord_HasMove(own, 171) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+    if (BattleRecord_HasMove(own, 138) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+    *(u8 *)((u32)base + (u32)side + 8) = chance;
+}
+
+extern s32 func_84155574(u8 *, u8);
+extern u8 func_80062D98(u8);
 extern s32 func_84155544(u8 *, u8);
 extern s32 func_841556C4(u8 *, u8);
 void BattlePlan_ScorePoison(u8 *plan, u8 side, u8 move, u8 chance) {
@@ -120,7 +147,6 @@ void BattlePlan_ScoreBurn(void *plan, u8 side, u8 move, u8 chance) {
 }
 
 extern u8 *func_84154B0C(void);
-extern s32 func_84154B9C(u8, u16);
 void BattlePlan_ScoreFreeze(void *plan, u8 side, u8 move, u8 chance) {
     u8 *other;
     u8 *cursor;
@@ -147,7 +173,26 @@ void BattlePlan_ScoreFreeze(void *plan, u8 side, u8 move, u8 chance) {
     ((u32 *)(u32)base)[(u32)side + 13] += cursor[15] * amount * chance / 255;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841509E0.s")
+void BattlePlan_ScoreParalysis(void *plan, u8 side, u8 move, u8 chance) {
+    u8 *other;
+    u8 *table;
+    u8 move_type;
+    s32 base;
+    u8 amount;
+    base = (s32)(u32)plan + 4;
+    other = func_84154B30((1 - (u32)side) & 0xFF);
+    move_type = func_80062D98(move);
+    if (*(u16 *)(other + 46) != 0) return;
+    if ((other[3] & 4) != 0) return;
+    if ((other[32] & 0x10) != 0) return;
+    if (func_80063660(other[9]) == 24) return;
+    if (func_84155574(other + 8, move_type) == 0) return;
+    *(u8 *)(u32)base |= 2;
+    *(u8 *)((u32)base + (u32)side + 8) = chance;
+    amount = func_8414A264();
+    table = func_8414A3A0(side);
+    ((u32 *)(u32)base)[(u32)side + 13] += table[16] * amount * chance / 255;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150B14.s")
 
@@ -355,14 +400,13 @@ extern void * func_8414A3A0(u8);
 extern u8 * func_84154B30(u8);
 void func_84151838(void *arg0, u8 arg1) { s32 base; void *table; u32 *entry; u8 amount; base = (s32)(u32)arg0 + 4; if ((func_84154B30(arg1)[3] & 8) == 0) { *(u8 *)((u8 *)(u32)base + arg1 + 8) = 0xFF; amount = func_8414A2AC(); table = func_8414A3A0(arg1); entry = (u32 *)((u8 *)(u32)base + (arg1 << 2) + 0x34); *entry += *(u8 *)((u8 *)table + 0x25) * amount; *(u8 *)(u32)base |= 2; } }
 
-extern void func_841509E0(void *, u8, u8, u8);
 
 void func_841518D0(void *arg0, u8 arg1, u8 arg2) {
     u8 local = arg2 / 3;
 
     BattlePlan_ScoreBurn(arg0, arg1, 0xA1, local);
     BattlePlan_ScoreFreeze(arg0, arg1, 0xA1, local);
-    func_841509E0(arg0, arg1, 0xA1, local);
+    BattlePlan_ScoreParalysis(arg0, arg1, 0xA1, local);
 }
 
 extern s32 func_841493F4(void);
@@ -895,9 +939,52 @@ void BattlePlan_AddPerishSongBonus(u8 *plan, u8 side) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153028.s")
+extern u8 func_8414A2B8(void);
+void BattlePlan_AddSandstormBonus(u8 *plan, u8 side) {
+    u8 *own;
+    u8 *other;
+    s32 base;
+    s32 amount;
+    u8 *table;
+    base = (s32)(u32)plan + 4;
+    own = func_84154B64(side);
+    other = func_84154B64((1 - (u32)side) & 0xFF);
+    if (func_84154B0C()[408] == 3) return;
+    *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+    table = func_8414A3A0(side);
+    amount = table[44] * func_8414A2B8();
+    if (func_84155544(own, 5) != 0 || func_84155544(own, 4) != 0 || func_84155544(own, 9) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+    if (func_84155544(other, 5) != 0 || func_84155544(other, 4) != 0 || func_84155544(other, 9) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] -= amount;
+    }
+    if (func_841556C4(own, 111) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+    ((u32 *)(u32)base)[(u32)side + 13] += amount / 2;
+    *(u8 *)(u32)base |= 2;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841531D4.s")
+void BattlePlan_ScoreEndure(u8 *plan, u8 side) {
+    u8 chance;
+    u8 *own;
+    s32 base;
+    s32 amount;
+    u8 *table;
+    base = (s32)(u32)plan + 4;
+    own = func_84154B64(side);
+    chance = 0xFF >> own[33];
+    plan[(u32)side + 12] = chance;
+    table = func_8414A3A0(side);
+    amount = table[55] * func_8414A2AC() * chance / 255;
+    if (func_841556C4(own, 99) != 0) {
+        if (*(u16 *)(own + 40) * 48 / *(u16 *)(own + 42) >= 6) {
+            ((u32 *)(u32)base)[(u32)side + 13] += amount;
+        }
+    }
+    *(u8 *)(u32)base |= 2;
+}
 
 extern void func_84151B8C(s32, u8, u8);
 extern u8 *func_84154B64(u8);

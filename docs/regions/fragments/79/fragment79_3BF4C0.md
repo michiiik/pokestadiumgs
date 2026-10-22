@@ -635,3 +635,105 @@ function extents. Scoped cleanup removes twenty redundant declarations;
 diagnostic helpers and rejected candidates stay outside the publication.
 Twelve ASM owners remain in this file, including the unresolved party-count
 and Protect/Detect allocation checkpoints.
+
+## Paralysis acceptance and initial sleep spill checkpoint
+
+On native revision `06a48630`, `841509E0` accepts as 308 bytes of genuine C.
+The effect dispatcher routes effects 6 and 67 through `.L84153F38` and
+`.L84153F24`; the intended name is `BattlePlan_ScoreParalysis`. The scorer
+rejects an existing status, snapshot flags, held-item code 24, or zero type
+effectiveness, then marks the plan and adds table byte 16 times
+`8414A264` times chance divided by 255. A consumed byte amount and a table
+pointer declared before the move-type byte reproduce its original byte
+homes at stack offsets 31 and 39. All locals carry actual loads, arithmetic,
+guards or calls; no unused frame reservation is present.
+
+The retained `native-f79-plan-paralysis-homes` candidate 0 is directly
+link-verified and passes the ordinary host-syntax-enabled full-ROM gate.
+Its first-success source, entire object, four collateral objects, ROM, ELF,
+linked script, layouts and original ASM are frozen and externally hashed
+before further compilation. Independent checks preserve all original module
+extents, collateral objects and unrelated dirty paths. This acceptance starts
+the four-owner batch completed below.
+
+`841503B0` initially remained a `requeue` at this checkpoint. Its sleep
+scoring checks status, snapshot flags, item code 23 and opposing party mask
+7, then adds table byte 12 times `8414A264` times chance divided by 255.
+An own Nightmare (171) and Dream Eater (138) each add that amount again.
+The original three-argument interface takes plan, side and chance.
+
+The best retained candidate is `native-f79-plan-sleep-table-home` candidate
+1: 392 bytes, a 56-byte frame, identical positional opcodes and relocation
+topology, but nine raw words differ. The opposing-side/header spill uses
+offset 28 rather than 32; the derived score-entry spill uses 24 rather than
+28. This is stack placement, not a register-color tie. Seventy-two recorded
+source candidates cover early/late header computation, declaration homes,
+consumed-view reuse, an explicit score-entry pointer, the established typed
+header, a real multiplier-result local, and side-argument conversion. None
+is accepted. Moving the table operand before the getter fixes a separate
+multiply operand-order difference; changing the remaining spill locations
+still requires a different mechanism.
+
+Eight stock/off/on/leading-blank whole-object controls calibrate a passive
+frame trace. The selected procedure reports saved area 8, local area 16,
+argument/temporary area 32 and final frame 56. A separately calibrated,
+stack-aware, restricted source-only permuter stays flat at score 36 for
+45 seconds. No diagnostic compiler or rejected source is installed.
+Next inspect the actual temporary-slot assignment/reuse events for this
+calibrated candidate, rather than repeating declaration orders or reserving
+an unused word to move both spills. The local evidence tags above identify
+the retained manifests, objects, reports and calibrated traces; they are
+private diagnostic artifacts, not new project dependencies.
+
+## Accepted Sleep, Paralysis, Sandstorm and Endure batch
+
+Four genuine C owners total 1,432 bytes. Move metadata and the original
+`84153E28` effect dispatcher establish these names and call interfaces:
+
+- `841503B0` / `BattlePlan_ScoreSleep`, 392 bytes: Sing (47), Sleep Powder
+  (79), Hypnosis (95) and Spore (147) have effect 1, dispatching through
+  `.L84153ECC` with chance 255. The status, snapshot, item-code and party
+  guards precede the table-12 score and the Nightmare/Dream Eater bonuses
+  described above. The three-argument interface is preserved.
+- `841509E0` / `BattlePlan_ScoreParalysis`, 308 bytes: Thunderbolt (85)
+  has effect 6 and Thunder Wave (86) has effect 67, dispatching through
+  `.L84153F38` and `.L84153F24`. The latter supplies chance 255. The byte
+  amount/type homes and table-16 calculation are described above.
+- `84153028` / `BattlePlan_AddSandstormBonus`, 428 bytes: Sandstorm (201)
+  has effect 115, dispatching through `.L8415474C`. Existing weather 3
+  stops scoring. Otherwise table byte 44 times `8414A2B8` supplies an
+  amount: own Rock/Ground/Steel types add it, opposing matching types
+  subtract it, an own effect-111 move adds it, and half the amount is
+  added unconditionally. The original signed division by two is preserved.
+- `841531D4` / `BattlePlan_ScoreEndure`, 304 bytes: Endure (203) has
+  effect 116, dispatching through `.L8415475C`. It marks chance as 255
+  shifted right by own record byte 33, then scales table byte 55 by
+  `8414A2AC` and that chance. An own effect-99 move (Flail 175 or Reversal
+  179) and `48 * HP / maxHP >= 6` gate the score addition. The plan flag
+  write remains unconditional. The real chance byte precedes the own
+  record pointer, reproducing their original stack homes 47 and 40.
+
+The sleep checkpoint closes through a measured temporary-area mechanism.
+The old spill-plan observer labeled each pre-color assignment with the
+preceding procedure's ordinal. A corrected logging-only observer uses the
+current ordinal and passes eight stock/off/on/leading-blank whole-object
+controls. Sleep's header and opposing-side expression share spill slot 0
+at -28; its score-entry expression takes slot 1 at -32. These offsets are
+assigned after all declared locals, even locals later promoted to registers.
+Removing the separate opposing-side local and using `1 - side` at both
+byte-argument calls lets the compiler share the expression and moves those
+slots to -24/-28, exactly reproducing original final-frame offsets 32/28.
+No padding, unused variable, dummy read, forced register, fake interface,
+volatile access or instruction rewrite is involved.
+
+The sandstorm scorer uses the same early integer-header-base mechanism as
+accepted neighboring scorers. The Endure scorer additionally preserves the
+real byte chance's declaration home. Both accept in their first eight-cell
+source family. All four owners are directly link-verified and pass ordinary
+host-syntax-enabled full-ROM gates. Every first success freezes the source,
+entire module object, four collateral objects, ROM, ELF, linked script,
+layouts and original ASM, with external hashes checked before any further
+compilation. Six cleanup/naming/ABI controls and eleven independent links
+preserve all 66 original extents and 19,440 retail text bytes. Scoped cleanup
+removes 22 redundant declarations. Eight assembly owners remain; the earlier
+party-count and Protect/Detect checkpoints are still unresolved.
