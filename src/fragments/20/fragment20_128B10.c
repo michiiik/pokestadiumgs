@@ -4,7 +4,29 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82600A40.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82600BA0.s")
+extern void func_82600A40(s32 *, s32, s32);
+void RecordSelection_ChooseSortedIndices(s32 *output, s32 draw_count, s32 pool_count) {
+    s32 index;
+    s32 minimum;
+    s32 scan;
+    s32 value;
+    s32 last;
+    func_82600A40(output, draw_count, pool_count);
+    last = draw_count - 1;
+    index = 0;
+    if (last > 0) {
+        do {
+            minimum = index;
+            for (scan = index + 1; scan < draw_count; scan++) {
+                if (output[scan] < output[minimum]) minimum = scan;
+            }
+            value = output[minimum];
+            output[minimum] = output[index];
+            output[index] = value;
+            index++;
+        } while (index != last);
+    }
+}
 
 extern void func_800619E8(void *);
 s32 func_80061B88(u8, u8, void *);

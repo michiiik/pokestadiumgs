@@ -313,3 +313,68 @@ to the end of the subtraction do not resolve it. No candidate is installed.
 Next: inspect the retained branch-local pointer's allocation/liveness and
 the independent border geometry, preserving the reloads after drawing
 calls rather than retaining stale viewport fields across them.
+
+The follow-up native box passes eight stock/off/on/20-leading-blank whole-
+module controls for a known owner and the retained geometry parent. Its
+logging-only trace assigns the incoming pointer web to S0 in allocator phase
+one (`save=1.6`, five uses); this is a measured saved-register choice, not an
+assembler delay-slot hypothesis. Signed-halfword snapshots, explicit embedded
+array/struct views, advancing the incoming argument to the viewport, and an
+early full-fill return all remain unmatched. Halfword snapshots can reach
+376 bytes but retain the wrong frame and saved pointer; they are not close
+instruction matches. The best later reported raw score is 0.3404 with a
+360-byte argument-advance body. Keep the 364-byte geometry parent as well:
+different scalar scores do not settle its better structural subregions.
+Next: distinguish the named/derived pointer's coalescing from its saved-
+register cost, using the calibrated allocation evidence before any new
+source family. No pointer-address escape, extra read, volatile qualifier,
+fabricated argument, or padding is justified by these results.
+
+### Resolved: `82600BA0` sorted unique index selection
+
+`RecordSelection_ChooseSortedIndices` calls `82600A40` with an output array,
+draw count, and pool count, then selection-sorts the chosen signed indices
+in ascending order. `82600D38` supplies six output slots and the row count
+from its packed table; the callee `82600A40` reads all three arguments.
+The interface is therefore three arguments even though the wrapper forwards
+the incoming pool-count register without emitting a new assignment.
+
+The accepted 340-byte source uses a guarded do/while over the last index
+and an ordinary inner scan. IDO performs the inner unrolling. The swap
+loads the chosen minimum first. No source-level unrolling, extra storage,
+object rewrite, or padding is used. Recorded runner acceptance and the
+normal host-syntax-enabled full-ROM gate passed. The first-success source,
+complete module, four collateral objects, layout/assembly inputs, ROM, ELF,
+and linked script were frozen before further compilation. Independent
+external hashes, whole-module byte/relocation/extent equality, unchanged
+collateral and foreign files, and US ROM MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d` passed.
+
+### Requeue: `82600D38` randomized party records
+
+The packed-table row count controls six unique sorted choices. For each
+record, `82600A40` produces a three-element permutation whose first two
+entries select the two sides' 24-byte packed Pokemon. `80071E48` unpacks
+each into an 88-byte working record. Unassigned sides divide five distinct
+stat-experience fields according to profile zero/four, one/two, or other/one,
+then `82600CF4` refreshes the record.
+
+The field interpretation is producer/consumer verified: `80071E48` copies
+packed halfwords to working offsets 12, 14, 16, 18, and 20, and supplies
+them to `Pokemon_CalculateStat` for HP, Attack, Defense, Speed, and both
+Special stats respectively. `Pokemon_CalculateStat` and
+`Pokemon_GetDVForStat` in `src/615D0.c` establish the stat-exp role and stat
+index mapping. A named-field model replaces the earlier speculative
+indexed loop; this is not a hand-unrolled generic array operation.
+
+Sixteen controlled candidates test that model and then packed-row versus
+destination evaluation order and selector width. Whole-module original,
+declaration-context, and leading-blank controls pass. The best reported raw
+similarity reaches 0.8107, but that 816-byte body remains eight bytes shorter
+than retail. Other 820-byte parents have the correct 216-byte frame and
+more faithful subregions. All remain rejected and none is installed.
+Computing the row first restores the retail inner-loop S1/S2 roles; genuine
+array stack homes, divisor branch topology, and temporary order still differ.
+Next: test selector/divisor lifetime reuse and inspect the real local-area
+layout; do not inflate the permutation or selected arrays, add padding,
+invent reads, or force allocation.
