@@ -47,23 +47,306 @@ void BattlePlan_ApplyPursuitMultiplier(u8 *state, u8 side) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150330.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841503B0.s")
+extern s32 BattleRecord_HasMove(u8 *, u8);
+extern u8 func_80063660(u8);
+extern u8 func_8414A264(void);
+extern void * func_8414A3A0(u8);
+extern u8 * func_84154B30(u8);
+extern s32 func_84154B9C(u8, u16);
+void BattlePlan_ScoreSleep(void *plan, u8 side, u8 chance) {
+    u8 *other;
+    u8 *own;
+    s32 base;
+    s32 amount;
+    u8 *table;
+    base = (s32)(u32)plan + 4;
+    other = func_84154B30(1 - side);
+    own = func_84154B64(side);
+    if (*(u16 *)(other + 46) != 0) return;
+    if ((other[3] & 4) != 0) return;
+    if ((other[32] & 0x10) != 0) return;
+    if (func_80063660(other[9]) == 23) return;
+    if (func_84154B9C(1 - side, 7) != 0) return;
+    *(u8 *)(u32)base |= 2;
+    table = func_8414A3A0(side);
+    amount = table[12] * func_8414A264() * chance / 255;
+    ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    if (BattleRecord_HasMove(own, 171) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+    if (BattleRecord_HasMove(own, 138) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+    *(u8 *)((u32)base + (u32)side + 8) = chance;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150538.s")
+extern s32 func_84155574(u8 *, u8);
+extern u8 func_80062D98(u8);
+extern s32 func_84155544(u8 *, u8);
+extern s32 func_841556C4(u8 *, u8);
+void BattlePlan_ScorePoison(u8 *plan, u8 side, u8 move, u8 chance) {
+    u8 *own;
+    u8 *other;
+    s32 base;
+    u8 move_type;
+    s32 amount;
+    u8 *cursor;
+    base = (s32)(u32)plan + 4;
+    own = func_84154B64(side);
+    other = func_84154B30((1 - (u32)side) & 0xFF);
+    move_type = func_80062D98(move);
+    if (*(u16 *)(other + 46) != 0) return;
+    if ((other[3] & 4) != 0) return;
+    if ((other[32] & 0x10) != 0) return;
+    if (func_80063660(other[9]) == 20) return;
+    cursor = other + 8;
+    if (func_84155544(cursor, 3) != 0) return;
+    if (func_84155574(cursor, move_type) == 0) return;
+    *(u8 *)((u32)base + (u32)side + 8) = chance;
+    cursor = func_8414A3A0(side);
+    amount = cursor[13] * func_8414A264() * chance / 255;
+    ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    if (move == 92) { ((u32 *)(u32)base)[(u32)side + 13] += amount >> 1; }
+    if (func_841556C4(own, 111) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+    *(u8 *)(u32)base |= 2;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841506D0.s")
+void BattlePlan_ScoreBurn(void *plan, u8 side, u8 move, u8 chance) {
+    u8 *other;
+    u8 *own;
+    s32 base;
+    u8 move_type;
+    s32 amount;
+    u8 *table;
+    base = (s32)(u32)plan + 4;
+    other = func_84154B30((1 - (u32)side) & 0xFF);
+    own = func_84154B64(side);
+    move_type = func_80062D98(move);
+    table = func_8414A3A0(side);
+    amount = table[14] * func_8414A264() * chance / 255;
+    if (*(u16 *)(other + 46) != 0) {
+        if ((*(u16 *)(other + 46) & 0x20) != 0) {
+            *(u8 *)((u32)base + (u32)side + 8) = chance;
+            ((u32 *)(u32)base)[(u32)side + 13] -= amount;
+        }
+        return;
+    }
+    if ((other[3] & 4) != 0) return;
+    if ((other[32] & 0x10) != 0) return;
+    if (func_80063660(other[9]) == 21) return;
+    if (func_84155544(other + 8, move_type) != 0) return;
+    if (func_84155574(other + 8, move_type) == 0) return;
+    *(u8 *)(u32)base |= 2;
+    *(u8 *)((u32)base + (u32)side + 8) = chance;
+    ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    if (func_841556C4(own, 111) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150878.s")
+extern u8 *func_84154B0C(void);
+void BattlePlan_ScoreFreeze(void *plan, u8 side, u8 move, u8 chance) {
+    u8 *other;
+    u8 *cursor;
+    u8 move_type;
+    s32 base;
+    u8 amount;
+    u8 other_side;
+    base = (s32)(u32)plan + 4;
+    other_side = (1 - (u32)side) & 0xFF;
+    other = func_84154B30(other_side);
+    move_type = func_80062D98(move);
+    if (*(u16 *)(other + 46) != 0) return;
+    if ((other[3] & 4) != 0) return;
+    if ((other[32] & 0x10) != 0) return;
+    if (func_80063660(other[9]) == 22) return;
+    if (func_84154B0C()[408] == 2) return;
+    cursor = other + 8;
+    if (func_84155544(cursor, move_type) != 0) return;
+    if (func_84155574(cursor, move_type) == 0) return;
+    if (func_84154B9C(other_side, 0x20) != 0) return;
+    *(u8 *)((u32)base + (u32)side + 8) = chance;
+    amount = func_8414A264();
+    cursor = func_8414A3A0(side);
+    ((u32 *)(u32)base)[(u32)side + 13] += cursor[15] * amount * chance / 255;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841509E0.s")
+void BattlePlan_ScoreParalysis(void *plan, u8 side, u8 move, u8 chance) {
+    u8 *other;
+    u8 *table;
+    u8 move_type;
+    s32 base;
+    u8 amount;
+    base = (s32)(u32)plan + 4;
+    other = func_84154B30((1 - (u32)side) & 0xFF);
+    move_type = func_80062D98(move);
+    if (*(u16 *)(other + 46) != 0) return;
+    if ((other[3] & 4) != 0) return;
+    if ((other[32] & 0x10) != 0) return;
+    if (func_80063660(other[9]) == 24) return;
+    if (func_84155574(other + 8, move_type) == 0) return;
+    *(u8 *)(u32)base |= 2;
+    *(u8 *)((u32)base + (u32)side + 8) = chance;
+    amount = func_8414A264();
+    table = func_8414A3A0(side);
+    ((u32 *)(u32)base)[(u32)side + 13] += table[16] * amount * chance / 255;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150B14.s")
+extern u8 func_8414A2C4(void);
+extern void *D_841951F8[];
+extern u8 BattleMoveState_FindStrongestMove(u8, u8);
+extern u8 func_8414A270(u8);
+void BattlePlan_ScoreStatIncrease(u8 *plan, u8 side, u8 move, u8 chance, u8 stage, u8 gain) {
+    u8 factor;
+    u8 *own;
+    u8 *other;
+    s32 base;
+    u8 *table;
+    s32 amount;
+    own = func_84154B64(side);
+    other = func_84154B64(1 - side);
+    base = (s32)(u32)plan + 4;
+    table = func_8414A3A0(side);
+    if (move == 111 && (own[22] & 1) == 0 && BattleRecord_HasMove(own, 205) != 0) {
+        *(u8 *)((u32)base + (u32)side + 8) = chance;
+        ((u32 *)(u32)base)[(u32)side + 13] += table[11] * func_8414A2C4() * chance / 255;
+    }
+    if (((BattlePlanStageRecord *)own)->stages[stage] >= 13) return;
+    if (stage < 5 && ((u16 *)(own + 54))[stage] >= 999) return;
+    *(u8 *)((u32)base + (u32)side + 8) = chance;
+    if (((BattlePlanStageRecord *)own)->stages[stage] + gain >= 14) {
+        gain = 13 - ((BattlePlanStageRecord *)own)->stages[stage];
+    }
+    factor = (13 - ((BattlePlanStageRecord *)own)->stages[stage]) * gain;
+    amount = (table + 23)[stage] * func_8414A270(stage) * factor * chance / 255;
+    ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    switch (stage) {
+    case 0:
+        if (BattleMoveState_FindStrongestMove(side, 0) != 0) ((u32 *)(u32)base)[(u32)side + 13] += amount >> 1;
+        break;
+    case 1:
+        if (BattleMoveState_FindStrongestMove(1 - side, 0) != 0) ((u32 *)(u32)base)[(u32)side + 13] += amount >> 1;
+        break;
+    case 2:
+        if (*(u16 *)(other + 58) < *(u16 *)(own + 58)) ((u32 *)(u32)base)[(u32)side + 13] = 0;
+        break;
+    case 3:
+        if (BattleMoveState_FindStrongestMove(side, 1) != 0) ((u32 *)(u32)base)[(u32)side + 13] += amount >> 1;
+        break;
+    case 4:
+        if (BattleMoveState_FindStrongestMove(1 - side, 1) != 0) ((u32 *)(u32)base)[(u32)side + 13] += amount >> 1;
+        break;
+    }
+    if (BattleRecord_HasMove(own, 226) != 0 && ((u8 *)D_841951F8[side])[9] >= 2) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+    *(u8 *)(u32)base |= 2;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150EA4.s")
+extern u8 func_80062D5C(u8);
+void BattlePlan_ScoreStatReduction(u8 *plan, u8 side, u8 move, u8 chance, u8 stage, u8 drop) {
+    u8 factor;
+    u8 *own;
+    u8 *other;
+    u8 move_type;
+    s32 amount;
+    BattlePlanScoreHeader *header;
+    u8 *table;
+    own = func_84154B64(side);
+    other = func_84154B64(1 - side);
+    header = (BattlePlanScoreHeader *)(plan + 4);
+    if ((other[24] & 0x10) != 0) return;
+    if ((other[24] & 2) != 0) return;
+    if (((BattlePlanStageRecord *)other)->stages[stage] < 2) return;
+    if (stage < 5 && ((u16 *)(other + 54))[stage] < 2) return;
+    if (func_80062D5C(move) > 0) {
+        move_type = func_80062D98(move);
+        if (func_84155574(other, move_type) == 0) return;
+    }
+    header->selected[side] = chance;
+    if (((BattlePlanStageRecord *)other)->stages[stage] - drop <= 0) {
+        drop = ((BattlePlanStageRecord *)other)->stages[stage] - 1;
+    }
+    factor = (((BattlePlanStageRecord *)other)->stages[stage] - 1) * drop;
+    table = func_8414A3A0(side);
+    amount = (table + 30)[stage] * func_8414A270(stage) * factor * chance / 255;
+    switch (stage) {
+    case 0:
+        if (BattleMoveState_FindStrongestMove(1 - side, 0) != 0) amount += amount >> 1;
+        break;
+    case 1:
+        if (BattleMoveState_FindStrongestMove(side, 0) != 0) amount += amount >> 1;
+        break;
+    case 2:
+        if (*(u16 *)(other + 58) < *(u16 *)(own + 58)) amount = 0;
+        break;
+    case 3:
+        if (BattleMoveState_FindStrongestMove(1 - side, 1) != 0) amount += amount >> 1;
+        break;
+    case 4:
+        if (BattleMoveState_FindStrongestMove(side, 1) != 0) amount += amount >> 1;
+        break;
+    }
+    header->score[side] += amount;
+    header->flags |= 2;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151128.s")
+extern void BattlePlan_ScoreStatIncrease(u8 *, u8, u8, u8, u8, u8);
+extern void BattlePlan_ScoreStatReduction(u8 *, u8, u8, u8, u8, u8);
+void BattlePlan_ScoreHaze(u8 *plan, u8 side) {
+    s32 first_stage;
+    s32 second_stage;
+    BattlePlanStageRecord *records[2];
+    s32 i;
+    s32 base;
+    base = (s32)(u32)plan + 4;
+    records[0] = (void *)func_84154B64(0);
+    records[1] = (void *)func_84154B64(1);
+    for (i = 0; i < 7; i++) {
+        first_stage = records[0]->stages[i];
+        if (first_stage >= 8) {
+            BattlePlan_ScoreStatReduction(plan, 1, 114, 0xFF, i, first_stage - 7);
+        } else if (first_stage < 7) {
+            BattlePlan_ScoreStatIncrease(plan, 0, 114, 0xFF, i, 7 - first_stage);
+        }
+        second_stage = records[1]->stages[i];
+        if (second_stage >= 8) {
+            BattlePlan_ScoreStatReduction(plan, 0, 114, 0xFF, i, second_stage - 7);
+        } else if (second_stage < 7) {
+            BattlePlan_ScoreStatIncrease(plan, 1, 114, 0xFF, i, 7 - second_stage);
+        }
+    }
+    *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+    *(u8 *)(u32)base |= 2;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151270.s")
+extern u8 func_80063660(u8);
+extern u8 func_8414A2A0(void);
+extern void * func_8414A3A0(u8);
+extern u8 * func_84154B30(u8);
+void BattlePlan_AddRampageBonus(u8 *plan, u8 side) {
+    u8 *state;
+    u8 *sub;
+    u8 value;
+    s32 base;
+    u8 *table;
+    u8 amount;
+    base = (s32)(u32)plan + 4;
+    state = func_84154B30(side);
+    sub = state + 8;
+    if ((state[3] & 4) == 0) {
+        //!bug: Later comparisons test the stored Boolean, not the getter result.
+        value = func_80063660(sub[1]) != 25;
+        if (value != 0 && value != 16 && value != 15) {
+            *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+            amount = func_8414A2A0();
+            table = func_8414A3A0(side);
+            ((u32 *)(u32)base)[(u32)side + 13] += table[18] * amount;
+        }
+    }
+}
 
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
@@ -121,11 +404,70 @@ s32 func_84151498(u8 *arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841514F8.s")
+extern u8 func_80063454(u8, u8, u8, s32);
+u8 BattlePlan_CountResistingMoveSlots(u8 side, u8 target_type) {
+    u8 count;
+    u8 *record;
+    s32 i;
+    u8 move_type;
+    count = 0;
+    record = func_84154B64(side);
+    for (i = 0; i < 4; i++) {
+        if (func_84151420(record, i) != 0) {
+            move_type = func_80062D98(*(u8 *)((u32)record + (u32)i + 4));
+            if (func_80063454(target_type, move_type, move_type, 0) < 10) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841515AC.s")
+extern u8 func_84148C74(u8);
+void BattlePlan_AddConversionBonus(u8 *plan, u8 side) {
+    u8 other_side;
+    u8 move;
+    s32 base;
+    u8 *table;
+    u8 incoming_type;
+    u8 count;
+    u8 amount;
+    base = (s32)(u32)plan + 4;
+    other_side = 1 - side;
+    move = *(u8 *)((u32)plan + (u32)other_side + 6);
+    if (move == 0) {
+        move = func_84148C74(other_side);
+    }
+    if (func_84151498(func_84154B64(side)) != 0) {
+        *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+        amount = func_8414A2AC();
+        table = func_8414A3A0(side);
+        incoming_type = func_80062D98(move);
+        count = BattlePlan_CountResistingMoveSlots(side, incoming_type);
+        ((u32 *)(u32)base)[(u32)side + 13] += count * table[48] * amount;
+        *(u8 *)(u32)base |= 2;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_8415169C.s")
+extern s32 func_8414C858(u8 *);
+extern u8 func_8414A288(void);
+void BattlePlan_AddFlinchBonus(u8 *plan, u8 side, u8 chance) {
+    u8 *other;
+    BattlePlanScoreHeader *base;
+    u8 *table;
+    u8 amount;
+    base = (void *)(plan + 4);
+    other = func_84154B64((1 - (u32)side) & 0xFF);
+    if (((other[24] & 0x10) == 0) && ((*(u16 *)(other + 38) & 0x27) == 0)) {
+        if (func_8414C858(plan) != 0) {
+            base->selected[side] = chance;
+            amount = func_8414A288();
+            table = func_8414A3A0(side);
+            base->score[side] += table[17] * amount * chance / 255;
+            base->flags |= 2;
+        }
+    }
+}
 
 extern s32 func_8414A2DC(void);
 extern void * func_8414A3A0(u8);
@@ -153,16 +495,13 @@ extern void * func_8414A3A0(u8);
 extern u8 * func_84154B30(u8);
 void func_84151838(void *arg0, u8 arg1) { s32 base; void *table; u32 *entry; u8 amount; base = (s32)(u32)arg0 + 4; if ((func_84154B30(arg1)[3] & 8) == 0) { *(u8 *)((u8 *)(u32)base + arg1 + 8) = 0xFF; amount = func_8414A2AC(); table = func_8414A3A0(arg1); entry = (u32 *)((u8 *)(u32)base + (arg1 << 2) + 0x34); *entry += *(u8 *)((u8 *)table + 0x25) * amount; *(u8 *)(u32)base |= 2; } }
 
-extern void func_841506D0(void *, u8, u8, u8);
-extern void func_84150878(void *, u8, u8, u8);
-extern void func_841509E0(void *, u8, u8, u8);
 
 void func_841518D0(void *arg0, u8 arg1, u8 arg2) {
     u8 local = arg2 / 3;
 
-    func_841506D0(arg0, arg1, 0xA1, local);
-    func_84150878(arg0, arg1, 0xA1, local);
-    func_841509E0(arg0, arg1, 0xA1, local);
+    BattlePlan_ScoreBurn(arg0, arg1, 0xA1, local);
+    BattlePlan_ScoreFreeze(arg0, arg1, 0xA1, local);
+    BattlePlan_ScoreParalysis(arg0, arg1, 0xA1, local);
 }
 
 extern s32 func_841493F4(void);
@@ -225,10 +564,6 @@ void func_84151AF4(void *arg0, u8 arg1) {
     }
 }
 
-extern s32 func_80063660(u8);
-extern u8 func_8414A2A0(void);
-extern void * func_8414A3A0(u8);
-extern u8 * func_84154B30(u8);
 extern u8 *func_84154B64(u8);
 extern s32 func_841556C4(u8 *, u8);
 void func_84151B8C(s32 arg0, u8 arg1, u8 arg2) {
@@ -269,7 +604,31 @@ void func_84151D3C(void *arg0, u8 arg1) { void *state; void *table; s32 base; u8
 extern u8 *func_84154B64(u8);
 void func_84151DD4(void *arg0, u8 arg1) { void *state; s32 base; state = func_84154B64(arg1); base = (s32)(u32)arg0 + 4; if (((*(u8 *)((u8 *)state + 0x18) & 0x10) == 0) && (((s32)*(u16 *)((u8 *)state + 0x2A) >> 2) < (s32)*(u16 *)((u8 *)state + 0x28))) { *(u8 *)((u8 *)(u32)base + arg1 + 8) = 0xFF; *(u8 *)((u8 *)(u32)base) |= 2; } }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151E44.s")
+void BattlePlan_AddMimicBonus(u8 *plan, u8 side) {
+    u8 *own;
+    u8 *other;
+    u8 move;
+    s32 i;
+    u8 *table;
+    s32 base;
+    u8 amount;
+    base = (s32)(u32)plan + 4;
+    own = func_84154B64(side);
+    other = func_84154B64((1 - (u32)side) & 0xFF);
+    move = other[36];
+    if ((move != 0) && (move != 165)) {
+        for (i = 0; i < 4; i++) {
+            if (own[i + 4] == move) {
+                return;
+            }
+        }
+        *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+        amount = func_8414A2AC();
+        table = func_8414A3A0(side);
+        ((u32 *)(u32)base)[(u32)side + 13] += table[62] * amount;
+        *(u8 *)(u32)base |= 2;
+    }
+}
 
 extern u8 func_8414A2AC(void);
 extern void * func_8414A3A0(u8);
@@ -558,7 +917,31 @@ void func_841528C4(void *arg0, u8 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152980.s")
+extern void BattlePlan_ScoreStatIncrease(u8 *, u8, u8, u8, u8, u8);
+extern void BattlePlan_ScoreStatReduction(u8 *, u8, u8, u8, u8, u8);
+void BattlePlan_ScoreCurse(u8 *plan, u8 side) {
+    u8 *own;
+    u8 *other;
+    u8 other_side;
+    s32 base;
+    u8 *table;
+    base = (s32)(u32)plan + 4;
+    own = func_84154B64(side);
+    other_side = 1 - side;
+    other = func_84154B64(other_side);
+    if (func_84155544(own, 8) != 0) {
+        if (((other[21] & 2) == 0) && ((other[24] & 0x10) == 0)) {
+            *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+            table = func_8414A3A0(side);
+            ((u32 *)(u32)base)[(u32)side + 13] = table[22] * func_8414A2AC();
+            *(u8 *)(u32)base |= 2;
+        }
+    } else {
+        BattlePlan_ScoreStatIncrease(plan, side, 174, 0xFF, 0, 1);
+        BattlePlan_ScoreStatIncrease(plan, side, 174, 0xFF, 1, 1);
+        BattlePlan_ScoreStatReduction(plan, other_side, 174, 0xFF, 2, 1);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84152AC0.s")
 
@@ -651,9 +1034,52 @@ void BattlePlan_AddPerishSongBonus(u8 *plan, u8 side) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153028.s")
+extern u8 func_8414A2B8(void);
+void BattlePlan_AddSandstormBonus(u8 *plan, u8 side) {
+    u8 *own;
+    u8 *other;
+    s32 base;
+    s32 amount;
+    u8 *table;
+    base = (s32)(u32)plan + 4;
+    own = func_84154B64(side);
+    other = func_84154B64((1 - (u32)side) & 0xFF);
+    if (func_84154B0C()[408] == 3) return;
+    *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+    table = func_8414A3A0(side);
+    amount = table[44] * func_8414A2B8();
+    if (func_84155544(own, 5) != 0 || func_84155544(own, 4) != 0 || func_84155544(own, 9) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+    if (func_84155544(other, 5) != 0 || func_84155544(other, 4) != 0 || func_84155544(other, 9) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] -= amount;
+    }
+    if (func_841556C4(own, 111) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+    ((u32 *)(u32)base)[(u32)side + 13] += amount / 2;
+    *(u8 *)(u32)base |= 2;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841531D4.s")
+void BattlePlan_ScoreEndure(u8 *plan, u8 side) {
+    u8 chance;
+    u8 *own;
+    s32 base;
+    s32 amount;
+    u8 *table;
+    base = (s32)(u32)plan + 4;
+    own = func_84154B64(side);
+    chance = 0xFF >> own[33];
+    plan[(u32)side + 12] = chance;
+    table = func_8414A3A0(side);
+    amount = table[55] * func_8414A2AC() * chance / 255;
+    if (func_841556C4(own, 99) != 0) {
+        if (*(u16 *)(own + 40) * 48 / *(u16 *)(own + 42) >= 6) {
+            ((u32 *)(u32)base)[(u32)side + 13] += amount;
+        }
+    }
+    *(u8 *)(u32)base |= 2;
+}
 
 extern void func_84151B8C(s32, u8, u8);
 extern u8 *func_84154B64(u8);
@@ -717,7 +1143,35 @@ void func_84153454(void *arg0, u8 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153554.s")
+extern void * D_841951F8[];
+void BattlePlan_AddBatonPassBonus(u8 *plan, u8 side) {
+    u8 *record;
+    u8 *sub;
+    s32 amount;
+    u8 *table;
+    s32 i;
+    s32 stage_index;
+    s32 base;
+    base = (s32)(u32)plan + 4;
+    record = func_84154B30(side);
+    sub = record + 8;
+    table = func_8414A3A0(side);
+    if (record[2] < 2) return;
+    amount = table[46] * func_8414A2AC();
+    if (record[1] != ((u8 *)D_841951F8[side])[10]) {
+        goto mark_plan;
+    }
+    i = 0;
+    do {
+        stage_index = i + 13;
+        if (sub[stage_index] >= 8) {
+            ((u32 *)(u32)base)[(u32)side + 13] += amount >> 2;
+        }
+        i++;
+    } while (i < 7);
+mark_plan:
+    *(u8 *)(u32)base |= 2;
+}
 
 u8 *func_84154B30(u8);
 u8 func_84153718(u8 arg0) { u8 *state; u8 result; state = func_84154B30(arg0); result = 0; if ((state[0x20] & 0x80) != 0) result = 1; if ((state[3] & 1) != 0) { result++; result &= 0xFF; } if (state[0x2B] > 0) result++; return result; }
@@ -792,7 +1246,7 @@ void BattlePlan_AddSunnyDayBonus(u8 *plan, u8 side) {
     }
 }
 
-extern void func_84150B14(void *, u8, s32, s32, s32, s32);
+extern void BattlePlan_ScoreStatIncrease(u8 *, u8, u8, u8, u8, u8);
 extern u8 *func_84154B64(u8);
 void func_84153A64(void *arg0, u8 arg1)
 {
@@ -803,7 +1257,7 @@ void func_84153A64(void *arg0, u8 arg1)
   func_84154B64((1 - ((u32) arg1)) & 0xFF);
   if ((((*((u16 *) (state + 0x28))) >= ((*((u16 *) (state + 0x2A))) >> 1)) && (state[0xD] < 0xD)) && ((*((u16 *) (state + 0x36))) < 0x3E7))
   {
-    func_84150B14(arg0, arg1, 0xBB, 0xFF, 0, 0xD);
+    BattlePlan_ScoreStatIncrease(arg0, arg1, 0xBB, 0xFF, 0, 0xD);
     *(((u8 *) arg0) + new_var) |= 2;
   }
 }
@@ -825,7 +1279,25 @@ s32 BattlePlan_HasUnfavorableStages(u8 *plan, u8 side) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84153CB8.s")
+void BattlePlan_AddPsychUpBonus(u8 *plan, u8 side) {
+    BattlePlanStageRecord *own;
+    s32 i;
+    s32 difference;
+    BattlePlanStageRecord *other;
+    s32 base;
+    base = (s32)(u32)plan + 4;
+    own = (void *)func_84154B64(side);
+    other = (void *)func_84154B64((1 - (u32)side) & 0xFF);
+    if (BattlePlan_HasUnfavorableStages(plan, side) != 0) {
+        for (i = 0; i < 7; i++) {
+            difference = other->stages[i] - own->stages[i];
+            if (difference > 0) {
+                BattlePlan_ScoreStatIncrease(plan, side, 244, 0xFF, i, difference);
+            }
+        }
+        *(u8 *)(u32)base |= 2;
+    }
+}
 
 extern u8 func_8414A2D0(void);
 extern void * func_8414A3A0(u8);
