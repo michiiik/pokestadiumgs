@@ -42,8 +42,22 @@ void BattleAnim_RegisterAssetTable(S1_arg1_func_80019420* arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_8410358C.s")
+extern s16 D_8418D240[];
+extern S1_arg1_func_80019420 *BattleAnim_LoadResourceTable(s32);
 
+void func_8410358C(void) {
+    s32 i;
+
+    i = 0;
+loop:
+    *(s32 *)((u8 *)D_8418CA20 + i * 0x10) = 0;
+    *(s32 *)((u8 *)D_8418CA20 + i * 0x10 + 4) = 0;
+    *(s32 *)((u8 *)D_8418CA20 + i * 0x10 + 8) = 0;
+    *(s32 *)((u8 *)D_8418CA20 + i * 0x10 + 0xC) = 0;
+    i++;
+    if ((u8 *)D_8418D240 != (u8 *)D_8418CA20 + i * 0x10) goto loop;
+    BattleAnim_RegisterAssetTable(BattleAnim_LoadResourceTable(0));
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_841035DC.s")
 
 extern s16 D_8418D240[];
@@ -71,11 +85,79 @@ void func_841036E8(s32 arg0, s16 arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_8410373C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_841037A0.s")
+extern s32 D_84190070;
+typedef struct unk_D_84190074 {
+    /* 0x0000 */ S1_MtxF unk_0000[0x16D];
+} unk_D_84190074;
+extern unk_D_84190074* D_84190074;
+extern void MtxF_ToFixed(void *, S1_MtxF *);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_8410383C.s")
+/* mkdraft:func_841037A0 begin */
+void func_841037A0(S1_MtxF* arg0) {
+    if (D_84190070 < 0x16C) {
+        MtxF_ToFixed(&D_84190074->unk_0000[D_84190070], arg0);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_841038F4.s")
+        gSPMatrix(D_800D0510++, (u32)&D_84190074->unk_0000[D_84190070] & 0x1FFFFFFF,
+                  G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+
+        D_84190070++;
+    }
+}
+/* mkdraft:func_841037A0 end */
+
+/* mkdraft:func_8410383C begin */
+void func_8410383C(S1_MtxF* arg0, s16 arg1, s16 arg2, s16 arg3, f32 arg4) {
+    f32 temp_fv0 = D_80087E50[(u16) arg3 >> 4] * arg4;
+    f32 temp_fv1 = D_80088E50[(u16) arg3 >> 4] * arg4;
+
+    arg0->mf[0][0] = temp_fv1;
+    arg0->mf[0][1] = -temp_fv0;
+    arg0->mf[0][2] = 0.0f;
+    arg0->mf[0][3] = 0.0f;
+
+    arg0->mf[1][0] = temp_fv0;
+    arg0->mf[1][1] = temp_fv1;
+    arg0->mf[1][2] = 0.0f;
+    arg0->mf[1][3] = 0.0f;
+
+    arg0->mf[2][0] = 0.0f;
+    arg0->mf[2][1] = 0.0f;
+    arg0->mf[2][2] = 1.0f;
+    arg0->mf[2][3] = 0.0f;
+
+    arg0->mf[3][0] = arg1;
+    arg0->mf[3][1] = arg2;
+    arg0->mf[3][2] = 0.0f;
+    arg0->mf[3][3] = 1.0f;
+}
+/* mkdraft:func_8410383C end */
+
+/* mkdraft:func_841038F4 begin */
+void func_841038F4(S1_MtxF* arg0, s16 arg1, s16 arg2, s16 arg3, f32 arg4) {
+    f32 temp_fv0 = D_80087E50[(u16) arg3 >> 4];
+    f32 temp_fv1 = D_80088E50[(u16) arg3 >> 4];
+
+    arg0->mf[0][0] = temp_fv1;
+    arg0->mf[0][1] = -temp_fv0;
+    arg0->mf[0][2] = 0.0f;
+    arg0->mf[0][3] = 0.0f;
+
+    arg0->mf[1][0] = temp_fv0 * arg4;
+    arg0->mf[1][1] = temp_fv1 * arg4;
+    arg0->mf[1][2] = 0.0f;
+    arg0->mf[1][3] = 0.0f;
+
+    arg0->mf[2][0] = 0.0f;
+    arg0->mf[2][1] = 0.0f;
+    arg0->mf[2][2] = 1.0f;
+    arg0->mf[2][3] = 0.0f;
+
+    arg0->mf[3][0] = arg1;
+    arg0->mf[3][1] = arg2;
+    arg0->mf[3][2] = 0.0f;
+    arg0->mf[3][3] = 1.0f;
+}
+/* mkdraft:func_841038F4 end */
 
 extern void func_8410383C(S1_MtxF *, s16, s16, s16, f32);
 extern void func_841037A0(S1_MtxF *);
@@ -99,7 +181,45 @@ void func_841039F4(s16 arg0, s16 arg1, s16 arg2, f32 arg3) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84103BCC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84103D2C.s")
+/* mkdraft:func_84103D2C begin */
+void func_84103D2C(S1_MtxF* arg0, S1_Vec3f arg1, S1_Vec3s arg2, f32 arg3, f32 arg4) {
+    f32 temp_fa0;
+    f32 temp_fa1;
+    f32 temp_fs0;
+    f32 temp_ft5;
+    f32 temp_fv0;
+    f32 temp_fv1;
+
+    temp_fa1 = D_80087E50[(u16) arg2.x >> 4];
+    temp_fv0 = D_80088E50[(u16) arg2.x >> 4];
+
+    temp_fv1 = D_80087E50[(u16) arg2.y >> 4];
+    temp_fa0 = D_80088E50[(u16) arg2.y >> 4];
+
+    temp_ft5 = D_80087E50[(u16) arg2.z >> 4];
+    temp_fs0 = D_80088E50[(u16) arg2.z >> 4];
+
+    arg0->mf[0][0] = ((temp_fa0 * temp_fs0) + (temp_fa1 * temp_fv1 * temp_ft5)) * arg3;
+    arg0->mf[0][1] = temp_fv0 * temp_ft5 * arg3;
+    arg0->mf[0][2] = ((-temp_fv1 * temp_fs0) + (temp_fa1 * temp_fa0 * temp_ft5)) * arg3;
+    arg0->mf[0][3] = 0.0f;
+
+    arg0->mf[1][0] = ((-temp_fa0 * temp_ft5) + (temp_fa1 * temp_fv1 * temp_fs0)) * arg4;
+    arg0->mf[1][1] = temp_fv0 * temp_fs0 * arg4;
+    arg0->mf[1][2] = ((temp_fv1 * temp_ft5) + (temp_fa1 * temp_fa0 * temp_fs0)) * arg4;
+    arg0->mf[1][3] = 0.0f;
+
+    arg0->mf[2][0] = temp_fv0 * temp_fv1;
+    arg0->mf[2][1] = -temp_fa1;
+    arg0->mf[2][2] = temp_fv0 * temp_fa0;
+    arg0->mf[2][3] = 0.0f;
+
+    arg0->mf[3][0] = arg1.x;
+    arg0->mf[3][1] = arg1.y;
+    arg0->mf[3][2] = arg1.z;
+    arg0->mf[3][3] = 1.0f;
+}
+/* mkdraft:func_84103D2C end */
 
 void ParticleGfx_BuildBillboardMatrix(S1_MtxF* arg0, S1_MtxF* arg1, S1_Vec3f arg2, f32 arg3) {
     arg0->mf[0][0] = arg1->mf[0][0] * arg3;

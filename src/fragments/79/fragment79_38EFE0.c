@@ -264,8 +264,15 @@ void BattleAnim_Vec3fSetPolarXZ(void *arg0, f32 arg1, s16 arg2) {
     (*(f32 *)((u8 *)(arg0) + (8))) = D_80087E50[index] * arg1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84120464.s")
-
+extern f32 D_80087E50[];
+extern f32 D_80088E50[0x1000];
+extern f32 D_84189C40;
+void BattleAnim_InitSwayOffset(void *arg0, f32 arg1, s16 arg2) {
+    (*(f32 *)((u8 *)(arg0) + (0x608))) = arg1;
+    (*(f32 *)((u8 *)(arg0) + (0x5F8))) = D_80088E50[(u16) arg2 >> 4] * arg1;
+    (*(f32 *)((u8 *)(arg0) + (0x5F4))) = D_80087E50[(u16) arg2 >> 4] * arg1;
+    (*(f32 *)((u8 *)(arg0) + (0x610))) = D_84189C40;
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841204BC.s")
 
 void func_8412060C(arg0)
@@ -400,7 +407,7 @@ extern s32 func_8411E164(s32 arg0);
 extern void func_841125F4(s32, s32);
 extern void func_8410B578(f32 arg0);
 extern f32 D_84189C70;
-extern void func_84120464(s32, s32, s32);
+extern void BattleAnim_InitSwayOffset(void *, f32, s16);
 void func_84120CA4(void *arg0, void *arg1) {
     (*(s16 *)((u8 *)(arg1) + (0x7EA))) = 0;
     Vec3f_SetComponentsDuplicate((f32 *)((u8 *)(arg0) + (0xC0)), 0.0f, 1.0f, 0.0f);
@@ -494,12 +501,12 @@ void func_84120E7C(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84120F5C.s")
 
-extern void func_84120464(s32, s32, s32);
-extern s32 D_84183C90;
+extern void BattleAnim_InitSwayOffset(void *, f32, s16);
+extern f32 D_84183C90;
 void func_841210CC(s32 arg0) {
     Vec3f_SetComponentsDuplicate(arg0 + 0x5E4, 0.0f, 0.0f, 0.0f);
     Vec3f_SetComponentsDuplicate(arg0 + 0x5F0, 0.0f, 0.0f, 0.0f);
-    func_84120464(arg0, D_84183C90, 0x4000);
+    BattleAnim_InitSwayOffset((void *)arg0, D_84183C90, 0x4000);
 }
 
 extern void func_841204BC(void *, s32, s32, s32, f32);
@@ -529,13 +536,41 @@ void func_84121260(void *arg0) {
     (*(s8 *)((u8 *)(arg0) + (0x623))) = 0;
     (*(s8 *)((u8 *)(arg0) + (0x624))) = 0;
     (*(s16 *)((u8 *)(arg0) + (0x604))) = (s16) (*(s16 *)((u8 *)(arg0) + (0x20)));
-    func_84120464((s32) arg0, D_84183C90, 0x4000);
+    BattleAnim_InitSwayOffset(arg0, D_84183C90, 0x4000);
 }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841212A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8412142C.s")
+#ifndef M2C_FIELD /* sweep: m2c --valid-syntax helpers (mirrors mkdraft.py) */
+#define M2C_UNK s32
+#define M2C_UNK8 s8
+#define M2C_UNK16 s16
+#define M2C_UNK32 s32
+#define M2C_UNK64 s64
+#define M2C_FIELD(expr, type, offset) (*(type)((u8*)(expr) + (offset)))
+#define M2C_BITWISE(type, expr) ((type)(expr))
+#define M2C_ERROR(desc) 0
+#define M2C_TRAP_IF(cond) ((void)0)
+#define M2C_BREAK() ((void)0)
+#define M2C_SYNC() ((void)0)
+#define M2C_CARRY 0
+#define M2C_STRUCT_COPY(dst, src) ((dst) = (src))
+#endif
 
+void func_8412142C(u8 *arg0) {
+    f32 *temp_a0;
+
+    M2C_FIELD(arg0, s16 *, 0x5FE) = 0;
+    M2C_FIELD(arg0, s16 *, 0x5FC) = 0;
+    M2C_FIELD(arg0, s8 *, 0x623) = 0;
+    M2C_FIELD(arg0, s8 *, 0x624) = 0;
+    M2C_FIELD(arg0, s16 *, 0x604) = (s16) M2C_FIELD(arg0, s16 *, 0x20);
+    temp_a0 = arg0 + 0x5E4;
+    M2C_FIELD(temp_a0, f32 *, 0x28) = (f32) (M2C_FIELD(arg0, f32 *, 0x34) * D_84189C70);
+    Vec3f_SetComponentsDuplicate(temp_a0, 0.0f, 0.0f, 0.0f);
+    Vec3f_SetComponentsDuplicate(arg0 + 0x5F0, 0.0f, 0.0f, 0.0f);
+    BattleAnim_InitSwayOffset(arg0, 1.0f, 0x4000);
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841214C0.s")
 
 void func_84121708(u8 *arg0) {
@@ -695,7 +730,7 @@ void func_84122CCC(void *arg0)
 void func_84122D74(s32 arg0) {
     Vec3f_SetComponentsDuplicate(arg0 + 0x5E4, 0.0f, 0.0f, 0.0f);
     Vec3f_SetComponentsDuplicate(arg0 + 0x5F0, 0.0f, 0.0f, 0.0f);
-    func_84120464(arg0, D_84183C90, 0x4000);
+    BattleAnim_InitSwayOffset((void *)arg0, D_84183C90, 0x4000);
 }
 
 extern void func_841204BC(void *, s32, s32, s32, f32);
@@ -778,7 +813,25 @@ void func_84123828(void *arg0) {
     (*(f32 *)((u8 *)(arg0) + (0x5F8))) = (f32) (*(f32 *)((u8 *)(arg0) + (0x38)));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123858.s")
+/* mkdraft:func_84123858 begin */
+extern f32 D_84189D10;
+
+void func_84123858(void *arg0) {
+    s16 angle;
+    f32 rate;
+
+    rate = D_84189D10;
+    *(s16 *)((u8 *)arg0 + 0x600) += 0xCCC;
+    angle = *(s16 *)((u8 *)arg0 + 0x600);
+    *(f32 *)((u8 *)arg0 + 0x60C) = Math_StepToF(*(f32 *)((u8 *)arg0 + 0x60C), 0.0f, rate, rate);
+    if (angle > 0) {
+        angle = -angle;
+    }
+    *(f32 *)((u8 *)arg0 + 0x30) = 1.0f - (*(f32 *)((u8 *)arg0 + 0x60C) * D_80087E50[((u16)angle) >> 4]);
+    *(f32 *)((u8 *)arg0 + 0x34) = (*(f32 *)((u8 *)arg0 + 0x60C) * D_80087E50[((u16)angle) >> 4]) + 1.0f;
+    *(f32 *)((u8 *)arg0 + 0x38) = 1.0f - (*(f32 *)((u8 *)arg0 + 0x60C) * D_80087E50[((u16)angle) >> 4]);
+}
+/* mkdraft:func_84123858 end */
 
 void func_84123914(u8 *arg0) {}
 
@@ -820,7 +873,7 @@ void func_841239E8(void *arg0)
 }
 
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
-extern void func_84120464(s32, s32, s32);
+extern void BattleAnim_InitSwayOffset(void *, f32, s16);
 extern void func_8411EFE4(s32);
 extern void func_8411EF2C(s32);
 extern void func_8410B578(f32 arg0);
@@ -835,7 +888,7 @@ extern void func_84111348(s32, s32);
 void func_84123A90(void *arg0) {
     Vec3f_SetComponentsDuplicate((f32 *)((u8 *)(arg0) + (0x5E4)), 0.0f, 0.0f, 0.0f);
     Vec3f_SetComponentsDuplicate((f32 *)((u8 *)(arg0) + (0x5F0)), 0.0f, 0.0f, 0.0f);
-    func_84120464((s32) arg0, 0x3F666666, 0x4000);
+    BattleAnim_InitSwayOffset(arg0, 0.9f, 0x4000);
     (*(s16 *)((u8 *)(arg0) + (0x606))) = 0;
     (*(s16 *)((u8 *)(arg0) + (0x602))) = 0;
     (*(u8 *)((u8 *)(arg0) + (0x623))) = 0;

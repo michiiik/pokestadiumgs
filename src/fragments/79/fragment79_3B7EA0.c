@@ -136,7 +136,32 @@ u8 func_84149424(void) { return D_8419D7B2; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_84149430.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_84149568.s")
+/* mkdraft:MoveDamage_ComputeBase_fragment79 begin */
+typedef struct Fragment79DamageContext { u8 unk_00, unk_01; u8 effect, power, type, level; u8 unk_06, unk_07; u16 attack, defense; s32 damage; u8 *attacker, *defender; u8 *unk_18; u8 *unk_1C; } Fragment79DamageContext;
+extern s32 func_800636C0(u8, u8);
+extern u8 func_80063690(u8);
+
+void MoveDamage_ComputeBase_fragment79(void *arg0) {
+    Fragment79DamageContext *ctx = arg0;
+    if (ctx->power != 0) {
+        if (ctx->effect == 7) {
+            ctx->defense >>= 1;
+        }
+        if (ctx->defense == 0) {
+            ctx->defense++;
+        }
+        ctx->damage = (((ctx->level * 2 / 5 + 2) * ctx->power * ctx->attack) / ctx->defense) / 50;
+        if (func_800636C0(ctx->attacker[1], ctx->type)) {
+            ctx->damage *= func_80063690(ctx->attacker[1]) + 100;
+            ctx->damage /= 100;
+        }
+        if (ctx->damage >= 999) {
+            ctx->damage = 996;
+        }
+        ctx->damage += 2;
+    }
+}
+/* mkdraft:MoveDamage_ComputeBase_fragment79 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_841496C0.s")
 
@@ -279,7 +304,28 @@ void func_8414A144(u8 *arg0) {
     func_84149FB8(arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3B7EA0/func_8414A180.s")
+/* mkdraft:func_8414A180 begin */
+extern u8 *func_84154B0C(void);
+extern s8 func_80062D20(u8);
+extern s8 func_80062DD4(u8);
+
+void func_8414A180(void *arg0, unsigned char arg1, u8 arg2)
+{
+  u8 *sp24;
+  int new_var2;
+  unsigned char new_var;
+  sp24 = func_84154B0C();
+  _bzero(arg0, 0xC);
+  *((u8 *) (((u8 *) arg0) + 0)) = arg2;
+  new_var = arg1;
+  *((s8 *) (((u8 *) arg0) + 1)) = func_80062D20(arg2);
+  *((s8 *) (((u8 *) arg0) + 2)) = func_80062DD4(arg2);
+  *((u8 *) (((u8 *) arg0) + 3)) = sp24[0x198];
+  new_var2 = new_var * 0xCC;
+  *((void **) (((u8 *) arg0) + 4)) = (&sp24[new_var2]) + 8;
+  *((void **) (((u8 *) arg0) + 8)) = (&sp24[((s32) arg1) * (-((0, 0xCC)))]) + ((0, 0xD4));
+}
+/* mkdraft:func_8414A180 end */
 
 u8 func_8414A240(void) { return D_84187030; }
 
