@@ -34,17 +34,10 @@ jobs:
     # regenerated from master's own already-trusted source, never from
     # PR-supplied input.
     # Draft PRs are skipped; marking one ready runs the gate (ready_for_review).
-    if: >-
-      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-      (
-        github.event_name == 'workflow_dispatch' ||
-        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
-        (
-          github.event.pull_request.user.login == 'pokestadium-public-ci[bot]' &&
-          github.event.pull_request.head.repo.full_name == github.repository &&
-          github.event.pull_request.head.ref == 'ci/refresh-coverage'
-        )
-      )
+    # Fork PRs run too: the repository setting "Require approval for all
+    # external contributors" makes a maintainer approve every fork run before
+    # it starts, so the approval is the trust decision. Keep that setting on.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     # This label is intentionally different from the private repository's
     # gs-decomp label. Register it only on a dedicated, credential-free Mac
     # runner after the public baseline image has been built.
