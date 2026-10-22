@@ -314,8 +314,51 @@ void func_868063CC(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/56/fragment56_code/func_8680649C.s")
+extern void ModelAnim_SetFrame(u8 *, s16);
+extern void func_8003F114(u8 *, s16, s16, void *);
+extern void func_8003F1DC(void *);
+extern void func_8003F210(void *, s32);
+extern void func_86800A7C(void);
+extern void func_86806180(void);
+extern u8 D_868086C8[];
+extern u8 D_86808C68[];
+extern u8 D_8681E388[];
+extern s32 D_8682CD00[];
+extern u8 D_8682EE18[];
+extern s32 D_8682F2A8;
 
+void func_8680649C(void) {
+    s32 i;
+
+    /* Fade-mode 1 intro: reset the 4 stage models (parallel arrays D_86808C68/
+     * D_8681E388/D_868086C8 stride 0x168, s32 D_8682CD00, D_8682EE18 stride
+     * 0x124), give each a random anim frame, then hand off to func_86800A7C,
+     * start the fade and enter state D_8682F2A8 = 5. The cursors are IDO's
+     * strength-reduced induction pointers from the indexed accesses; the loop
+     * bound is the EE18 element count (D_8682F2A8 = D_8682EE18 + 4*0x124),
+     * materialized by the IV transform. */
+    if (StageContext_GetFadeMode() == 1) {
+        i = 0;
+        do {
+            func_8003F1DC(&D_86808C68[i * 0x168]);
+            func_8003F1DC(&D_8681E388[i * 0x168]);
+            func_8003F114(&D_868086C8[i * 0x168], 0, -1, D_8682CD00[i]);
+            D_868086C8[i * 0x168 + 0xA0] = 0xFF;
+            D_868086C8[i * 0x168 + 0xA1] = 0;
+            D_868086C8[i * 0x168 + 0xA2] = 0;
+            *(s32 *)(&D_8682EE18[i * 0x124] + 0x10) = 1;
+            func_8003F210(&D_868086C8[i * 0x168], 1);
+            ModelAnim_SetFrame(&D_868086C8[i * 0x168], (s16)(guRandom() % 10));
+            i++;
+        } while (i != 4);
+        func_86800A7C();
+        StageFade_StartFromOpaque(0x14);
+        func_87F00688();
+        D_8682F2A8 = 5;
+        return;
+    }
+    func_86806180();
+}
 extern s32 D_8682F2A8;
 extern s32 func_87F01A40(void);
 extern void StageContext_SetClearColor(s32);

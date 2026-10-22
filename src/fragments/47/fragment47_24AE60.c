@@ -4,8 +4,23 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86004840.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/47/fragment47_24AE60/func_86004968.s")
+void func_86004968(void *arg0) {
+    typedef struct {
+        u8 pad[0xAED0];
+        f32 values[2][4][4];
+    } Ctx;
+    s32 i;
+    s32 j;
+    s32 k;
 
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 4; j++) {
+            for (k = 0; k < 4; k++) {
+                ((Ctx *)arg0)->values[i][j][k] = 0.0f;
+            }
+        }
+    }
+}
 typedef struct {
     u8 pad0[1];
     u8 flags;
@@ -305,7 +320,7 @@ void func_860075A8(void *arg0) {
 extern void func_87F02328();
 void func_860075E4(void *arg0) {
     (*(u8 *)((u8 *)(arg0) + (0x75C0))) = (u8) ((*(u8 *)((u8 *)(arg0) + (0x75C0))) & 0xFFF7);
-    func_86004968();
+    func_86004968(arg0);
     func_87F02328();
 }
 

@@ -21,12 +21,32 @@ void func_88508780(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_885087D4.s")
+/* mkdraft:func_885087D4 begin */
+typedef struct { s32 unk_00; s16 unk_02; s16 unk_04; s16 unk_06; s16 unk_08; s16 unk_0A; s16 unk_0C; s16 unk_0E; s16 unk_10; s16 unk_12; f32 unk_14; f32 unk_18; f32 unk_1C; } unk_D_88523100;
+extern f32 D_80087E50[];
+extern f32 D_8850D56C;
+
+void func_885087D4(unk_D_88523100 *arg0) {
+    arg0->unk_04 = D_88523034 + arg0->unk_02;
+    arg0->unk_06 = (s16)(D_80087E50[(u16)(arg0->unk_12) >> 4] * 3.0f + ((D_80087E50[(u16)(arg0->unk_12) >> 4] * 3.0f) > 0.0f ? 0.5f : -0.5f)) + 0xBE;
+
+    arg0->unk_12 += 0x800;
+
+    arg0->unk_1C -= D_8850D56C;
+    if (arg0->unk_1C < 1.0f) {
+        arg0->unk_1C = 1.0f;
+    }
+}
+/* mkdraft:func_885087D4 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_8850889C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88508B10.s")
+void TradeCable_UpdateLightWaitPulse(unk_D_88523100 *arg0) {
+    arg0->unk_04 = D_88523034 + arg0->unk_02;
+    arg0->unk_06 = (s16)(2.0f * D_80087E50[(u16)(arg0->unk_12) >> 4] + ((2.0f * D_80087E50[(u16)(arg0->unk_12) >> 4]) > 0.0f ? 0.5f : -0.5f)) + 0xD2;
 
+    arg0->unk_12 += 0x800;
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88508B98.s")
 
 extern u8 D_88523100[];
@@ -46,8 +66,12 @@ void func_88508BEC(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88508CAC.s")
+void TradeCable_UpdateLightFlashPulse(unk_D_88523100 *arg0) {
+    arg0->unk_04 = D_88523034 + arg0->unk_02;
+    arg0->unk_06 = (s16)(2.0f * D_80087E50[(u16)(arg0->unk_12) >> 4] + ((2.0f * D_80087E50[(u16)(arg0->unk_12) >> 4]) > 0.0f ? 0.5f : -0.5f)) + 0xD2;
 
+    arg0->unk_12 += 0x800;
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88508D34.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88508E34.s")
@@ -93,12 +117,34 @@ void func_885093F0(void) { s32 i = 0; u8 *ptr = D_88523050; do { i += 1; ptr += 
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_885095EC.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_885096E0.s")
+typedef struct { s16 unk_00; s16 unk_02; s16 unk_04; } unk_D_88523050_012;
+typedef struct { s32 unk_00; s16 unk_04; s16 unk_06; s16 unk_08; s16 unk_0A; s16 unk_0C; s16 unk_0E; s16 unk_10; unk_D_88523050_012 unk_12[10]; } unk_D_88523050;
 
+void TradeCable_SpawnBallTrailGhost(unk_D_88523050 *arg0) {
+    s32 i;
+    unk_D_88523050_012 *var_v0 = NULL;
+
+    for (i = 0; i < 10; i++) {
+        if (arg0->unk_12[i].unk_04 == 0) {
+            break;
+        }
+    }
+
+    if (i < 10) {
+        var_v0 = &arg0->unk_12[i];
+    }
+
+    if (var_v0 != NULL) {
+        var_v0->unk_00 = arg0->unk_04;
+        var_v0->unk_02 = arg0->unk_06;
+        var_v0->unk_04 = 0x14;
+        arg0->unk_10++;
+    }
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_8850974C.s")
 
 extern void func_8850974C(u8 *);
-extern u8 *func_885096E0(u8 *);
+extern void TradeCable_SpawnBallTrailGhost(unk_D_88523050 *);
 extern void func_885084EC(s32, s32);
 void func_88509870(u8 *arg0) {
     s16 temp_v0;
@@ -121,7 +167,7 @@ void func_88509870(u8 *arg0) {
         temp_v0_2 = *(s16 *)(arg0 + 8);
         if (temp_v0_2 == 0) {
             if (*(s16 *)(arg0 + 0x10) < 0xA) {
-                func_885096E0(arg0);
+                TradeCable_SpawnBallTrailGhost((unk_D_88523050 *)arg0);
                 *(s16 *)(arg0 + 8) = 2;
             }
         }
