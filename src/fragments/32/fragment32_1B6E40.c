@@ -59,8 +59,33 @@ void func_88306404(s32 arg0) {
     (*(s8 *)((u8 *)(temp_v0) + (4))) = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B6E40/func_88306430.s")
+s32 func_800601A4(s8, s32);
+extern s8 D_88006868;
+extern u8 *D_88601890;
+extern void **D_88601898;
 
+void func_88306430(void)
+{
+  unsigned char new_var;
+  s32 temp_t9;
+  u32 var_s0;
+  void **var_s1;
+  var_s1 = D_88601898;
+  var_s0 = 0;
+  if ((*((u8 *) (((u8 *) D_88601890) + (((0x38E & 0xFFFFFFFFFFFFFFFF) & 0xFFFFFFFFFFFFFFFF) & 0xFFFFFFFFFFFFFFFF)))) != 0)
+  {
+    do
+    {
+      temp_t9 = func_800601A4(D_88006868, var_s0 & (0xFF & 0xFF)) * 2;
+      new_var = 4;
+      new_var = 1;
+      var_s0 += new_var;
+      *var_s1 = (D_88601890 + temp_t9) - -0x20C;
+      var_s1 += new_var;
+    }
+    while (var_s0 < ((u8) (*((u8 *) (((u8 *) D_88601890) + 0x38E)))));
+  }
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B6E40/func_883064C8.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/32/fragment32_1B6E40/func_883067C4.s")
