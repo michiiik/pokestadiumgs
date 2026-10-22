@@ -59,7 +59,40 @@ void func_826018BC(void *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82601968.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82601A84.s")
+extern void *func_8004C874(s32, s32);
+extern void _bcopy(void *, void *, s32);
+void RecordNames_LoadFourSlots(u8 *context, s32 override_names) {
+    s32 index;
+    s32 selection;
+    u8 *table;
+    s8 *state;
+    s8 *owner;
+    u8 *entry;
+    void *name;
+    table = *(u8 **)(context + 12);
+    state = *(s8 **)context;
+    selection = *(s16 *)((u8 *)state + 136);
+    if (table != 0) {
+        entry = ((u8 (*)[152])table)[((s16 *)context)[selection + 12]] + 4;
+        index = 0;
+        owner = state;
+        do {
+            if (*owner >= 0 && override_names) {
+                name = func_8004C874(42, 87);
+                if (name != 0) {
+                    _bcopy(name, (u8 *)state + index * 12 + 2256, 12);
+                }
+            } else if (*owner == -1) {
+                name = func_8004C874(42, entry[1] - 1);
+                if (name != 0) {
+                    _bcopy(name, (u8 *)state + index * 12 + 2256, 12);
+                }
+            }
+            index++;
+            owner++;
+        } while (index != 4);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82601BB0.s")
 

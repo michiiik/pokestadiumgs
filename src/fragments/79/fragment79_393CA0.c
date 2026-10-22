@@ -2573,7 +2573,55 @@ void BattleAnim_Table_84185F10_042(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_8412D950.s")
+extern void func_84136678(u8, s16);
+extern void func_84135B00(u16);
+extern void func_84134DD8(u8);
+extern void func_84134CBC(u8, u8);
+extern void BattleRecord_AdvanceWriteSlot(void);
+extern void func_84136B9C(u8, s16, u16);
+extern void func_841566D0(u8, u8, u8);
+extern void func_84125734(u8 arg0);
+extern u8 D_841951BC;
+extern u8 D_841951BF;
+extern void * D_841951F8[];
+extern u8 * D_84195200[];
+extern u8 * D_84195208[];
+void BattleEffect_ClearPartyStatus(void) {
+    u8 next_index;
+    u16 previous_status;
+    s32 index;
+    u8 *pokemon;
+    u8 *party;
+    func_84136678(D_841951BC, -1);
+    func_84135B00(180);
+    func_84134DD8(D_841951BF);
+    func_84134CBC(D_841951BC, 0);
+    BattleRecord_AdvanceWriteSlot();
+    D_84195208[D_841951BC][13] &= ~1;
+    pokemon = D_84195200[D_841951BC];
+    previous_status = pokemon[36];
+    pokemon[36] = 0;
+    func_84136B9C(D_841951BC, -1, 0);
+    func_84125734(D_841951BC);
+    if (previous_status & 0x20) {
+        func_84134CBC(D_841951BC, 44);
+    } else if (previous_status & 7) {
+        func_84134CBC(D_841951BC, 29);
+        func_841566D0(D_841951BC, ((u8 *)D_841951F8[D_841951BC])[10], 0x20);
+    } else {
+        func_84134CBC(D_841951BC, 86);
+    }
+    BattleRecord_AdvanceWriteSlot();
+    index = 0;
+    D_84195208[D_841951BC][20] = 0;
+    party = (u8 *)D_841951F8[D_841951BC];
+    while (index < party[8]) {
+        party[index * 88 + 60] = 0;
+        next_index = index + 1;
+        index = next_index;
+        party = (u8 *)D_841951F8[D_841951BC];
+    }
+}
 #endif
 
 #ifdef VERSION_US

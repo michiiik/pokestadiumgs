@@ -807,3 +807,5 @@ func_8412F49C = BattleEffect_HealByWeather;
 func_841315C4 = BattleCommand_RunSequence;
 func_84136CA8 = BattleRecord_AdvanceWriteSlot;
 func_84127C88 = BattleDamage_RollCriticalHit;
+func_8412D950 = BattleEffect_ClearPartyStatus;
+func_82601A84 = RecordNames_LoadFourSlots;
