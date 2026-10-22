@@ -84,5 +84,25 @@ void func_82900798(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33CB20/func_82900AFC.s")
+/* mkdraft:func_82900AFC begin */
+extern s32 func_8004CA10(u16 *);
+extern s32 func_8004CA24(u16 *);
+extern u8 *func_8004CA60(u8 *);
+extern s32 func_8004CA38(u8 *);
+extern s32 func_8004CA4C(u8 *);
+extern void func_829007A0(s16, s16, u16, u16, s32, s32, u8 *, s32, s32, s32);
+
+void func_82900AFC(s16 arg0, s16 arg1, u16 arg2, u16 arg3, u16 *arg4) {
+    s32 sp44;
+    s32 sp40;
+    s32 sp3C;
+    s32 sp24 = 1;
+    u8 *sp34;
+    sp44 = func_8004CA10(arg4);
+    sp40 = func_8004CA24(arg4);
+    sp34 = func_8004CA60((u8 *)arg4);
+    sp3C = func_8004CA38((u8 *)arg4);
+    func_829007A0(arg0, arg1, arg2, arg3, sp44, sp40, sp34, sp3C, func_8004CA4C((u8 *)arg4), sp24);
+}
+/* mkdraft:func_82900AFC end */
 #endif
