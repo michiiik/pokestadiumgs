@@ -64,5 +64,30 @@ void func_8822B284(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19DFC0/func_8822B2D8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19DFC0/func_8822B43C.s")
+void func_8822B240(void);
+void func_8822B24C(void);
+void func_8822B284(void);
+s32 func_8004C54C(s32, s32);
+s32 func_8004C8A0(void *, s32, s32, s32);
+s32 func_800635E0(u8);
+s32 func_88004804(s32, s32, s32, s32, s32, s32, s32, s32, s32, s32 *, s32 *, s32 *, s32 *, s32, s32);
+s32 func_8820137C(s32);
+extern volatile unsigned char D_8800ED50;
+extern s32 D_882345F4;
+void func_8822B240(void);
+void func_8822B24C(void);
+void func_8822B284(void);
+void func_8822B2D8(void);
+
+void func_8822B43C(u8 arg0)
+{
+  D_88234900 = Util_Malloc(0x48);
+  *((s32 *) (((u8 *) D_88234900) + 4)) = func_8820137C(D_882345F4);
+  func_8004C54C(0x18, func_800635E0(arg0));
+  func_8004C8A0(D_88234900 + 8, 0x40, 0x25, 0x75);
+  *((void **) (((u8 *) D_88234900) + 0)) = (void *) ((func_88004804(0, 3, 0xC7, 0xE0, 0, 1, 0xDC, 0xDC, 0xB4, &func_8822B284, &func_8822B2D8, &func_8822B240, &func_8822B24C, 2, 0) * 0x4C) + (&D_8800ED50));
+  *((s16 *) (((u8 *) (*((void **) (((u8 *) D_88234900) + 0)))) + 0x10)) = 0x165;
+  *((s16 *) (((u8 *) (*((void **) (((u8 *) D_88234900) + 0)))) + 0x12)) = 0x81;
+  D_880068B4 = 0;
+}
 #endif

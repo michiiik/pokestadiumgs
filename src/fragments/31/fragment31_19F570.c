@@ -34,8 +34,38 @@ void func_8822C30C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19F570/func_8822C374.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_19F570/func_8822C4A0.s")
+extern u8 **D_88234920;
+extern void func_80049064(s32, s32, s32, const char *);
+extern void *func_8004C874(s32, s32);
+extern s32 func_8800005C(void);
 
+void func_8822C4A0(void) {
+    s32 sp1C;
+    s32 var_a1;
+
+    switch (*(s16 *)((u8 *) D_88234920 + 0x40)) {
+    case 0:
+        if (func_8800005C() != 0) {
+            var_a1 = 0x16;
+        } else {
+            var_a1 = 0x17;
+        }
+        break;
+    case 1:
+        var_a1 = 0x18;
+        break;
+    case 2:
+        var_a1 = 0x19;
+        break;
+    case 3:
+        var_a1 = 0x1A;
+        break;
+    default:
+        var_a1 = sp1C;
+        break;
+    }
+    func_80049064(0x140, 0x183, 1, func_8004C874(0x21, var_a1));
+}
 extern void Input_SetRepeatController(void *);
 extern void *D_80087200;
 extern s32 D_88234714;

@@ -2,7 +2,32 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_175260/func_88201FE0.s")
+/* mkdraft:func_88201FE0 begin */
+u8 func_80062F68(u8);
+u8 func_80063014(u8);
+s32 func_88A008CC(u8 *);
+extern u8 D_88A01B80[];
+
+u8 func_88201FE0(u8 *arg0) {
+    s32 i;
+
+    if (func_88A008CC(arg0) != 0) {
+        if (arg0[0] >= 0xC9 && arg0[0] < 0xFB) {
+            return func_80063014(arg0[0] - 0xC8);
+        }
+        if (arg0[0] >= 0xC4 && arg0[0] < 0xC9) {
+            return func_80063014(arg0[0] - 0x91);
+        }
+    } else {
+        for (i = 0; i != 0x39; i++) {
+            if (arg0[0] == D_88A01B80[i]) {
+                return func_80062F68(i + 1);
+            }
+        }
+    }
+    return 0;
+}
+/* mkdraft:func_88201FE0 end */
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_175260/func_88202098.s")
 
