@@ -544,3 +544,94 @@ and ABI widths; eight independent links reproduce all 19,440 retail text
 bytes and preserve all 66 original function extents. Sixteen ASM owners
 remain in this file. The Protect/Detect and party-count checkpoints above
 remain unresolved; no diagnostic tooling or rejected candidate is published.
+
+## Accepted Haze scoring
+
+On native revision `e4057715`, `84151128` accepts as 328 bytes of genuine C.
+Move 114 has effect 25 in the local move table, whose dispatcher entry is
+`.L841544F8`, so the intended name is `BattlePlan_ScoreHaze`. It inspects
+both sides' seven stage bytes: above neutral 7 it invokes `84150EA4` through
+the opposite side, and below neutral it invokes `84150B14` through the same
+side. Both helpers receive move 114, chance 255, the stage index and its
+distance from neutral. It then marks the requested side and plan bit 2.
+This evaluates the move's score; it does not directly reset battle stats.
+
+Independent record pointers strength-reduce into two extra saved pointers
+and produce the wrong loop. A real two-element record-pointer array keeps
+the original adjacent pointer homes at stack offsets 48 and 52. An early
+header base restores the original tail address formation. These changes
+leave only a 56-versus-64-byte frame difference. Two distinct signed stage
+locals, each initialized from its side and consumed by that side's guards
+and helper arguments, declared before the pointer array, reproduce the
+original frame and all instruction words. No variable is unused, no array
+is oversized, and no padding, forced register, volatile access or manual
+loop unrolling is used.
+
+The first three eight-candidate families reject; the fourth accepts candidate
+3 after three rejected layouts. All four batches pass known/context/leading-
+blank full-object controls. The acceptance is directly link-verified and
+passes the ordinary host-syntax-enabled full-ROM gate. Its first-success
+source, entire module object, four collateral objects, ROM/ELF/linked script,
+layouts and original ASM are frozen and externally hashed before further
+compilation. Independent verification confirms all original module extents,
+the unchanged collateral objects and preserved foreign edits.
+
+The retained first-success receipt is `native-f79-plan-haze-stage-values`.
+This owner joins the condition-scoring batch below. The preceding Rampage
+batch was published and merged independently as PR #1414.
+
+## Accepted Poison, Burn and Freeze scoring
+
+Together with Haze, three further original owners bring this batch to four
+genuine matches and 1,520 bytes:
+
+- `84150538` / `BattlePlan_ScorePoison` (408 bytes): move 40 (Poison Sting)
+  has effect 2, which dispatches through `.L84153EF4`; move 92 (Toxic) has
+  effect 33, dispatching through `.L84153EE0` with chance 255. After status,
+  snapshot, held-item-code, Poison-type and effectiveness guards, the scorer
+  adds table byte 13 times `8414A264` times the incoming chance divided by
+  255. Toxic adds half again. An own move with effect 111 adds the scaled
+  amount again: `841556C4` compares `80062D20` move effects, not move IDs;
+  Protect (182) and Detect (197) have effect 111 in the local move table.
+  The consumed record view is reused for the later table lookup. Declaring
+  the header base before the type byte and amount preserves the original
+  spill offset 36. Keeping the Toxic guard and update on one physical line
+  recovers the measured shift/constant scheduling order. Wider line layouts
+  preserve semantics but retain two differing words.
+- `841506D0` / `BattlePlan_ScoreBurn` (424 bytes): Fire Punch (7), Ember
+  (52), Flamethrower (53) and Fire Blast (126) have effect 4 and dispatch
+  through `.L84153F04`. Table byte 14 supplies the chance-scaled amount. An
+  existing opposing status with bit `0x20` marks the side and subtracts the
+  amount; other nonzero statuses stop scoring. With no status, the snapshot,
+  item-code, type and effectiveness guards gate the score addition and the
+  same own-effect-111 bonus. Derived record and score addresses, rather
+  than a source-level cursor variable, let CSE share the original pointer
+  spill at stack offset 36. The existing generic plan-pointer interface is
+  preserved; no argument or return category is invented for allocation.
+- `84150878` / `BattlePlan_ScoreFreeze` (360 bytes): Ice Punch (8), Ice
+  Beam (58) and Blizzard (59) have effect 5 and dispatch through
+  `.L84153F14`. Weather value 2, opposing capability bit `0x20`, status,
+  snapshot, item-code, type and effectiveness guards precede table byte 15
+  times `8414A264` times chance divided by 255. It preserves the original
+  absence of a plan-bit-2 write. Placing the consumed cursor before the
+  move-type byte gives that byte its original stack offset 47. The opposing
+  side is an actual byte local used by both side-indexed helpers.
+
+The three scorers' pointer/amount locals are consumed by real loads, guards,
+arithmetic or calls. Eight stock/off/on/leading-blank whole-object controls
+validate passive poison-frame logging. Reusing consumed views or changing their
+representations alone does not suffice: record/table view reuse, precise
+spill homes and the independently measured scheduling relation each have
+separate retained controls. No forced frame, dummy read, volatile local,
+instruction rewrite, padding or manual loop unrolling is used.
+
+All four acceptances are directly link-verified and pass the normal
+host-syntax-enabled full-ROM gate. Every first success freezes complete
+objects, source, ROM, ELF, linked script, layouts and original ASM, with
+external hashes checked before further compilation. Six full-module
+controls cover cleanup, naming, leading blanks and ABI widths. Eleven
+independent links reproduce all 19,440 retail text bytes and all 66 original
+function extents. Scoped cleanup removes twenty redundant declarations;
+diagnostic helpers and rejected candidates stay outside the publication.
+Twelve ASM owners remain in this file, including the unresolved party-count
+and Protect/Detect allocation checkpoints.

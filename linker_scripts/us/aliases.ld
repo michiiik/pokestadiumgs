@@ -733,3 +733,7 @@ func_84151E44 = BattlePlan_AddMimicBonus;
 func_8415169C = BattlePlan_AddFlinchBonus;
 func_84152980 = BattlePlan_ScoreCurse;
 func_84151270 = BattlePlan_AddRampageBonus;
+func_84151128 = BattlePlan_ScoreHaze;
+func_84150538 = BattlePlan_ScorePoison;
+func_841506D0 = BattlePlan_ScoreBurn;
+func_84150878 = BattlePlan_ScoreFreeze;

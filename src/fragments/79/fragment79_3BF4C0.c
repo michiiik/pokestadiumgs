@@ -49,11 +49,103 @@ void BattlePlan_ApplyPursuitMultiplier(u8 *state, u8 side) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841503B0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150538.s")
+extern u8 func_8414A264(void);
+extern s32 func_84155574(u8 *, u8);
+extern u8 func_80062D98(u8);
+extern u8 func_80063660(u8);
+extern void * func_8414A3A0(u8);
+extern u8 * func_84154B30(u8);
+extern s32 func_84155544(u8 *, u8);
+extern s32 func_841556C4(u8 *, u8);
+void BattlePlan_ScorePoison(u8 *plan, u8 side, u8 move, u8 chance) {
+    u8 *own;
+    u8 *other;
+    s32 base;
+    u8 move_type;
+    s32 amount;
+    u8 *cursor;
+    base = (s32)(u32)plan + 4;
+    own = func_84154B64(side);
+    other = func_84154B30((1 - (u32)side) & 0xFF);
+    move_type = func_80062D98(move);
+    if (*(u16 *)(other + 46) != 0) return;
+    if ((other[3] & 4) != 0) return;
+    if ((other[32] & 0x10) != 0) return;
+    if (func_80063660(other[9]) == 20) return;
+    cursor = other + 8;
+    if (func_84155544(cursor, 3) != 0) return;
+    if (func_84155574(cursor, move_type) == 0) return;
+    *(u8 *)((u32)base + (u32)side + 8) = chance;
+    cursor = func_8414A3A0(side);
+    amount = cursor[13] * func_8414A264() * chance / 255;
+    ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    if (move == 92) { ((u32 *)(u32)base)[(u32)side + 13] += amount >> 1; }
+    if (func_841556C4(own, 111) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+    *(u8 *)(u32)base |= 2;
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841506D0.s")
+void BattlePlan_ScoreBurn(void *plan, u8 side, u8 move, u8 chance) {
+    u8 *other;
+    u8 *own;
+    s32 base;
+    u8 move_type;
+    s32 amount;
+    u8 *table;
+    base = (s32)(u32)plan + 4;
+    other = func_84154B30((1 - (u32)side) & 0xFF);
+    own = func_84154B64(side);
+    move_type = func_80062D98(move);
+    table = func_8414A3A0(side);
+    amount = table[14] * func_8414A264() * chance / 255;
+    if (*(u16 *)(other + 46) != 0) {
+        if ((*(u16 *)(other + 46) & 0x20) != 0) {
+            *(u8 *)((u32)base + (u32)side + 8) = chance;
+            ((u32 *)(u32)base)[(u32)side + 13] -= amount;
+        }
+        return;
+    }
+    if ((other[3] & 4) != 0) return;
+    if ((other[32] & 0x10) != 0) return;
+    if (func_80063660(other[9]) == 21) return;
+    if (func_84155544(other + 8, move_type) != 0) return;
+    if (func_84155574(other + 8, move_type) == 0) return;
+    *(u8 *)(u32)base |= 2;
+    *(u8 *)((u32)base + (u32)side + 8) = chance;
+    ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    if (func_841556C4(own, 111) != 0) {
+        ((u32 *)(u32)base)[(u32)side + 13] += amount;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150878.s")
+extern u8 *func_84154B0C(void);
+extern s32 func_84154B9C(u8, u16);
+void BattlePlan_ScoreFreeze(void *plan, u8 side, u8 move, u8 chance) {
+    u8 *other;
+    u8 *cursor;
+    u8 move_type;
+    s32 base;
+    u8 amount;
+    u8 other_side;
+    base = (s32)(u32)plan + 4;
+    other_side = (1 - (u32)side) & 0xFF;
+    other = func_84154B30(other_side);
+    move_type = func_80062D98(move);
+    if (*(u16 *)(other + 46) != 0) return;
+    if ((other[3] & 4) != 0) return;
+    if ((other[32] & 0x10) != 0) return;
+    if (func_80063660(other[9]) == 22) return;
+    if (func_84154B0C()[408] == 2) return;
+    cursor = other + 8;
+    if (func_84155544(cursor, move_type) != 0) return;
+    if (func_84155574(cursor, move_type) == 0) return;
+    if (func_84154B9C(other_side, 0x20) != 0) return;
+    *(u8 *)((u32)base + (u32)side + 8) = chance;
+    amount = func_8414A264();
+    cursor = func_8414A3A0(side);
+    ((u32 *)(u32)base)[(u32)side + 13] += cursor[15] * amount * chance / 255;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_841509E0.s")
 
@@ -61,7 +153,34 @@ void BattlePlan_ApplyPursuitMultiplier(u8 *state, u8 side) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84150EA4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3BF4C0/func_84151128.s")
+extern void func_84150B14(void *, u8, s32, s32, s32, s32);
+extern void func_84150EA4(u8 *, u8, u8, u8, u8, u8);
+void BattlePlan_ScoreHaze(u8 *plan, u8 side) {
+    s32 first_stage;
+    s32 second_stage;
+    BattlePlanStageRecord *records[2];
+    s32 i;
+    s32 base;
+    base = (s32)(u32)plan + 4;
+    records[0] = (void *)func_84154B64(0);
+    records[1] = (void *)func_84154B64(1);
+    for (i = 0; i < 7; i++) {
+        first_stage = records[0]->stages[i];
+        if (first_stage >= 8) {
+            func_84150EA4(plan, 1, 114, 0xFF, i, first_stage - 7);
+        } else if (first_stage < 7) {
+            func_84150B14(plan, 0, 114, 0xFF, i, 7 - first_stage);
+        }
+        second_stage = records[1]->stages[i];
+        if (second_stage >= 8) {
+            func_84150EA4(plan, 0, 114, 0xFF, i, second_stage - 7);
+        } else if (second_stage < 7) {
+            func_84150B14(plan, 1, 114, 0xFF, i, 7 - second_stage);
+        }
+    }
+    *(u8 *)((u32)base + (u32)side + 8) = 0xFF;
+    *(u8 *)(u32)base |= 2;
+}
 
 extern u8 func_80063660(u8);
 extern u8 func_8414A2A0(void);
@@ -236,15 +355,13 @@ extern void * func_8414A3A0(u8);
 extern u8 * func_84154B30(u8);
 void func_84151838(void *arg0, u8 arg1) { s32 base; void *table; u32 *entry; u8 amount; base = (s32)(u32)arg0 + 4; if ((func_84154B30(arg1)[3] & 8) == 0) { *(u8 *)((u8 *)(u32)base + arg1 + 8) = 0xFF; amount = func_8414A2AC(); table = func_8414A3A0(arg1); entry = (u32 *)((u8 *)(u32)base + (arg1 << 2) + 0x34); *entry += *(u8 *)((u8 *)table + 0x25) * amount; *(u8 *)(u32)base |= 2; } }
 
-extern void func_841506D0(void *, u8, u8, u8);
-extern void func_84150878(void *, u8, u8, u8);
 extern void func_841509E0(void *, u8, u8, u8);
 
 void func_841518D0(void *arg0, u8 arg1, u8 arg2) {
     u8 local = arg2 / 3;
 
-    func_841506D0(arg0, arg1, 0xA1, local);
-    func_84150878(arg0, arg1, 0xA1, local);
+    BattlePlan_ScoreBurn(arg0, arg1, 0xA1, local);
+    BattlePlan_ScoreFreeze(arg0, arg1, 0xA1, local);
     func_841509E0(arg0, arg1, 0xA1, local);
 }
 
