@@ -6,8 +6,38 @@ s32 func_87E043F0(u8 *arg0) {
     return (*(u16 *)(arg0 + 0x274) & 4) != 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_307D60/func_87E04400.s")
+s32 func_87E10E64(s32);
+s32 func_87E10EA8(s32);
+s32 func_87E10F2C(s32);
+// 12-byte entries whose three fields are passed one each to func_87E10E64,
+// func_87E10EA8 and func_87E10F2C. D_87E19A74 is a parallel table starting
+// 0x30 bytes (four entries) after D_87E19A44.
+typedef struct unk_func_87E04400 {
+    s32 unk_00;
+    s32 unk_04;
+    s32 unk_08;
+} unk_func_87E04400;
+extern unk_func_87E04400 D_87E19A44[];
+extern unk_func_87E04400 D_87E19A74[];
+void func_87E04400(void *arg0) {
+    unk_func_87E04400 *var_v0;
+    s32 temp_v1;
 
+    if (*(u8 *)(*(u8 **)((u8 *)arg0 + 0x270) + 0x2180) == 0) {
+        var_v0 = &D_87E19A44[*(s32 *)((u8 *)arg0 + 4)];
+    } else {
+        var_v0 = &D_87E19A74[*(s32 *)((u8 *)arg0 + 4)];
+    }
+    temp_v1 = *(s32 *)arg0;
+    if ((temp_v1 == 2) || (temp_v1 == 3)) {
+        func_87E10EA8(-1);
+        func_87E10F2C(-1);
+        return;
+    }
+    func_87E10E64(var_v0->unk_00);
+    func_87E10EA8(var_v0->unk_04);
+    func_87E10F2C(var_v0->unk_08);
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_307D60/func_87E044B8.s")
 
 /* mkdraft:func_87E0469C begin */

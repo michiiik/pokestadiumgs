@@ -77,7 +77,32 @@ s32 *func_816020BC(u8 arg0) {
 extern u8 D_8160BD30[];
 void *func_81602108(s32 arg0) { s32 index = arg0 & 0xFF; s32 *p = &arg0; *p = arg0; if (index >= 6) index = 0; return &D_8160BD30[index * 3]; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/11/fragment11_D9520/func_81602134.s")
+/* Collects into arg0's list: entry 0 is a 0 terminator, then every ID 1..0xFE
+ * whose bit is set in the arg1 bitset (func_81601980), grouped so IDs whose
+ * func_81601FA0 value equals the outer counter (1..5) come out in pass order;
+ * the entry count lands in the u16 at arg0+0x40. func_816021E8 scans this list. */
+void func_81602134(u8 *arg0, s32 *arg1) {
+    s32 i;
+    s32 j;
+    s32 value;
+    s32 count;
+
+    arg0[0] = 0;
+    count = 1;
+    for (j = 1; j != 6; j++) {
+        for (i = 1; i != 0xFF; i++) {
+            if (func_81601980(arg1, i) == 0) {
+                continue;
+            }
+            value = func_81601FA0(i);
+            if (j == value) {
+                arg0[count] = i;
+                count++;
+            }
+        }
+    }
+    *(u16 *)(arg0 + 0x40) = count;
+}
 
 s32 func_816021E8(u8 *arg0, u8 arg1) {
     s32 i;

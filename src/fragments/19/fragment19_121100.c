@@ -334,8 +334,50 @@ extern s32 func_82300F4C(void);
 extern s16 D_82305E68[];
 s32 func_82303488(void) { s32 result = 0; s16 *counter = D_82305E68; if (func_82300AB4()) result = 1; if (func_82300F4C()) result |= 2; if (result == 3) { if (++counter[0] < 2) result = 0; } else result = 0; return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82303508.s")
+extern s32 func_82305A4C(void);
+extern void StageLoader_WaitForRetrace(void);
+extern s32 main_pool_pop_state(s32);
+extern s32 main_pool_push_state(s32);
+extern s32 func_8004D690(s32);
+extern void func_80008624(void);
+extern void func_82300020(s32);
+extern s32 func_80001FF0(void);
+extern void func_800225C4(s32);
+extern u8 D_82305A74[];
+extern s16 D_82305E6C;
+extern s32 D_82305E98;
 
+s32 func_82303508(void) {
+    s32 result;
+    s32 ready;
+    u8 *entry;
+    s16 *counter;
+
+    result = 0;
+    entry = &D_82305A74[D_82305E6C * 36];
+    counter = D_82305E68;
+    ready = func_82305A4C();
+    if (ready == 0) {
+        return 0;
+    }
+    if (D_82305E98 == 0) {
+        if (++counter[0] >= 2) {
+            StageLoader_WaitForRetrace();
+            main_pool_pop_state(0x63776C70);
+            D_82305E98 = func_8004D690(*(s16 *)(entry + 8));
+            main_pool_push_state(0x63776C70);
+            func_80008624();
+            func_82300020(0);
+            counter[0] = 0;
+        }
+    } else if (func_823000F8() != 0) {
+        if (++counter[0] >= 2) {
+            result = 1;
+            func_800225C4(func_80001FF0());
+        }
+    }
+    return result;
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_8230362C.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/19/fragment19_121100/func_82303A04.s")

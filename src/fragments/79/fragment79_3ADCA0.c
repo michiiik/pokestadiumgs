@@ -6,7 +6,43 @@
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_8413E490.s")
+extern u8 D_8418B1C0;
+extern u8 D_8419C0C0;
+extern u16 D_8419D7A0;
+
+s32 func_8413E490(u8 arg0)
+{
+  s32 new_var2;
+  u8 *end;
+  s32 key;
+  u8 *cursor;
+  u32 new_var;
+  // FAKE: the unused `end`, the empty statement, new_var standing in for the
+  // constant offset 0x7A, and the one-line loop head are permuter output.
+  ;
+ key = arg0; new_var = 0x7A; cursor = &D_8419C0C0; loop_1: if (key == cursor[0]) { new_var2 = (s32) (cursor + 1); return new_var2; }
+  if (key == cursor[new_var])
+  {
+    return (s32) (cursor + 0x7B);
+  }
+  if (key == cursor[0xF4])
+  {
+    return (s32) (cursor + 0xF5);
+  }
+  if (key == cursor[0x16E])
+  {
+    // FAKE: arithmetic nop on key.
+    key--;
+    key++;
+    return (s32) (cursor + 0x16F);
+  }
+  cursor += 0x1E8;
+  if (((u8 *) (&D_8419D7A0)) != cursor)
+  {
+    goto loop_1;
+  }
+  return (s32) (&D_8418B1C0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -2171,7 +2207,64 @@ void func_84147C9C(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3ADCA0/func_84147E50.s")
+extern void func_841476E0(u8 *, s16, u8, u8, s32);
+
+void func_84147E50(u8 *arg0) {
+    switch (arg0[0]) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+        func_8414735C(arg0, -D_84186F0C, 1, D_84186F00, 0);
+        break;
+    case 18:
+        func_8414735C(arg0, -D_84186F0C, 0, D_84186F00, -1);
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        func_841474B4(arg0, -D_84186F10, 0, D_84186F00, -D_84186F00);
+        break;
+    case 9:
+        func_8414760C(arg0, -1, D_84186F00, -D_84186F00);
+        break;
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+        func_841476E0(arg0, -1, 0, D_84186F04, -D_84186F04);
+        break;
+    case 19:
+        arg0[8] &= ~1;
+        func_84147270(arg0, D_84186F00, -D_84186F00);
+        break;
+    case 21:
+    case 22:
+        arg0[8] &= ~1;
+        func_84147270(arg0, D_84186F00, -1);
+        break;
+    case 20:
+        arg0[8] &= ~1;
+        /* The (u16) casts are value-preserving here (D_84186F04 is u8, so the
+         * u8-narrowing andi for arg1 and the s16 negation for arg2 produce the
+         * same values without them), but they are load-bearing for codegen:
+         * typed u16, the shared subexpression forms one web that IDO colors
+         * into a3 and reads directly by both the negu for arg2 and the
+         * andi 0xff in the jal delay slot for arg1. Plain, (s16)-typed, or
+         * named-local spellings color the same load v0 instead. */
+        func_84147270(arg0, (u16)D_84186F04, -(u16)D_84186F04); // FAKE
+        break;
+    case 23:
+        func_84147B20(arg0);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US

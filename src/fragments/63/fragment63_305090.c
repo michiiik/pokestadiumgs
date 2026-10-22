@@ -141,8 +141,35 @@ void func_87E02438(void) {
     func_8004C8C0(0x1A7);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_305090/func_87E02470.s")
+extern s32 main_pool_get_available(void);
+extern s32 MainPool_AllocState(s32, s32);
+extern void MainPool_FinalizeAllocation(s32);
+extern s32 func_80040E80(s32, void *);
+extern u8 D_87E197CC;
+extern s32 func_87F08E7C(u16, u16, u8, u8, s32);
+extern s32 func_800071A4(s32, s32, s32, s32, s32);
 
+void func_87E02470(u8 *arg0) {
+    s32 state;
+    s32 unk;
+    s32 i;
+    s32 temp;
+    u8 *record;
+
+    state = MainPool_AllocState(main_pool_get_available(), 0);
+    *(s32 *)((u8 *)arg0 + 0x27C) = func_80040E80(state, &D_87E197CC);
+    MainPool_FinalizeAllocation(state);
+    unk = func_87F08E7C(124, 51, 0, 2, 0xF000000);
+    record = (u8 *)arg0 + 0x1C;
+    // FAKE: the store of temp into the previous record sits in the loop's
+    // increment expression instead of the body.
+    for (i = 0; i != 4; i++, record += 0x98, *(s32 *)(record - 0x8C) = temp) {
+        *(s32 *)(record + 0) = 0;
+        *(s32 *)(record + 4) = i;
+        *(s32 *)(record + 8) = unk;
+        temp = func_800071A4(0, 2, 124, 51, 0);
+    }
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/63/fragment63_305090/func_87E02538.s")
 
 extern void func_87E02538(void);

@@ -45,18 +45,52 @@ s32 func_8130CEAC(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130CEF0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130D098.s")
+/* Overlay rectangle filled from an eased window-close progress: arg0 carries
+ * the s16 origin (+8/+0xA) and the close progress at +0x2C, which the
+ * func_8130F09C update in this file drives toward 1.0f. D_8160BD18 and
+ * D_8160BD1C are the easing function-pointer tables shared with the matched
+ * grid code (Fragment14_ComputeGridRectangles in fragment14_FF070.c); the
+ * rectangle layout and the trailing func_816072FC finalize call match
+ * func_8130D45C below, which fills the same struct without easing. */
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130D1FC.s")
-
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130D340.s")
-
+extern f32 (*D_8160BD18)(f32);
+extern f32 (*D_8160BD1C)(f32);
+extern f64 D_813127E0;
+extern f64 D_813127E8;
+extern void func_816072FC(void *arg0);
 typedef struct unk_func_8130D45C {
     s16 unk_00;
     s16 unk_02;
     s16 unk_04;
     s16 unk_06;
 } unk_func_8130D45C;
+
+f32 func_8130D098(u8 *arg0, unk_func_8130D45C *arg1) {
+    f32 progress;
+    f32 scale;
+
+    progress = *(f32 *)(arg0 + 0x2C);
+    scale = 1.0f;
+    /* FAKE: division by 1. Keep the divisor int-spelled: IDO lowers progress / 1.0f to a multiply
+     * (same lowering as the / 16 in Fragment14_InterpolatePanelRectangle,
+     * //@src/fragments/14/fragment14_FCD40.c). */
+    if (progress < 1) {
+        scale = progress / 1;
+    }
+    /* The double adds keep the integer base as the left operand; writing the
+     * product first flips add.d's operands and rotates the FPU temp
+     * assignment of every statement after these two. */
+    arg1->unk_00 = (s16)(s32)(*(s16 *)(arg0 + 8) + 27 + (1.0f - D_8160BD18(scale)) * D_813127E0);
+    arg1->unk_02 = (s16)(s32)(*(s16 *)(arg0 + 10) + 37 + (1.0f - D_8160BD1C(scale)) * D_813127E8);
+    arg1->unk_04 = (s16)(s32)(D_8160BD18(scale) * 73.0f);
+    arg1->unk_06 = (s16)(s32)(D_8160BD1C(scale) * 73.0f);
+    func_816072FC(arg1);
+    return scale;
+}
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130D1FC.s")
+
+#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_104FC0/func_8130D340.s")
+
 
 extern void func_8160732C(void* arg0, void* arg1);
 extern void func_8160724C(s16* arg0, s16* arg1);

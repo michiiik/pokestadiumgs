@@ -672,8 +672,56 @@ void Fragment14_EnterSelectionState(void *arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/14/fragment14_F81B0/func_8130209C.s")
+extern void func_81301648(void *, s32);
+extern void func_81609CB8(void);
+/* Renamed callees invoked through their func_ address symbols so the jal
+ * relocations keep the retail spelling (Fragment14_UpdateSlotDialog is
+ * func_81301548, etc.). */
+extern void func_81301F64(void *, s32);
+extern void func_81301548(void *, s32);
+extern void func_8130176C(void *, s32);
+extern void func_8130183C(void *, s32);
+extern void func_813018FC(void *, s32);
+extern void func_813019C8(void *, s32);
 
+void func_8130209C(void *arg0, s32 arg1) {
+    if (*(s32 *)(((u8 *)arg0 + 0x18000) + 0x216C) != 0) {
+        func_81301F64(arg0, *(s8 *)(((u8 *)arg0 + 0x18000) + 0x2141));
+    }
+    switch (*(u8 *)(((u8 *)arg0 + 0x18000) + 0x2140)) {
+    case 0:
+        func_81301548(arg0, arg1);
+        break;
+    case 1:
+        func_81301648(arg0, arg1);
+        break;
+    case 2:
+        func_8130176C(arg0, arg1);
+        break;
+    case 3:
+        func_813018FC(arg0, arg1);
+        break;
+    case 4:
+        func_8130183C(arg0, arg1);
+        break;
+    case 5:
+        func_813019C8(arg0, arg1);
+        break;
+    case 6:
+        func_81301BDC((s32)arg0, arg1);
+        break;
+    case 7:
+        func_81301C54((s32)arg0, arg1);
+        break;
+    case 8:
+        func_81301CCC((u8 *)arg0, arg1);
+        break;
+    case 9:
+        func_81301CD8((u8 *)arg0, arg1);
+        break;
+    }
+    func_81609CB8();
+}
 void Fragment14_DrawSelectionState(void *arg0, s32 arg1) {
     switch (((Fragment14SetupState *)arg0)->active) {
     case 0: func_81301CE4((s32)arg0); break;

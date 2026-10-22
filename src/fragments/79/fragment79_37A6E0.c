@@ -334,7 +334,31 @@ void func_8410C304(u8 *arg0, s32 arg1, s32 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410C720.s")
+extern u8 *D_841911E8;
+extern u8 *func_8410B330(u8 *);
+extern s32 BattleAnim_StepToS16(s16 *, s16, s16);
+extern void func_841203B4(u8 *, f32, f32);
+extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+
+void func_8410C720(u8 *arg0, u8 *arg1, f32 arg2, f32 arg3, f32 arg4, s32 arg5) {
+    f32 target[3];
+    f32 pos[3];
+    f32 distance;
+    s16 angle1;
+    s16 angle0;
+
+    D_841911E8 = func_8410B330(arg0);
+    BattleAnim_StepToS16((s16 *)(D_841911E8 + 0x3C), -0xE38, *(s16 *)((u8 *)&arg5 + 2));
+    func_841203B4(arg0 + 0xB8, arg3, *(f32 *)(D_841911E8 + 0x44) * arg4);
+    *(f32 *)(D_841911E8 + 0x54) = *(f32 *)(arg0 + 0xB8);
+    func_841203B4(D_841911E8 + 0x44, 0.15f, 0.03f);
+    func_800371B4(D_841911E8 + 0x50, (u8 *)target, arg2, *(s16 *)(D_841911E8 + 0x3C), *(s16 *)(D_841911E8 + 0x3E));
+    Vec3f_SetComponentsDuplicate(pos, *(f32 *)(arg0 + 0xA8), *(f32 *)(arg0 + 0xAC), *(f32 *)(arg0 + 0xB0));
+    func_80037120((s32)pos, (s32)target, (s32 *)&distance, &angle0, &angle1);
+    func_800371B4((u8 *)pos, arg0 + 0xA8, *(f32 *)(D_841911E8 + 0x44) * distance, angle0, angle1);
+}
 #endif
 
 #ifdef VERSION_US

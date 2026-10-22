@@ -1036,7 +1036,28 @@ s32 func_84126F2C(u8 arg0, u16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_841270D8.s")
+extern void *D_841951F0;
+
+// Stores (arg0 & 1) << 4 | (arg1 & 0xF) into the first 0xFF byte of the
+// 12-byte table at D_841951F0 + 0x9C8. Declared s32 but has no return on the
+// path that reaches the end; its caller discards the result.
+s32 func_841270D8(u8 arg0, u8 arg1)
+{
+  s32 slot;
+  slot = 0;
+  if ((*((u8 *) (((u8 *) D_841951F0) + 0x9C8))) != 0xFF)
+  {
+ while (slot != 11) { slot++; // FAKE: one-line loop head (permuter layout)
+      if ((*((u8 *) ((((u8 *) D_841951F0) + 0x9C8) + slot))) == 0xFF)
+      {
+        break;
+        return slot; // FAKE: unreachable after break
+      }
+    }
+
+  }
+  *((u8 *) ((((u8 *) D_841951F0) + 0x9C8) + slot)) = ((arg0 & 1) << 4) | (arg1 & 0xF);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1163,7 +1184,44 @@ void BattleDamage_RollCriticalHit(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84128204.s")
+extern s32 D_841951C8;
+
+// Same function as func_84125080 (aliases.ld); this caller declares the return as
+// unsigned short because that type puts the result in a separate temp, which IDO
+// colors v1 via `move v1,v0` in both loop delay slots. The callee returns an lbu byte.
+extern unsigned short func_84125080_u16();
+void func_84128204(void)
+{
+  s32 temp_v0;
+  s32 temp_v0_2;
+  s32 new_var2;
+  s32 var_v1;
+  s32 new_var;
+  if (D_841951C8 >= 2)
+  {
+    temp_v0 = func_84125080_u16();
+    var_v1 = temp_v0;
+    if (temp_v0 < 217)
+    {
+      do
+      {
+        temp_v0_2 = func_84125080_u16();
+        var_v1 = temp_v0_2;
+      }
+      while (temp_v0_2 < 217);
+    }
+    // FAKE: xor-0 arithmetic nop; the promotion web its conversion node creates claims a
+    // uopt walk slot (the zero-instruction-temp family - see func_80019C08's documented xor-0).
+    D_841951C8 = ((s32) ((new_var = var_v1 ^ 0) * D_841951C8)) / 255;
+    new_var2 = D_841951C8;
+    // FAKE: multiply-by-zero spells the zero constant as an expression tree, keeping the
+    // compare's operand out of the shared-constant pool (permuter-found, same device family).
+    if (new_var2 == (217 * 0))
+    {
+      D_841951C8 += 1;
+    }
+  }
+}
 #endif
 
 #ifdef VERSION_US
@@ -4059,7 +4117,43 @@ void BattleCommand_RunSequence(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84131760.s")
+extern s32 func_8004C874(s32, s32);
+extern void func_8004C54C(u8, s32);
+extern void func_84134CBC(u8 arg0, u8 arg1);
+extern void func_84135B00(u16);
+extern void func_84136678(u8 arg0, s16 arg1);
+extern void func_84136CA8(void);
+extern u8 D_841951D2;
+extern u8 D_841951D3;
+extern u8 *D_84195200[];
+extern u8 *D_84195208[];
+
+void func_84131760(void) {
+    s32 i;
+    s32 ret;
+    u8 t;
+
+    for (i = 0; i != 2; i++) {
+        if (D_84195200[i][1] == 152) {
+            D_84195200[i][1] = 0;
+            D_84195208[i][0xF] |= 0x80;
+            ret = func_84125080();
+            t = i;
+            D_84195208[i][0x13] = (ret & 3) + 2;
+            D_841951D2 = 0;
+            D_841951D3 = 0;
+            func_84125CF8(t & 0xFF, 0, 2, 0);
+            func_84136678(t, -1);
+            func_8004C54C(26, D_84195200[i] + 0x34);
+            func_8004C54C(42, func_8004C874(8, 151));
+            func_84135B00(151);
+            func_8004C54C(28, D_84195200[i] + 0x34);
+            func_84135B00(94);
+            func_84134CBC(t, 65);
+            func_84136CA8();
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -4381,7 +4475,7 @@ void func_841330B4(void) {
 
 #ifdef VERSION_US
 extern void func_84124E44(u8);
-extern void func_841270D8(u8, u8);
+extern s32 func_841270D8(u8, u8);
 extern void func_84131664(u8);
 extern u8 func_80062D20(u8);
 extern void func_84134CBC(u8 arg0, u8 arg1);

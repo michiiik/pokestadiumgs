@@ -111,8 +111,62 @@ void func_88509290(void) {
 extern u8 D_88523050[];
 void func_885093F0(void) { s32 i = 0; u8 *ptr = D_88523050; do { i += 1; ptr += 0x50; *(s32 *)(ptr - 0x50) = 0; } while (i != 2); }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88509418.s")
+typedef struct { s16 unk_00; s16 unk_02; s16 unk_04; } unk_func_88509418_012;
+// Same layout as unk_D_88523050 (declared further down in this file): one ball
+// record = state word, seven s16 fields, ten 6-byte trail ghosts. Declaring an
+// equivalent type here keeps this function self-contained ahead of that typedef.
+typedef struct {
+    s32 unk_00;
+    s16 unk_04;
+    s16 unk_06;
+    s16 unk_08;
+    s16 unk_0A;
+    s16 unk_0C;
+    s16 unk_0E;
+    s16 unk_10;
+    unk_func_88509418_012 unk_12[10];
+} unk_func_88509418;
 
+// arg0 must stay u8: ugen then homes the incoming register framelessly
+// (sw a0, 0(sp)) and narrows it in place (andi a0, a0, 0xFF); a wider
+// parameter type drops the home store. The ball base is indexed through
+// the cast type instead of an explicit arg0 * 80: with an explicit
+// multiply uopt copies the narrowed arg0 out of a0 before the base addu,
+// which recolors the pointer and turns the ghost loop's strength-reduced
+// pointer into a byte-offset counter plus a per-iteration addu.
+void func_88509418(u8 arg0, s32 arg1) {
+    unk_func_88509418 *temp_v0 = &((unk_func_88509418 *)D_88523050)[arg0];
+    s32 i;
+
+    temp_v0->unk_00 = arg1;
+    switch (arg1) {
+    case 1:
+        temp_v0->unk_08 = 40;
+        temp_v0->unk_06 = 90;
+        temp_v0->unk_04 = (arg0 * 90) + 250;
+        temp_v0->unk_0E = 0;
+        temp_v0->unk_10 = 0;
+        for (i = 0; i < 10; i++) {
+            // Chained on purpose: the assignment to unk_00 re-reads unk_02
+            // through memory (the target's lh right after the sh), rather
+            // than reusing the constant.
+            temp_v0->unk_12[i].unk_00 = temp_v0->unk_12[i].unk_02 = 0;
+            temp_v0->unk_12[i].unk_04 = 0;
+        }
+        break;
+    case 2:
+        temp_v0->unk_08 = 30;
+        temp_v0->unk_0A = 0;
+        temp_v0->unk_0E = 0xFF;
+        break;
+    case 3:
+        temp_v0->unk_08 = 0;
+        temp_v0->unk_0A = 0;
+        temp_v0->unk_0C = 0;
+        temp_v0->unk_0E = 0xFF;
+        break;
+    }
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88509538.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_885095EC.s")
@@ -187,7 +241,7 @@ extern s32 func_8850CED8(s32);
 extern void func_88509538(u8 *);
 extern void func_885095EC(u8 *);
 extern void func_88509870(u8 *);
-extern void func_88509418(s32, s32);
+extern void func_88509418(u8, s32);
 extern void func_800226C0(s32);
 void func_8850998C(void) {
     s32 i;

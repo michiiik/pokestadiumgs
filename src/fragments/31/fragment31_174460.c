@@ -2,8 +2,31 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_174460/func_882011E0.s")
+extern s32 func_80063754();
+extern s16 func_88A00248(void *, s32 *, u8 **, void *, s32, s8);
+extern void _bcopy(void *, void *, s32);
+extern void _bzero(void *, s32);
+extern s8 D_88006868;
+extern s16 D_882345F0;
+extern u8 D_882345F8[];
+extern u8 D_88234618[];
+extern s32 D_88A01C30;
+extern u8 *D_88A01C34;
+extern u8 (*D_88A01C38)[0x60];
+extern u8 D_88A01C40[];
 
+void func_882011E0(void *arg0) {
+    u32 i;
+
+    D_882345F0 = func_88A00248(arg0, &D_88A01C30, &D_88A01C34, &D_88A01C38, 3, D_88006868);
+    _bcopy(D_88A01C40, D_882345F8, 30);
+    _bzero(D_88234618, 6);
+    for (i = 0; i < D_88A01C34[0x15]; i++) {
+        if (func_80063754(D_88A01C38[i][9]) != 0) {
+            D_88234618[i] = 1;
+        }
+    }
+}
 s8 func_882012E4(void *arg0) {
     u8 *state = *(u8 **)arg0;
     void **entry = *(void ***)(state + 0x10);

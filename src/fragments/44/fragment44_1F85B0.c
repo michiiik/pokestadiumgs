@@ -47,8 +47,42 @@ void func_8AF0A888(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F85B0/func_8AF0A900.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F85B0/func_8AF0AAF8.s")
+extern u8 func_8006397C(u8);
+extern u8 func_800639C0(u8);
+extern s16 Trade_GetSelectedBox(s16);
+extern s16 func_80063454(u8, u8, u8, s32);
+extern u8 D_8AF2D302[];
+extern s16 D_8AF2D3D8;
 
+/**
+ * Fills D_8AF2D3D8[typeSlot] for all 17 attacking-type slots with the matchup
+ * multiplier of that type against the species whose byte sits at D_8AF2D302[1].
+ * func_8006397C/func_800639C0 are the species -> type 1 / type 2 converters
+ * (see src/641E0.c:100), and func_80063454 is the matchup multiplier lookup
+ * (see src/63CF0.c:105). The consumer func_8AF0B7BC below scans the filled
+ * table and draws one icon per slot whose matchup equals its argument.
+ */
+void func_8AF0AAF8(void)
+{
+    u8 *species_byte;
+    s32 unused_slot_30; // FAKE: declared-only; reserves the 4-byte stack slot at 0x30(sp)
+    s16 unused_slot_2e; // FAKE: declared-only; reserves the 2-byte stack slot at 0x2e(sp)
+    u8 types[2];
+    u32 i;
+    s32 species_offset;
+    s16 *matchups = &D_8AF2D3D8;
+
+    i = 1;
+    types[0] = func_8006397C(D_8AF2D302[i]);
+    species_offset = (u8) i;
+    if (!species_offset) { // FAKE: empty if
+    }
+    species_byte = &D_8AF2D302[species_offset];
+    types[1] = func_800639C0(*species_byte);
+    for (i = 0; i < 17; i++) {
+        matchups[i] = func_80063454((u8) Trade_GetSelectedBox(i), types[0], types[1], 0);
+    }
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F85B0/func_8AF0AB84.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/44/fragment44_1F85B0/func_8AF0ACDC.s")

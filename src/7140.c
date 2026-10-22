@@ -120,8 +120,45 @@ s32 Storage_StartFlashWriteBuffer(void *arg0) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/7140/func_800068C4.s")
+void func_800068C4(void *arg0) {
+    struct unk_func_800068C4 { u8 unk0; u8 filler[0x27]; s32 unk28; };
+    extern OSMesgQueue D_800D045C;
+    struct unk_func_800068C4 *req;
+    OSMesg result;
 
+    osFlashInit();
+
+    while (1) {
+        osRecvMesg(&D_800D045C, (void *)&req, 1);
+
+        switch (req->unk0) {
+            case 0xF0:
+                result = (OSMesg)func_800066EC(req, 0);
+                break;
+            case 0xF2:
+                result = (OSMesg)Storage_ReadSram(req);
+                break;
+            case 0xF3:
+                result = (OSMesg)func_80006664(req);
+                break;
+            case 0xF4:
+                result = (OSMesg)func_80006778(req);
+                break;
+            case 0xF5:
+                result = (OSMesg)Storage_ReadFlashArray((u8 *)req);
+                break;
+            case 0xF6:
+                result = (OSMesg)Storage_StartFlashWriteBuffer(req);
+                break;
+        }
+
+        if ((OSMesgQueue *)req->unk28 != NULL) {
+            osSendMesg((OSMesgQueue *)req->unk28, result, 0);
+        }
+
+        Util_Free(req);
+    }
+}
 void func_800068C4(void *);
 extern OSThread D_800CE170;
 extern u8 D_800D0320;

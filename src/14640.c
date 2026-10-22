@@ -185,8 +185,50 @@ s32 func_80014A5C(s32 arg0, s32 arg1, s32 arg2) {
     return func_80014AA8(arg0, arg1, 0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/14640/func_80014AA8.s")
+extern u8 D_8011BE90[];
+extern void func_8001CA3C(void *);
+extern void func_8001F7F0(void *);
+/* Bitfield view of the slot byte at offset 0: bit 7 is set and bit 6 cleared
+   when the slot becomes active (the 0x80/0xBF masks in this function). */
+typedef struct { u32 unk_7 : 1; u32 unk_6 : 1; u32 unk_0 : 6; } unk_func_80014AA8;
+s32 func_80014AA8(s32 arg0, s32 arg1, s32 arg2) {
+    u8 *obj;
+    s32 index;
+    s32 count;
+    s32 value;
+    s32 result;
 
+    obj = *(u8 **)(D_8011BE90 + arg0 * 4 + 0x604C);
+    func_8001CA3C(obj);
+    value = 0xFF;
+    index = *(u16 *)(*(u8 **)(D_8011BE90 + 0x2BD0) + arg1 * 2);
+    count = (*(u8 **)(D_8011BE90 + 0x2BD0))[index++];
+    if (count > 0) {
+        do {
+            value = (*(u8 **)(D_8011BE90 + 0x2BD0))[index++];
+            func_80014D64(value);
+            --count;
+        } while (count > 0);
+    }
+    result = func_80014BD4(arg1);
+    if (result == 0) {
+        return 0;
+    }
+    func_8001F7F0(obj);
+    obj[4] = arg1;
+    if (value != 0xFF) {
+        obj[5] = func_8001510C(1, value);
+    } else {
+        obj[5] = 0xFF;
+    }
+    *(s32 *)(obj + 0x18) = result;
+    *(s32 *)(obj + 0x78) = result;
+    ((unk_func_80014AA8 *)obj)->unk_7 = 1;
+    obj[0x90] = 0;
+    *(s16 *)(obj + 0x10) = 0;
+    ((unk_func_80014AA8 *)obj)->unk_6 = 0;
+    obj[7] = arg0;
+}
 extern s32 func_80014E68(s32, s32, void *);
 extern s32 func_8001510C(s32, s32);
 extern u8 D_8011F258;

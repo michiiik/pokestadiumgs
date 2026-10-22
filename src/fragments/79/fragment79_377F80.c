@@ -254,7 +254,26 @@ void func_8410933C(void* arg0) {
 }
 /* mkdraft:func_8410933C end */
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_84109394.s")
+void func_84109394(void)
+{
+  s32 i;
+  s32 j;
+  D_841901B4 = 0;
+ do { j = 0; } while (0); // FAKE: single-pass loop around the assignment
+  for (i = 0; i < 2; i++)
+  {
+    D_841901C0[j + 1] = 0;
+    D_841901E0[(i * 4) + 1] = 0;
+    D_841901C0[j + 2] = 0;
+    D_841901E0[(i * 4) + 2] = 0;
+    D_841901C0[j + 3] = 0;
+    D_841901E0[(i * 4) + 3] = 0;
+    j += 4;
+    D_841901C0[j - 4] = 0;
+    D_841901E0[i * 4] = 0;
+  }
+
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_377F80/func_841093E8.s")
 

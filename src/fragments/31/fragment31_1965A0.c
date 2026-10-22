@@ -107,5 +107,41 @@ s32 func_88223554(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1965A0/func_88223850.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/31/fragment31_1965A0/func_882241B8.s")
+extern void *Util_Malloc(s32);
+extern s32 func_88004804(s32, s32, s16, s16, s32, s32, s32, s32, s32,
+                         void (*)(void), void (*)(void), void (*)(void),
+                         void (*)(void), s32, s32);
+extern void func_88001C6C(void *, u16, u8, s16, u8, s16, s16, s16, s16, s16, s32);
+extern s32 func_80001FF0(void);
+extern u8 D_8800ED50[];
+extern void func_882235CC(void);
+extern void func_88223850(void);
+
+void func_882241B8(void) {
+    s32 result;
+    s32 index;
+    s32 first_refresh_rate;
+
+    D_88234850 = (s32)Util_Malloc(0x38);
+    result = func_88004804(0, 3, 167, 146, 0, 1, 220, 220, 180,
+                           func_882235CC, func_88223850, func_88223320,
+                           func_88223348, 0, 0);
+    *(void **)D_88234850 = D_8800ED50 + result * 0x4C;
+    *(s16 *)(*(s32 *)D_88234850 + 0x10) = 253;
+    *(s16 *)(*(s32 *)D_88234850 + 0x12) = 303;
+    D_880068B4 = 0;
+    *(s32 *)((u8 *)D_88234850 + 0x30) = 1;
+    *(s16 *)((u8 *)D_88234850 + 0x34) = 0;
+    for (index = 0; index < 2; index = (index + 1) & 0xFF) {
+        ((s8 *)(u32)D_88234850)[index + 0x36] = D_88234758[index + 7];
+    }
+    first_refresh_rate = func_80001FF0();
+    func_88001C6C((u8 *)D_88234850 + 4, 17, 9, 209, 23, 12,
+                 (s32)(540.0f / (f32)first_refresh_rate + (0.0f < (540.0f / func_80001FF0()) ? 0.5f : -0.5f)),
+                 41, 41, 12, 70);
+}
+/* Retail carries three zero words after the epilogue (882243B4-882243BC);
+ * fragment31_1965A0.o .text must stay 0x10A0 bytes so fragment31_197640.o
+ * keeps starting at 0x882243C0 (same class as fragment31_1A43F0.c). */
+#pragma C_FUNCTION_PADDING(12)
 #endif

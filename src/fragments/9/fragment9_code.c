@@ -50,8 +50,52 @@ s32 func_8FB00F78(void *arg0, void *arg1) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB01A74.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB01C14.s")
+/* Initializes the number-display widget state at
+ * arg0 (the same struct drawn by func_8FB01EC4/func_8FB01FCC
+ * //@src/fragments/9/fragment9_code.c: u16 x,y,w,h at 0..8, s16 offset at
+ * 8, u16 count at 0xA, digit bytes at 0xC, s32 value at 0x14). Geometry
+ * comes from the sub-struct at arg1+0x44 (u16 x at +4, u16 y at +6, u16
+ * digit count at +0xC): width = digitCount * 20, height fixed 20, offset 0,
+ * count = digitCount - 1. If the guard call func_8FB01A74 returns nonzero,
+ * the value at +0x14 is decomposed LSB-first into the digit byte array at
+ * +0xC in radix arg2 (digits[0] = value % radix, value /= radix, i from 0
+ * while i <= count). Returns 1 when the digits were filled, else 0.
+ */
 
+s32 func_8FB01A74();
+
+s32 func_8FB01C14(void *arg0, void *arg1, s32 arg2) {
+    s32 var_v0;
+    s32 var_v1;
+    u8 *var_a0;
+
+    (*(u16 *)((u8 *)(arg0) + (0))) = (u16) (*(u16 *)((u8 *)(*(void **)((u8 *)(arg1) + (0x44))) + (4)));
+    (*(u16 *)((u8 *)(arg0) + (2))) = (u16) (*(u16 *)((u8 *)(*(void **)((u8 *)(arg1) + (0x44))) + (6)));
+    (*(s16 *)((u8 *)(arg0) + (4))) = (s16) ((*(u16 *)((u8 *)(*(void **)((u8 *)(arg1) + (0x44))) + (0xC))) * 20);
+    /* The u16 lvalue type below is load-bearing: with s16, uopt CSEs this
+     * store's 20 with the multiply's literal 20 above into one shared
+     * register (li vN,0x14 + multu t1,vN), losing the sll/addu/sll chain
+     * and shifting every later t-temp up one slot. As a u16 store the
+     * constant stays a distinct node from the int multiply constant. */
+    (*(u16 *)((u8 *)(arg0) + (6))) = 20;
+    (*(s16 *)((u8 *)(arg0) + (8))) = 0;
+    (*(u16 *)((u8 *)(arg0) + (0xA))) = (u16) ((*(u16 *)((u8 *)(*(void **)((u8 *)(arg1) + (0x44))) + (0xC))) - 1);
+    if (func_8FB01A74() != 0) {
+        var_v0 = (*(s32 *)((u8 *)(arg0) + (0x14)));
+        var_v1 = 0;
+        var_a0 = (u8 *)arg0;
+        if ((s32)(*(u16 *)((u8 *)(arg0) + (0xA))) >= 0) {
+            do {
+                (*(s8 *)((u8 *)(var_a0) + (0xC))) = (s8) (var_v0 % arg2);
+                var_v1 += 1;
+                var_v0 = var_v0 / arg2;
+                var_a0 += 1;
+            } while ((s32)(*(u16 *)((u8 *)(arg0) + (0xA))) >= var_v1);
+        }
+        return 1;
+    }
+    return 0;
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/9/fragment9_code/func_8FB01CF8.s")
 
 extern u8 D_8FB03490[];
