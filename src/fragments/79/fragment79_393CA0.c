@@ -1107,7 +1107,51 @@ void func_84127B00(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_393CA0/func_84127C88.s")
+extern u8 D_8418547C[];
+extern u8 D_84185484[];
+extern u8 D_841951C5;
+extern s32 func_84125080(void);
+extern s32 func_80063660(u8);
+extern s32 func_84124EFC(u8 arg0, u8 *arg1);
+extern u8 D_841951BC;
+extern u8 D_841951BF;
+extern s8 D_841951C2;
+extern u8 * D_84195208[];
+void BattleDamage_RollCriticalHit(void) {
+    u8 stage;
+    D_841951D1 = 0;
+    D_841951E4 = 0;
+    if ((u8)D_841951C2 != 0) {
+        stage = 0;
+        switch (D_84195208[D_841951BC][0]) {
+        case 113:
+            if (D_841951C5 == 30) {
+                stage = 2;
+            }
+            break;
+        case 83:
+            if (D_841951C5 == 105) {
+                stage = 2;
+            }
+            break;
+        default:
+            if (D_84195208[D_841951BC][16] & 4) {
+                stage = 1;
+            }
+            if (func_84124EFC(D_841951BF, D_8418547C)) {
+                stage += 2;
+            }
+            if (func_80063660(D_841951C5) == 73) {
+                stage++;
+            }
+            break;
+        }
+        if (func_84125080() < D_84185484[stage]) {
+            D_841951D1 = 1;
+            D_841951E4 = 1;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US

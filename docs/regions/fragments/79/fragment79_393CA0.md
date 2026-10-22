@@ -442,3 +442,58 @@ positions. This is not a proven register-only residual. Next: capture the
 first scan-value web and determine why it survives in v1 rather than an
 uncolored byte temporary; preserve the two original loop roles. The owner
 remains assembly, with no near-match installed.
+
+## 2026-10-23: critical-hit roll
+
+`84127C88` is accepted as `BattleDamage_RollCriticalHit`, 304 bytes, through
+the recorded native runner and the ordinary host-syntax-enabled full-ROM
+gate. The original threshold table `D_84185484` contains bytes 17, 32, 64,
+85, 128, 128, 128. `D_8418547C` supplies the terminated high-critical move
+list. The function resets `D_841951D1`/`D_841951E4`, combines the species/item
+exceptions with the record flag and move/item contributions, and sets both
+flags when the existing byte RNG is below the selected threshold.
+`func_84125200` consumes the critical flag when comparing stage values.
+
+Three source mechanisms recover the retail object: read the existing gate
+as an unsigned byte; put species case 113 before case 83 in the source
+while keeping the compiler's sorted comparison chain; and inline the record
+lookup in the switch and flag test. The cached record pointer had exchanged
+v0/a0 roles with the species expression, leaving seven instruction words
+different. A calibrated, restricted source search found the inlining change;
+its unused pointer declaration and empty statement were removed before the
+candidate was submitted to the recorded runner. Neither artifact is present
+in the accepted source. No padding, extra arguments, manual unrolling,
+forced registers, or instruction/relocation rewrite was introduced.
+
+The first successful gate immediately froze the source, complete module,
+four collateral objects, ROM, ELF, linked script, layout inputs, and original
+assembly dependencies. External hashes and the full original-module
+comparison were verified before further compilation. The ROM MD5 remains
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. The address alias preserves existing callers.
+
+Publication controls compile both the complete current-master source and the
+proposed public source, preserving intervening merges. Original game bytes,
+section layout, and semantic relocation targets agree throughout. Public
+function extents are compared with the current-master baseline: its existing
+`8413E2EC` extent is 288 bytes rather than the older assembly-backed 292,
+with the same trailing alignment bytes. This change preserves that metadata.
+
+### Remaining evidence
+
+`84130380` is already C in current master `737f43b`. Independent signed
+scan/copy cursors, explicit byte wrapping, and direct indexed accesses
+supersede the private cached-value candidate's 37-word residual. Earlier
+stock/off/on/blank controls and the byte-local allocator observation describe
+that private candidate, not an unresolved owner in the public tree. Do not
+schedule this owner again; consult the current-master source when refreshing
+an older native checkout.
+
+`8412D950` is a requeue. Its active status is a byte at offset 36, saved in a
+real halfword local across the existing calls; party rows have an 88-byte
+stride and a status byte at offset 60. Correcting those widths and using a
+promoted byte-wrapping cursor gives all 105 original instruction positions
+with only the halfword spill/reload at sp+38 instead of sp+36 different.
+Putting a real byte cursor before the saved status obtains sp+36 but leaves
+four cursor/stride register differences. Next: compare those two typed
+cursor families in the allocator, preserving both independently measured
+improvements. No near-match is installed.
