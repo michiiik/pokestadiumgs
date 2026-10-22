@@ -363,6 +363,11 @@ void func_826028E0(Func826028E0StateX *arg0) {
 }
 
 
+extern u8 StageContext_GetFadeMode(void);
+extern s32 func_800355E4(s32);
+extern s32 func_80044144(void *);
+extern s32 func_82614F0C(void);
+
 s32 func_82602930(s32 arg0) {
     s32 result = arg0;
     switch (arg0) {
@@ -451,7 +456,47 @@ void RecordNames_LoadUnassignedFourSlots(u8 *context) {
     } while (index != 4);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82602B9C.s")
+void RecordNames_LoadTwoSlotsOptionalDefaults(u8 *context, s32 use_defaults) {
+    s8 slot;
+    u8 *row;
+    void *name;
+    u8 *teams[2];
+    u8 *profiles[3];
+    s32 index;
+    s8 *state;
+    s8 *cursor;
+    state = *(s8 **)context;
+    teams[0] = *(u8 **)(context + 12) + 4;
+    index = 0;
+    teams[1] = *(u8 **)(context + 12) + 156;
+    profiles[0] = *(u8 **)(context + 12) + 308;
+    profiles[1] = *(u8 **)(context + 12) + 460;
+    cursor = state;
+    profiles[2] = *(u8 **)(context + 12) + 612;
+    do {
+        slot = *cursor;
+        name = 0;
+        switch (slot) {
+        case -1:
+            row = profiles[*(s16 *)(*(u8 **)context + 12)];
+            break;
+        case -2:
+            row = 0;
+            break;
+        default:
+            row = use_defaults != 0 ? teams[index] : 0;
+            break;
+        }
+        if (row != 0) {
+            name = func_8004C874(42, row[1] - 1);
+        }
+        if (name != 0) {
+            _bcopy(name, (u8 *)state + index * 12 + 2256, 12);
+        }
+        index++;
+        cursor++;
+    } while (index != 2);
+}
 
 void RecordNames_LoadSelectedOrDefaultPair(u8 *context) {
     s32 index;
@@ -625,5 +670,40 @@ s32 RecordOwners_AnyUnassigned(void) {
 }
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_82603870.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_128B10/func_826039A0.s")
+extern s32 func_826058CC(s32);
+extern s32 func_82603870(s32);
+void RecordSelection_RunPhaseLoop(void) {
+    s32 mode_category;
+    u8 *state;
+    u16 mode_group;
+    s32 next_phase;
+    s32 phase;
+    state = *(u8 **)D_82615370;
+    phase = 0;
+    mode_group = *(u16 *)(state + 8) & 0xFF00;
+    if (StageContext_GetFadeMode() != 0) {
+        func_800086A4(2);
+        StageFade_StartFromOpaque(5);
+    }
+    do {
+        func_80064D28();
+        func_82604170();
+        func_82613814();
+        func_82603684();
+        next_phase = func_82603870(phase);
+        phase = next_phase;
+    } while (next_phase != 4);
+    func_800086A4(2);
+    mode_category = func_826058CC(state[7]);
+    if (mode_category == 0) {
+        switch (mode_group) {
+        case 0x300:
+            func_826036DC(state);
+            break;
+        case 0x600:
+            func_826037BC(state);
+            break;
+        }
+    }
+}
 #endif

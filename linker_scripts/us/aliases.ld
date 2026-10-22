@@ -817,3 +817,5 @@ func_82601968 = RecordText_CopyUnassignedEntries;
 func_82602AC0 = RecordNames_LoadUnassignedFourSlots;
 func_82602CF4 = RecordNames_LoadSelectedOrDefaultPair;
 func_82603814 = RecordOwners_AnyUnassigned;
+func_82602B9C = RecordNames_LoadTwoSlotsOptionalDefaults;
+func_826039A0 = RecordSelection_RunPhaseLoop;
