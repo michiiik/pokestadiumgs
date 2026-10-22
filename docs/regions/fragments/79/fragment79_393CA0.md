@@ -488,12 +488,22 @@ that private candidate, not an unresolved owner in the public tree. Do not
 schedule this owner again; consult the current-master source when refreshing
 an older native checkout.
 
-`8412D950` is a requeue. Its active status is a byte at offset 36, saved in a
-real halfword local across the existing calls; party rows have an 88-byte
-stride and a status byte at offset 60. Correcting those widths and using a
-promoted byte-wrapping cursor gives all 105 original instruction positions
-with only the halfword spill/reload at sp+38 instead of sp+36 different.
-Putting a real byte cursor before the saved status obtains sp+36 but leaves
-four cursor/stride register differences. Next: compare those two typed
-cursor families in the allocator, preserving both independently measured
-improvements. No near-match is installed.
+### `8412D950`: accepted party-status clear
+
+`BattleEffect_ClearPartyStatus` replaces all 420 bytes of `8412D950` with
+genuine C through the recorded native runner and ordinary full-ROM gate.
+Its active status is a byte at offset 36, saved in a real halfword local
+across the existing calls; party rows have an 88-byte stride and a status
+byte at offset 60. The cross-file `func_841566D0` interface takes three
+byte arguments; the fourth address inferred by m2c is not an argument.
+
+The integer loop index uses a byte-sized next-index value: assigning
+`index + 1` to that value performs the original byte wrap before widening
+it for row arithmetic and the next count comparison. Both values are live
+parts of the cursor update. Alongside the saved status local, this source
+form recovers the original stack home and multiplication sequence. No
+unused local, forced register/frame, padding, or synthetic access is added.
+The first successful gate froze source, whole module, four collateral
+objects, linked outputs, layout inputs, and assembly dependencies; external
+hashes and all original-module/collateral comparisons passed before more
+compilation. The ROM MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
