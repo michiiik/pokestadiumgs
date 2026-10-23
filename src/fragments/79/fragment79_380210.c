@@ -13,7 +13,7 @@ extern s32 D_841911EC;
 extern s32 D_84184148;
 extern void func_8410C934(u8 *arg0, s32 arg1, s16 arg2);
 extern void func_8410E688(u8 *arg0, void *arg1);
-extern void func_84110B2C(u8 *, s32);
+extern void BattleAnim_UpdateCameraWave(u8 *, s32);
 extern void func_8410AFD4(void);
 extern void BattleAnim_UpdateCameraHeightTarget(u8 *arg0, u8 *arg1);
 extern void func_8410E7D0(u8 *arg0, void *arg1);
@@ -80,7 +80,29 @@ void BattleAnim_ModelDispatch_141(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_380210/func_84110B2C.s")
+extern f32 D_80088E50[];
+extern f32 D_80087E50[];
+extern u8 *D_841911E4;
+extern void func_80037120(void *, void *, f32 *, s16 *, s16 *);
+void BattleAnim_UpdateCameraWave(u8 *arg0, s32 arg1) {
+    f32 vertical;
+    f32 distance;
+    f32 offset;
+    s16 angle;
+    s16 elevation;
+    D_841911E8 = func_8410B330(arg0);
+    if (D_841911E8 != D_841911E4) {
+        func_80037120(arg0 + 168, arg0 + 180, &distance, &elevation, &angle);
+        *(s16 *)(D_841911E8 + 150) += 14560;
+        func_841203B4(D_841911E8 + 140, 0.0f, 0.16f);
+        offset = *(f32 *)(D_841911E8 + 140) * D_80088E50[*(u16 *)(D_841911E8 + 150) >> 4];
+        vertical = offset / 3.0f;
+        *(f32 *)(arg0 + 172) += vertical;
+        *(f32 *)(arg0 + 184) += vertical;
+        *(f32 *)(arg0 + 168) += offset * D_80087E50[(u16)(angle + 16384) >> 4];
+        *(f32 *)(arg0 + 180) += offset * D_80087E50[(u16)(angle + 16384) >> 4];
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -126,7 +148,7 @@ void BattleAnim_UpdateCameraFromInput(u8 *arg0, u8 *arg1) {
 
 #ifdef VERSION_US
 extern u8 D_84183960[];
-extern void func_84110B2C(u8 *, s32);
+extern void BattleAnim_UpdateCameraWave(u8 *, s32);
 extern void func_8410DFC4(u8 *, void *);
 extern void func_8410E688(u8 *arg0, void *arg1);
 extern void func_8410E7D0(u8 *arg0, void *arg1);
@@ -144,7 +166,7 @@ void BattleAnim_ModelDispatch_009(u8 *arg0, s32 arg1) {
     } else {
         func_8410E7D0(arg0, (void *)arg1);
     }
-    func_84110B2C(arg0, arg1);
+    BattleAnim_UpdateCameraWave(arg0, arg1);
 }
 #endif
 
