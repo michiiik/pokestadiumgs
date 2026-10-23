@@ -36,33 +36,6 @@ symbol for the latter includes eight terminal zero alignment bytes (252 bytes
 in total). C emits the same module bytes and terminal alignment, with a
 244-byte function symbol. No padding is added to the C body.
 
-## Unresolved owners
-
-- **requeue — `func_86207BC0`**, 384 bytes: line projection kernel. The
-  best separate-scalar candidate has normalized similarity 0.9375, raw
-  0.2708, a 380-byte body and 88-byte frame versus the original 80-byte
-  frame. Scalar declaration order and vector aggregates have been tested.
-  Eight consumed-endpoint carrier variants changed the frame to 32, 40,
-  72 or 80 bytes but missed instruction topology; their best normalized
-  similarity was 0.9167. The degeneracy guard compares endpoint X deltas
-  directly, Y difference to zero and Z difference to zero. Preserve its
-  ordered floating comparisons and reload the parameter after each output
-  store to preserve alias behavior. Next: inspect temporary spill lifetimes
-  around the parameter division and the first closest-vector store, keeping
-  the six-pointer output-only ABI.
-- **requeue — `func_86207A80`**, 320 bytes: XZ orientation predicate.
-  Eight conditional-delta/product variants reached normalized 0.7125 and
-  raw 0.15, with a 304-byte body and 48-byte frame versus 320/64. Eight
-  up-front-delta branch-chain variants regressed. The positive orientation's
-  final test uses the first cross product where the negative path uses the
-  first X delta; the assembly's stack offsets establish this asymmetry.
-  Preserve it rather than substituting a conventional triangle predicate.
-  Next: test scoped short-circuit topology with conditional third-point
-  loads and explicit result assignment.
-
-Rejected candidates are not installed. No instruction rewriting, forced
-registers, artificial locals, manual loop unrolling or source padding is used.
-
 ## Accepted plane parameter (US ROM, 2026-10-23)
 
 `func_86207EB0` → `Geometry_ComputePlaneParameter`, 132 bytes: for plane
@@ -88,21 +61,63 @@ normal components before the denominator in the explicit-result candidate;
 the direct conditional expression changed that ordering and supplied the
 starting point for the successful operand-order candidates.
 
-### Remaining handoff
+## Accepted line projection (US ROM, 2026-10-24)
 
-- **requeue — `func_86207BC0`**: eight real projection-carrier variants
-  (separate scalar or consumed origin-Z carrier, before/after-guard deltas)
-  did not match: best normalized 0.9271, raw 0.2396. They increased frame
-  size rather than closing it. Eight zero-literal variants reached the
-  original 384-byte body in one case but still used an 88-byte frame and
-  changed operands (normalized 0.9167, raw 0.1562). Next: calibrate the
-  best separate-scalar candidate's allocator trace and identify which
-  spill occupies the extra eight bytes before adding any more carriers.
-- **requeue — `func_86207A80`**: eight conditional cross-guard variants
-  improved raw similarity to 0.2875 while retaining normalized 0.7125 and
-  a 304-byte body/48-byte frame. Eight explicit second/last cross-product
-  temporaries produced the original 64-byte frame, but the body remained
-  304 bytes, normalized 0.7125, raw 0.2000. All temporaries carried real
-  products consumed by the predicate. Next: compare that 64-byte-frame
-  candidate's short-circuit branches and duplicated first-product lifetimes
-  against the original 80-instruction topology; do not add unused locals.
+`func_86207BC0` → `Geometry_ComputeLineProjection`, 384 bytes. For point
+P and endpoints A/B, form p=A-P, q=B-P and d=q-p. The parameter is
+`-(p dot d)/(d dot d)`; the vector output is `p + parameter*d`, the
+closest position on the infinite line relative to P. The distance is that
+vector's Euclidean length. `Geometry_TestSegmentContact` bounds the
+parameter to [0,1] and normalizes/negates the relative vector on success.
+These producers and consumer justify the projection name and vector type.
+
+The degenerate guard preserves its exact comparisons: q.x equals p.x,
+Y delta equals zero, and Z delta equals zero. Degenerate input writes zero
+to distance, parameter and all vector fields, even if P differs from the
+coincident endpoints. The first parameter value is used for X, then the
+parameter is reloaded for Y and Z after the preceding vector stores. This
+preserves behavior when the parameter pointer overlaps the vector output.
+
+Winning source mechanisms:
+
+- Direct point-coordinate reads let IDO share the three coordinate values;
+  explicit origin snapshots had an 88-byte frame. The accepted frame is 80.
+- A named Y direction delta in the zero test preserves the subtraction;
+  the inline test was folded into a direct comparison of endpoint deltas.
+- Declaration order places the Z endpoint delta before X/Y endpoint deltas,
+  then the Z direction delta before X/Y direction deltas. An explicit final
+  `point_distance` carries the computed square root to the distance store.
+  Every local participates in the projection or distance calculation.
+- Three-component output fields reproduce the final load order and floating
+  globals. The accepted body was cleaned up to take `GeometryVec3 *`
+  directly, with its only C caller updated and the obsolete extern removed.
+  The six-pointer calling convention is unchanged.
+
+The runner accepted the complete ROM and full containing-module bytes and
+semantic relocations. The named, typed and formatted cleanup passed a fresh
+`make COMPARE=1 RUN_CC_CHECK=1`, retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Stock 5.3 and 7.1 drivers had reproduced
+the same residuals on the tested near-match candidates after complete current
+module and blank-line controls; the ordinary driver produced the final match.
+
+## Unresolved XZ predicate
+
+**requeue — `func_86207A80`**, 320 bytes. Let a, b and c be the three
+XZ vertices relative to the queried point. The positive path first compares
+`a.x*b.z >= b.x*a.z`, then requires the BC and CA cross products to be
+nonnegative. The fallback requires the AB, BC and CA cross products to be
+nonpositive. Preserve the direct product comparison on the positive path.
+
+The `bc1fl` at `86207AD0` executes its subtraction delay slot only when the
+branch is taken to the negative path. On the positive fallthrough the slot
+is annulled; F6 still holds a.x when stored at stack offset zero. Thus the
+positive CA test uses a.x, exactly as the negative test does. The preceding
+region notes misread that annulled slot and described a false asymmetry.
+Fresh structured and goto-only m2c reconstructions agree with this register
+trace. No C body for this owner has been installed.
+
+Earlier candidates scoring up to 0.725 normalized used the wrong positive
+CA formula. Those measurements are invalid source hypotheses and must not
+seed further candidates. Next: probe the corrected two-orientation predicate
+with conditional third-vertex deltas, then classify its actual frame/branch
+residual. Do not infer source semantics from a normalized score.
