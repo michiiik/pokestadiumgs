@@ -377,3 +377,62 @@ No generated coverage, instruction/relocation rewriting, artificial locals,
 padding, forced registers/frame/ABI or manual unrolling is introduced.
 The species transform loader at `func_84113014` remains assembly: its
 diagnostic near-match is not part of this accepted batch.
+
+## 2026-10-23: category action and camera track sequences
+
+Four further owners are runner-accepted, totaling 5,016 code bytes:
+
+- `func_84118DD4` / `BattleAnim_UpdateCategoryActionTimeline`: 1,464 bytes.
+  Frame 2 dispatches category-specific records and audio; frame 71 clears
+  the original two flags independently, restores tracks, installs the side
+  callback, and stops category-specific audio. Preserve fresh global and
+  actor-field reads across callbacks, the per-category call order, and the
+  separate side queries. Typed sixteen-byte metadata records reproduce the
+  original address-tree register ownership.
+- `func_8411C418` / `BattleAnim_UpdateSideTrackViewportTransition`: 928
+  bytes. This sibling of `BattleAnim_UpdateSideViewportTransition` adds
+  side-track setup, sound when the sliding viewport reaches 30, a viewport
+  reset at 320, and a forty-frame model transition. Its five explicit
+  phases match with direct phase and viewport-field reads; caching the
+  phase in a word changes register allocation.
+- `func_841170A0` / `BattleAnim_InitializeCategoryAction`: 1,332 bytes.
+  Category dispatch chooses animation tracks and duration, then configures
+  the camera and side feedback. The two duration consumers preserve a real
+  signed-halfword snapshot from the animation data at pointer offset 68,
+  field offset 10. Keep the separate metadata reads and callback branches.
+  The original duplicate equality branch before the byte-1562 write is
+  preserved as two nested guards; this is an observed retail control-flow
+  detail, not an additional read or a historical source claim. Existing
+  address-keyed aliases are used for previously named helper functions.
+- `func_8411BCC8` / `BattleAnim_UpdateCategoryCameraSequence`: 1,292 bytes.
+  Five phases coordinate track selection, camera movement, timed audio,
+  and final flag cleanup. A signed-halfword camera selector is saved and
+  restored across callbacks. Test the original camera field before the
+  temporary selector change; testing the narrow saved scalar instead adds
+  a stack reload and eight code bytes. All three metadata consumers need
+  the typed record view. The eight-cell composition confirms each site
+  independently removes its three-register residual; all three together
+  pass the ROM gate.
+
+Each winning probe differs only in relocation-controlled fields and does
+not claim initial `link_verified`. Each passes its authoritative sequential
+normal, host-syntax-enabled ROM gate. Successful inputs and outputs are
+immediately frozen before further compilation. Independent proof preserves
+all 332 original function extents, complete game sections and semantic
+relocations, four collateral objects, and the entire linked fragment.
+Naming is re-gated with the whole batch. External SHA-256 checks pass;
+US ROM MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+Original function names remain linker aliases. Export only these four
+definitions and their exact alias, prototype/call-name, and note deltas.
+No generated coverage, instruction/relocation rewriting, artificial
+locals/fields/reads, padding, forced register/frame/ABI, or manual
+unrolling is introduced.
+
+`func_84113014` remains a requeue, not accepted C. A further controlled
+eight-cell batch tests signed/unsigned numeric stream-address fields and
+pointer/numeric sum forms. The numeric forms retain the four reversed
+`addu` operands at raw similarity 0.9837; pointer forms move to a worse
+basin. No zero-table label or linker metadata is added. Resume from the
+documented exact-opcode parent and resolve its arithmetic ownership and
+zero-table representation together.
