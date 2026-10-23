@@ -86,3 +86,55 @@ produce 148-byte bodies (best raw 0.7368). No preload body is installed.
 Next action: observe the scalar-key global-color decisions and their
 interference before another source campaign. Preserve the two real lookup
 arguments and the signed count increment followed by unsigned return masking.
+
+## Three-word audio event forwarding
+
+At public baseline `01b387fd38c0c8ec7d718631b138a60aa55e7e8c`, `func_8AB00BA4`
+has a no-argument C signature, although its assembly callers `func_8AB03D10`
+and `func_8AB03DFC` supply three values. The downstream `func_80024F20` reads
+the incoming a0, a1 and a2 words in `hand_asm/229E0/func_80024F20_manual.s`;
+it overwrites incoming a3 before use. The wrapper now forwards all three words
+explicitly with matching prototypes.
+
+Four fresh native whole-module controls (before, before plus leading blanks,
+after, after plus leading blanks) preserve all 23008 text bytes, 48 rodata
+bytes, 81 function extents and semantic relocations. The normal host-syntax
+full-ROM gate and independently frozen linked-fragment/collateral checks pass
+at native commit `b9affee9`; retail US MD5 remains
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. This changes an existing C definition's
+signature and adds no newly decompiled owner.
+
+## Row-state callers / requeue
+
+Both callers above remain assembly. For `func_8AB03D10`, the closest ordinary
+C body has the original 236-byte extent and 40-byte frame, with the first 34
+instruction words exact. Seven raw word positions differ when the complete
+extent, including the return tail, is compared; the changes are concentrated
+in branch formation and the final state store/return. Tested declaration
+orders, secondary-pointer assignment forms, early returns, shared labels and
+adjacent count/state halfword views do not close the residual. For
+`func_8AB03DFC`, the basic body is 208 bytes against 216 expected; indexed
+148-byte row/120-byte highlight views do not recover the original
+address-calculation schedule. A fresh normal/explicit `-g0` diagnostic leaves
+all seven positional word differences unchanged; leading blanks also preserve
+the complete normal proposal module. Next action: inspect control-flow
+lowering and the real caller contracts before another source campaign.
+
+## Preload interference / register-tie, requeue
+
+Eight fresh stock/off/on/leading-blank controls preserve the complete known
+module and retained 152-byte preload proposal under a logging-only compiler.
+For proposal archive web 10, the measured interference neighbors are the entry
+key (web 18), count (7), destination (4), source (0) and terminator (42). The
+entry key receives v0 before the archive key receives v1. These observations
+cover the proposal, not unavailable original source; logging changes are
+private and the acceptance compiler is unchanged.
+
+A follow-up eight-body campaign tests source postincrements, while-condition
+assignment and entry-copy assignment/reuse. No owner is accepted: the retained
+152-byte opcode-equivalent body remains raw 0.8158. Rereading the copied entry
+reaches raw 0.8684 but changes opcode order (normalized 0.9737), so it is not
+an instruction-equivalent improvement. Next action: inspect whether a real
+record view can leave the entry as an expression temporary while carrying the
+archive through its compare, copy and argument normalization. Preserve the
+actual two-argument lookup contract.

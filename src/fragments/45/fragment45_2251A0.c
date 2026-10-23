@@ -354,7 +354,10 @@ void func_8AB00B98(u8 *arg0, u32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80024F20(void); void func_8AB00BA4(void) { func_80024F20(); }
+extern void func_80024F20(s32, s32, s32);
+void func_8AB00BA4(s32 event, s32 parameter, s32 variant) {
+    func_80024F20(event, parameter, variant);
+}
 #endif
 
 #ifdef VERSION_US
