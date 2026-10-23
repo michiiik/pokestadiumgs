@@ -893,3 +893,4 @@ func_862009E4 = SceneCollision_TestBoundedPlaneHit;
 func_86203DE8 = SceneFlags_MarkWhenCountsMatch;
 func_86207D40 = Geometry_TestSphereContact;
 func_86207F34 = Geometry_TestSegmentContact;
+func_86207EB0 = Geometry_ComputePlaneParameter;

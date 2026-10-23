@@ -50,18 +50,6 @@ in total). C emits the same module bytes and terminal alignment, with a
   store to preserve alias behavior. Next: inspect temporary spill lifetimes
   around the parameter division and the first closest-vector store, keeping
   the six-pointer output-only ABI.
-- **register-tie — `func_86207EB0`**, 132 bytes: computes the plane
-  parameter as the negated plane equation at the point divided by the
-  normal/direction dot product, returning positive zero on a zero denominator.
-  Twenty-four source variants covered snapshot normals, dot-product
-  accumulation and result carriers. A parameter carrier with explicit
-  success/failure branches reached normalized 1.0 but raw 0.4848, with
-  register differences. A calibrated 90-second source-only permuter improved
-  its score from 115 to 95 without an exact match. Stock IDO 5.3 and the
-  normal driver both reproduced both accepted contact bodies in complete
-  known-module and leading-blank controls. Next: compare this leaf's
-  register lifetimes across the stock compiler paths; controls alone do not
-  establish an alternate compiler match.
 - **requeue — `func_86207A80`**, 320 bytes: XZ orientation predicate.
   Eight conditional-delta/product variants reached normalized 0.7125 and
   raw 0.15, with a 304-byte body and 48-byte frame versus 320/64. Eight
@@ -74,3 +62,47 @@ in total). C emits the same module bytes and terminal alignment, with a
 
 Rejected candidates are not installed. No instruction rewriting, forced
 registers, artificial locals, manual loop unrolling or source padding is used.
+
+## Accepted plane parameter (US ROM, 2026-10-23)
+
+`func_86207EB0` → `Geometry_ComputePlaneParameter`, 132 bytes: for plane
+coefficients `(nx, ny, nz, d)`, point P and direction V, returns
+`-(n dot P + d) / (n dot V)`, or positive zero for a zero denominator.
+The formula establishes the name. It preserves the original grouping of
+three-term dot products and the early return without point loads on a zero
+denominator. Nonzero and unordered denominators take the division path.
+
+The direct array expression and conditional result gave the denominator its
+original F0 register. Commuting operands within the same grouped additions
+and multiplications then gave the normal components their original register
+order. The last mismatch was a multiplication with reversed source operands;
+reversing that source pair produced an exact match. No reassociation,
+register forcing, extra reads, padding or object edits were required.
+
+The runner accepted this body with a full byte-identical US ROM, complete
+module section/semantic-relocation comparison and unchanged collateral.
+The named and formatted source also passed a fresh ordinary ROM gate.
+Logging-only IDO controls reproduced the complete module with tracing on,
+off and after leading blank lines. Equal-cost floating globals selected the
+normal components before the denominator in the explicit-result candidate;
+the direct conditional expression changed that ordering and supplied the
+starting point for the successful operand-order candidates.
+
+### Remaining handoff
+
+- **requeue — `func_86207BC0`**: eight real projection-carrier variants
+  (separate scalar or consumed origin-Z carrier, before/after-guard deltas)
+  did not match: best normalized 0.9271, raw 0.2396. They increased frame
+  size rather than closing it. Eight zero-literal variants reached the
+  original 384-byte body in one case but still used an 88-byte frame and
+  changed operands (normalized 0.9167, raw 0.1562). Next: calibrate the
+  best separate-scalar candidate's allocator trace and identify which
+  spill occupies the extra eight bytes before adding any more carriers.
+- **requeue — `func_86207A80`**: eight conditional cross-guard variants
+  improved raw similarity to 0.2875 while retaining normalized 0.7125 and
+  a 304-byte body/48-byte frame. Eight explicit second/last cross-product
+  temporaries produced the original 64-byte frame, but the body remained
+  304 bytes, normalized 0.7125, raw 0.2000. All temporaries carried real
+  products consumed by the predicate. Next: compare that 64-byte-frame
+  candidate's short-circuit branches and duplicated first-product lifetimes
+  against the original 80-instruction topology; do not add unused locals.
