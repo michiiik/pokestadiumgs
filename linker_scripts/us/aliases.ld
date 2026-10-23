@@ -846,3 +846,7 @@ func_84113590 = BattleAnim_LoadCameraTrackResource;
 func_84113658 = BattleAnim_LoadSpeciesCameraPreset;
 func_8411A7D8 = BattleAnim_ResetPackedModelState;
 func_84111EC4 = BattleAnim_ClearFinishedEventTrack;
+func_84111774 = BattleAnim_RunCameraStageCallbacks;
+func_841156D0 = BattleAnim_UpdateAscentPhase;
+func_8411DAE0 = BattleAnim_UpdateBothSideCallbacks;
+func_84112C98 = BattleAnim_RefreshSpeciesModel;
