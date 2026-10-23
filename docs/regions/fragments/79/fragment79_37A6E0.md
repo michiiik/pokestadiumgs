@@ -629,3 +629,26 @@ still-assembly full-ROM gate must be checked before installing the C body.
 Do not repeat source variants or inject zeros to work around this layout
 prerequisite. The packed-state and record-index requeues above also remain
 unresolved.
+
+## 2026-10-23: camera-input translation-unit split
+
+The measured split is now validated, based on native revision `41eaec4b`.
+The original text interval is partitioned at ROM `0x380210` and `0x380A00`;
+its read-only interval is partitioned at `0x3F8830` and `0x3F8850`. The
+middle file is `src/fragments/79/fragment79_380210.c`; later owners move to
+`src/fragments/79/fragment79_380A00.c`. Bodies, existing assembly owners,
+and table contents retain their order. Declarations needed across the new
+file boundaries are copied from the original translation-unit context.
+
+The still-assembly split passes the host-syntax-enabled full-ROM gate.
+`func_84110C6C` then accepts as `BattleAnim_UpdateCameraFromInput` (760
+bytes) in the middle file. Normal object alignment supplies the eight-byte
+gap after its six-entry switch table. No explicit padding or dummy data is
+emitted. The combined three modules preserve all 332 original function
+extents, game-section bytes, and final linked relocation encodings; four
+collateral objects and the US ROM are unchanged.
+
+See `docs/regions/fragments/79/fragment79_380210.md` for the input owner's
+source mechanism. The packed-state `func_8411BB04` and category-camera
+`func_84116BC0` requeues above now belong to `fragment79_380A00.c`; their
+source-shape residuals remain unresolved.

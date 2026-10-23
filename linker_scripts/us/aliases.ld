@@ -838,3 +838,4 @@ func_84119CF0 = BattleAnim_InitializeCategorySequence;
 func_8410CF80 = BattleAnim_UpdateCameraHeightTarget;
 func_84117E94 = BattleAnim_UpdateTimedMoveEvents;
 func_841119CC = BattleAnim_SelectCameraPreset;
+func_84110C6C = BattleAnim_UpdateCameraFromInput;
