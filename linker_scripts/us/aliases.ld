@@ -896,3 +896,7 @@ func_86207F34 = Geometry_TestSegmentContact;
 func_86207EB0 = Geometry_ComputePlaneParameter;
 func_86207BC0 = Geometry_ComputeLineProjection;
 func_86207A80 = Geometry_IsPointInTriangleXZ;
+func_86207650 = SceneAux_UpdatePosition;
+func_86207760 = SceneAux_RenderModel;
+func_86207874 = SceneAux_CreateModels;
+func_862079C0 = SceneAux_LoadResources;
