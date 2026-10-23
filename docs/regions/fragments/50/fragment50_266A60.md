@@ -182,3 +182,17 @@ bytes). The target shuffle was not run through that failing harness. Existing
 logging-only controls remain valid. Next action: recover the normal binary
 assembler input and its exact pass options before treating a text round trip
 as evidence about source or compiler reachability.
+
+### Four-byte array view follow-up
+
+`func_8620169C`: **requeue**. Eight native runner candidates test the
+observed four-byte order array as a pointer-to-array view for initialization,
+swaps, or both, combined with scalar and one-element-array cursor stores.
+Known and leading-blank complete-module controls pass. Every candidate is
+240 bytes versus the original 244 and preserves the first 50 instruction
+words before reusing s1 for the cursor store (raw similarity 0.9508). The
+array-view load-order mechanism that matched `SceneAux_RenderModel` does
+not repair this address-materialization residual. No candidate was installed.
+Next action: compare CFE and UOPT representations of the cursor store once
+an independently evidenced containing context layout is available; repeated
+small-view or integer-literal changes have not recovered the original store.
