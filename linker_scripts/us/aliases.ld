@@ -910,3 +910,6 @@ func_86205500 = SceneModel_InitPlayerAttachment;
 func_86205B8C = SceneModel_StartPlayerAction;
 func_86205C8C = SceneModel_SelectPlayerDirection;
 func_86205D98 = SceneModel_UpdateAnimationState;
+func_862057A8 = SceneMotion_RemoveInwardVelocity;
+func_86205A7C = SceneMotion_ResolvePlayerContacts;
+func_862061B0 = SceneModel_UpdateAnimatedPosition;

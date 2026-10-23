@@ -11,6 +11,11 @@ extern u8 *D_87F119DC;
 extern s32 ModelAnim_IsFinished(u8 *);
 extern s32 func_8003EC54(u8 *);
 extern void func_87F02684(s32);
+extern void func_8620581C(s32, u8 *, u8 *);
+extern f32 D_862090C0[];
+extern void func_87C03B60(u8 *, f32 *, f32 *);
+extern void func_86205F34(u8 *);
+
 
 void SceneModel_InitPlayerAttachment(u8 *source, s32 player_index) {
     u8 *flag_model;
@@ -69,7 +74,16 @@ void func_8620573C(f32 *arg0, f32 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26BF40/func_862057A8.s")
+void SceneMotion_RemoveInwardVelocity(u8 *object, f32 *normal) {
+    f32 dot;
+
+    dot = *(f32 *)(object + 24) * normal[2] + (*(f32 *)(object + 20) * normal[1] + normal[0] * *(f32 *)(object + 16));
+    if (dot < 0.0f) {
+        *(f32 *)(object + 16) -= normal[0] * dot;
+        *(f32 *)(object + 20) -= normal[1] * dot;
+        *(f32 *)(object + 24) -= normal[2] * dot;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -77,7 +91,33 @@ void func_8620573C(f32 *arg0, f32 *arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26BF40/func_86205A7C.s")
+void SceneMotion_ResolvePlayerContacts(void) {
+    u8 *model;
+    u8 *node;
+    u8 *metadata;
+    s32 player_index;
+
+    model = (u8 *)(u32)D_8620E198 + 467576;
+    for (player_index = 0; player_index < 4; player_index++, model += 396) {
+        if (*(u32 *)(model + 12) & 0x20000000) {
+            node = *(u8 **)((u8 *)(u32)D_8620E198 + 384);
+            while (node != NULL) {
+                metadata = *(u8 **)(node + 32);
+                *(f32 *)(metadata + 32) = 0.0f;
+                *(f32 *)(metadata + 28) = 0.0f;
+                *(f32 *)(metadata + 24) = 0.0f;
+                func_8620581C(player_index, model, node);
+                *(f32 *)(node + 72) += *(f32 *)(metadata + 24);
+                *(f32 *)(node + 76) += *(f32 *)(metadata + 28);
+                *(f32 *)(node + 80) += *(f32 *)(metadata + 32);
+                *(f32 *)(metadata + 24) = 0.0f;
+                *(f32 *)(metadata + 28) = 0.0f;
+                *(f32 *)(metadata + 32) = 0.0f;
+                node = *(u8 **)(node + 4);
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -178,7 +218,34 @@ void SceneModel_UpdateAnimationState(u8 *metadata) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26BF40/func_862061B0.s")
+void SceneModel_UpdateAnimatedPosition(void) {
+    u8 *metadata;
+    f32 *rotation;
+    u8 *attachment;
+    s32 frame;
+
+    metadata = *(u8 **)(D_87F119DC + 32);
+    func_87C03B60((u8 *)(u32)D_8620E198 + 474308, (f32 *)(D_87F119DC + 72), (f32 *)(metadata + 24));
+    if (*(s16 *)(D_87F119DC + 100) == 2) {
+        frame = (*(s32 *)(D_87F119DC + 108) >> 16) - 4;
+        frame = frame < 0 ? 0 : frame;
+    } else {
+        frame = 0;
+    }
+    rotation = D_862090C0 + frame * 3;
+    *(f32 *)(metadata + 12) = rotation[0] + *(f32 *)(D_87F119DC + 72);
+    *(f32 *)(metadata + 16) = rotation[1] + *(f32 *)(D_87F119DC + 76);
+    *(f32 *)(metadata + 20) = rotation[2] + *(f32 *)(D_87F119DC + 80);
+    attachment = *(u32 *)metadata * 24 + *(u8 **)((u8 *)(u32)D_8620E198 + 469184);
+    *(f32 *)(attachment + 4) = rotation[0];
+    *(f32 *)(attachment + 8) = rotation[1] + 180.0f;
+    *(f32 *)(attachment + 12) = rotation[2];
+    if (*(s32 *)((u8 *)(u32)D_8620E198 + 232) == 5) {
+        func_86205F34(metadata);
+    } else {
+        SceneModel_UpdateAnimationState(metadata);
+    }
+}
 #endif
 
 #ifdef VERSION_US
