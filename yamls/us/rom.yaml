@@ -1176,6 +1176,8 @@
     - [0x26E090, c,       fragments/50/fragment50_26E090]
     - [0x26E4C0, c,       fragments/50/fragment50_26E4C0]
     - [0x26EA70, data,    fragments/50/fragment50_data]
+    - [0x274B80, .rodata, fragments/50/fragment50_26DCC0] # pooled model scale
+    - [0x274B90, rodata] # original overlay relocation records
 
   - name: fragment51
     type: code

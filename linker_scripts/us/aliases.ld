@@ -900,3 +900,5 @@ func_86207650 = SceneAux_UpdatePosition;
 func_86207760 = SceneAux_RenderModel;
 func_86207874 = SceneAux_CreateModels;
 func_862079C0 = SceneAux_LoadResources;
+func_86207280 = SceneModels_SelectAlternateAnimation;
+func_862073CC = SceneModels_CreatePairs;
