@@ -50,7 +50,24 @@ void func_862002A4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_8620050C.s")
+extern void func_87F0277C(void *);
+extern void func_8003F114(void *, s32, s32, s32);
+extern void func_8003F1DC(void *);
+extern void * func_87F025B8(void *, void *);
+extern void * D_8620E198;
+void SceneMotion_CreateThreeModels(void) {
+    s32 i;
+    void *result;
+    u8 *model;
+    for (i = 0; i < 3; i++) {
+        result = func_87F025B8((u8 *)D_8620E198 + 466332, 0);
+        if (result != 0) {
+            model = (u8 *)result + 36;
+            func_8003F1DC(model);
+            func_8003F114(model, 0, -1, *(s32 *)((u8 *)D_8620E198 + 320 + i * 4));
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -326,7 +343,22 @@ void func_86201620(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86201790.s")
+typedef struct OrientedSideDelta { f32 z, x; } OrientedSideDelta;
+extern void * D_87F119DC;
+s32 SceneMotion_IsCrossXZNonnegative(f32 start_x, f32 start_z, f32 end_x, f32 end_z) {
+    OrientedSideDelta start;
+    OrientedSideDelta end;
+    u8 *origin;
+    s32 result;
+    origin = D_87F119DC;
+    result = 0;
+    start.x = start_x - *(f32 *)(origin + 72);
+    start.z = start_z - *(f32 *)(origin + 80);
+    end.x = end_x - *(f32 *)(origin + 72);
+    end.z = end_z - *(f32 *)(origin + 80);
+    if (start.x * end.z >= end.x * start.z) result = 1;
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -453,7 +485,18 @@ void func_86203B08(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86203BA8.s")
+typedef struct NodePositionVector { f32 x, y, z; } NodePositionVector;
+extern void * D_8620E198;
+void SceneMotion_CopyNodePositionsToModels(void) {
+    u8 *node;
+    u8 *model;
+    node = *(u8 **)((u8 *)D_8620E198 + 384);
+    while (node != 0) {
+        model = *(u8 **)(node + 32);
+        *(NodePositionVector *)(model + 60) = *(NodePositionVector *)(node + 72);
+        node = *(u8 **)(node + 4);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -479,7 +522,26 @@ void func_86203BEC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86203C58.s")
+extern void func_86202574(void);
+extern void func_86203B08(void);
+extern void SceneMotion_CopyNodePositionsToModels(void);
+extern void func_86203BEC(void);
+extern void * D_8620E198;
+void SceneMotion_RunSubsteps(void) {
+    s32 i;
+    SceneMotion_CopyNodePositionsToModels();
+    for (i = 0; i < *(s32 *)((u8 *)D_8620E198 + 60); i++) {
+        func_87F0277C((u8 *)D_8620E198 + 467556);
+        func_87F0277C((u8 *)D_8620E198 + 372);
+        func_87F0277C((u8 *)D_8620E198 + 60808);
+        func_87F0277C((u8 *)D_8620E198 + 466332);
+        if (*(s32 *)((u8 *)D_8620E198 + 474028) > 0) func_86205A7C();
+        func_86202574();
+        func_862025E0();
+        func_86203B08();
+    }
+    func_86203BEC();
+}
 #endif
 
 #ifdef VERSION_US
@@ -498,7 +560,7 @@ void func_86203D50(void) { if (*(s32 *)((u8 *)D_8620E198 + 0x90) == 0) { *(s16 *
 extern void *D_8620E198;
 extern void *func_87F0A3E8(void *);
 extern void func_86203DE8(void);
-extern void func_86203C58(void);
+extern void SceneMotion_RunSubsteps(void);
 extern void func_86200020(s32 arg0);
 void func_86203ED8(void) {
     if (func_87F0A3E8((u8 *)D_8620E198 + 0x73C54) != NULL) {
@@ -509,7 +571,7 @@ void func_86203ED8(void) {
         }
     }
     func_86203DE8();
-    func_86203C58();
+    SceneMotion_RunSubsteps();
 }
 #endif
 
