@@ -539,7 +539,35 @@ void func_84121260(void *arg0) {
     BattleAnim_InitSwayOffset(arg0, D_84183C90, 0x4000);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_841212A0.s")
+
+extern s32 func_8411E1D4(s32);
+extern s32 func_841211CC(void *, s16, s16);
+extern f64 D_84189C68;
+extern s32 D_84191208;
+void BattleAnim_UpdateStagedTurn(u8 *arg0) {
+    f32 remaining;
+    f32 fraction;
+    s16 step;
+    if (*(s8 *)(arg0 + 1571) < 3) {
+        *(s16 *)(arg0 + 1534) = Math_StepToS32(*(s16 *)(arg0 + 1534), 13104, 364, 364);
+        if (func_841211CC(arg0, *(s16 *)(arg0 + 1534), (s16)(func_8411E1D4((s32)arg0) * 16384)) != 0) {
+            *(s8 *)(arg0 + 1571) += 1;
+        }
+    }
+    if (*(s8 *)(arg0 + 1571) >= 3 && *(s8 *)(arg0 + 1572) == 0) {
+        remaining = 16384 - *(s16 *)(arg0 + 1540);
+        fraction = (131072.0 - remaining) / 131072.0;
+        if (fraction >= 1.0f) fraction -= 1.0f;
+        step = (s16)(*(s16 *)(arg0 + 1534) * fraction * D_84189C68);
+        if (step < 3640) step = 3640;
+        *(s8 *)(arg0 + 1572) = func_841211CC(arg0, step, (s16)(func_8411E1D4((s32)arg0) * 16384));
+        if (*(s8 *)(arg0 + 1572) != 0) {
+            if ((s32)arg0 == D_84191208) *(s16 *)(arg0 + 1540) = 16384;
+            else *(s16 *)(arg0 + 1540) = -16384;
+        }
+    }
+    *(s16 *)(arg0 + 32) = *(s16 *)(arg0 + 1540);
+}
 
 #ifndef M2C_FIELD /* sweep: m2c --valid-syntax helpers (mirrors mkdraft.py) */
 #define M2C_UNK s32
@@ -631,7 +659,42 @@ void func_841218EC(u8 *arg0) {
     func_84120E7C(arg0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84121920.s")
+
+typedef struct ActorOscillationOffset { f32 x, y, z; } ActorOscillationOffset;
+extern ActorOscillationOffset D_84183CAC;
+extern ActorOscillationOffset D_84183D3C;
+extern f32 D_80087E50[];
+extern void func_8411EFE4(s32);
+extern void func_84120F5C(u8 *, s16);
+extern void BattleAnim_Vec3fSetPolarXZ(void *arg0, f32 arg1, s16 arg2);
+extern void func_841203B4(f32 *arg0, f32 arg1, f32 arg2);
+void BattleAnim_UpdateWideOscillation(u8 *arg0) {
+    f32 distance;
+    ActorOscillationOffset offset = D_84183CAC;
+    switch (*(s8 *)(arg0 + 1572)) {
+    case 0:
+        func_841203B4((f32 *)(arg0 + 1548), 50.0f, 0.1f);
+        *(s16 *)(arg0 + 1534) += 3640;
+        distance = *(f32 *)(arg0 + 1548) * D_80087E50[(u16)*(s16 *)(arg0 + 1534) >> 4];
+        BattleAnim_Vec3fSetPolarXZ((f32 *)&offset, distance, *(s16 *)(arg0 + 32));
+        func_8411EFE4((s32)arg0);
+        Vec3f_AddInPlace((f32 *)(arg0 + 36), (f32 *)&offset);
+        if (*(f32 *)(arg0 + 1548) > 49.0f) *(s8 *)(arg0 + 1572) = 1;
+        func_84120F5C(arg0, 0);
+        break;
+    case 1:
+        func_841203B4((f32 *)(arg0 + 1548), 0.0f, 0.1f);
+        *(s16 *)(arg0 + 1534) += 3640;
+        distance = *(f32 *)(arg0 + 1548) * D_80087E50[(u16)*(s16 *)(arg0 + 1534) >> 4];
+        BattleAnim_Vec3fSetPolarXZ((f32 *)&offset, distance, *(s16 *)(arg0 + 32));
+        func_8411EFE4((s32)arg0);
+        Vec3f_AddInPlace((f32 *)(arg0 + 36), (f32 *)&offset);
+        if (*(f32 *)(arg0 + 1548) <= 0.5f) func_8411EFE4((s32)arg0);
+        func_84120F5C(arg0, 0);
+        break;
+    }
+
+}
 
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 extern u8 *D_841911E0;
@@ -968,7 +1031,35 @@ void func_84123CD8(u8 *arg0) {
     *(f32 *)(arg0 + 0x60C) = 0.0f;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123CF4.s")
+
+extern void BattleAnim_Vec3fSetPolarXZ(void *arg0, f32 arg1, s16 arg2);
+extern void func_841203B4(f32 *arg0, f32 arg1, f32 arg2);
+void BattleAnim_UpdateTimedOscillation(u8 *arg0) {
+    f32 distance;
+    ActorOscillationOffset offset = D_84183D3C;
+    switch (*(s8 *)(arg0 + 1572)) {
+    case 0:
+        *(s8 *)(arg0 + 1571) += 1;
+        func_841203B4((f32 *)(arg0 + 1548), 0.6f, 0.4f);
+        *(s16 *)(arg0 + 1534) += 25486;
+        distance = *(f32 *)(arg0 + 1548) * D_80087E50[(u16)*(s16 *)(arg0 + 1534) >> 4];
+        BattleAnim_Vec3fSetPolarXZ((f32 *)&offset, distance, *(s16 *)(arg0 + 32));
+        func_8411EFE4((s32)arg0);
+        Vec3f_AddInPlace((f32 *)(arg0 + 36), (f32 *)&offset);
+        if (*(s8 *)(arg0 + 1571) >= 31) *(s8 *)(arg0 + 1572) = 1;
+        break;
+    case 1:
+        func_841203B4((f32 *)(arg0 + 1548), 0.0f, 0.1f);
+        *(s16 *)(arg0 + 1534) += 16384;
+        distance = *(f32 *)(arg0 + 1548) * D_80087E50[(u16)*(s16 *)(arg0 + 1534) >> 4];
+        BattleAnim_Vec3fSetPolarXZ((f32 *)&offset, distance, *(s16 *)(arg0 + 32));
+        func_8411EFE4((s32)arg0);
+        Vec3f_AddInPlace((f32 *)(arg0 + 36), (f32 *)&offset);
+        if (*(f32 *)(arg0 + 1548) <= 0.5f) func_8411EFE4((s32)arg0);
+        break;
+    }
+
+}
 
 extern f32 D_84189D34;
 void func_84123E74(u8 *arg0) { f32 v = *(f32 *)(arg0 + 0x34); f32 s = D_84189D34; *(f32 *)(arg0 + 0x5E8) = v + v; *(f32 *)(arg0 + 0x5EC) = *(f32 *)(arg0 + 0x38) * s;*(f32 *)(arg0 + 0x5E4) = *(f32 *)(arg0 + 0x30) * s;*(u8 *)(arg0 + 0x623) = 0; *(f32 *)(arg0 + 0x60C) = 0.0f; }
