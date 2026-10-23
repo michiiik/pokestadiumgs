@@ -653,3 +653,57 @@ source mechanism. The packed-state `func_8411BB04` requeue is resolved as
 `BattleAnim_InitializePackedModelState` in `fragment79_380A00.c`. The category-camera
 `func_84116BC0` requeue is resolved as `BattleAnim_ConfigureAnimationCamera`;
 see `docs/regions/fragments/79/fragment79_380A00.md`.
+
+## 2026-10-23: camera-distance adjustment curves
+
+Three assembly owners are replaced by runner-accepted C, totaling 2,280
+code bytes and 570 MIPS instructions:
+
+- `func_8410D5CC` / `BattleAnim_AdjustCameraDistanceMild`: 1,004 bytes.
+  Twelve descending reference-distance thresholds, from 1.5 to 0.4, select
+  distance multipliers from 0.68 to 0.99. The name describes its milder
+  contraction relative to the stronger curve below.
+- `func_8410D9B8` / `BattleAnim_AdjustCameraDistanceLowerBands`: 272 bytes.
+  Thresholds 1.6, 1.5, and 1.4 select multipliers 0.6, 0.75, and 0.85.
+  These are lower thresholds than `BattleAnim_AdjustCameraDistance` in this
+  file, whose corresponding thresholds are 1.7, 1.6, and 1.5.
+- `func_8410DAC8` / `BattleAnim_AdjustCameraDistanceStrong`: 1,004 bytes.
+  The same twelve thresholds as the mild curve select multipliers from
+  0.3 to 0.89, producing a greater contraction at each threshold.
+
+Each function compares the supplied distance with the camera reference at
+byte offset 128 and calls `func_800371B4` at most once. The original branch
+ladders are explicit in assembly; these C branches do not unroll a loop.
+The two angle parameters retain their signed 16-bit ABI.
+
+IDO distinguishes the source spellings of equal float constants in the
+mild curve: writing its 0.7-band coefficient as `0.80f`, while retaining the
+0.8 threshold as `0.8f`, reproduces the separate constant pool entries and
+loads in the ROM. The ordinary `0.8f` coefficient gives 996 rather than
+1,004 code bytes. The `0.80f` spelling passes the sequential full-ROM gate
+without object rewriting or extra memory accesses. The two literals have
+identical IEEE-754 single-precision values.
+
+Each accepted probe is relocation-masked and reports `link_verified: false`;
+acceptance comes from its successful sequential full-ROM gate. Successful
+build inputs and outputs are immediately frozen. Independent verification
+checks complete game sections, all 332 original function extents, semantic
+relocations including final linked high-half encodings, the complete linked
+fragment, and four collateral objects. Final parameter cleanup and names
+are checked through normal and leading-blank complete-module controls and
+re-gated together. US ROM MD5: `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+### Unresolved species-aware adjustment
+
+`func_8410D174`: **requeue**. Eight real-local declaration-order/reference
+variants do not pass. The best field-reading form has 1,112 bytes and
+normalized similarity 1.0, raw 0.8058, with `immediate_drift`; its frame is
+72 bytes versus the original 88. The candidate position vector starts at
+stack 60 rather than 76, distance at 56 rather than 60, and bonus at 48
+rather than 56. Both angle outputs already use stack 54/52. The original
+carries a real float bonus across calls, sets it to 2 for species 161, and
+adds it in the first six distance bands. No additional fields, dummy
+vectors, padding, or forced frame are installed. The assembly owner remains.
+Next action: inspect authentic local aggregate/expression lifetimes and
+compiler stack allocation around the vector helper calls; preserve the
+six bonus-using branches and the species-filter early return.
