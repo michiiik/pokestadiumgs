@@ -856,3 +856,7 @@ func_826042A0 = TrailEffect_DrawAll;
 func_82507DC0 = CellularTransition_SeedCells;
 func_82507EE8 = CellularTransition_FindEmptyNeighbors;
 func_8250850C = CellularTransition_Draw;
+func_841153DC = BattleAnim_UpdateTimedFinishPhase;
+func_84117AA0 = BattleAnim_DispatchActionFeedback;
+func_84115B34 = BattleAnim_UpdateBurrowTransition;
+func_8411D7F8 = BattleAnim_InitializeActorFromSide;
