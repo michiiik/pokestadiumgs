@@ -1597,6 +1597,8 @@
     - [0x3F8830, .rodata, fragments/79/fragment79_380210]
     - [0x3F8850, .rodata, fragments/79/fragment79_380A00]
     - [0x3F8CE0, rodata]
+    - [0x3F95D0, .rodata, fragments/79/fragment79_38EFE0] # Movement setup/update dispatch tables, 192 bytes.
+    - [0x3F9690, rodata]
     - [0x3FA810, .rodata, fragments/79/fragment79_393CA0] # jtbl_8418AF80, jtbl_8418AFB0, jtbl_8418AFEC, jtbl_8418B008, jtbl_8418B020, jtbl_8418B0C0, jtbl_8418B0D8, jtbl_8418B0F4, jtbl_8418B10C, jtbl_8418B124, jtbl_8418B150, jtbl_8418B174, jtbl_8418B194
     - [0x3FAA50, rodata]
     - [0x3FAA60, .rodata, fragments/79/fragment79_3ADCA0] # jtbl_8418B1D0 (+13 more, incl. jtbl_8418B738/jtbl_8418B74C)
