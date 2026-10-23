@@ -205,3 +205,58 @@ declaration-context correction, not a source-shape hypothesis failure.
 The four old function names remain linker aliases. No instruction or
 relocation rewrites, fake reads, artificial address-taking, volatile tricks,
 or manual loop unrolling are introduced. Other assembly owners remain.
+
+## 2026-10-23: callback pipeline and model-state batch
+
+Four further owners are accepted, totaling 1,072 bytes:
+
+- `func_84111774` / `BattleAnim_RunCameraStageCallbacks`: 244 bytes. Two
+  ordinary loops run seven eight-byte context/callback entries for the two
+  cameras, then call `func_841114A8`. The shared `D_841911EC` counter is
+  reloaded after every callback because callbacks can modify it. An inline
+  typed slot view matches; caching a slot pointer or spelling a while-loop
+  changes the instruction sequence. The seven-slot layout is also written
+  by `func_84111348` and `func_841113F8`.
+- `func_841156D0` / `BattleAnim_UpdateAscentPhase`: 264 bytes. It fires
+  timed effects at the trigger byte, continues their updater after the
+  elapsed halfword reaches that trigger, and advances the phase when the
+  state float at 40 reaches baseline float 1616 plus 200. Both actual
+  counters are reloaded after the callbacks. Loading and declaring the
+  trigger before elapsed reproduces the original `$v0`/`$v1` assignment.
+- `func_8411DAE0` / `BattleAnim_UpdateBothSideCallbacks`: 276 bytes. It
+  sets bit 0 of each side's flags at 2028, runs common update hooks, and
+  conditionally runs each side's object callbacks using the two mode bytes.
+  Each mode-byte reload across a callback is retained. Both sides' finished
+  event tracks are checked afterwards.
+- `func_84112C98` / `BattleAnim_RefreshSpeciesModel`: 288 bytes. It compares
+  requested species 1628 to current species 1624, reloads a changed model,
+  restores animation and side-state effects, then clears two state fields.
+  A direct requested-first entry comparison supplies the original branch
+  operands and current/requested load schedule; two scalar species caches
+  rotate many registers. The `func_84112EAC` caller now explicitly passes
+  its actual model pointer in the same acceptance transaction. Its entire
+  compiled function remains unchanged.
+
+Each owner uses calibrated known and leading-blank whole-module controls,
+followed by the normal host-syntax-enabled full-ROM gate. The first, second,
+and fourth winners are link-verified in the runner. The two-side updater's
+initial link-shape check reports a relocation-name difference because its
+last two calls use `BattleAnim_ClearFinishedEventTrack` rather than the old
+address-keyed alias. It passes the authoritative sequential ROM gate;
+independent aggregate relocation normalization and the complete linked
+fragment establish the identical final call destinations. The initial
+runner flag is not reported as link-verified.
+
+Every success is frozen before subsequent compilation. Independent checks
+preserve all 332 original function extents, complete game sections and
+relocation encodings, the entire linked fragment, four collateral objects,
+and externally hashed inputs/outputs. US ROM MD5 remains
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. No fake local/field/read, padding,
+instruction rewriting, forced ABI/register/frame, or manual unrolling is
+used. Original function names remain linker aliases.
+
+Public integration must start after merged #1444 (`2edb8be4`) and its
+camera-helper declaration repair. That merge changes a separate prefix
+module, `fragment79_37A6E0.c`, but none of these four owners. The public
+prefix and all other merged source bodies must be preserved; fresh public
+whole-module checks are required before publishing this batch.
