@@ -905,3 +905,4 @@ func_862073CC = SceneModels_CreatePairs;
 func_862067B4 = SceneMotion_ComputeNearbyDirection;
 func_86206C34 = SceneInput_AdvanceSelectionPhase;
 func_86206D20 = SceneInput_UpdateCpuSelection;
+func_86206920 = SceneInput_SelectScoredDirection;

@@ -2,12 +2,20 @@
 
 
 #ifdef VERSION_US
+typedef struct SceneDirectionChoice {
+    f32 origin[3];
+    f32 directions[4][3];
+    s16 buttons;
+} SceneDirectionChoice;
+
 extern u8 *D_8620E198;
 extern f32 D_862090C0[];
+extern SceneDirectionChoice D_86208F28[5];
 extern f32 func_87D005E8(f32 *, f32 *, f32 *);
 extern void func_8620573C(f32 *, f32 *);
-extern s16 func_86206920(s32, s32, f32);
 extern u32 func_8003570C(void);
+extern f32 func_87D0059C(f32 *, f32 *);
+
 
 void func_86206790(f32 *arg0, f32 *arg1, s32 *arg2, s32 *arg3) {
     f32 temp_fv0;
@@ -51,7 +59,82 @@ s32 SceneMotion_ComputeNearbyDirection(f32 *origin, f32 *direction, u8 *object, 
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26D1D0/func_86206920.s")
+s16 SceneInput_SelectScoredDirection(s32 index, s32 rank, f32 threshold) {
+    s32 i;
+    s32 direction_index;
+    f32 *origin;
+    SceneDirectionChoice *choices[5];
+    SceneDirectionChoice **choice_cursor;
+    f32 scores[5];
+    f32 *score_cursor;
+    s16 result;
+    SceneDirectionChoice **sort_choice_slot;
+    f32 relative[3];
+    SceneDirectionChoice *choice;
+    f32 *direction;
+    u8 *object;
+    u8 *metadata;
+    f32 best;
+    f32 (*directions)[3];
+    f32 score;
+    s32 j;
+    u32 first;
+    u32 second;
+    choice = D_86208F28;
+    choice_cursor = choices;
+    score_cursor = scores;
+    result = 0;
+    for (i = 0; i < 5; i++) {
+        best = 0.0f;
+        object = *(u8 **)(D_8620E198 + 384);
+        while (object != 0) {
+            metadata = *(u8 **)(object + 32);
+            directions = choice->directions;
+            direction_index = *(u8 *)(D_8620E198 + 474066 + index * 24);
+            origin = choice->origin;
+            direction = directions[direction_index];
+            relative[0] = 0.0f;
+            relative[1] = 0.0f;
+            relative[2] = 0.0f;
+            if (SceneMotion_ComputeNearbyDirection(origin, direction, object, relative)) {
+                relative[0] += *(f32 *)(object + 16);
+                relative[1] = 0.0f;
+                relative[2] += *(f32 *)(object + 24);
+                func_87D0059C(&relative[0], &relative[2]);
+                score = relative[2] * direction[2] + relative[0] * direction[0];
+                score *= *(s32 *)(metadata + 48);
+            } else {
+                score = -1.0f;
+            }
+            if (best < score || object == *(u8 **)(D_8620E198 + 384)) {
+                best = score;
+            }
+            object = *(u8 **)(object + 4);
+        }
+        *score_cursor = best;
+        *choice_cursor = choice;
+        choice++;
+        choice_cursor++;
+        score_cursor++;
+    }
+    for (i = 0; i < 5; i++) {
+        first = func_8003570C() % 5;
+        second = func_8003570C() % 5;
+        func_86206790(&scores[first], &scores[second], (s32 *)&choices[first], (s32 *)&choices[second]);
+    }
+    for (i = 5 - 1; i != 0; i--) {
+        for (j = i; j > 0; j--) {
+            if (scores[j - 1] < scores[j]) {
+                sort_choice_slot = &choices[j];
+                func_86206790(&scores[j], &scores[j - 1], (s32 *)sort_choice_slot, (s32 *)&choices[j - 1]);
+            }
+        }
+    }
+    if (threshold < scores[rank]) {
+        result = choices[rank]->buttons;
+    }
+    return result;
+}
 
 s16 SceneInput_AdvanceSelectionPhase(s32 index, s32 entry_delay, s32 rank, f32 threshold, s32 release_delay) {
     u8 *state;
@@ -66,7 +149,7 @@ s16 SceneInput_AdvanceSelectionPhase(s32 index, s32 entry_delay, s32 rank, f32 t
         }
         break;
     case 1:
-        buttons = func_86206920(index, rank, threshold);
+        buttons = SceneInput_SelectScoredDirection(index, rank, threshold);
         if (buttons != 0) {
             *(u8 *)(state + 19) = 2;
             *(s32 *)(state + 8) = 0;

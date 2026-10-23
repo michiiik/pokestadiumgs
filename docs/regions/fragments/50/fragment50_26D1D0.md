@@ -7,9 +7,10 @@
 | `func_862067B4` | `SceneMotion_ComputeNearbyDirection` | 364 |
 | `func_86206C34` | `SceneInput_AdvanceSelectionPhase` | 236 |
 | `func_86206D20` | `SceneInput_UpdateCpuSelection` | 472 |
+| `func_86206920` | `SceneInput_SelectScoredDirection` | 788 |
 
-The three owners replace 1072 instruction bytes. The existing paired-value
-swap remains C; three other owners remain assembly as described below.
+The four owners replace 1860 instruction bytes. The existing paired-value
+swap remains C; two other owners remain assembly as described below.
 Backward aliases retain the original entry names.
 
 ### Nearby direction calculation
@@ -113,9 +114,42 @@ recovered float pools and relocation-record tail. Linked fragments 50 and 79,
 hashes remain unchanged. Private probes, searches and compiler binaries are
 excluded from the public change.
 
+## Accepted scored direction selector
+
+`SceneInput_SelectScoredDirection` scores five 64-byte direction-choice records.
+Each record contains an origin vector, four player-indexed direction vectors,
+and a signed button mask at offset 60. For each choice, it walks the object
+list at context offset 384, computes nearby relative motion, removes its Y
+component, normalizes X/Z, and weights the directional dot product by the
+signed word at metadata offset 48. The first object supplies the score even
+when negative; an empty list scores zero.
+
+It then performs five pairs of random swaps and the original descending
+bubble-sort traversal over parallel score/pointer arrays. It returns the
+requested rank's button mask only when the score strictly exceeds the supplied
+threshold; otherwise it returns zero. The five RNG pairs and comparison order
+are preserved.
+
+The decisive spelling uses the actual direction index read from the player
+record, the choice's origin pointer and its direction-table pointer. It keeps
+the score multiplication in the score value instead of introducing separate
+signed-weight, float-weight and dot-product locals. These source-level values
+recover the original 224-byte frame, global allocation and emitted temporaries
+without fabricated storage, padding, forced registers or instruction rewriting.
+A normal `for (i = 0; i < 5; i++)` initializer supplies the last scheduling fix.
+Accepted runner label:
+`direction-select-counter-schedule:for-initializer:header-increment`.
+
+The runner reports `link_verified: true` and an authoritative full-ROM accept.
+Immediately frozen complete-module sections, all seven function extents,
+semantic relocations, the recovered float-pool/data partition, linked fragments
+50/79, collateral objects and the retail ROM all pass independent comparison.
+After naming the function and consolidating declarations, another normal
+host-syntax-enabled ROM gate and the same independent proofs pass.
+
 ## Remaining owners
 
-### `func_86206920`: requeue
+### Scorer investigation history (resolved)
 
 The five-choice scoring, shuffle and descending bubble-sort reconstruction
 reaches the original 788-byte extent and opcode sequence. Explicit parallel
@@ -173,3 +207,42 @@ assigning `buttons & 0x4000` to an 8-bit selector, which erases the mode-3
 call. That proposal is semantically invalid and is rejected. Next action:
 trace the table-address high-half web against the original dependency order;
 retain the proven hook signatures and every mode-specific call.
+
+
+### Scorer follow-up after PR #1483 (resolved)
+
+The accepted three-function public batch is head
+`49b0b747bc5bd7c51ec22daef503775b06516c3d`. The following historical diagnostics preceded
+the selector acceptance described above. Eight logging controls for the retained home-order spelling
+and matching sibling pass in the updated threshold-pool module; another eight
+pass for the subsequent scalar-value spelling. The controls compare stock,
+logging off, logging on and leading blanks, including all unchanged module
+sections and semantic relocations.
+
+The indexed-context addition is globally colored into v0; the original uses
+an emitted temporary. Removing that pointer local repairs the expression but
+reduces the natural frame to 216 bytes. Explicit conversion of the actual
+signed object weight into a float restores the 224-byte frame. Moving the
+real counter's initialization before cursor setup recovers the original
+counter/parallel-cursor register assignment, at the cost of moving the initial
+counter assignment from byte 120 to byte 92.
+
+The best ordinary source now has raw similarity 0.9340, normalized 0.9949,
+197 words and extent 788 bytes. A calibrated 90-second source-only search
+improves its predecessor's local score 140 to 120 by commuting the two
+operands of the X dot-product multiplication. Both reported proposals contain
+that same valid arithmetic edit; their other difference is whitespace. The
+edit was extracted into readable source and tested through the normal runner.
+The best runner label is
+`direction-select-xdot-order:before-cursors:increment-header`.
+
+Remaining differences concern the initial counter assignment, direction-byte
+and multiply-result temporaries, the signed weight carrier in v0 versus t3,
+and score coalescing into f2 versus f0. Counter initialization positions and
+increment forms, explicit dot-product/conversion values, actual velocity or
+sum locals, and compound score assignment were tested in recorded batches.
+Velocity/sum carrier variants worsen allocation; they do not justify adding
+storage or padding. Those remaining mechanisms were resolved by the real direction index and
+choice-field pointers, score compound assignment and normal for initializer,
+as documented in the accepted-selector section. Every RNG call and the signed
+16-bit return contract remain intact.
