@@ -868,3 +868,5 @@ func_84118DD4 = BattleAnim_UpdateCategoryActionTimeline;
 func_8411C418 = BattleAnim_UpdateSideTrackViewportTransition;
 func_841170A0 = BattleAnim_InitializeCategoryAction;
 func_8411BCC8 = BattleAnim_UpdateCategoryCameraSequence;
+func_84113E7C = BattleAnim_ConfigureGuardedCategoryCamera;
+func_84114BF4 = BattleAnim_UpdateMoveTimeline;

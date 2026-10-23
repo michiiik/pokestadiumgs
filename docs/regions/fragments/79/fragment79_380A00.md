@@ -436,3 +436,64 @@ pointer/numeric sum forms. The numeric forms retain the four reversed
 basin. No zero-table label or linker metadata is added. Resume from the
 documented exact-opcode parent and resolve its arithmetic ownership and
 zero-table representation together.
+
+## 2026-10-23: guarded category cameras and the move timeline
+
+Two large owners are runner-accepted, totaling 3,948 code bytes and 987
+MIPS instructions:
+
+- `func_84113E7C` / `BattleAnim_ConfigureGuardedCategoryCamera`: 1,924
+  bytes. It emits one-time category feedback, checks each side prerequisite
+  independently, and selects category-specific camera tracks, randomized
+  presets, visibility, and timers. The real byte rejection flag survives
+  callbacks at stack 39; a word flag does not reproduce the code. Preserve
+  each separate prerequisite call and side lookup: short-circuiting the
+  checks would skip callbacks present in the original.
+- `func_84114BF4` / `BattleAnim_UpdateMoveTimeline`: 2,024 bytes. It handles
+  initial model tracks, signed-byte start timing, category/species lookups,
+  frame-triggered audio and camera changes, visibility, and completion.
+  Both completion paths clear flag 8, then flag 1, then assign phase 4.
+  This statement order resolves all fourteen remaining register differences;
+  the compiler schedules the resulting instructions exactly as in the ROM.
+  The eight-cell composition varies the phase write's position independently
+  in the two blocks; only placing it after both flag writes in both blocks
+  passes the ROM gate. No artificial flag snapshot or additional local is
+  retained.
+
+The camera owner's last instruction residual was an unnecessary byte mask
+before `func_8411F750`. Its definition in `fragment79_38EFE0.c` takes `s32`
+in both the native and public trees; an older block declaration inside
+`func_84112E40` incorrectly said `u8`. The runner companion transaction
+corrects that declaration to `s32` and adds the same forward declaration
+for the new caller. A declaration-only control preserves the complete
+existing module before the candidate runs. The defining helper and its
+other translation unit are unchanged.
+
+The move owner initially uses the file's existing word-address parameter
+and explicit byte-pointer views. Post-acceptance controls replace that
+parameter and its one forward declaration with `u8 *`, removing repeated
+casts throughout the body. Both normal and leading-blank versions preserve
+the complete module, including existing callers; that readable pointer
+form is retained. An alternative local pointer view also preserves the
+module but is not installed.
+
+The camera probe is relocation-masked and does not claim initial
+`link_verified`; its authoritative sequential ROM gate passes. The move
+probe is link-verified and passes the same normal host-syntax-enabled gate.
+Successful inputs and outputs are frozen immediately. Independent proof
+preserves all 332 original function extents, complete game sections and
+semantic relocations, four collateral objects, and the entire linked
+fragment. Final cleanup and names are re-gated together. External SHA-256
+checks pass; US MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+The original names remain linker aliases. No generated coverage,
+instruction/relocation rewriting, padding, artificial locals/fields/reads,
+forced registers/frame/ABI, or manual unrolling is introduced.
+
+`func_84113014` remains the only shared assembly owner in this suffix.
+Eight new incremental pointer-construction forms do not improve its
+documented four-addition residual; literal-zero forms still fold the zero
+table address instructions away. No diagnostic zero label is installed.
+Resume from the raw-0.9837 parent with exact opcode order; its next action
+remains resolving constant-base arithmetic ownership and the genuine zero
+table representation together.
