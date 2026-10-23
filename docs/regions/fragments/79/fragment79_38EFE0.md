@@ -207,3 +207,37 @@ pending owner when a later owner gates sequentially first. This produced a
 prototype-order compile failure for the setup switch. Gating the setup owner
 against the accepted update owner with its own shared declarations resolves
 the declaration scope without changing either handler's ABI.
+
+## 2026-10-23: auxiliary gravity and rotated motion updates
+
+Three runner-accepted owners add 1,436 code bytes / 359 instructions:
+
+- `func_84123468` / `BattleAnim_InitAuxiliaryGravityMotion` (508 bytes)
+  copies translation `D_84183D28` and rotation `D_84183D34`, signs the copied
+  Y rotation with `func_8411E1D4`, and rotates an initial offset through a
+  matrix. It initializes the auxiliary model at actor offset 1664 and its
+  rotation/position at 1694/1700. The initial X position depends on whether
+  the actor is `D_84191208`. Narrow the direction-times-16384 rotation to
+  `s16` before passing it to `Vec3s_SetComponents`; passing a word-sized
+  product omits two original instructions. Matrix-first declarations and
+  X/Y/Z position initialization preserve the original 144-byte frame.
+- `func_84123664` / `BattleAnim_UpdateAuxiliaryGravityMotion` (452 bytes)
+  applies downward acceleration, integrates the shared motion fields and
+  advances the auxiliary model position. At Y <= 5 it clamps height, sets
+  rotation to (0, 16384, 0), and clears acceleration and velocity. Above the
+  floor it increments all three rotation components. Direct compound
+  assignments reproduce the field-load schedule; introducing global-pointer
+  locals changes it.
+- `func_8412328C` / `BattleAnim_UpdateRotatedMotion` (476 bytes) applies
+  shared damping/integration coefficients, advances actor X/Z, writes
+  downward acceleration -3 and increments signed byte 1571. At counter >= 5
+  it converges all three scale components through `Math_StepToF`. Reusing
+  `step` and `result`, loading the next rate before storing the previous
+  result, matches the original schedule. This spelling also appears in
+  `func_8412391C` in this source.
+
+Each owner has a link-verified runner acceptance and an immediately frozen,
+host-syntax-enabled full-ROM gate. Independent checks cover complete helper
+text, existing jump tables and fixed-address relocation destinations, the
+entire linked fragment 79, the camera modules and four collateral objects.
+The original assembly objects and retail ROM remain the comparison oracles.

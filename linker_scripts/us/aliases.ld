@@ -881,3 +881,6 @@ func_84121920 = BattleAnim_UpdateWideOscillation;
 func_84123CF4 = BattleAnim_UpdateTimedOscillation;
 func_84123F60 = BattleAnim_InitMovementByType;
 func_84124104 = BattleAnim_UpdateMovementByType;
+func_84123468 = BattleAnim_InitAuxiliaryGravityMotion;
+func_84123664 = BattleAnim_UpdateAuxiliaryGravityMotion;
+func_8412328C = BattleAnim_UpdateRotatedMotion;

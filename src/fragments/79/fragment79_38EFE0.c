@@ -924,11 +924,130 @@ void BattleAnim_InitRotatedMotion(u8 *arg0) {
     *(u8 *)(arg0 + 1571) = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8412328C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123468.s")
+extern f32 Math_StepToF(f32, f32, f32, f32);
+extern f32 D_84189CE0;
+extern f32 D_84189CE4;
+extern f32 D_84189CE8;
+extern f32 D_84189CEC;
+extern f32 D_84189CF0;
+extern f32 D_84189CF4;
+extern f32 D_84193F90;
+extern f32 D_84193F98;
+extern f32 D_84193F9C;
+void BattleAnim_UpdateRotatedMotion(u8 *arg0) {
+    f32 step;
+    f32 result;
+    *(f32 *)(arg0 + 1520) *= D_84193F90;
+    *(f32 *)(arg0 + 1524) *= D_84193F90;
+    *(f32 *)(arg0 + 1528) *= D_84193F90;
+    *(f32 *)(arg0 + 1508) *= D_84193F9C;
+    *(f32 *)(arg0 + 1512) *= D_84193F9C;
+    *(f32 *)(arg0 + 1516) *= D_84193F9C;
+    *(f32 *)(arg0 + 1520) += *(f32 *)(arg0 + 1508);
+    *(f32 *)(arg0 + 1524) += *(f32 *)(arg0 + 1512);
+    *(f32 *)(arg0 + 1528) += *(f32 *)(arg0 + 1516);
+    *(f32 *)(arg0 + 1520) *= D_84193F98;
+    *(f32 *)(arg0 + 1524) *= D_84193F98;
+    *(f32 *)(arg0 + 1528) *= D_84193F98;
+    *(f32 *)(arg0 + 1520) *= D_84193F9C;
+    *(f32 *)(arg0 + 1524) *= D_84193F9C;
+    *(f32 *)(arg0 + 1528) *= D_84193F9C;
+    (*(s8 *)(arg0 + 1571))++;
+    *(f32 *)(arg0 + 36) += *(f32 *)(arg0 + 1520);
+    *(f32 *)(arg0 + 44) += *(f32 *)(arg0 + 1528);
+    *(f32 *)(arg0 + 1512) = -3.0f;
+    if (*(s8 *)(arg0 + 1571) >= 5) {
+        step = D_84189CE0;
+        result = Math_StepToF(*(f32 *)(arg0 + 48), D_84189CE4, step, step);
+        step = D_84189CE8;
+        *(f32 *)(arg0 + 48) = result;
+        result = Math_StepToF(*(f32 *)(arg0 + 52), D_84189CEC, step, step);
+        step = D_84189CF0;
+        *(f32 *)(arg0 + 52) = result;
+        result = Math_StepToF(*(f32 *)(arg0 + 56), D_84189CF4, step, step);
+        *(f32 *)(arg0 + 56) = result;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123664.s")
+
+extern S1_Vec3f D_84183D28;
+extern ActorMotionRotation D_84183D34;
+extern f32 D_84189CF8;
+extern f32 D_84189CFC;
+extern f32 D_84189D00;
+extern f32 D_84189D04;
+extern f32 D_84189D08;
+extern void MtxF_SetRotationTranslationF(void *, void *, void *);
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+extern s32 func_8411E1D4(s32);
+extern s32 D_84191208;
+extern f32 D_84193F90;
+extern f32 D_84193F94;
+extern f32 D_84193F98;
+extern f32 D_84193F9C;
+void BattleAnim_InitAuxiliaryGravityMotion(u8 *arg0) {
+    S1_MtxF matrix;
+    S1_Vec3f translation = D_84183D28;
+    ActorMotionRotation rotation = D_84183D34;
+    S1_Vec3f position;
+    D_84193F90 = 0.5f;
+    D_84193F94 = D_84189CF8;
+    D_84193F98 = D_84189CFC;
+    D_84193F9C = D_84189D00;
+    rotation.y *= func_8411E1D4((s32)arg0);
+    position.x = 0.0f;
+    position.y = 0.0f;
+    position.z = D_84193F94;
+    Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 1508), 0.0f, 0.0f, 0.0f);
+    Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 1520), 0.0f, 0.0f, 0.0f);
+    Vec3s_SetComponents((s16 *)(arg0 + 1694), 0, (s16)(func_8411E1D4((s32)arg0) * 16384), 0);
+    if ((s32)arg0 == D_84191208) {
+        Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 1700), (f32)func_8411E1D4((s32)arg0) * D_84189D04, 20.0f, 0.0f);
+    } else {
+        Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 1700), (f32)func_8411E1D4((s32)arg0) * D_84189D08, 20.0f, 0.0f);
+    }
+    ModelAnim_SetFrame(arg0 + 1664, 0);
+    MtxF_SetRotationTranslationF(&matrix, &translation, &rotation);
+    GalleryCamera_RotateVecByMatrix(&position, &matrix);
+    *(f32 *)(arg0 + 1508) = -position.x;
+    *(f32 *)(arg0 + 1512) = -position.y;
+    *(f32 *)(arg0 + 1516) = -position.z;
+    *(f32 *)(arg0 + 1524) = 50.0f;
+}
+
+
+extern f32 D_84193F98;
+extern f32 D_84193F9C;
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+void BattleAnim_UpdateAuxiliaryGravityMotion(u8 *arg0) {
+    *(f32 *)(arg0 + 1512) = -1.0f;
+    *(f32 *)(arg0 + 1508) *= D_84193F9C;
+    *(f32 *)(arg0 + 1512) *= D_84193F9C;
+    *(f32 *)(arg0 + 1516) *= D_84193F9C;
+    *(f32 *)(arg0 + 1520) += *(f32 *)(arg0 + 1508);
+    *(f32 *)(arg0 + 1524) += *(f32 *)(arg0 + 1512);
+    *(f32 *)(arg0 + 1528) += *(f32 *)(arg0 + 1516);
+    *(f32 *)(arg0 + 1520) *= D_84193F98;
+    *(f32 *)(arg0 + 1524) *= D_84193F98;
+    *(f32 *)(arg0 + 1528) *= D_84193F98;
+    *(f32 *)(arg0 + 1520) *= D_84193F9C;
+    *(f32 *)(arg0 + 1524) *= D_84193F9C;
+    *(f32 *)(arg0 + 1528) *= D_84193F9C;
+    *(f32 *)(arg0 + 1700) += *(f32 *)(arg0 + 1520);
+    *(f32 *)(arg0 + 1704) += *(f32 *)(arg0 + 1524);
+    *(f32 *)(arg0 + 1708) += *(f32 *)(arg0 + 1528);
+    if (*(f32 *)(arg0 + 1704) <= 5.0f) {
+        Vec3s_SetComponents((s16 *)(arg0 + 1694), 0, 16384, 0);
+        *(f32 *)(arg0 + 1704) = 5.0f;
+        Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 1520), 0.0f, 0.0f, 0.0f);
+        Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 1508), 0.0f, 0.0f, 0.0f);
+    } else {
+        *(s16 *)(arg0 + 1694) += 10922;
+        *(s16 *)(arg0 + 1698) += 7281;
+        *(s16 *)(arg0 + 1696) += 10922;
+    }
+}
 
 extern f32 D_84189D0C;
 
@@ -1089,14 +1208,14 @@ void func_84123EB0(u8 *arg0) {
 
 extern void func_84121CAC(u8 *);
 extern void func_8412230C(u8 *);
-extern void func_84123468(u8 *);
+extern void BattleAnim_InitAuxiliaryGravityMotion(u8 *);
 extern void func_841214C0(u8 *);
 extern void func_84121B18(u8 *);
 extern void func_84121DE8(u8 *);
 extern void func_84122448(u8 *);
 extern void func_84122AB8(u8 *);
-extern void func_8412328C(u8 *);
-extern void func_84123664(u8 *);
+extern void BattleAnim_UpdateRotatedMotion(u8 *);
+extern void BattleAnim_UpdateAuxiliaryGravityMotion(u8 *);
 extern void func_84123B08(u8 *);
 
 void BattleAnim_InitMovementByType(u8 *arg0, s32 arg1) {
@@ -1156,7 +1275,7 @@ void BattleAnim_InitMovementByType(u8 *arg0, s32 arg1) {
             BattleAnim_InitRotatedMotion(arg0);
             break;
         case 22:
-            func_84123468(arg0);
+            BattleAnim_InitAuxiliaryGravityMotion(arg0);
             break;
         case 23:
             func_84123CD8(arg0);
@@ -1227,10 +1346,10 @@ void BattleAnim_UpdateMovementByType(u8 *arg0, s32 arg1) {
             func_84123034(arg0);
             break;
         case 21:
-            func_8412328C(arg0);
+            BattleAnim_UpdateRotatedMotion(arg0);
             break;
         case 22:
-            func_84123664(arg0);
+            BattleAnim_UpdateAuxiliaryGravityMotion(arg0);
             break;
         case 23:
             BattleAnim_UpdateTimedOscillation(arg0);
