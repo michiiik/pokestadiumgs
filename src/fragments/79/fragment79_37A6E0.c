@@ -237,7 +237,7 @@ void func_8410B594(u8 *arg0) {
 
 #ifdef VERSION_US
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
-extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+extern void func_80037120(void *, void *, f32 *, s16 *, s16 *);
 extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 extern s32 func_8411DC80(u16, s32 *, s32);
 extern void func_841203B4(u8 *, f32, f32);
@@ -436,7 +436,26 @@ void func_8410CAE4(u8 *arg0, s32 arg1, s16 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410CF80.s")
+extern void func_80037120(void *, void *, f32 *, s16 *, s16 *);
+extern u8 * func_8410B330(u8 *arg0);
+extern void func_8411E0A4(void *, void *, void *);
+extern void func_841203B4(u8 *, f32, f32);
+extern u8 * D_841911E8;
+void BattleAnim_UpdateCameraHeightTarget(u8 *arg0, u8 *arg1) {
+    f32 position[3];
+    f64 separation;
+    f32 distance;
+    s16 angle_x;
+    s16 angle_y;
+    D_841911E8 = func_8410B330(arg0);
+    func_8411E0A4(arg1, position, D_841911E8);
+    func_80037120(position, D_841911E8 + 80, &distance, &angle_x, &angle_y);
+    separation = distance;
+    if (*(f32 *)(D_841911E8 + 128) * 0.6 < separation) {
+        func_841203B4(D_841911E8 + 96, position[1], 0.3f);
+    }
+    *(f32 *)(arg0 + 184) = *(f32 *)(D_841911E8 + 96);
+}
 #endif
 
 #ifdef VERSION_US
@@ -649,7 +668,7 @@ void BattleAnim_ModelDispatch_127(u8 *arg0, u8 *arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+extern void func_80037120(void *, void *, f32 *, s16 *, s16 *);
 extern u8 * func_8410B330(u8 *);
 extern s32 D_84184148;
 extern u8 * D_841911E8;
@@ -1247,10 +1266,10 @@ void BattleAnim_ModelDispatch_022(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8410CF80(void);
-void BattleAnim_ModelDispatch_023(u8 *arg0) {
+extern void BattleAnim_UpdateCameraHeightTarget(u8 *, u8 *);
+void BattleAnim_ModelDispatch_023(u8 *arg0, u8 *arg1) {
     *(f32 *)(arg0 + 0x2C) = 45.0f;
-    func_8410CF80();
+    BattleAnim_UpdateCameraHeightTarget(arg0, arg1);
 }
 #endif
 
@@ -3732,7 +3751,47 @@ void BattleAnim_Dispatch_197(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841193E0.s")
+extern void func_84103694(s32, s16);
+extern void func_84111348(s32 arg0, s32 arg1);
+extern void func_84113560(s32 arg0);
+extern void func_84113D38(u8 *arg0);
+extern void func_8411FEE8(s32);
+extern s32 D_84183D50;
+extern u8 * D_841911E0;
+extern s32 D_841911F4;
+extern s32 D_84191208;
+extern s32 D_8419120C;
+extern u8 * D_84193DD0;
+extern u8 D_84193DD8[];
+void BattleAnim_DispatchDelayedCategory(u8 *arg0) {
+    if (*(s16 *)(arg0 + 2024) < 2) return;
+    arg0[2038] = 2;
+    func_8411FEE8(80);
+    switch (*(u16 *)(D_84193DD0 + 4)) {
+    case 49: func_84113560(262); break;
+    case 52: func_84113560(289); break;
+    case 50: func_84113560(263); break;
+    case 53: func_84113560(287); break;
+    case 54: func_84113560(268); break;
+    case 48: func_84103694((s32)D_84193DD8, 275); break;
+    case 51: func_84113560(288); break;
+    }
+    switch (*(u16 *)(D_84193DD0 + 4)) {
+    case 48:
+    case 49:
+    case 50:
+    case 51:
+    case 52:
+    case 53:
+        func_84113D38((u8 *)D_84191208);
+        func_84113D38((u8 *)D_8419120C);
+        if (*(s16 *)(D_841911E0 + 152) != 33) {
+            func_84111348((s32)arg0, 29);
+        }
+        break;
+    }
+    *(s32 *)(arg0 + D_841911F4 * 4 + 1480) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -3997,7 +4056,79 @@ void BattleAnim_Dispatch_120(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84119CF0.s")
+extern void func_84111348(s32 arg0, s32 arg1);
+extern void func_84112158(s32 arg0, s32 arg1);
+extern void func_84112464(u8 *arg0);
+extern void func_84112564(s32 arg0);
+extern void func_84112580(s32 arg0);
+extern void func_841126C8(s32 arg0);
+extern void func_84112E40(s32 arg0);
+extern s32 func_84113430(s32 arg0);
+extern s32 func_841139D0(u8 *arg0);
+extern void func_84113D38(u8 *arg0);
+extern void func_8411FEE8(s32);
+extern s32 D_84183D50;
+extern u8 * D_841911E0;
+extern s32 D_841911F4;
+extern u8 * D_84193DD0;
+void BattleAnim_InitializeCategorySequence(u8 *arg0) {
+    if (func_84113430((s32)arg0) == 0) return;
+    func_841126C8((s32)arg0);
+    func_84112E40((s32)arg0);
+    *(s16 *)(arg0 + 2024) = 0;
+    func_8411FEE8(62);
+    arg0[1562] = 60;
+    *(s16 *)(D_841911E0 + 152) = 0;
+    func_84111348((s32)arg0, 0);
+    arg0[1567] = 255;
+    switch (*(u16 *)(D_84193DD0 + 4)) {
+    case 44:
+        arg0[2038] = 0;
+        if (((u16 (*)[8])(D_84193DD0 + 16))[func_8411E1F8((s32)arg0)][1] & 4) {
+            func_841139D0(arg0);
+        } else {
+            func_84112464(arg0);
+        }
+        break;
+    case 2:
+        arg0[2038] = 0;
+        func_84112464(arg0);
+        break;
+    case 3:
+    case 5:
+        func_84113D38(arg0);
+        break;
+    case 4:
+        func_84112324(arg0);
+        break;
+    case 7:
+        func_84112158((s32)arg0, 251);
+        if (((u16 (*)[8])(D_84193DD0 + 16))[func_8411E1F8((s32)arg0)][1] & 2) {
+            *(s16 *)(D_841911E0 + 152) = 37;
+        } else {
+            *(s16 *)(D_841911E0 + 152) = 36;
+        }
+        arg0[1562] = 35;
+        func_8411FEE8(37);
+        func_84113D38(arg0);
+        break;
+    case 8:
+        arg0[1562] = 35;
+        *(s16 *)(D_841911E0 + 152) = 36;
+        func_84112324(arg0);
+        func_8411FEE8(37);
+        break;
+    case 9:
+        *(s16 *)(D_841911E0 + 152) = 38;
+        arg0[1562] = 35;
+        func_84112464(arg0);
+        func_8411FEE8(37);
+        break;
+    }
+    func_84112564((s32)arg0);
+    func_84112580((s32)arg0);
+    *(s32 *)(arg0 + D_841911F4 * 4 + 1480) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -5302,7 +5433,7 @@ void BattleAnim_Dispatch_211(u8 *arg0) {
 #ifdef VERSION_US
 extern u8 D_841904DC[];
 extern u8 D_841904D0[];
-extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+extern void func_80037120(void *, void *, f32 *, s16 *, s16 *);
 extern void Camera_ComputeEyeFromAngles(u8 *, u8 *, f32, s16, s32);
 extern void func_84111348(s32 arg0, s32 arg1);
 extern void func_8411FEE8(s32);

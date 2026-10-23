@@ -386,3 +386,101 @@ all game instructions and relocation encodings in original/header-relative/
 leading-blank whole-module controls. One access belongs to the previously
 accepted `BattleAnim_UpdateTimedEffectSequence`; its narrow view cleanup is
 included alongside the four new owners, without claiming another owner match.
+
+## 2026-10-23: delayed category dispatch and sequence initialization
+
+The native batch based on `b1859dc6` replaces two assembly owners with C:
+
+- `func_841193E0` / `BattleAnim_DispatchDelayedCategory` (412 bytes) waits
+  for the object's halfword counter at 2024 to reach two, sets phase byte
+  2038 to two, then selects event/resource operations by the context's
+  category halfword at offset four. Its second switch applies shared setup
+  to categories 48 through 53 and installs the next callback. The original
+  seven- and six-entry jump tables remain byte-identical.
+- `func_84119CF0` / `BattleAnim_InitializeCategorySequence` (564 bytes)
+  waits for `func_84113430`, resets object/camera state, and selects model
+  setup, frame timing, and camera presets by the same category field.
+  Side flags are read from halfword one of a 16-byte row following the
+  16-byte context header. The table for categories two through nine and
+  the separate category-44 branch retain their original layout.
+
+`src/229E0.c` defines `func_80037120` with two vector pointers followed by
+distance and two rotation outputs. Three stale forward declarations in this
+file now use `void *, void *, f32 *, s16 *, s16 *`; complete-module controls
+verify the correction changes no existing game instructions. Known-module,
+corrected-context, and leading-blank controls pass through the stock native
+IDO 7.1 compiler. Both new owners pass the ordinary host-syntax-enabled
+full-ROM gate. Three successful gate snapshots retain the module, four
+collateral objects, source/assembly/layout dependencies, ELF, linker output,
+and ROM before any later compilation. Independent hashes, all module words
+and true function extents, relocation encodings at the frozen link layout,
+and the US ROM MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d` agree.
+
+### Remaining camera and packed-state owners
+
+- `func_8410CF80`: **requeue**, frame-layout residual. Two natural vector/
+  scalar declaration orders produce 192-byte bodies with the original
+  opcodes and relocation topology, but a 56-byte frame instead of 72.
+  Thirteen instruction words differ in frame or local-stack offsets.
+  The real caller `BattleAnim_ModelDispatch_023` must forward its two
+  object/context arguments; that transactional prototype/call correction
+  passes whole-module controls but is not installed without an accepted
+  owner. Next investigate compiler storage placement for the actual vector,
+  distance, and two rotation outputs. Extra unused vectors or padding would
+  not explain their roles and are excluded.
+- `func_8411BB04`: **requeue**, saved-side stack-home residual. The natural
+  292-byte body has the correct 40-byte frame and differs only at offsets
+  164 and 200: retail saves/reloads the byte at stack offset 34, while the
+  closest candidate uses 39. Eight scalar-width/order variants and eight
+  real camera-choice/packed-state temporary variants fail. Scalar variants
+  use homes 35 or 39 (or change the access width); real temporaries also
+  disturb scheduling/relocations or grow the body. Next inspect frontend
+  local-home placement or an independently evidenced packed local object;
+  do not repeat those measured families or manufacture a storage aggregate.
+
+No instruction rewriting, synthetic padding, artificial arguments, forced
+registers, fake locals, or extra reads are used for the accepted dispatchers.
+
+## 2026-10-23: camera height target and measured stack allocation
+
+The camera requeue above is resolved after calibrated logging-only allocation
+diagnostics on native commit `999e87c0`. Stock, observer-off, observer-on,
+and leading-blank builds preserve every allocatable module byte, symbol,
+layout, and relocation for both a known dispatcher and each residual parent
+(16 controls total). The camera parent has eight saved-register bytes, a
+24-byte local area, and 24 outgoing-argument bytes, yielding its 56-byte
+frame. The original 72-byte frame is reached by naming the double-precision
+distance consumed by the existing comparison:
+
+`f64 separation; ... separation = distance;`
+
+`func_8410CF80` / `BattleAnim_UpdateCameraHeightTarget` (192 bytes) obtains
+the object's camera, computes a context position, and measures its distance
+from the camera vector at offset 80. When that distance exceeds camera field
+128 multiplied by the double literal `0.6`, it approaches camera field 96
+toward the computed Y coordinate with step factor `0.3f`. That height becomes
+the object's target at offset 184; `BattleAnim_ModelDispatch_024` consumes
+the target while approaching the object's Y coordinate at offset 172.
+
+Keep the real `f64 separation` between the three-float position and the
+distance/rotation outputs. It is assigned and consumed once, and reproduces
+all 48 retail instructions, the 72-byte frame, and relocation topology with
+the stock compiler. Naming the threshold instead reproduces the frame but
+leaves seven register differences; other tested one/two-double layouts fail.
+The existing `BattleAnim_ModelDispatch_023` now forwards its actual object
+and context arguments to this two-argument owner. Whole-module controls
+confirm its machine code is unchanged. The ordinary host-syntax-enabled
+ROM gate passes; immediate source/module/layout/assembly/ELF/ROM snapshots,
+external hashes, the complete module comparison, and four collateral
+objects independently verify the result. No unused storage or padding is
+introduced.
+
+`func_8411BB04` remains **requeue**. Its calibrated parent has a 40-byte
+frame and a byte local at frontend slot -1, emitted at stack offset 39.
+Naming the real random two-entry camera-table index reaches the original
+offset 34 in one byte-local layout, but changes scheduling, registers, and
+relocations (27 differing words); eight such index variants fail. Reaching
+one stack home is not a match. Next inspect the frontend's actual local-home
+allocation and statement topology together; scalar width/order, standalone
+camera values, packed-state temporaries, and this index family are measured
+negative basins under the tested layouts.

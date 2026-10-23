@@ -833,3 +833,6 @@ func_84112B64 = BattleAnim_LoadSpecialModel;
 func_84117744 = BattleAnim_UpdateMoveFramesAndCamera;
 func_841187E4 = BattleAnim_DispatchAnimationStart;
 func_84119AB4 = BattleAnim_UpdateModelEventSequence;
+func_841193E0 = BattleAnim_DispatchDelayedCategory;
+func_84119CF0 = BattleAnim_InitializeCategorySequence;
+func_8410CF80 = BattleAnim_UpdateCameraHeightTarget;
