@@ -885,3 +885,7 @@ func_84123468 = BattleAnim_InitAuxiliaryGravityMotion;
 func_84123664 = BattleAnim_UpdateAuxiliaryGravityMotion;
 func_8412328C = BattleAnim_UpdateRotatedMotion;
 func_84120700 = BattleAnim_InitActorFromActionFlags;
+func_8620050C = SceneMotion_CreateThreeModels;
+func_86201790 = SceneMotion_IsCrossXZNonnegative;
+func_86203BA8 = SceneMotion_CopyNodePositionsToModels;
+func_86203C58 = SceneMotion_RunSubsteps;
