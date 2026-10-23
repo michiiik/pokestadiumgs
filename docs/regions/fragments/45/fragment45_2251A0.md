@@ -104,21 +104,38 @@ at native commit `b9affee9`; retail US MD5 remains
 `1561c75d11cedf356a8ddb1a4a5f9d5d`. This changes an existing C definition's
 signature and adds no newly decompiled owner.
 
-## Row-state callers / requeue
+## Accepted orange row state
 
-Both callers above remain assembly. For `func_8AB03D10`, the closest ordinary
-C body has the original 236-byte extent and 40-byte frame, with the first 34
-instruction words exact. Seven raw word positions differ when the complete
-extent, including the return tail, is compared; the changes are concentrated
-in branch formation and the final state store/return. Tested declaration
-orders, secondary-pointer assignment forms, early returns, shared labels and
-adjacent count/state halfword views do not close the residual. For
-`func_8AB03DFC`, the basic body is 208 bytes against 216 expected; indexed
-148-byte row/120-byte highlight views do not recover the original
-address-calculation schedule. A fresh normal/explicit `-g0` diagnostic leaves
-all seven positional word differences unchanged; leading blanks also preserve
-the complete normal proposal module. Next action: inspect control-flow
-lowering and the real caller contracts before another source campaign.
+`func_8AB03D10` is now `TextRow_SetOrangeState` (236 bytes). It emits the
+three-word event, increments the row count when entering from state zero,
+enables the selected panel and optional secondary node, writes orange
+`0xFF500080` and mode zero to their highlight records, then records state one.
+The input dispatchers in `fragment45_22AB80/func_8AB06D78` and
+`fragment45_2348E0/func_8AB1075C` call it for the current panel index and ignore
+its return. The name describes the observed writes without assigning an
+unproven gameplay meaning to the row.
+
+The decisive source change splits the record address into a base assignment
+and an indexed offset addition. A calibrated 90-second four-worker source
+search reproduced all 59 base words and relocation targets, then found this
+single, behavior-preserving transformation at score zero. The normal runner
+accepted it with `link_verified: true`; the host-syntax-enabled retail-ROM gate
+and independently frozen full-module, linked-fragment and collateral checks
+pass. The old symbol remains a linker alias for existing assembly callers.
+
+## Blue row state / requeue
+
+`func_8AB03DFC` remains assembly. Its ordinary C reconstruction emits event two,
+sets blue `0x1E82FF80` and mode one on the selected highlight and optional
+secondary node, and writes row state two. Base-plus-offset construction
+recovers the original 216-byte extent, but the address-calculation schedule
+still differs (best normalized 0.7407, raw 0.5926 among that family).
+
+A calibrated 90-second four-worker search reproduces all 54 base words and
+relocation targets; its best score is 560 from 1890. That proposal adds and
+reuses an unjustified row-index alias and is excluded. Eight explicit row-offset
+variants also reject. Next action: inspect the actual record and embedded-node
+construction to explain the interleaved row/highlight address calculations.
 
 ## Preload interference / register-tie, requeue
 
@@ -138,3 +155,10 @@ an instruction-equivalent improvement. Next action: inspect whether a real
 record view can leave the entry as an expression temporary while carrying the
 archive through its compare, copy and argument normalization. Preserve the
 actual two-argument lookup contract.
+
+Subsequent entry-expression/one-sided source-record and aggregate key-pair
+campaigns accept no preload owner. A word-valued key-pair local reproduces the
+152-byte opcode-equivalent scalar result (raw 0.8158); narrow aggregate and
+while-assignment forms change frame sizes or instruction order. These measured
+negatives narrow the next lifetime experiment; they do not establish that the
+original archive register is unreachable from ordinary C.
