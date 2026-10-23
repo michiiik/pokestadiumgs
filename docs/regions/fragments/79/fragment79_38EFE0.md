@@ -241,3 +241,26 @@ host-syntax-enabled full-ROM gate. Independent checks cover complete helper
 text, existing jump tables and fixed-address relocation destinations, the
 entire linked fragment 79, the camera modules and four collateral objects.
 The original assembly objects and retail ROM remain the comparison oracles.
+
+## 2026-10-23: actor setup from action flags
+
+`func_84120700` / `BattleAnim_InitActorFromActionFlags` adds 608 code bytes /
+152 instructions. It restores the actor's starting position and rotation
+through `func_8411EFE4`, resets scale to (1, 1, 1), and applies the current
+action's metadata together with actor-local flags. Those branches can raise
+Y to the stored home height plus 200, clear actor byte 28, and invoke the
+existing flag/feedback helpers. Preserve each of the seven action-index
+lookups: intervening helper calls can change the state they inspect.
+
+A typed `u16[8]` record view reproduces the original 16-byte stride and
+base/index address evaluation. The equivalent byte-offset expression has
+normalized similarity 1.0 but different raw instruction operands and was
+rejected. The pointer-typed function definition and forward declarations
+preserve all previously accepted callers' object bytes.
+
+The runner reports a link-verified acceptance. Normal host-syntax-enabled
+full-ROM comparison and independent complete-module checks preserve the
+helper text, existing dispatch tables, fixed-address relocation targets,
+the complete linked fragment 79 and four collateral objects. Verification
+also covers the exact public export and leading-blank controls. The retail
+US ROM MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
