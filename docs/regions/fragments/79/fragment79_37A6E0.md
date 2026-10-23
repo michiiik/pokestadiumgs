@@ -233,3 +233,46 @@ TYPE CONFLICT: func_800371B4 is extern void func_800371B4(u8 *, u8 *, f32, s16, 
 ## 2026-10-04
 
 func_84114804: matched (call_sequence:ladder:post-lookup-byte-reloads-exact), 1 iterations, agent codex
+
+## 2026-10-23: side-object and model-resource batch
+
+Four native IDO 7.1 owners are accepted through the ordinary host-syntax
+and byte-identical US-ROM gate, totaling 632 bytes:
+
+- `func_841118E0` / `BattleAnim_AllocateSideObjects` (236 bytes) allocates
+  and clears two 2040-byte objects, publishes the pointers used by the
+  side selector `func_8411E1F8` in `fragment79_38D510.c`, fills three
+  per-side resource words, and allocates the 148-byte shared block.
+- `func_841121CC` / `BattleAnim_SetAnimationAndFrame` (76 bytes) calls
+  the existing model-animation, event-track, animation-frame, and
+  event-frame setters. Both frame setters receive the same fourth argument.
+- `func_84112648` / `BattleAnim_RunObjectCallbacks` (128 bytes) runs seven
+  callbacks at object offset 1480. The global callback index is reloaded
+  after each call because callbacks can change it. The object counter at
+  offset 2024 increments afterward.
+- `func_8411275C` / `BattleAnim_LoadModelResource` (192 bytes) selects a
+  16-byte ROM-range entry with the signed model ID at offset 1624, invokes
+  the synchronous ROM-read helper `func_80003F74` in `4420.c`, and stores
+  the selected 5600-byte side buffer at object offset 724. A four-word
+  scaled table view and entry-offset-first addition resolve the measured
+  three-word address/load-order residual without instruction rewrites.
+
+The existing callers `func_8411281C`, `func_84112B44`, `func_84112EDC`, and
+`func_8411DA2C` now pass their actual object argument explicitly. Complete
+module controls prove these interface corrections preserve all game bytes,
+function extents, and semantic relocation targets.
+
+The first multi-owner installation exposed declaration scope: the prefix
+was attached to the first submitted owner, which occurred later in the
+source than the allocation owner. The allocation probe matched but its
+combined installation could not compile. Supplying declarations before the
+earlier owner resolved this; no C algorithm or compiler flags changed.
+Order future multi-owner batches by source position when sharing a prefix.
+
+All successful gates immediately retain source, module, four collateral
+objects, layout inputs, assembly dependencies, ELF, linker output, and ROM;
+external hashes and independent complete-module comparisons pass before
+further experiments. The US ROM MD5 is
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. No padding, injected instructions, fake
+locals, extra reads, or artificial ABI parameters are used. Existing
+unrelated source spellings and unresolved requeues remain outside this batch.

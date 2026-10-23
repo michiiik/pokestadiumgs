@@ -1393,7 +1393,30 @@ s32 func_84111868(s32 arg0, u8 *arg1, u8 *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841118E0.s")
+extern u8 *D_84191200[];
+extern s32 D_84191208;
+extern s32 D_8419120C;
+extern s32 D_84195208[];
+extern s32 D_841951F8[];
+extern s32 D_84195200[];
+extern u8 *D_84193FA0;
+extern void *main_pool_alloc(s32, s32);
+extern void _bzero(void *, s32);
+void BattleAnim_AllocateSideObjects(void) {
+    D_84191200[0] = main_pool_alloc(2040, 0);
+    D_84191200[1] = main_pool_alloc(2040, 0);
+    _bzero(D_84191200[0], 2040);
+    _bzero(D_84191200[1], 2040);
+    D_84191208 = (s32)D_84191200[0];
+    D_8419120C = (s32)D_84191200[1];
+    *(s32 *)((u8 *)D_84191208 + 1644) = D_84195208[0];
+    *(s32 *)((u8 *)D_8419120C + 1644) = D_84195208[1];
+    *(s32 *)((u8 *)D_84191208 + 1648) = D_841951F8[0];
+    *(s32 *)((u8 *)D_84191208 + 1652) = D_84195200[0];
+    *(s32 *)((u8 *)D_8419120C + 1648) = D_841951F8[1];
+    *(s32 *)((u8 *)D_8419120C + 1652) = D_84195200[1];
+    D_84193FA0 = main_pool_alloc(148, 0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1578,7 +1601,12 @@ void func_84112158(s32 arg0, s32 arg1) { func_84111D64((u8 *)arg0, *(u8 *)((u8 *
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841121CC.s")
+void BattleAnim_SetAnimationAndFrame(u8 *arg0, s32 animation, s32 event, s32 frame) {
+    func_84111D64(arg0, animation);
+    func_84111E50(arg0, event);
+    func_84111DB4(arg0, frame);
+    func_84111E80(arg0, frame);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1703,7 +1731,13 @@ void func_841125F4(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84112648.s")
+extern s32 D_841911F4;
+void BattleAnim_RunObjectCallbacks(u8 *arg0) {
+    for (D_841911F4 = 0; D_841911F4 < 7; D_841911F4++) {
+        ((void (**)(u8 *))(arg0 + 1480))[D_841911F4](arg0);
+    }
+    (*(s16 *)(arg0 + 2024))++;
+}
 #endif
 
 #ifdef VERSION_US
@@ -1735,13 +1769,25 @@ void func_84112704(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411275C.s")
+extern u8 *D_841910DC;
+extern u8 D_84191210[];
+extern void func_80003F74(u8 *, u8 *, u8 *, s32);
+void BattleAnim_LoadModelResource(u8 *arg0) {
+    u8 *start;
+    u8 *end;
+    s32 *entry;
+    entry = ((s32 (*)[4])D_841910DC)[*(s16 *)(arg0 + 1624)];
+    start = (u8 *)(entry[0] + *(s32 *)(D_841910DC + 4));
+    end = start + entry[1];
+    func_80003F74(D_84191210 + func_8411E1F8((s32)arg0) * 5600, start, end, 0);
+    *(u8 **)(arg0 + 724) = D_84191210 + func_8411E1F8((s32)arg0) * 5600;
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_8411275C(void);
-void func_8411281C(void) {
-    func_8411275C();
+extern void BattleAnim_LoadModelResource(u8 *);
+void func_8411281C(u8 *arg0) {
+    BattleAnim_LoadModelResource(arg0);
 }
 #endif
 
@@ -1836,8 +1882,8 @@ void func_84112A40(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-void func_84112B44(void) {
-    func_8411275C();
+void func_84112B44(u8 *arg0) {
+    BattleAnim_LoadModelResource(arg0);
 }
 #endif
 
@@ -1906,7 +1952,7 @@ extern void func_8411EFE4(s32);
 extern s32 D_84191208;
 void func_84112EDC(u8 *arg0) {
     *(s16 *)(arg0 + 0x658) = *(s16 *)(arg0 + 0x65C);
-    func_84112B44();
+    func_84112B44(arg0);
     func_84113014(arg0);
     func_8003F1DC(arg0);
     func_841129E8(arg0, *(s16 *)(arg0 + 0x658), *(s32 *)(*(s32 *)(*(s32 *)(*(s32 *)(arg0 + 0x5C0) + 0x38) + 8)));
@@ -2895,7 +2941,7 @@ void func_841166C4(u8 *arg0) {
 
 #ifdef VERSION_US
 extern void func_841166C4(u8 *);
-extern void func_841121CC(u8 *, s32, s32, s32);
+extern void BattleAnim_SetAnimationAndFrame(u8 *, s32, s32, s32);
 extern void func_84116604(u8 *arg0);
 extern u8 * D_84193DD0;
 void func_84116808(u8 *arg0) {
@@ -2912,7 +2958,7 @@ void func_84116808(u8 *arg0) {
             func_841166C4(arg0);
             break;
         case 4:
-            func_841121CC(arg0, *(s8 *)(arg0 + 0x616), *(s8 *)(arg0 + 0x617), arg0[0x61A]);
+            BattleAnim_SetAnimationAndFrame(arg0, *(s8 *)(arg0 + 0x616), *(s8 *)(arg0 + 0x617), arg0[0x61A]);
             break;
     }
 }
@@ -5193,10 +5239,10 @@ void func_8411D9B4(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_84112648(void);
-// K&R (): retail's caller forwards the D_84191208 pointer in a0, but this pure
-// jal wrapper has no parameter home-store; a prototyped param adds sw a0,24(sp).
-void func_8411DA2C() { func_84112648(); }
+extern void BattleAnim_RunObjectCallbacks(u8 *);
+void func_8411DA2C(u8 *arg0) {
+    BattleAnim_RunObjectCallbacks(arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -5226,7 +5272,7 @@ void func_8411DA4C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_841118E0(void);
+extern void BattleAnim_AllocateSideObjects(void);
 extern void func_8411DA4C(void);
 extern void func_8411DAE0(void);
 extern s32 n_alResampleParam(void);
@@ -5235,7 +5281,7 @@ s32 func_8411DBF4(s32 arg0) {
      * recovered from jtbl_841893D4's actual call targets: retail's switch
      * declares case 30 before case 3 and case 5. */
     switch (arg0) {
-    case 0: func_841118E0(); break;
+    case 0: BattleAnim_AllocateSideObjects(); break;
     case 1:
     case 2: func_8411DA4C(); break;
     case 30: func_8411DAE0(); break;

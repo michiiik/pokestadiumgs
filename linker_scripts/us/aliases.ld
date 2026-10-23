@@ -821,3 +821,7 @@ func_82602B9C = RecordNames_LoadTwoSlotsOptionalDefaults;
 func_826039A0 = RecordSelection_RunPhaseLoop;
 func_82600BA0 = RecordSelection_ChooseSortedIndices;
 func_82600D38 = RecordSelection_PrepareTwoParties;
+func_841118E0 = BattleAnim_AllocateSideObjects;
+func_841121CC = BattleAnim_SetAnimationAndFrame;
+func_84112648 = BattleAnim_RunObjectCallbacks;
+func_8411275C = BattleAnim_LoadModelResource;
