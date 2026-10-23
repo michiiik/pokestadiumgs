@@ -864,3 +864,7 @@ func_84118C08 = BattleAnim_RefreshCategoryCamera;
 func_841189EC = BattleAnim_DispatchCategoryRecord;
 func_841114A8 = BattleAnim_UpdateAudioProjections;
 func_8411CD38 = BattleAnim_UpdateSideViewportTransition;
+func_84118DD4 = BattleAnim_UpdateCategoryActionTimeline;
+func_8411C418 = BattleAnim_UpdateSideTrackViewportTransition;
+func_841170A0 = BattleAnim_InitializeCategoryAction;
+func_8411BCC8 = BattleAnim_UpdateCategoryCameraSequence;
