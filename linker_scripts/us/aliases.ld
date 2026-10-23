@@ -853,3 +853,6 @@ func_84112C98 = BattleAnim_RefreshSpeciesModel;
 func_82603B20 = TrailEffect_Advance;
 func_826040D8 = TrailEffect_Initialize;
 func_826042A0 = TrailEffect_DrawAll;
+func_82507DC0 = CellularTransition_SeedCells;
+func_82507EE8 = CellularTransition_FindEmptyNeighbors;
+func_8250850C = CellularTransition_Draw;
