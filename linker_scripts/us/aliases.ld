@@ -906,3 +906,7 @@ func_862067B4 = SceneMotion_ComputeNearbyDirection;
 func_86206C34 = SceneInput_AdvanceSelectionPhase;
 func_86206D20 = SceneInput_UpdateCpuSelection;
 func_86206920 = SceneInput_SelectScoredDirection;
+func_86205500 = SceneModel_InitPlayerAttachment;
+func_86205B8C = SceneModel_StartPlayerAction;
+func_86205C8C = SceneModel_SelectPlayerDirection;
+func_86205D98 = SceneModel_UpdateAnimationState;

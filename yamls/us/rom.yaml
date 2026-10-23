@@ -1176,6 +1176,7 @@
     - [0x26E090, c,       fragments/50/fragment50_26E090]
     - [0x26E4C0, c,       fragments/50/fragment50_26E4C0]
     - [0x26EA70, data,    fragments/50/fragment50_data]
+    - [0x274B40, .rodata, fragments/50/fragment50_26BF40] # motion/model constants and state jump table
     - [0x274B70, .rodata, fragments/50/fragment50_26D1D0] # pooled CPU selection thresholds
     - [0x274B80, .rodata, fragments/50/fragment50_26DCC0] # pooled model scale
     - [0x274B90, rodata] # original overlay relocation records

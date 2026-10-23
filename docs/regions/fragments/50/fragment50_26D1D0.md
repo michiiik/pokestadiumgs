@@ -246,3 +246,78 @@ storage or padding. Those remaining mechanisms were resolved by the real directi
 choice-field pointers, score compound assignment and normal for initializer,
 as documented in the accepted-selector section. Every RNG call and the signed
 16-bit return contract remain intact.
+
+
+### Decoder follow-up after PR #1483: requeue
+
+The four-owner batch merged as `b8341dcacc7b706854b7f314ca015fb50ab3b139`.
+The actual retail-ROM CI job `120596511276` passed at head
+`c79799122a2089c9fddd0e253d4a7aa40e228285`. Decoder work below installs no C.
+
+Eight calibrated logging controls cover the known matching motion helper and
+the retained 456-byte decoder spelling, each stock/off/on/leading-blank.
+The comparison accounts explicitly for the candidate's 16-byte text growth
+and shifted subsequent extent/relocation offsets; all other module sections
+and semantic targets remain unchanged. The old one-size trace assertion is
+inapplicable to this deliberately nonmatching candidate, and its failed audit
+was retained before the corrected comparison was used.
+
+The decoder trace places the second pointer argument in a2 because another
+mode-local value receives a1. Keeping the current/latched masks as u32 values
+and sharing the mode-0 latch-initialization exit removes that parameter copy.
+A nested final direction fallback reaches 444 bytes versus the original 440.
+The direct 16-bit mask domains and separate per-mode held values reintroduce
+the copy and are negative. Moving between signed short/word result spelling
+alone does not repair the residual; both keep the same physical word-return
+contract and no signature change is installed.
+
+Best raw similarity is now 0.9375 (448 bytes, normalized 0.9554), label
+`input-decode-narrow-at-exit:return-s32:else-chain:default-last`. The same
+family's candidate 4 reaches the correct 440-byte extent but has poorer
+opcode agreement. The useful earlier family remains
+`input-decode-shared-latch-exit`, candidate 4: 444 bytes, with the initial
+parameter allocation corrected. Residuals concern the mode-2 last-priority
+branch and short-mask conversion/return tail, plus sharing of the mode-3
+return. Guard-return casts, assignment casts, common-exit casts and short/word
+result carriers were compared; none accepted. Next action: trace the CFG and
+conversion tail of the corrected 444-byte spelling rather than returning to
+controller-prefix or parameter-width guesses. Preserve the complete signed
+mask domain and all latch stores.
+
+
+### Decoder return scheduling: requeue
+
+The corrected candidate `input-decode-action-exit:u32:else-chain:assignment-return`
+has the original data flow and register assignments. Its six differing
+instruction positions are confined to two conditional branches and the shared
+return: the original uses ordinary branches with empty delay slots and ends
+with `jr ra` / `move v0,v1`; the candidate duplicates that move into two
+branch-likely delay slots and leaves a bare return. Its extent is 444 versus
+440 bytes. This is a return-block scheduling residual, not a register tie.
+
+A logging-only assembler observer, calibrated on the matching motion helper
+and this candidate with stock/off/on/leading-blank controls, preserves complete
+module bytes/extents/semantic relocations. It records the shared move
+`0x00601025` in its own block, two positive branch-copy eligibility decisions,
+and the resulting branch words `0x51400047` and `0x51400003`. The return's
+separate block prevents the desired move from occupying its delay slot.
+No compiler decision or game instruction was patched for acceptance.
+
+Mixed break/return layouts, explicit common labels, label ownership/case order,
+return-width combinations, common-result phi spellings and action-bit carrier
+forms were tested through the normal runner. A 90-second calibrated search
+from each of two retained candidates found no improvement. Proven controller
+prefix/const views also do not repair this residual. The best scalar raw score
+is 0.9469 (452 bytes); the 444-byte candidate above is the cleaner mechanism
+baseline despite that lower scalar score. A preflight replay of an unchanged
+baseline was removed before the remaining new variants ran; it consumed no
+hypothesis budget.
+
+The dispatcher was recalibrated with the accepted scorer's shared record type
+and CPU updater declaration. Separating a raw returned word from its narrowed
+mask worsens it (452 bytes), while the ordinary mask spelling retains its
+460-byte code and original final alignment word. Do not widen callee APIs to
+force this difference. Next action: change the compiler's return-block formation
+with a genuine control-flow reconstruction, then re-run the assembler observer;
+do not return to declaration-order or controller-prefix guessing. The related
+motion/model helpers are the next shared-layout evidence source.
