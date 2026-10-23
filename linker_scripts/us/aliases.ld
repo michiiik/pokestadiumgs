@@ -825,3 +825,7 @@ func_841118E0 = BattleAnim_AllocateSideObjects;
 func_841121CC = BattleAnim_SetAnimationAndFrame;
 func_84112648 = BattleAnim_RunObjectCallbacks;
 func_8411275C = BattleAnim_LoadModelResource;
+func_8410DEB4 = BattleAnim_AdjustCameraDistance;
+func_841146D4 = BattleAnim_ApplyAnimationRecord;
+func_84116F7C = BattleAnim_BeginMoveAnimation;
+func_8411D1A8 = BattleAnim_UpdateTimedEffectSequence;

@@ -178,7 +178,7 @@ extern u8 *func_8410B330(u8 *);
 extern s32 func_8411DC80(u16, s32 *, s32);
 extern s32 func_8411E140(s32);
 extern void func_8410B35C(u8 *, void *, s16);
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void func_800371B4(u8 *, u8 *, f32, s16, s16);
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 
 void func_8410B420(u8 *arg0, void *arg1, s16 arg2) {
@@ -470,7 +470,15 @@ void BattleAnim_ModelDispatch_024(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410DEB4.s")
+void BattleAnim_AdjustCameraDistance(u8 *arg0, f32 distance, s16 pitch, s16 angle, u8 *from, u8 *to) {
+    if (distance > *(f32 *)(arg0 + 128) * 1.7f) {
+        func_800371B4(from, to, distance * 0.6f, pitch, angle);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.6f) {
+        func_800371B4(from, to, distance * 0.75f, pitch, angle);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.5f) {
+        func_800371B4(from, to, distance * 0.85f, pitch, angle);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1745,7 +1753,7 @@ extern s32 func_8411E164();
 extern void func_841125A4(s32);
 extern void func_84112158(s32, s32);
 void func_841126C8(s32 arg0) {
-    func_841125A4(func_8411E164());
+    func_841125A4(func_8411E164(arg0));
     func_84112158(func_8411E164(arg0), 0xFB);
 }
 #endif
@@ -2272,13 +2280,34 @@ void func_84114678(void *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841146D4.s")
+extern s32 func_8411E164(s32);
+void BattleAnim_ApplyAnimationRecord(u8 *arg0, s32 index) {
+    u8 *entry;
+
+    entry = *(u8 **)(arg0 + 724) + index * 20;
+    arg0[1558] = entry[0];
+    arg0[1559] = entry[1];
+    arg0[1561] = entry[11];
+    arg0[1562] = entry[10];
+    arg0[1563] = entry[6];
+    arg0[1568] = entry[9];
+    arg0[1564] = entry[2];
+    arg0[1565] = entry[3];
+    *(s16 *)(arg0 + 1576) = entry[12];
+    *(s16 *)(arg0 + 1578) = entry[13];
+    *(s16 *)(arg0 + 1580) = entry[14];
+    arg0[1633] = entry[15];
+    *(s16 *)((u8 *)func_8411E164((s32)arg0) + 1576) = (*(u8 **)((u8 *)func_8411E164((s32)arg0) + 724))[index * 20 + 16];
+    *(s16 *)((u8 *)func_8411E164((s32)arg0) + 1578) = (*(u8 **)((u8 *)func_8411E164((s32)arg0) + 724))[index * 20 + 17];
+    *(s16 *)((u8 *)func_8411E164((s32)arg0) + 1580) = (*(u8 **)((u8 *)func_8411E164((s32)arg0) + 724))[index * 20 + 18];
+    *(u8 *)((u8 *)func_8411E164((s32)arg0) + 1633) = (*(u8 **)((u8 *)func_8411E164((s32)arg0) + 724))[index * 20 + 19];
+}
 #endif
 
 #ifdef VERSION_US
 extern s32 D_841839EC[];
 extern void func_841119CC(u8 *, u16);
-extern void func_841146D4(u8 *, s32);
+extern void BattleAnim_ApplyAnimationRecord(u8 *, s32);
 extern s32 func_8411DC80(u16, s32 *, s32);
 extern u8 D_841849B6[];
 extern u8 * D_841911E0;
@@ -2303,7 +2332,7 @@ void func_84114804(u8 *arg0) {
         else if (arg0[0x618] == 0xBB) { arg0[0x61F] = 26; }
         else if (arg0[0x618] == 0xC2) { arg0[0x61F] = 24; }
         else { arg0[0x61F] = 0xFF; }
-        func_841146D4(arg0, arg0[0x618] - 1);
+        BattleAnim_ApplyAnimationRecord(arg0, arg0[0x618] - 1);
     }
 }
 #endif
@@ -2369,11 +2398,11 @@ void BattleAnim_Dispatch_043(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-extern void func_841146D4(u8 *, s32);
+extern void BattleAnim_ApplyAnimationRecord(u8 *, s32);
 void func_841155B0(u8 *arg0) {
     if ((*(u16 *)(arg0 + 0x7EC) & 1) == 0) {
         arg0[0x61F] = 3;
-        func_841146D4(arg0, 0x100);
+        BattleAnim_ApplyAnimationRecord(arg0, 0x100);
     }
 }
 #endif
@@ -2478,7 +2507,7 @@ void func_84115940(u8 *arg0) {
     if (!((*(u16 *)((u8 *)(arg0) + (0x7EC))) & 1)) {
         (*(s16 *)((u8 *)(D_841911E0) + (0x98))) = 0x10;
         (*(s8 *)((u8 *)(arg0) + (0x61F))) = 5;
-        func_841146D4(arg0, 0x102);
+        BattleAnim_ApplyAnimationRecord(arg0, 0x102);
     }
 }
 #endif
@@ -2560,7 +2589,7 @@ void BattleAnim_Dispatch_106(u8 *arg0) {
 
 #ifdef VERSION_US
 extern u8 * D_841911E0;
-void func_84115D4C(u8 *arg0) { if ((*(u16 *)(arg0 + 0x7EC) & 1) == 0) { s32 index = (s32)arg0[0x618] - 1; *(s16 *)(D_841911E0 + 0x98) = 14; *(u8 *)(arg0 + 0x61F) = 255; func_841146D4(arg0, index); } }
+void func_84115D4C(u8 *arg0) { if ((*(u16 *)(arg0 + 0x7EC) & 1) == 0) { s32 index = (s32)arg0[0x618] - 1; *(s16 *)(D_841911E0 + 0x98) = 14; *(u8 *)(arg0 + 0x61F) = 255; BattleAnim_ApplyAnimationRecord(arg0, index); } }
 #endif
 
 #ifdef VERSION_US
@@ -2697,7 +2726,7 @@ void func_84116010(u8 *arg0) {
             func_841119CC(D_841911E0, D_841851AE);
         }
         *(u8 *)(arg0 + 0x61F) = 0xFF;
-        func_841146D4(arg0, index);
+        BattleAnim_ApplyAnimationRecord(arg0, index);
     }
 }
 /* mkdraft:func_84116010 end */
@@ -2815,7 +2844,7 @@ void func_84116410(u8 *arg0) {
     if ((*(u16 *)(arg0 + 0x7EC) & 1) == 0) {
         s32 index = arg0[0x618] - 1;
         arg0[0x616] = *(u8 *)(*(u8 **)(arg0 + 0x2D4) + (index * 0x14));
-        func_841146D4(arg0, index);
+        BattleAnim_ApplyAnimationRecord(arg0, index);
     }
 }
 #endif
@@ -2977,7 +3006,7 @@ void func_841168A0(u8 *arg0) {
             *(u16 *)((u8 *)&D_84183BDC +
                 ((func_8003570C() % 6) * 2));
         *(u8 *)(arg0 + 0x61F) = 0xFF;
-        func_841146D4(arg0, sp1C);
+        BattleAnim_ApplyAnimationRecord(arg0, sp1C);
     }
 }
 #endif
@@ -3107,7 +3136,33 @@ void func_84116EB4(u8 *arg0) { s16 height; s32 timer; if (*(s8 *)(arg0 + 0x619) 
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84116F7C.s")
+extern void func_84111C6C(void);
+extern void func_841134A0(u8 *arg0);
+extern void func_841134D8(u8 *arg0);
+extern s32 D_841839E0[];
+void BattleAnim_BeginMoveAnimation(u8 *arg0) {
+    func_8411FEE8(300);
+    if (*(u16 *)(D_84193DD0 + 4) == 16 || *(u16 *)(D_84193DD0 + 4) == 20 || *(u16 *)(D_84193DD0 + 4) == 75) {
+        arg0[1560] = 1;
+    } else {
+        arg0[1560] = D_84193DD0[8];
+    }
+    if (*(u16 *)(D_84193DD0 + 4) != 18 && *(u16 *)(D_84193DD0 + 4) != 19 && *(u16 *)(D_84193DD0 + 4) != 17) {
+        if (D_84193DD0[8] == 18 || D_84193DD0[8] == 46) {
+            func_84108A10(arg0);
+        }
+    }
+    func_84111C6C();
+    if (*(u16 *)(arg0 + 2028) & 1) {
+        func_841134A0(arg0);
+    } else {
+        func_841134D8(arg0);
+    }
+    if (func_8411DC80(arg0[1560], D_841839E0, 10) != 0) {
+        arg0[2] |= 2;
+    }
+    *(s32 *)(arg0 + D_841911F4 * 4 + 1480) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -5019,7 +5074,40 @@ void BattleAnim_Dispatch_233(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8411D1A8.s")
+extern void func_80023A3C(s32, s32, s32);
+extern s32 func_8006456C(s32);
+extern void func_8410890C(s32, s32);
+extern void func_8411C7B8(void *arg0, void *arg1, s32 arg2);
+extern void func_8411FEE8(s32);
+extern u8 * D_841911E0;
+extern s32 D_84191208;
+extern u8 * D_84193DD0;
+void BattleAnim_UpdateTimedEffectSequence(u8 *arg0) {
+    switch (*(s8 *)(arg0 + 2038)) {
+    case 1:
+        func_8411C7B8((void *)D_84191208, D_841911E0, 220);
+        if (*(s16 *)(arg0 + 2024) == 100) {
+            func_8410890C(298, (s32)arg0);
+            func_80023A3C(4, 0, 0);
+            arg0[2038] = 2;
+        }
+        break;
+    case 2:
+        if (*(s16 *)(arg0 + 2024) == 207) {
+            if (func_8006456C(*(u16 *)(((u8 (*)[16])D_84193DD0)[func_8411E1F8((s32)arg0)] + 20)) == 1) {
+                func_80023A3C(61, 0, 0);
+            } else {
+                func_80023A3C(60, 0, 0);
+            }
+        }
+        func_8411C7B8((void *)D_84191208, D_841911E0, 220);
+        if (*(s16 *)(arg0 + 2024) == 260) {
+            func_8411FEE8(0);
+            arg0[2038] = 3;
+        }
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
