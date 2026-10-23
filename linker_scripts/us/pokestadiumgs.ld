@@ -5118,6 +5118,8 @@ SECTIONS
         build/src/fragments/79/fragment79_379450.o(.text);
         build/src/fragments/79/fragment79_379E90.o(.text);
         build/src/fragments/79/fragment79_37A6E0.o(.text);
+        build/src/fragments/79/fragment79_380210.o(.text);
+        build/src/fragments/79/fragment79_380A00.o(.text);
         build/src/fragments/79/fragment79_38D510.o(.text);
         build/src/fragments/79/fragment79_38EBD0.o(.text);
         build/src/fragments/79/fragment79_38EFA0.o(.text);
@@ -5176,6 +5178,10 @@ SECTIONS
         build/src/fragments/79/fragment79_379E90.o(.data);
         fragments_79_fragment79_37A6E0 = .;
         build/src/fragments/79/fragment79_37A6E0.o(.data);
+        fragments_79_fragment79_380210 = .;
+        build/src/fragments/79/fragment79_380210.o(.data);
+        fragments_79_fragment79_380A00 = .;
+        build/src/fragments/79/fragment79_380A00.o(.data);
         fragments_79_fragment79_38D510 = .;
         build/src/fragments/79/fragment79_38D510.o(.data);
         fragments_79_fragment79_38EBD0 = .;
@@ -5252,6 +5258,8 @@ SECTIONS
         build/src/fragments/79/fragment79_379450.o(.rodata);
         build/src/fragments/79/fragment79_379E90.o(.rodata);
         build/src/fragments/79/fragment79_37A6E0.o(.rodata);
+        build/src/fragments/79/fragment79_380210.o(.rodata);
+        build/src/fragments/79/fragment79_380A00.o(.rodata);
         build/src/fragments/79/fragment79_38D510.o(.rodata);
         build/src/fragments/79/fragment79_38EBD0.o(.rodata);
         build/src/fragments/79/fragment79_38EFA0.o(.rodata);
@@ -5309,6 +5317,8 @@ SECTIONS
         build/src/fragments/79/fragment79_379450.o(.bss);
         build/src/fragments/79/fragment79_379E90.o(.bss);
         build/src/fragments/79/fragment79_37A6E0.o(.bss);
+        build/src/fragments/79/fragment79_380210.o(.bss);
+        build/src/fragments/79/fragment79_380A00.o(.bss);
         build/src/fragments/79/fragment79_38D510.o(.bss);
         build/src/fragments/79/fragment79_38EBD0.o(.bss);
         build/src/fragments/79/fragment79_38EFA0.o(.bss);
