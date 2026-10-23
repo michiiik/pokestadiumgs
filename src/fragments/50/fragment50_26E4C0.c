@@ -4,11 +4,46 @@
 #ifdef VERSION_US
 typedef struct { f32 x, y, z; } GeometryVec3;
 extern GeometryVec3 *func_80035A10(GeometryVec3 *);
-extern void func_86207BC0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26E4C0/func_86207A80.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26E4C0/func_86207BC0.s")
+void Geometry_ComputeLineProjection(f32 *point, f32 *start, f32 *end, f32 *distance, f32 *parameter, GeometryVec3 *closest) {
+    f32 px;
+    f32 py;
+    f32 pz;
+    f32 qz;
+    f32 qx;
+    f32 qy;
+    f32 dz;
+    f32 dx;
+    f32 dy;
+    f32 point_distance;
+    px = start[0] - point[0];
+    py = start[1] - point[1];
+    pz = start[2] - point[2];
+    qx = end[0] - point[0];
+    qy = end[1] - point[1];
+    qz = end[2] - point[2];
+    dz = qz - pz;
+    dx = qx - px;
+    dy = qy - py;
+    if (qx == px && dy == 0 && dz == 0) {
+        *distance = 0;
+        *parameter = 0;
+        closest->x = 0;
+        closest->y = 0;
+        closest->z = 0;
+    } else {
+        *parameter = -((px * dx + py * dy) + pz * dz) / ((dx * dx + dy * dy) + dz * dz);
+        closest->x = *parameter * dx + px;
+        closest->y = *parameter * dy + py;
+        closest->z = *parameter * dz + pz;
+        point_distance = sqrtf((closest->x * closest->x +
+                                closest->y * closest->y) +
+                               closest->z * closest->z);
+        *distance = point_distance;
+    }
+}
 
 s32 Geometry_TestSphereContact(f32 *first, f32 radius, f32 *second, GeometryVec3 *normal, f32 *depth) {
     s32 result;
@@ -45,7 +80,7 @@ s32 Geometry_TestSegmentContact(f32 *point, f32 radius, f32 *start, f32 *end, Ge
     f32 distance;
     f32 parameter;
     s32 result;
-    func_86207BC0(point, start, end, &distance, &parameter, (f32 *)normal);
+    Geometry_ComputeLineProjection(point, start, end, &distance, &parameter, normal);
     if (distance < radius && parameter >= 0 && parameter <= 1) {
         result = 1;
         func_80035A10(normal);

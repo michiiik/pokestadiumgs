@@ -38,18 +38,6 @@ in total). C emits the same module bytes and terminal alignment, with a
 
 ## Unresolved owners
 
-- **requeue — `func_86207BC0`**, 384 bytes: line projection kernel. The
-  best separate-scalar candidate has normalized similarity 0.9375, raw
-  0.2708, a 380-byte body and 88-byte frame versus the original 80-byte
-  frame. Scalar declaration order and vector aggregates have been tested.
-  Eight consumed-endpoint carrier variants changed the frame to 32, 40,
-  72 or 80 bytes but missed instruction topology; their best normalized
-  similarity was 0.9167. The degeneracy guard compares endpoint X deltas
-  directly, Y difference to zero and Z difference to zero. Preserve its
-  ordered floating comparisons and reload the parameter after each output
-  store to preserve alias behavior. Next: inspect temporary spill lifetimes
-  around the parameter division and the first closest-vector store, keeping
-  the six-pointer output-only ABI.
 - **requeue — `func_86207A80`**, 320 bytes: XZ orientation predicate.
   Eight conditional-delta/product variants reached normalized 0.7125 and
   raw 0.15, with a 304-byte body and 48-byte frame versus 320/64. Eight
@@ -90,14 +78,6 @@ starting point for the successful operand-order candidates.
 
 ### Remaining handoff
 
-- **requeue — `func_86207BC0`**: eight real projection-carrier variants
-  (separate scalar or consumed origin-Z carrier, before/after-guard deltas)
-  did not match: best normalized 0.9271, raw 0.2396. They increased frame
-  size rather than closing it. Eight zero-literal variants reached the
-  original 384-byte body in one case but still used an 88-byte frame and
-  changed operands (normalized 0.9167, raw 0.1562). Next: calibrate the
-  best separate-scalar candidate's allocator trace and identify which
-  spill occupies the extra eight bytes before adding any more carriers.
 - **requeue — `func_86207A80`**: eight conditional cross-guard variants
   improved raw similarity to 0.2875 while retaining normalized 0.7125 and
   a 304-byte body/48-byte frame. Eight explicit second/last cross-product
@@ -106,3 +86,64 @@ starting point for the successful operand-order candidates.
   products consumed by the predicate. Next: compare that 64-byte-frame
   candidate's short-circuit branches and duplicated first-product lifetimes
   against the original 80-instruction topology; do not add unused locals.
+
+## XZ Boolean follow-up
+
+**requeue — `func_86207A80`**, 2026-10-24: sixteen variants tested a
+single short-circuit OR between the two orientation paths, direct versus
+cached third-point deltas, and explicit consumed cross-product temporaries.
+The best normalized score increased from 0.7125 to 0.7250 (raw 0.1750),
+with a 312-byte body versus the original 320. Frames ranged from 40 to 56
+bytes; cached deltas shortened the body further to 288 bytes. These results
+do not supersede the earlier 64-byte-frame explicit-cross candidate.
+Next: compare that candidate's branch graph and value lifetimes against the
+original before combining expression changes. Preserve the positive path's
+use of the first cross product in the final test.
+
+## Accepted line projection (US ROM, 2026-10-24)
+
+`func_86207BC0` → `Geometry_ComputeLineProjection`, 384 bytes. For point
+P and endpoints A/B, form p=A-P, q=B-P and d=q-p. The parameter is
+`-(p dot d)/(d dot d)`; the vector output is `p + parameter*d`, the
+closest position on the infinite line relative to P. The distance is that
+vector's Euclidean length. `Geometry_TestSegmentContact` bounds the
+parameter to [0,1] and normalizes/negates the relative vector on success.
+These producers and consumer justify the projection name and vector type.
+
+The degenerate guard preserves its exact comparisons: q.x equals p.x,
+Y delta equals zero, and Z delta equals zero. Degenerate input writes zero
+to distance, parameter and all vector fields, even if P differs from the
+coincident endpoints. The first parameter value is used for X, then the
+parameter is reloaded for Y and Z after the preceding vector stores. This
+preserves behavior when the parameter pointer overlaps the vector output.
+
+Winning source mechanisms:
+
+- Direct point-coordinate reads let IDO share the three coordinate values;
+  explicit origin snapshots had an 88-byte frame. The accepted frame is 80.
+- A named Y direction delta in the zero test preserves the subtraction;
+  the inline test was folded into a direct comparison of endpoint deltas.
+- Declaration order places the Z endpoint delta before X/Y endpoint deltas,
+  then the Z direction delta before X/Y direction deltas. An explicit final
+  `point_distance` carries the computed square root to the distance store.
+  Every local participates in the projection or distance calculation.
+- Three-component output fields reproduce the final load order and floating
+  globals. The accepted body was cleaned up to take `GeometryVec3 *`
+  directly, with its only C caller updated and the obsolete extern removed.
+  The six-pointer calling convention is unchanged.
+
+The runner accepted the complete ROM and full containing-module bytes and
+semantic relocations. The named, typed and formatted cleanup passed a fresh
+`make COMPARE=1 RUN_CC_CHECK=1`, retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Stock 5.3 and 7.1 drivers had reproduced
+the same residuals on the tested near-match candidates after complete current
+module and blank-line controls; the ordinary driver produced the final match.
+
+### Remaining XZ diagnostic
+
+**requeue — `func_86207A80`**: eight direct-delta expression variants
+were also rejected. Flag forms gave 284 bytes; OR forms gave 268, against
+320 bytes in ground truth. Best normalized similarity remained 0.7250,
+raw 0.1500. Direct expressions alone do not reproduce this predicate's
+spill/branch topology. Resume from the earlier 64-byte-frame candidate and
+compare its branch graph, preserving the asymmetric positive-path formula.
