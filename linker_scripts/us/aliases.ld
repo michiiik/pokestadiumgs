@@ -860,3 +860,7 @@ func_841153DC = BattleAnim_UpdateTimedFinishPhase;
 func_84117AA0 = BattleAnim_DispatchActionFeedback;
 func_84115B34 = BattleAnim_UpdateBurrowTransition;
 func_8411D7F8 = BattleAnim_InitializeActorFromSide;
+func_84118C08 = BattleAnim_RefreshCategoryCamera;
+func_841189EC = BattleAnim_DispatchCategoryRecord;
+func_841114A8 = BattleAnim_UpdateAudioProjections;
+func_8411CD38 = BattleAnim_UpdateSideViewportTransition;

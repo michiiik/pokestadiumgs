@@ -329,3 +329,51 @@ fresh public master before probing: four earlier private track matches were
 already C publicly and were deliberately not exported or counted as new
 coverage. Transfer only this batch's owned definitions, aliases, declarations,
 and this note; preserve all other newer public source and notes.
+
+## 2026-10-23: category camera, records, audio and viewport transition
+
+Four further owners are runner-accepted, totaling 2,588 code bytes:
+
+- `func_84118C08` / `BattleAnim_RefreshCategoryCamera`: 460 bytes. It
+  prepares actor tracks, refreshes the category-dependent camera, and
+  installs the current side callback. Reroll categories must be enumerated:
+  unlisted categories, including 71 and 75, leave the camera untouched.
+  The retry loop reloads the camera pointer after the preset callback and
+  continues until its identifier changes. The previous identifier is a
+  signed halfword declared before the actual camera pointer.
+- `func_841189EC` / `BattleAnim_DispatchCategoryRecord`: 540 bytes. Once
+  frame 2 is reached, it selects a category-specific animation record (or
+  the category-89 action), updates phase 2, and installs the side callback.
+  The switch directly consumes the promoted halfword category. Unsigned
+  word and narrow cached alternatives do not reproduce its signed range
+  check and register ownership. Its existing jump-table layout is retained.
+- `func_841114A8` / `BattleAnim_UpdateAudioProjections`: 716 bytes. It
+  copies two existing three-float points and computes angle/distance pairs
+  for audio channels 0, 1 and 2. Category and flag checks choose the actor
+  point used by channels 1 and 2. Actual helper output arguments account
+  for the six polar outputs. Expanding the actor field expressions removes
+  an unnecessary cached point local and recovers the original 80-byte frame;
+  the compiler supplies its own common-expression spill at stack 36.
+- `func_8411CD38` / `BattleAnim_UpdateSideViewportTransition`: 872 bytes.
+  Five phases coordinate the side viewport slide, model completion,
+  frame-triggered audio and model-track resets. A typed sixteen-byte
+  metadata-record view reproduces the original register ownership. The
+  published view skips the sixteen-byte header and reads halfword 2 within
+  each eight-halfword record. Four independently compiled post-acceptance
+  cleanup forms all preserve the complete module; the earlier cross-row
+  byte-pointer expression is not retained.
+
+The camera, record dispatcher and viewport probes initially differ in
+relocation-controlled fields and do not claim `link_verified`. Their
+sequential normal, host-syntax-enabled full-ROM gates pass. The audio probe
+is link-verified and passes the same gate. Each success is frozen before
+subsequent compilation, followed by independent comparison of all 332
+original function extents, complete game sections and semantic relocations,
+four collateral objects, and the entire linked fragment. Final names and
+cleanup are re-gated together. US MD5 is
+`1561c75d11cedf356a8ddb1a4a5f9d5d`; original function names remain aliases.
+
+No generated coverage, instruction/relocation rewriting, artificial locals,
+padding, forced registers/frame/ABI or manual unrolling is introduced.
+The species transform loader at `func_84113014` remains assembly: its
+diagnostic near-match is not part of this accepted batch.
