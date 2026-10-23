@@ -276,3 +276,54 @@ further experiments. The US ROM MD5 is
 `1561c75d11cedf356a8ddb1a4a5f9d5d`. No padding, injected instructions, fake
 locals, extra reads, or artificial ABI parameters are used. Existing
 unrelated source spellings and unresolved requeues remain outside this batch.
+
+## 2026-10-23: camera thresholds and animation-state batch
+
+Four additional native IDO 7.1 owners are accepted, totaling 1168 bytes:
+
+- `func_8410DEB4` / `BattleAnim_AdjustCameraDistance` (272 bytes) selects
+  distance multipliers 0.6, 0.75, or 0.85 when distance exceeds 1.7, 1.6,
+  or 1.5 times the source object field at offset 128. The called
+  `Camera_ComputeEyeFromAngles` implementation in `229E0.c` establishes
+  the distance and two signed-angle argument roles.
+- `func_841146D4` / `BattleAnim_ApplyAnimationRecord` (304 bytes) selects
+  a 20-byte resource record, copies the animation/event/frame fields used
+  by the existing setters, and updates four opponent-object fields from
+  the opponent resource record. `func_8411E164` in `fragment79_38D510.c`
+  selects the opposite side. The repeated calls reflect the original
+  expression evaluation; distinct field assignments are not a loop unroll.
+- `func_84116F7C` / `BattleAnim_BeginMoveAnimation` (292 bytes) starts a
+  300-frame control interval, derives the animation ID from the move
+  context, initializes object state and flags, and clears the current
+  callback slot to the default handler. Special move IDs and guarded
+  side effects retain their original order.
+- `func_8411D1A8` / `BattleAnim_UpdateTimedEffectSequence` (300 bytes)
+  handles object phases 1 and 2. It updates the first-side scene object,
+  issues effect 298 at counter 100, selects sound 60/61 at counter 207
+  using the side-record format predicate, and enters phase 3 at 260.
+  A scaled byte-row view fixes the three-word base/index temporary-order
+  residual without changing the two-case switch.
+
+The existing `func_841126C8` caller now explicitly passes its object to
+the first opponent-selector call. The actual selector takes one argument;
+whole-module controls verify this interface correction preserves all game
+words and true function extents.
+
+The first camera gate was byte-identical but a strict object diagnostic
+aborted acceptance: the relocation reader pairs HI16 with the next matching
+LO16, so a shared literal-page high acquired addend 268 rather than 272.
+The frozen ELF establishes the rodata base as `0x84188E30`. Both adjusted
+high halves encode `0x8419`, and that exact word is present in the linked
+instruction. A carry-boundary negative control and exact checks on every
+other relocation prevent treating arbitrary relocation drift as equality.
+The source was restored after that diagnostic exception, then submitted
+again through the ordinary runner; the successful rerun records acceptance.
+This is a comparator-only diagnostic, not an object/relocation rewrite.
+
+Every successful gate immediately retains source, complete module, four
+collateral objects, layout and assembly inputs, ELF, linker output, and
+ROM. Independent hashes and whole-module/relocation-encoding checks pass;
+the US ROM MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`. No fake locals,
+unused reads, forced registers, artificial arguments, padding, or injected
+instructions are used. Other owners and the fragment 20 requeues remain
+outside this batch.
