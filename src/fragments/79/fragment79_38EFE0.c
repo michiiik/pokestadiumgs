@@ -583,6 +583,7 @@ void func_84121708(u8 *arg0) {
 
 s32 func_841211CC(void *, s16, s16);
 void func_84121724(void *arg0) {
+    extern s32 func_8411E1D4(s32);
     if ((*(s8 *)((u8 *)(arg0) + (0x623))) == 0) {
         (*(s16 *)((u8 *)(arg0) + (0x5FE))) = Math_StepToS32((s32) (*(s16 *)((u8 *)(arg0) + (0x5FE))), 0x2C14, 0xB6, 0xB6);
         if (func_841211CC(arg0, (*(s16 *)((u8 *)(arg0) + (0x5FE))), (s16) (func_8411E1D4((s32) arg0) * -0x4000)) != 0) {
@@ -605,6 +606,7 @@ void func_841217C8(u8 *arg0) {
 
 extern s32 func_841211CC(void *, s16, s16);
 void func_841217E4(u8 *arg0) {
+    extern s32 func_8411E1D4(s32);
     extern f32 func_8411E1B4(u8 *);
     if (*(s8 *)(arg0 + 0x623) < 3) {
         *(s16 *)(arg0 + 0x5FE) = Math_StepToS32(*(s16 *)(arg0 + 0x5FE), 0x3FFC, 0x16C, 0x16C);
@@ -677,7 +679,12 @@ void func_84122A04(u8 *arg0) {
     arg0[0x623] = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122A0C.s")
+extern f32 BattleAnim_SampleTerrainHeightAndSlope(f32, f32, f32 *);
+void BattleAnim_UpdateTerrainPose(u8 *arg0) {
+    f32 slope;
+    *(f32 *)(arg0 + 40) = *(f32 *)(arg0 + 1616) + BattleAnim_SampleTerrainHeightAndSlope(*(f32 *)(arg0 + 36), *(f32 *)(arg0 + 44), &slope);
+    *(s16 *)(arg0 + 30) = (s16)slope * 182;
+}
 
 extern f32 D_84189CB8;
 void func_84122A78(void *arg0) {
@@ -771,7 +778,43 @@ void GalleryCamera_RotateVecByMatrix(S1_Vec3f* arg0, S1_MtxF* arg1) {
     arg0->z = z;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84122EEC.s")
+typedef struct ActorMotionRotation { s16 x, y, z; } ActorMotionRotation;
+extern S1_Vec3f D_84183D00;
+extern S1_Vec3f D_84183D14;
+extern ActorMotionRotation D_84183D0C;
+extern ActorMotionRotation D_84183D20;
+extern f32 D_84193F90;
+extern f32 D_84193F94;
+extern f32 D_84193F98;
+extern f32 D_84193F9C;
+extern f32 D_84189CD0;
+extern f32 D_84189CD4;
+extern f32 D_84189CD8;
+extern f32 D_84189CDC;
+extern void MtxF_SetRotationTranslationF(void *, void *, void *);
+extern s32 func_8411E1D4(s32);
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+void BattleAnim_InitSignedRotatedMotion(u8 *arg0) {
+    S1_MtxF matrix;
+    S1_Vec3f translation = D_84183D00;
+    ActorMotionRotation rotation = D_84183D0C;
+    S1_Vec3f position;
+    D_84193F90 = D_84189CD0;
+    D_84193F94 = 29.5f;
+    D_84193F98 = D_84189CD4;
+    D_84193F9C = 0.75f;
+    rotation.y = *(s16 *)(arg0 + 32);
+    position.x = 0.0f;
+    position.y = 0.0f;
+    position.z = (f32)func_8411E1D4((s32)arg0) * D_84193F94;
+    Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 1508), 0.0f, 0.0f, 0.0f);
+    Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 1520), 0.0f, 0.0f, 0.0f);
+    MtxF_SetRotationTranslationF(&matrix, &translation, &rotation);
+    GalleryCamera_RotateVecByMatrix(&position, &matrix);
+    *(f32 *)(arg0 + 1508) = -position.x;
+    *(f32 *)(arg0 + 1512) = -position.y;
+    *(f32 *)(arg0 + 1516) = -position.z;
+}
 
 extern f32 D_84193F90;
 extern f32 D_84193F98;
@@ -795,7 +838,28 @@ void func_84123034(u8 *arg0) {
     *(f32 *)(arg0 + 0x2C) += *(f32 *)(arg0 + 0x5F8);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123150.s")
+void BattleAnim_InitRotatedMotion(u8 *arg0) {
+    S1_MtxF matrix;
+    S1_Vec3f translation = D_84183D14;
+    ActorMotionRotation rotation = D_84183D20;
+    S1_Vec3f position;
+    D_84193F90 = 0.5f;
+    D_84193F94 = 50.0f;
+    D_84193F98 = D_84189CD8;
+    D_84193F9C = D_84189CDC;
+    rotation.y = *(s16 *)(arg0 + 32);
+    position.z = -D_84193F94;
+    position.x = 0.0f;
+    position.y = 0.0f;
+    Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 1508), 0.0f, 0.0f, 0.0f);
+    Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 1520), 0.0f, 0.0f, 0.0f);
+    MtxF_SetRotationTranslationF(&matrix, &translation, &rotation);
+    GalleryCamera_RotateVecByMatrix(&position, &matrix);
+    *(f32 *)(arg0 + 1508) = -position.x;
+    *(f32 *)(arg0 + 1512) = -position.y;
+    *(f32 *)(arg0 + 1516) = -position.z;
+    *(u8 *)(arg0 + 1571) = 0;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_8412328C.s")
 
