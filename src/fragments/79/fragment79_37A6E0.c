@@ -1084,7 +1084,7 @@ extern u8 * func_8410B330(u8 *arg0);
 extern void func_8410DFC4(u8 *, void *);
 extern void func_8410E688(u8 *arg0, void *arg1);
 extern void func_8410E73C(u8 *arg0, void *arg1);
-extern void func_84110B2C(u8 *, s32);
+extern void BattleAnim_UpdateCameraWave(u8 *, s32);
 extern s32 func_8411DC80(u16, s32 *, s32);
 extern void func_841203B4(u8 *, f32, f32);
 extern u8 D_8418393C;
@@ -1100,7 +1100,7 @@ void func_84110718(u8 *arg0, u8 *arg1) {
     } else {
         func_8410E73C(arg0, arg1);
     }
-    func_84110B2C(arg0, (s32)arg1);
+    BattleAnim_UpdateCameraWave(arg0, (s32)arg1);
 }
 #endif
 
