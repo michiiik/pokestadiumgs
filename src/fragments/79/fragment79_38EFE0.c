@@ -1086,7 +1086,164 @@ void func_84123EB0(u8 *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84123F60.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84124104.s")
+extern void func_84121CAC(u8 *);
+extern void func_8412230C(u8 *);
+extern void func_84123468(u8 *);
+extern void func_841214C0(u8 *);
+extern void func_84121B18(u8 *);
+extern void func_84121DE8(u8 *);
+extern void func_84122448(u8 *);
+extern void func_84122AB8(u8 *);
+extern void func_8412328C(u8 *);
+extern void func_84123664(u8 *);
+extern void func_84123B08(u8 *);
+
+void BattleAnim_InitMovementByType(u8 *arg0, s32 arg1) {
+    switch (arg1) {
+        case 3:
+            func_841210CC((s32)arg0);
+            break;
+        case 4:
+            func_84121260(arg0);
+            break;
+        case 5:
+            func_841217C8(arg0);
+            break;
+        case 6:
+            func_841218EC(arg0);
+            break;
+        case 7:
+            func_84121CAC(arg0);
+            break;
+        case 8:
+            func_84121AB8(arg0);
+            break;
+        case 9:
+            func_84122990(arg0);
+            break;
+        case 10:
+            func_84122A04(arg0);
+            break;
+        case 13:
+            func_84122A78(arg0);
+            break;
+        case 14:
+            func_84122D74((s32)arg0);
+            break;
+        case 15:
+            func_84123828(arg0);
+            break;
+        case 12:
+            func_84123914(arg0);
+            break;
+        case 16:
+            func_841239E0(arg0);
+            break;
+        case 18:
+            func_84123A90(arg0);
+            break;
+        case 19:
+            func_8412142C(arg0);
+            break;
+        case 20:
+            func_84121708(arg0);
+            break;
+        case 11:
+            BattleAnim_InitSignedRotatedMotion(arg0);
+            break;
+        case 21:
+            BattleAnim_InitRotatedMotion(arg0);
+            break;
+        case 22:
+            func_84123468(arg0);
+            break;
+        case 23:
+            func_84123CD8(arg0);
+            break;
+        case 24:
+            func_84123E74(arg0);
+            break;
+        case 25:
+            func_8412230C(arg0);
+            break;
+        case 26:
+            func_84122C94(arg0);
+            break;
+    }
+}
+
+void BattleAnim_UpdateMovementByType(u8 *arg0, s32 arg1) {
+    switch (arg1) {
+        case 3:
+            func_84121130(arg0);
+            break;
+        case 4:
+            BattleAnim_UpdateStagedTurn(arg0);
+            break;
+        case 5:
+            func_841217E4(arg0);
+            break;
+        case 6:
+            BattleAnim_UpdateWideOscillation(arg0);
+            break;
+        case 7:
+            func_84121DE8(arg0);
+            break;
+        case 8:
+            func_84121B18(arg0);
+            break;
+        case 9:
+            func_84122998(arg0);
+            break;
+        case 10:
+            BattleAnim_UpdateTerrainPose(arg0);
+            break;
+        case 13:
+            func_84122AB8(arg0);
+            break;
+        case 14:
+            func_84122DD8(arg0);
+            break;
+        case 15:
+            func_84123858(arg0);
+            break;
+        case 12:
+            func_8412391C(arg0);
+            break;
+        case 16:
+            func_841239E8(arg0);
+            break;
+        case 18:
+            func_84123B08(arg0);
+            break;
+        case 19:
+            func_841214C0(arg0);
+            break;
+        case 20:
+            func_84121724(arg0);
+            break;
+        case 11:
+            func_84123034(arg0);
+            break;
+        case 21:
+            func_8412328C(arg0);
+            break;
+        case 22:
+            func_84123664(arg0);
+            break;
+        case 23:
+            BattleAnim_UpdateTimedOscillation(arg0);
+            break;
+        case 24:
+            func_84123EB0(arg0);
+            break;
+        case 25:
+            func_84122448(arg0);
+            break;
+        case 26:
+            func_84122CCC(arg0);
+            break;
+    }
+}
 #endif

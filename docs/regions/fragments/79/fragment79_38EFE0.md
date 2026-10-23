@@ -172,3 +172,38 @@ Y product do not close it. Next action: recover the meaningful scalar
 lifetimes for the normalized direction, double `1.0 - cosine` calculation,
 and the three separately reloaded camera outputs. No frame padding or
 uninitialized extra local is installed.
+
+## 2026-10-23: actor movement setup/update dispatch
+
+`func_84123F60` / `BattleAnim_InitMovementByType` and `func_84124104` /
+`BattleAnim_UpdateMovementByType` each dispatch one actor to 23 handlers
+selected by values 3 through 26, with 17 and out-of-range values doing nothing.
+The shared actor sequencer in `fragment79_380A00.c` passes byte 1567 as the
+selector, initializes on the trigger frame and calls the update dispatcher
+on subsequent frames. The selected handlers include staged turning,
+oscillation, terrain pose and rotated translation.
+
+The original physical case order is 3-10, 13-15, 12, 16, 18-20, 11, 21-26.
+Preserve the table-to-handler map rather than inferring it from function
+addresses. Both dispatchers compile as ordinary switches with one call per
+case and a common return.
+
+Only the two 96-byte tables at ROM 0x3F95D0 and 0x3F9630 move into this
+source's `.rodata` subsegment. The preceding float pool and large table
+remain shared. The still-assembly layout was gated before replacing either
+owner. Pinned splat 0.25.0 and spimdisasm commit
+`fe1338434c99240eb4adca0b7860edc12b847565` produced the split.
+
+Verification covers the normal host-syntax-enabled full-ROM comparison,
+complete helper text and shared-rodata bytes, fixed-address relocation
+destinations, the entire linked fragment 79 and four collateral objects.
+Resolve the old object's two internal PC-relative fixups before comparing
+unlinked text. The update function has 420 code bytes followed by eight
+unchanged module-alignment zero bytes; the old assembly symbol includes
+those bytes in its 428-byte extent. No source padding is needed.
+
+The runner's combined install can place shared declarations after a prior
+pending owner when a later owner gates sequentially first. This produced a
+prototype-order compile failure for the setup switch. Gating the setup owner
+against the accepted update owner with its own shared declarations resolves
+the declaration scope without changing either handler's ABI.
