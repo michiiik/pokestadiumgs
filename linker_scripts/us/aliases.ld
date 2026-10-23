@@ -850,3 +850,6 @@ func_84111774 = BattleAnim_RunCameraStageCallbacks;
 func_841156D0 = BattleAnim_UpdateAscentPhase;
 func_8411DAE0 = BattleAnim_UpdateBothSideCallbacks;
 func_84112C98 = BattleAnim_RefreshSpeciesModel;
+func_82603B20 = TrailEffect_Advance;
+func_826040D8 = TrailEffect_Initialize;
+func_826042A0 = TrailEffect_DrawAll;
