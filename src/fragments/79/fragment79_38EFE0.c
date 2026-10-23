@@ -299,13 +299,39 @@ void func_841206D0(void *arg0)
   func_8412060C();
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38EFE0/func_84120700.s")
+
+extern s32 func_8411E1F8(s32);
+extern void func_8411EFE4(s32);
+extern void func_8411EE74(u8 *);
+extern void func_84108F88(u8 *, s32);
+extern void func_84108E00(u8 *, s32);
+extern void func_84112290(u8 *);
+extern u8 *D_84193DD0;
+extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
+void BattleAnim_InitActorFromActionFlags(u8 *arg0) {
+    func_8411EFE4((s32)arg0);
+    Vec3f_SetComponentsDuplicate((f32 *)(arg0 + 48), 1.0f, 1.0f, 1.0f);
+    if ((((u16 (*)[8])(D_84193DD0 + 18))[func_8411E1F8((s32)arg0)][0] & 2) != 0 || (*(u16 *)(arg0 + 2036) & 8) != 0) {
+        *(f32 *)(arg0 + 40) = *(f32 *)(arg0 + 1616) + 200.0f;
+    }
+    if ((((u16 (*)[8])(D_84193DD0 + 18))[func_8411E1F8((s32)arg0)][0] & 4) != 0) {
+        if (*(s16 *)(arg0 + 26) != 50 && *(s16 *)(arg0 + 26) != 51) func_8411EE74(arg0);
+    }
+    arg0[28] = 0;
+    if ((((u16 (*)[8])(D_84193DD0 + 16))[func_8411E1F8((s32)arg0)][0] & 7) != 0 && *(s16 *)(arg0 + 26) != 252) func_84108F88(arg0, 2);
+    if (((u16 (*)[8])(D_84193DD0 + 16))[func_8411E1F8((s32)arg0)][0] == 32 && *(s16 *)(arg0 + 26) != 252) func_84108F88(arg0, 1);
+    if ((*(u16 *)(arg0 + 2036) & 4) != 0) func_8411EE74(arg0);
+    if ((*(u16 *)(arg0 + 86) & 1) != 0 && (*(u16 *)(arg0 + 2036) & 2) == 0 && (*(u16 *)(arg0 + 2036) & 1) == 0) func_84112290(arg0);
+    if (((u16 (*)[8])(D_84193DD0 + 14))[func_8411E1F8((s32)arg0)][0] == 0) func_8411EE74(arg0);
+    if ((((u16 (*)[8])(D_84193DD0 + 16))[func_8411E1F8((s32)arg0)][0] & 7) != 0 && (arg0[1] & 1) == 0) func_84108E00(arg0, 2);
+    if (((u16 (*)[8])(D_84193DD0 + 16))[func_8411E1F8((s32)arg0)][0] == 32 && (arg0[1] & 1) == 0) func_84108E00(arg0, 1);
+}
 
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 extern s32 D_84191208;
 extern s32 D_8419120C;
 extern void func_8411EF08(u8 *arg0);
-extern void func_84120700(s32);
+extern void BattleAnim_InitActorFromActionFlags(u8 *);
 extern void func_8410B578(f32 arg0);
 extern u8 *D_84193DD0;
 extern f32 D_84189C4C;
@@ -316,8 +342,8 @@ void func_84120960(void *arg0, void *arg1) {
     Vec3f_SetComponentsDuplicate((f32 *)((u8 *)(arg0) + (0xC0)), 0.0f, 1.0f, 0.0f);
     func_8411EF08((u8 *) D_84191208);
     func_8411EF08((u8 *) D_8419120C);
-    func_84120700(D_84191208);
-    func_84120700(D_8419120C);
+    BattleAnim_InitActorFromActionFlags(D_84191208);
+    BattleAnim_InitActorFromActionFlags(D_8419120C);
     if (*(u16 *)((u8 *) D_84193DD0 + 0x12) & 8) {
         Vec3f_SetComponentsDuplicate((f32 *)((u8 *)(D_84191208) + 0x30), D_84189C4C, D_84189C4C, D_84189C4C);
     }
@@ -333,14 +359,14 @@ extern s32 D_84191208;
 extern s32 D_8419120C;
 extern void func_8411EF08(u8 *arg0);
 extern s32 func_8411E164(s32 arg0);
-extern void func_84120700(s32);
+extern void BattleAnim_InitActorFromActionFlags(u8 *);
 extern void func_8410B578(f32 arg0);
 void func_84120A50(void *arg0, void *arg1) {
     (*(s16 *)((u8 *)(arg1) + (0x7EA))) = 0;
     Vec3f_SetComponentsDuplicate((f32 *)((u8 *)(arg0) + (0xC0)), 0.0f, 1.0f, 0.0f);
     func_8411EF08((u8 *) D_84191208);
     func_8411EF08((u8 *) D_8419120C);
-    func_84120700(func_8411E164((s32) arg1));
+    BattleAnim_InitActorFromActionFlags(func_8411E164((s32) arg1));
     func_8410B578(0.0f);
 }
 
@@ -348,7 +374,7 @@ extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 extern s32 D_84191208;
 extern s32 D_8419120C;
 extern void func_8411EF08(u8 *arg0);
-extern void func_84120700(s32);
+extern void BattleAnim_InitActorFromActionFlags(u8 *);
 extern void func_8410B578(f32 arg0);
 extern u8 *D_84193DD0;
 extern f32 D_84189C58;
@@ -359,8 +385,8 @@ void func_84120AC4(void *arg0, void *arg1) {
     Vec3f_SetComponentsDuplicate((f32 *)((u8 *)(arg0) + (0xC0)), 0.0f, 1.0f, 0.0f);
     func_8411EF08((u8 *) D_84191208);
     func_8411EF08((u8 *) D_8419120C);
-    func_84120700(D_84191208);
-    func_84120700(D_8419120C);
+    BattleAnim_InitActorFromActionFlags(D_84191208);
+    BattleAnim_InitActorFromActionFlags(D_8419120C);
     if (*(u16 *)((u8 *) D_84193DD0 + 0x12) & 8) {
         Vec3f_SetComponentsDuplicate((f32 *)((u8 *)(D_84191208) + 0x30), D_84189C58, D_84189C58, D_84189C58);
     }
@@ -371,7 +397,7 @@ void func_84120AC4(void *arg0, void *arg1) {
     func_8410B578(0.0f);
 }
 
-extern void func_84120700(s32);
+extern void BattleAnim_InitActorFromActionFlags(u8 *);
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 void func_8411EF2C(s32 arg0);
 void func_8410B578(f32 arg0);
@@ -379,8 +405,8 @@ void func_84120BB4(u8 *arg0, s32 arg1) {
     (*(s16 *)((u8 *)(arg1) + (0x7EA))) = 0;
     Vec3f_SetComponentsDuplicate((f32 *) (arg0 + 0xC0), 0.0f, 1.0f, 0.0f);
     func_8411EF2C(arg1);
-    func_84120700(D_84191208);
-    func_84120700(D_8419120C);
+    BattleAnim_InitActorFromActionFlags(D_84191208);
+    BattleAnim_InitActorFromActionFlags(D_8419120C);
     func_8410B578(0.0f);
 }
 
@@ -402,7 +428,7 @@ extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
 extern s32 D_84191208;
 extern s32 D_8419120C;
 extern void func_8411EF08(u8 *arg0);
-extern void func_84120700(s32);
+extern void BattleAnim_InitActorFromActionFlags(u8 *);
 extern s32 func_8411E164(s32 arg0);
 extern void func_841125F4(s32, s32);
 extern void func_8410B578(f32 arg0);
@@ -413,8 +439,8 @@ void func_84120CA4(void *arg0, void *arg1) {
     Vec3f_SetComponentsDuplicate((f32 *)((u8 *)(arg0) + (0xC0)), 0.0f, 1.0f, 0.0f);
     func_8411EF08((u8 *) D_84191208);
     func_8411EF08((u8 *) D_8419120C);
-    func_84120700(D_84191208);
-    func_84120700(D_8419120C);
+    BattleAnim_InitActorFromActionFlags(D_84191208);
+    BattleAnim_InitActorFromActionFlags(D_8419120C);
     func_841125F4(func_8411E164((s32) arg1), 0);
     func_8410B578(0.0f);
 }
@@ -423,7 +449,7 @@ extern s32 D_84191208;
 extern s32 D_8419120C;
 extern void func_8411EFE4(s32);
 extern void func_8411EF08(u8 *);
-extern void func_84120700(s32);
+extern void BattleAnim_InitActorFromActionFlags(u8 *);
 extern s32 func_8411E164(s32);
 extern void func_841125F4(s32, s32);
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
@@ -437,8 +463,8 @@ void func_84120D34(void *arg0, void *arg1)
   func_8411EF08((u8 *) D_84191208);
   func_8411EF08((u8 *) D_8419120C);
   temp_v1 = (s32) arg1;
-  func_84120700(D_84191208);
-  func_84120700(D_8419120C);
+  BattleAnim_InitActorFromActionFlags(D_84191208);
+  BattleAnim_InitActorFromActionFlags(D_8419120C);
   func_841125F4(func_8411E164(temp_v1), 0);
   Vec3f_SetComponentsDuplicate((f32 *) (((u8 *) arg0) + 0xC0), 0.0f, 1.0f, 0.0f);
   temp_v1 = *((s16 *) (((u8 *) arg1) + 0x1A));
@@ -468,7 +494,7 @@ void func_84120E14(s32 arg0) {
     func_8411EFE4(func_8411E164(arg0));
     func_8411EE74((u8 *) arg0);
     func_8411EF08(func_8411E164(arg0));
-    func_84120700(func_8411E164(arg0));
+    BattleAnim_InitActorFromActionFlags(func_8411E164(arg0));
     func_8410B578(0.0f);
 }
 

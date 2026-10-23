@@ -884,3 +884,4 @@ func_84124104 = BattleAnim_UpdateMovementByType;
 func_84123468 = BattleAnim_InitAuxiliaryGravityMotion;
 func_84123664 = BattleAnim_UpdateAuxiliaryGravityMotion;
 func_8412328C = BattleAnim_UpdateRotatedMotion;
+func_84120700 = BattleAnim_InitActorFromActionFlags;
