@@ -484,3 +484,74 @@ one stack home is not a match. Next inspect the frontend's actual local-home
 allocation and statement topology together; scalar width/order, standalone
 camera values, packed-state temporaries, and this index family are measured
 negative basins under the tested layouts.
+
+## 2026-10-23: timed move events and dispatcher return typing
+
+`func_84117E94` / `BattleAnim_UpdateTimedMoveEvents` (676 bytes) is accepted
+from the native batch based on `fdfe0fdc`. Its first-counter update selects
+animation handlers by category, object state, and context flags. Subsequent
+events use the signed start-frame byte at 1561 and halfword counter at 2024:
+the category-specific event runs at the start frame, camera/model callbacks
+run at or after it, another callback runs ten frames later, and animation
+completion restores the model resource's byte at 5020 before final phase
+processing. The source retains the separate category-16/category-20 event
+switch and the original callback order.
+
+The first natural body matches all but three instruction words: its category
+load and two branch uses select `$v1` instead of retail `$v0`. Width/scope
+changes to a real category local do not change this residual. The actual
+callee immediately before the category switch is the side-effect dispatcher
+`func_84123F60` in `fragment79_38EFE0.c`. Its assembly dispatches to handlers
+such as the void definitions `func_841210CC` and `func_84121260`; its default
+path returns without producing a value. An explicit
+`extern void func_84123F60(u8 *, s32);` before its first caller replaces the
+implicit integer-return assumption. This fixes the three register words
+without modifying existing caller code, adding parameters, or using an
+unused return value. The new owner passes the ordinary host-syntax-enabled
+full-ROM gate with the stock compiler.
+
+Known-module, corrected-context, and leading-blank controls preserve every
+game instruction, true function extent, section, and relocation encoding.
+The successful gate is immediately frozen with source, assembly/layout
+inputs, module, four collateral objects, ELF, linker output, and ROM.
+Independent hashes and the complete frozen-layout module proof pass, with
+US ROM MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. No instruction rewriting,
+padding, artificial arguments, fake locals, or extra reads are used.
+
+### Continued requeues
+
+- `func_8411BB04`: **requeue**. Eight camera-byte-offset variants add an
+  unwanted narrowing mask and grow to 296 bytes. Ten signed-byte/embedded
+  index variants and eight mask-at-use variants also fail. An embedded
+  unsigned index reaches the correct 40-byte frame, saved-side home 34,
+  and relocation topology, but rotates temporary registers after the random
+  call (25 differing words). A 90-second source-only, stack-aware permuter
+  search excludes fake, ABI, and type mutations; its base is calibrated
+  against all 73 retained parent words and relocation topology. It stops
+  without zero, improving its stack-aware score from ten to two by a
+  declaration reorder already represented in the hand-tested pool. The
+  original two-word byte-home residual remains the closer natural parent.
+  Next investigate the temporary allocation events for that parent versus
+  the correct-home embedded-index basin; do not treat the permuter score or
+  one healed home as acceptance.
+- `func_84116BC0`: **requeue**, record-index storage and allocation. The
+  natural category-camera switch retains its eleven-entry table topology.
+  A `u16` index produces the correct 756-byte body and 32-byte frame but
+  leaves 21 instruction differences, including a halfword store at stack
+  30 rather than retail's word store at 24, an extra narrow conversion,
+  and swapped model/record pointer registers. Wider/signed index forms
+  instead produce 748-byte bodies with a 24-byte frame. Four width/guard
+  variants, four width/pointer-order variants, and eight guarded-initializer
+  variants do not resolve those basins. Next inspect the original index's
+  storage and record-pointer lifetimes; do not add padding or artificial
+  address-taking to obtain its frame.
+
+The latter owner's declaration prerequisite is measured separately from its
+C-shape attempts. `asm/us/data/fragments/79/fragment79_data.data.s` defines
+`D_84183BDC` as exactly six halfwords (0, 1, 2, 3, 6, 7), followed by
+`D_84183BE8`. Candidate preparation must supply this table type explicitly
+as well as transactionally correct the old byte declaration in
+`func_841168A0`; otherwise declaration synthesis reintroduces the byte type
+and fails before comparison. The table-only typing transaction preserves
+the complete original module. It is not included with the unrelated accepted
+timing owner.
