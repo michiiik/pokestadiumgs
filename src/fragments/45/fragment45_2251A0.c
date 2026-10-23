@@ -950,7 +950,32 @@ extern void func_8AB01288(void); extern void func_8AB02D14(void); void func_8AB0
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB03D10.s")
+extern u8 D_8AB14268[];
+extern u8 D_8AB14278[];
+void TextRow_SetOrangeState(s16 row_index) {
+    u8 *row;
+    u8 *panel;
+    u8 *highlight;
+    u8 *secondary;
+    panel = ((u8 **)D_8AB14268)[D_8AB1269A];
+    highlight = D_8AB14278 + D_8AB1269A * 120;
+    func_8AB00BA4(1, row_index, D_8AB12690);
+    row = D_8AB12CB0;
+    row += row_index * 148;
+    if (*(s16 *)(row + 4) == 0) {
+        (*(s16 *)(row + 2))++;
+    }
+    *(u16 *)(panel + 2) |= 1;
+    *(u32 *)(highlight + 108) = 0xFF500080;
+    *(s16 *)(highlight + 38) = 0;
+    secondary = *(u8 **)(row + 20);
+    if (secondary != NULL) {
+        *(u16 *)(secondary + 2) |= 1;
+        *(u32 *)(row + 132) = 0xFF500080;
+        *(s16 *)(row + 62) = 0;
+    }
+    *(s16 *)(row + 4) = 1;
+}
 #endif
 
 #ifdef VERSION_US
