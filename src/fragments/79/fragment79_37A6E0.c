@@ -1447,7 +1447,35 @@ void BattleAnim_AllocateSideObjects(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_841119CC.s")
+extern u16 D_84183BDC[6];
+extern u32 func_8003570C(void);
+extern u16 D_84183BE8[];
+extern u16 D_84183BF0[];
+extern u16 D_84183BFC[];
+extern u16 D_84183C04[];
+extern u16 D_84183C0C[];
+extern u16 D_84183C14[];
+extern u16 D_84183C1C[];
+extern u16 D_84183C24[];
+extern u16 D_84183C2C[];
+extern u16 D_84183C34[];
+void BattleAnim_SelectCameraPreset(u8 *arg0, u16 arg1) {
+    s32 selector = arg1;
+    switch (selector) {
+    case 40: *(u16 *)(arg0 + 152) = D_84183BDC[func_8003570C() % 6]; break;
+    case 41: *(u16 *)(arg0 + 152) = D_84183BE8[func_8003570C() % 4]; break;
+    case 42: *(u16 *)(arg0 + 152) = D_84183BF0[func_8003570C() % 6]; break;
+    case 43: *(u16 *)(arg0 + 152) = D_84183BFC[func_8003570C() % 4]; break;
+    case 44: *(u16 *)(arg0 + 152) = D_84183C04[func_8003570C() % 3]; break;
+    case 45: *(u16 *)(arg0 + 152) = D_84183C0C[func_8003570C() % 3]; break;
+    case 46: *(u16 *)(arg0 + 152) = D_84183C14[func_8003570C() % 3]; break;
+    case 47: *(u16 *)(arg0 + 152) = D_84183C1C[func_8003570C() % 3]; break;
+    case 48: *(u16 *)(arg0 + 152) = D_84183C24[func_8003570C() % 3]; break;
+    case 49: *(u16 *)(arg0 + 152) = D_84183C2C[func_8003570C() % 4]; break;
+    case 50: *(u16 *)(arg0 + 152) = D_84183C34[func_8003570C() % 3]; break;
+    default: *(u16 *)(arg0 + 152) = selector; break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -2358,7 +2386,7 @@ void BattleAnim_ApplyAnimationRecord(u8 *arg0, s32 index) {
 
 #ifdef VERSION_US
 extern s32 D_841839EC[];
-extern void func_841119CC(u8 *, u16);
+extern void BattleAnim_SelectCameraPreset(u8 *, u16);
 extern void BattleAnim_ApplyAnimationRecord(u8 *, s32);
 extern s32 func_8411DC80(u16, s32 *, s32);
 extern u8 D_841849B6[];
@@ -2366,7 +2394,7 @@ extern u8 * D_841911E0;
 void func_84114804(u8 *arg0) {
     u8 id;
     if ((*(u16 *)(arg0 + 0x7EC) & 1) == 0) {
-        func_841119CC(D_841911E0, *(u16 *)(D_841849B6 + (arg0[0x618] * 8)));
+        BattleAnim_SelectCameraPreset(D_841911E0, *(u16 *)(D_841849B6 + (arg0[0x618] * 8)));
         id = arg0[0x618];
         if (id == 0x39) { arg0[0x61F] = 10; }
         else if (id == 0x42) { arg0[0x61F] = 4; }
@@ -2766,16 +2794,16 @@ void func_84116010(u8 *arg0) {
             index = 0x104;
         }
         if (*(u16 *)(D_84193DD0 + 4) == 0x16) {
-            func_841119CC(D_841911E0, D_84185196);
+            BattleAnim_SelectCameraPreset(D_841911E0, D_84185196);
         }
         if (*(u16 *)(D_84193DD0 + 4) == 0x17) {
-            func_841119CC(D_841911E0, D_8418519E);
+            BattleAnim_SelectCameraPreset(D_841911E0, D_8418519E);
         }
         if (*(u16 *)(D_84193DD0 + 4) == 0x18) {
-            func_841119CC(D_841911E0, D_841851A6);
+            BattleAnim_SelectCameraPreset(D_841911E0, D_841851A6);
         }
         if (*(u16 *)(D_84193DD0 + 4) == 0x19) {
-            func_841119CC(D_841911E0, D_841851AE);
+            BattleAnim_SelectCameraPreset(D_841911E0, D_841851AE);
         }
         *(u8 *)(arg0 + 0x61F) = 0xFF;
         BattleAnim_ApplyAnimationRecord(arg0, index);
@@ -2930,7 +2958,7 @@ void func_84116460(u8 *arg0) {
 
 #ifdef VERSION_US
 extern u8 D_841849B6[];
-extern void func_841119CC(u8 *, u16);
+extern void BattleAnim_SelectCameraPreset(u8 *, u16);
 extern s32 func_800427B8(s32);
 extern void func_84111348(s32 arg0, s32 arg1);
 extern void func_84111C44(void);
@@ -2946,7 +2974,7 @@ void BattleAnim_Dispatch_156(u8 *arg0) {
         func_84116410(arg0);
         *(u8 *)(arg0 + 0x7F6) = 1;
         *(s16 *)(arg0 + 0x7E8) = 0;
-        func_841119CC(D_841911E0,
+        BattleAnim_SelectCameraPreset(D_841911E0,
             *(u16 *)((u8 *)D_841849B6 + (*(u8 *)(arg0 + 0x618) << 3)));
         func_84111348((s32)arg0, 0);
         *(s32 *)((u8 *)arg0 + (D_841911F4 * 4) + 0x5C8) = D_84183D50;
@@ -3048,7 +3076,7 @@ void func_84116808(u8 *arg0) {
 #ifdef VERSION_US
 extern u32 func_8003570C(void);
 void func_841168A0(u8 *arg0) {
-    extern u8 D_84183BDC;
+    extern u16 D_84183BDC[6];
     extern u32 func_8003570C(void);
     s32 sp1C;
 
@@ -4754,7 +4782,7 @@ void BattleAnim_Dispatch_092(u8 *arg0) {
 
 #ifdef VERSION_US
 extern void func_84111348(s32 arg0, s32 arg1);
-extern void func_841119CC(u8 *, u16);
+extern void BattleAnim_SelectCameraPreset(u8 *, u16);
 extern void func_84111D64(u8 *arg0, s32 arg1);
 extern void func_84111DB4(u8 *arg0, s32 arg1);
 extern void func_84111E80(void *arg0, s32 arg1);
@@ -4769,7 +4797,7 @@ void func_8411B070(u8 *arg0) {
     if (func_84113430((s32)arg0)) {
         *(s16 *)(arg0 + 0x7E8) = 0;
         func_8411AF6C(arg0);
-        func_841119CC(D_841911E0, *(u16 *)(D_841849B6 + arg0[0x618] * 8));
+        BattleAnim_SelectCameraPreset(D_841911E0, *(u16 *)(D_841849B6 + arg0[0x618] * 8));
         func_84111348((s32)arg0, 0);
         func_84111E50(arg0, *(s8 *)(arg0 + 0x617));
         func_84111D64(arg0, *(s8 *)(arg0 + 0x616));
@@ -4842,7 +4870,7 @@ void BattleAnim_Dispatch_078(u8 *arg0)
 
 #ifdef VERSION_US
 extern u8 D_841849B6[];
-extern void func_841119CC(u8 *, u16);
+extern void BattleAnim_SelectCameraPreset(u8 *, u16);
 extern void func_80030420(s32, u8, s16, s32);
 extern void func_84111348(s32 arg0, s32 arg1);
 extern void func_84112158(s32, s32);
@@ -4855,7 +4883,7 @@ void BattleAnim_Dispatch_079(u8 *arg0) {
     func_841126C8((s32)arg0);
     *(s16 *)(arg0 + 0x7E8) = 0;
     func_84112158((s32)arg0, 0xFB);
-    func_841119CC(D_841911E0,
+    BattleAnim_SelectCameraPreset(D_841911E0,
         *(u16 *)((u8 *)D_841849B6 + (*(u8 *)(arg0 + 0x618) << 3)));
     func_84111348((s32)arg0, 0);
     *(s8 *)(arg0 + 0x7F6) = 1;

@@ -555,3 +555,77 @@ as well as transactionally correct the old byte declaration in
 and fails before comparison. The table-only typing transaction preserves
 the complete original module. It is not included with the unrelated accepted
 timing owner.
+
+## 2026-10-23: random camera preset selection and input-table alignment
+
+`func_841119CC` / `BattleAnim_SelectCameraPreset` (544 bytes, 136
+instructions) is accepted from the native batch based on `4cdda1c2`.
+Selectors 40 through 50 choose a random entry from eleven existing halfword
+tables; every other selector is stored directly in camera field 152.
+The selection counts, in selector order, are 6, 4, 6, 4, 3, 3, 3, 3, 3, 4,
+and 3. In particular, selector 48 uses modulo three, unlike the older
+near-miss source that used a four-entry mask for that table.
+
+The historical 32-attempt pool was measured before the file's jump-table
+layout was ready. A new confirmation reaches the original 544-byte body
+and relocation topology, but leaves nine prologue/default-store words.
+Keep the actual unsigned-halfword parameter and copy it to the real switch
+carrier `s32 selector = arg1;`. That ordinary promotion closes all nine
+words, including the initial `$v0` mask and the saved incoming `$a1`.
+Unsigned/narrow carrier alternatives do not reproduce the same prologue.
+
+`D_84183BDC` is declared as its six-halfword array, both before the new owner
+and in the existing caller `func_841168A0`. Its actual values and bounds are
+defined in `asm/us/data/fragments/79/fragment79_data.data.s`, with the next
+symbol at `D_84183BE8`. Other table declarations remain unsized halfword
+views; their used selection counts come directly from the retail modulo or
+mask instructions. No table contents or sizes are changed.
+
+Known-module, corrected-context, and leading-blank controls pass. The stock
+compiler's normal host-syntax-enabled full-ROM gate passes. The immediately
+frozen successful gate preserves source/module, active assembly/layout
+dependencies, four collateral objects, ELF, linker output, and ROM; external
+hashes and the independent complete-module/frozen-relocation proof agree,
+with US MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. No synthetic padding,
+instruction rewriting, fake locals, or artificial arguments are used.
+
+### Input camera owner: exact text, unresolved layout prerequisite
+
+`func_84110C6C` is **layout-prerequisite**, not accepted. The camera/input
+body updates model coordinates, distance, and signed-halfword angles from
+controller buttons and axes. Its actual two-argument callback prologue saves
+both incoming arguments, although the body only reads the first. Literal
+typing matters: integer 4/8 coordinate-distance steps avoid the float
+constant's long-lived register, while the axis products retain `8.0f`.
+Signed-halfword rotation deltas close the remaining temporary-register
+differences. Field views, axis snapshots, deltas, and condition variants do
+not remove an eight-byte load-hoisting residual under the original exit form.
+
+A calibrated source-only permuter reproduces all 192 words and relocation
+topology of the retained 768-byte parent before searching. Fake, ABI, and
+type mutations are disabled. It finds zero in 8.4 seconds by moving the final
+default-case `break` into its existing nonzero guard. This preserves all
+side effects: the false path simply reaches the end of the switch. A readable
+version independently reproduces the 760-byte retail text, with only the
+normal jump-table relocation fields differing. It still fails the full-ROM
+gate and is not installed.
+
+The remaining failure is fully localized in the object's 1,568-byte rodata:
+the six table entries at offsets `0x170..0x187` agree exactly, but retail has
+eight zero bytes at `0x188..0x18F`. The compiled C table omits that gap. Every
+byte from original offset `0x190` onward appears eight bytes earlier in the
+candidate, whose final eight bytes become zero. Thus matching text or a zero
+permuter score does not establish a complete match for this owner.
+
+Next investigate a genuine translation-unit/layout partition, preserving
+normal object alignment rather than emitting dummy C data. The closest
+16-aligned text boundaries bracketing this owner are `0x84110980`
+(`BattleAnim_ModelDispatch_093`, ROM `0x380210`) and `0x84111170`
+(`BattleAnim_ModelDispatch_016`, ROM `0x380A00`). The input table's rodata
+window is already 16-aligned: ROM `0x3F8830..0x3F8850`. These are measured
+planning boundaries, not a validated split: shared declarations, literal
+ownership, all moved functions, rodata alignment, linker order, and a fresh
+still-assembly full-ROM gate must be checked before installing the C body.
+Do not repeat source variants or inject zeros to work around this layout
+prerequisite. The packed-state and record-index requeues above also remain
+unresolved.
