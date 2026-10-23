@@ -1956,7 +1956,38 @@ void func_84116B40(u8 *arg0, s16 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_380A00/func_84116BC0.s")
+extern u8 D_841849BA[];
+extern s32 D_84183A0C[];
+void BattleAnim_ConfigureAnimationCamera(u8 *arg0) {
+    if (*(u16 *)(arg0 + 2028) & 1) return;
+    arg0[1561] = (arg0[1560] * 20 + (*(u8 **)(arg0 + 724)))[-13];
+    arg0[1562] = (arg0[1560] * 20 + (*(u8 **)(arg0 + 724)))[-10];
+    arg0[1568] = (arg0[1560] * 20 + (*(u8 **)(arg0 + 724)))[-12];
+    arg0[1564] = (*(u8 **)(arg0 + 724))[5082];
+    arg0[1565] = (*(u8 **)(arg0 + 724))[5083];
+    *(s16 *)(arg0 + 1576) = (arg0[1560] * 20 + (*(u8 **)(arg0 + 724)))[-4];
+    *(s16 *)(arg0 + 1578) = (arg0[1560] * 20 + (*(u8 **)(arg0 + 724)))[-3];
+    *(s16 *)(arg0 + 1580) = (arg0[1560] * 20 + (*(u8 **)(arg0 + 724)))[-2];
+    arg0[1633] = (arg0[1560] * 20 + (*(u8 **)(arg0 + 724)))[-1];
+    if (arg0[1560] == 23 || arg0[1560] == 34) arg0[1567] = 15;
+    else if (arg0[1560] == 205) arg0[1567] = 18;
+    else if (func_8411DC80(arg0[1560], D_84183A0C, 10) != 0) arg0[1567] = 16;
+    else if (arg0[1560] == 18 || arg0[1560] == 46) arg0[1567] = 21;
+    else arg0[1567] = 255;
+    switch (*(u16 *)(D_84193DD0 + 4)) {
+    case 16: case 20: case 75: BattleAnim_SelectCameraPreset(D_841911E0, 40); break;
+    case 17: *(s16 *)(D_841911E0 + 152) = D_84183BDC[func_8003570C() % 6]; break;
+    case 13: BattleAnim_SelectCameraPreset(D_841911E0, *(u16 *)(D_841849BA + arg0[1560] * 8)); break;
+    case 15: BattleAnim_SelectCameraPreset(D_841911E0, *(u16 *)(D_841849BA + arg0[1560] * 8)); break;
+    case 21: *(s16 *)(D_841911E0 + 152) = 3; break;
+    case 14: case 59: BattleAnim_SelectCameraPreset(D_841911E0, *(u16 *)(D_841849BA + arg0[1560] * 8)); break;
+    case 18: *(s16 *)(D_841911E0 + 152) = 3; break;
+    case 11: BattleAnim_SelectCameraPreset(D_841911E0, *(u16 *)(D_841849BA + arg0[1560] * 8)); break;
+    case 12: BattleAnim_SelectCameraPreset(D_841911E0, *(u16 *)(D_841849BA + arg0[1560] * 8)); break;
+    case 19: *(s16 *)(D_841911E0 + 152) = 22; break;
+    default: BattleAnim_SelectCameraPreset(D_841911E0, *(u16 *)(D_841849BA + arg0[1560] * 8)); break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
