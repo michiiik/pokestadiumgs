@@ -147,3 +147,107 @@ file are `func_862055F0`, `func_862057A8`, `func_8620581C`, `func_86205A7C`,
 Prioritize the recorded float-allocation follow-up before filling the next
 batch from these same-file callers. The input decoder/dispatcher handoffs are
 in the neighboring `fragment50_26D1D0.md` notes. No coverage was regenerated.
+
+## Post-batch projection follow-up: measured coloring / requeue
+
+A logging-only IDO 7.1 uopt observer was calibrated against the stock compiler
+with tracing off/on and a blank-line control, on both the accepted initializer
+and the retained projection candidate. All eight controls preserve complete
+module game sections, 17 extents and semantic relocations. The earlier retained
+candidate predates this file's rodata recovery; calibration therefore requires
+its exact 116-byte body inside the current otherwise-unchanged verified module,
+including the recovered 48-byte pool, rather than equating the old external
+constant ownership with the current local ownership.
+
+The candidate trace assigns the first velocity web to f0 and the dot-product
+web to f16; the original instructions require velocity X in f2 and dot in f0.
+This is observed global coloring, not a reason to rotate temporary-register
+pools or change the return ABI. Eight partial-sum variants (two/three stages,
+operand order and early Z snapshot) retain the 116-byte extent but alter
+scheduling without reaching the target (best raw 0.4483). Eight uniform
+float-pointer variants of the snapshot/direct expressions also fail (best raw
+0.5517). No C body was installed and the accepted four-function source is
+unchanged.
+
+Next action: calibrate the direct-expression candidate through the same narrow
+observer and align its float webs/uses with the snapshot candidate to identify
+which genuine live-range change can put dot in the first global color. Preserve
+the original left-associated float arithmetic, original normal reloads after
+component writes, and void ABI. Keep the already-rejected pure aliases and
+response-block extra-load variants out of the next campaign.
+
+## 2026-10-24: motion and animation callback follow-up
+
+### Accepted projection (`func_862057A8`, 116 bytes)
+
+The calibrated direct-expression observer showed that the dot product already
+held f0, while its memory-value webs put velocity Z in f2 instead of velocity X.
+Changing the expression tree to Z plus (Y plus X), then commuting each product
+independently, recovered all 29 original instructions. The accepted expression is
+`velocity_z * normal[2] + (velocity_y * normal[1] + normal[0] * velocity_x)`;
+the compiler emits the original X/Y pair before adding Z. The three response
+stores keep ordinary compound assignments and reload normal Y/Z after prior
+stores. No snapshots, fake aliases, return-type changes or register directives
+are needed. The full ROM and containing module were independently verified.
+
+### Accepted contact loop (`func_86205A7C`, 272 bytes)
+
+An ordinary four-iteration for loop advances the model pointer by 396 bytes.
+For models carrying the action flag, it traverses the context's linked node
+list, clears each node's displacement, invokes the existing contact helper,
+adds the resulting three components to position, then clears displacement
+again. Separate reverse-order initial zero stores and normal-order final stores
+match. No manual loop unrolling or record padding is used. The first candidate
+passed the normal full-ROM gate and complete-module checks.
+
+### Accepted animated-position callback (`func_862061B0`, 340 bytes)
+
+The metadata pointer survives the existing position helper. The animation frame
+is `(frame_word >> 16) - 4` in state 2, otherwise zero; a ternary clamp reproduces
+the original two zero paths. An ordinary if assignment or shared goto merges
+those paths and removes eight bytes. Rotation-first addition operands recover
+the position float assignments. Reading the metadata's player index as unsigned
+and placing its 24-byte record offset before the attachment-pool pointer
+recovers the remaining eight integer-register words. The same player-slot field is used
+by the four-model initialization path. The real pointer/width choice avoids
+extra locals and keeps the original 32-byte frame. The callback retains the
+mode-dependent dispatch to the existing state handlers.
+
+### Direction pose: register-tie / requeue
+
+A logging-only IDO observer passed stock/off/on/blank controls for both the
+accepted initializer and the retained 308-byte pose candidate. Its global colors
+cover the scale result and shared constants 18 and 5; the f16/f18 rotation occurs
+in temporary expression evaluation after those reservations. Eight natural
+coefficient/displacement binding candidates did not improve the best raw 0.8701.
+Binding both displacement intermediates can grow the function to 312 bytes.
+Keep the original arithmetic grouping and context reloads. Next action: use the
+calibrated expression events to isolate the multiply operand/free sequence at
+byte 128, then test a source mechanism that preserves the earlier constants.
+
+### Player initializer: register-tie / requeue
+
+`func_86206334` reconstructs four model nodes, animation resources, scale, initial
+facing-dependent choices and attachments. The best retained body is
+`model-player-init:for:shared-work-True:chain-False`: original 468-byte extent,
+complete opcode sequence and raw 0.9402. One displayed immediate difference
+is the legitimate local 0.31 pool reference at offset 32; the true residual is
+six integer-register words in the input-record address calculation at bytes
+240 through 264. The scale constant, switch cases, flags, callbacks and all
+later calls otherwise reproduce the original sequence.
+
+Sharing one work pointer between the animation and metadata roles keeps the
+original 104-byte frame. Separate pointer locals or an explicit input-record
+view can grow the frame to 112 bytes. Changing index signedness, pointer/base
+addition order, raw 32-bit address arithmetic or inlining the switch selector
+did not close the residual. A calibrated 90-second source-only search reproduced
+all 117 base words and relocation targets, then stayed at score 55 with no
+proposal. No initializer C body is installed.
+
+Next action: capture the selected procedure's temporary allocation/free events
+for the index/root loads and compare the working attachment-address spelling
+in the accepted animated-position callback. The root load needs the earlier
+temporary even though scheduling moves the index load first. Preserve actual
+resource signatures and callback behavior; do not add arguments or padding to
+force a frame. Five assembly owners remain in this source: `func_862055F0`,
+`func_8620581C`, `func_86205F34`, `func_86206334` and `func_86206508`.
