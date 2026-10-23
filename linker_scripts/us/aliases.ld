@@ -891,3 +891,5 @@ func_86203BA8 = SceneMotion_CopyNodePositionsToModels;
 func_86203C58 = SceneMotion_RunSubsteps;
 func_862009E4 = SceneCollision_TestBoundedPlaneHit;
 func_86203DE8 = SceneFlags_MarkWhenCountsMatch;
+func_86207D40 = Geometry_TestSphereContact;
+func_86207F34 = Geometry_TestSegmentContact;
