@@ -105,5 +105,47 @@ hash checks. Independent aggregate comparison preserves all 332 original
 function extents, game sections, linked relocation encodings, and the full
 linked fragment; US MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 
-The original address-keyed function name remains a linker alias. The
-packed-state `func_8411BB04` requeue remains unresolved.
+The original address-keyed function name remains a linker alias.
+
+## 2026-10-23: packed-model initialization resolved
+
+`func_8411BB04` / `BattleAnim_InitializePackedModelState` is runner-accepted
+at 292 bytes, 73 instructions, and a 40-byte frame. After resetting animation
+state, it selects camera 0 or 6 unless camera 33 is active, obtains a side's
+halfword format input and packed model state, and passes them through
+`func_84112FD0` to `func_80041FD0`. Finally it records `D_84183D50` in the
+current side's state slot. These initialization and model-state consumers
+justify the name; the packed word's individual byte meanings remain unknown.
+//@src/fragments/79/fragment79_380A00.c
+//@src/229E0.c
+
+The closest scalar parent already reproduces every instruction except the
+cached side's byte-stack home: stores and reloads use 39 or 35 instead of
+34. A corrected, calibrated source search reaches a zero-difference proposal
+with a redundant pointer alias and byte copy. That proposal is diagnostic
+evidence only; neither alias is retained in the accepted source.
+
+Four subsequent eight-cell batches test real-value representations:
+halfword camera-table indexing, an actual completion-array base, a named
+halfword predicate input, and a model-selection record. The first three do
+not match. Separate halfword locals move the saved byte to 37, 33, 39, or
+35; this does not establish that all scalar forms are impossible.
+
+The accepted form groups the actual halfword predicate input and cached
+side byte in one local record, declared after the predicate result. Both
+fields are assigned and consumed: the halfword goes to `func_8006456C`, and
+the byte indexes the packed state passed to `func_84112FD0`. The compiler
+naturally puts the side at stack 34 and preserves every original register
+and instruction. No unused field, artificial address-taking, duplicate
+byte copy, forced ABI, padding, or instruction rewriting is present.
+
+Known and leading-blank complete-module controls pass before the batch.
+The winning probe is link-verified and passes the normal host-syntax-enabled
+full-ROM gate. The first success is immediately frozen with the three source
+modules, active assembly and layout inputs, four collateral objects, ELF,
+linker output, and ROM; external hashes verify every frozen artifact.
+Independent aggregate comparison preserves all 332 original function extents,
+game sections, relocation encodings, and the entire linked fragment. US ROM
+MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. The address-keyed function name is
+retained as a linker alias. This result resolves the earlier saved-side
+stack-home requeue, not the remaining assembly owners in this file.
