@@ -260,3 +260,72 @@ camera-helper declaration repair. That merge changes a separate prefix
 module, `fragment79_37A6E0.c`, but none of these four owners. The public
 prefix and all other merged source bodies must be preserved; fresh public
 whole-module checks are required before publishing this batch.
+
+## 2026-10-23: timed feedback and side-model initialization
+
+Four owners still active as assembly on public master `0a8b6347` are
+runner-accepted, totaling 1,548 bytes:
+
+- `func_841153DC` / `BattleAnim_UpdateTimedFinishPhase`: 284 bytes. Fire
+  the trigger's callbacks/feedback, adjust camera 4's scalar to 60, set
+  the track flag, then finish at the specified elapsed frame or when a
+  zero-valued completion selector allows the model-animation completion
+  test. The two finish paths retain their separate flag/phase/reset tails.
+  Keep the existing word-sized object parameter and a real byte-pointer
+  view; an incompatible new prototype is not a source hypothesis.
+- `func_84117AA0` / `BattleAnim_DispatchActionFeedback`: 376 bytes. Handle
+  action 48 and actions 217/168 separately, then select the remaining
+  feedback from the side's halfword status and global mode. The actual
+  entry classification is a word-sized snapshot; the value sent to the
+  dispatch helper is read again after the sound callback. The byte-sized
+  snapshot has the same operations but a different register. A typed
+  eight-halfword row view preserves both side queries and the original
+  address-addition order. A calibrated, read-corrected source-only search
+  suggested the snapshot role; the retained source uses no generated
+  placeholder or unused value.
+- `func_84115B34` / `BattleAnim_UpdateBurrowTransition`: 444 bytes. A regular
+  four-case switch matches the observed branch chain. The phases delay,
+  start the transition, update the ordinary/special model paths, then reset
+  the side-facing angle after 30 frames. Diglett/Dugtrio IDs 50/51 skip the
+  ordinary descent/effect path; the preceding producer selects action 91.
+  Keep the species reload after the effect callback. The equivalent if-chain
+  has different dispatch instructions and is not installed.
+- `func_8411D7F8` / `BattleAnim_InitializeActorFromSide`: 444 bytes. Query
+  the side's species, format and packed model state, initialize model and
+  scene hooks, copy the current species into shared state, then reset flags
+  and mark the appropriate side ready. Chained species stores preserve the
+  single source read. The requested-species field view is consumed by the
+  later model call, preserving a fresh field read after callbacks rather
+  than caching its earlier value. All locals have real consumers. The
+  ordinary scalar-only parent differs only in frame extent; eight attempts
+  to replace the accepted field view with a freshly read scalar reject in
+  complete-module comparison. No unused reservation, synthetic padding,
+  dummy read, or address escape is retained.
+
+The private suffix had a stale byte-sized first parameter for
+`func_800231A0`. Its assembly explicitly handles action ID 300, so that
+declaration cannot describe the supported input domain. A word-sized
+integer declaration preserves all existing native game sections/extents
+under normal and leading-blank controls, and is installed transactionally
+with the feedback routine. Both signed word spellings produce the same
+residual until the classification snapshot is corrected; the type change
+alone is not a match. The helper's historical source spelling is unknown.
+Public integration must reconcile its narrower declaration too and prove
+that every already accepted public owner remains unchanged.
+
+Every winner initially reports `link_verified: true` and passes the ordinary
+host-syntax-enabled full-ROM gate. The first success is frozen before any
+subsequent compilation: source and active assembly/layout inputs, all three
+camera modules, four collateral objects, ELF/linker output and ROM.
+Independent comparison preserves all 332 original function extents,
+complete game sections/semantic relocations, and the entire linked fragment.
+External SHA-256 checks pass; US MD5 is
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Original names remain linker aliases.
+
+No instruction or relocation rewriting, forced register/frame/ABI, fake
+local/field/read, volatile trick, or manual unrolling is introduced. Future
+target selection must intersect the private owner's active pragma with
+fresh public master before probing: four earlier private track matches were
+already C publicly and were deliberately not exported or counted as new
+coverage. Transfer only this batch's owned definitions, aliases, declarations,
+and this note; preserve all other newer public source and notes.
