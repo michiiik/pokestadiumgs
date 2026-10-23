@@ -649,7 +649,7 @@ extents, game-section bytes, and final linked relocation encodings; four
 collateral objects and the US ROM are unchanged.
 
 See `docs/regions/fragments/79/fragment79_380210.md` for the input owner's
-source mechanism. The packed-state `func_8411BB04` requeue now belongs to
-`fragment79_380A00.c` and remains unresolved. The category-camera
+source mechanism. The packed-state `func_8411BB04` requeue is resolved as
+`BattleAnim_InitializePackedModelState` in `fragment79_380A00.c`. The category-camera
 `func_84116BC0` requeue is resolved as `BattleAnim_ConfigureAnimationCamera`;
 see `docs/regions/fragments/79/fragment79_380A00.md`.

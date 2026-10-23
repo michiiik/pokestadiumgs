@@ -3951,7 +3951,45 @@ void func_8411BAB8(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_380A00/func_8411BB04.s")
+extern void func_8411EE74(u8 *);
+extern u32 func_8003570C(void);
+extern s32 func_8006456C(s32);
+extern void func_84111248(void);
+extern void func_84111C1C(void);
+extern void func_841126C8(s32 arg0);
+extern void func_8411BAB8(u8 *arg0);
+extern void func_8411FEE8(s32);
+extern s32 func_8410C544(s32, s32, s16);
+extern s32 D_84183D50;
+extern u8 * D_841911E0;
+extern s32 D_841911F4;
+extern u8 * D_84193DD0;
+void BattleAnim_InitializePackedModelState(u8 *arg0) {
+    extern u8 D_84183AA8[];
+    s32 variant;
+    struct {
+        u16 format_input;
+        u8 side;
+    } model;
+    func_84111C1C();
+    func_841126C8((s32)arg0);
+    func_8411EE74(arg0);
+    arg0[2038] = 0;
+    func_8411BAB8(arg0);
+    func_8411FEE8(300);
+    *(s16 *)(arg0 + 2024) = 0;
+    if (*(s16 *)(D_841911E0 + 152) != 33) {
+        func_84111248();
+        *(s16 *)(D_841911E0 + 152) = *(u16 *)(D_84183AA8 + (func_8003570C() & 1) * 2);
+        func_8410C544((s32)*(u8 **)D_841911E0, (s32)arg0, *(s16 *)(D_841911E0 + 152));
+    }
+    model.side = func_8411E1F8((s32)arg0);
+    model.format_input = ((u16 (*)[8])(D_84193DD0 + 16))[func_8411E1F8((s32)arg0)][2];
+    variant = func_8006456C(model.format_input);
+    func_84112FD0(*(u8 **)(arg0 + 1472), *(u16 *)(arg0 + 1628),
+        *(F12State *)(((u8 (*)[16])(D_84193DD0 + 16))[model.side] + 8), variant);
+    *(s32 *)(arg0 + D_841911F4 * 4 + 1480) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
