@@ -842,3 +842,7 @@ func_84110C6C = BattleAnim_UpdateCameraFromInput;
 func_84110B2C = BattleAnim_UpdateCameraWave;
 func_84116BC0 = BattleAnim_ConfigureAnimationCamera;
 func_8411BB04 = BattleAnim_InitializePackedModelState;
+func_84113590 = BattleAnim_LoadCameraTrackResource;
+func_84113658 = BattleAnim_LoadSpeciesCameraPreset;
+func_8411A7D8 = BattleAnim_ResetPackedModelState;
+func_84111EC4 = BattleAnim_ClearFinishedEventTrack;

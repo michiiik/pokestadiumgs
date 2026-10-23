@@ -149,3 +149,59 @@ game sections, relocation encodings, and the entire linked fragment. US ROM
 MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. The address-keyed function name is
 retained as a linker alias. This result resolves the earlier saved-side
 stack-home requeue, not the remaining assembly owners in this file.
+
+## 2026-10-23: camera resources and model-event batch
+
+Four further owners are runner-accepted, totaling 736 bytes:
+
+- `func_84113590` / `BattleAnim_LoadCameraTrackResource`: 200 bytes. It
+  normalizes the byte selection for battle categories 20 and 25, stores
+  `D_841911F9`, then copies the selected ROM resource to `D_84190520`.
+  Camera updater `func_8410BDA0` consumes this buffer and selection byte.
+  Both ROM-offset and 26-byte metadata-row lookups use the stored byte;
+  parameter-only lookup forms lose the original address and narrowing steps.
+- `func_84113658` / `BattleAnim_LoadSpeciesCameraPreset`: 144 bytes. It
+  transfers the species-indexed sixteen-byte record from ROM and writes six
+  typed fields into preset 39 of the 28-byte `D_8418455C` camera table.
+  Camera consumers `func_8410B884` and `func_8410C934` interpret the two
+  halfword/halfword/float groups. Field names remain offset-based where their
+  precise axis or scaling role has not been established.
+- `func_8411A7D8` / `BattleAnim_ResetPackedModelState`: 168 bytes. It clears
+  two state fields, sets the 300-tick interval, and reapplies packed model
+  state. The actual predicate-input/side record proven for
+  `BattleAnim_InitializePackedModelState` also resolves this sibling's saved
+  side at stack 34. Both fields are assigned and consumed.
+- `func_84111EC4` / `BattleAnim_ClearFinishedEventTrack`: 224 bytes. It
+  checks model and battle-state guards, then passes -1 to the event-track
+  setter only when a non-null track has finished. The helper's stale local
+  `void (void *, u8)` declaration is corrected to `s32 (void *, s32)` in the
+  same runner transaction. The callee explicitly recognizes -1; its existing
+  byte-valued caller remains byte-identical.
+//@src/fragments/79/fragment79_37A6E0.c
+//@src/229E0.c
+
+The species loader's real record, ROM-range pointer, and destination pointer
+produce its 48-byte frame naturally. Eight initial single-pointer forms
+place the sixteen-byte transfer at stack 32 or 28; removing the range cache
+changes both the frame and instruction count. Declaring the two consumed
+pointers before the record, and computing the destination after the ROM
+copy, supplies stack 24 and all original loads/stores. No enlarged buffer,
+unused local, dummy field, or padding is used.
+
+Each batch begins with known and leading-blank complete-module controls.
+Every accepted owner is link-verified and passes the normal host-syntax-enabled
+full-ROM gate, with an immediate frozen success before later compilation.
+Independent aggregate comparisons preserve all 332 original function extents,
+game sections, linked relocations, the full linked fragment, and four
+collateral objects. External hashes verify the captured inputs and outputs;
+the US ROM MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+An initial reset-sibling batch rejects a late `s32` declaration of a helper
+that earlier callers already declared implicitly as `int`. Removing that
+new declaration allows the unchanged, ABI-equivalent side-selection call
+to compile; no forced signature or compiler changes are made. This is a
+declaration-context correction, not a source-shape hypothesis failure.
+
+The four old function names remain linker aliases. No instruction or
+relocation rewrites, fake reads, artificial address-taking, volatile tricks,
+or manual loop unrolling are introduced. Other assembly owners remain.

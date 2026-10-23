@@ -342,7 +342,24 @@ void func_84111E80(void *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_380A00/func_84111EC4.s")
+extern u8 *D_84193DD0;
+extern s32 func_84111C8C(u8 *);
+extern s32 func_84111CF8(u8 *);
+extern s32 func_8003F3BC(void *, s32);
+extern s32 ModelAnim_IsEventTrackDone();
+void BattleAnim_ClearFinishedEventTrack(u8 *arg0) {
+    u16 flags;
+    if ((*(u16 *)(arg0 + 86) & 1) != 0) return;
+    if (((u16 (*)[8])(D_84193DD0 + 16))[func_8411E1F8((s32)arg0)][0] == 32) return;
+    if ((((u16 (*)[8])(D_84193DD0 + 16))[func_8411E1F8((s32)arg0)][0] & 7) != 0) return;
+    if (func_84111C8C(arg0) != 0) return;
+    if (func_84111CF8(arg0) != 0) return;
+    flags = *(u16 *)(arg0 + 2036);
+    if ((flags & 2) == 0 && (flags & 1) == 0 &&
+        *(s32 *)(arg0 + 88) != 0 && ModelAnim_IsEventTrackDone(arg0) != 0) {
+        func_8003F3BC(arg0, -1);
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -629,7 +646,7 @@ void func_8411283C(u8 *arg0) {
 
 #ifdef VERSION_US
 extern void func_8003F018(void *);
-extern void func_8003F3BC(void *, u8);
+extern s32 func_8003F3BC(void *, s32);
 extern void func_8003F114(u8 *, s32, s16, s32);
 extern void func_8003F1DC(u8 *);
 extern void ModelAnim_SetResourceAnimation(s32, s32, s32);
@@ -914,11 +931,50 @@ void func_84113560(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_380A00/func_84113590.s")
+extern s32 D_841910D8;
+extern u8 D_841911F9;
+extern u32 D_84183A90[];
+extern s16 D_841851D4[][13];
+extern u8 D_84190520[];
+extern u8 D_49B780[];
+extern void func_80003F74(u8 *, u8 *, u8 *, s32);
+void BattleAnim_LoadCameraTrackResource(u8 arg0) {
+    u8 *rom;
+    if (D_841910D8 == 20 && arg0 == 0) arg0 = 1;
+    if (D_841910D8 == 25 && arg0 == 3) arg0 = 1;
+    D_841911F9 = arg0;
+    rom = D_49B780 + (D_84183A90[D_841911F9] & 0xFFFFFF);
+    func_80003F74(D_84190520, rom, rom + D_841851D4[D_841911F9][0], 0);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_380A00/func_84113658.s")
+typedef struct {
+    s16 unk_00;
+    s16 unk_02;
+    f32 unk_04;
+    s16 unk_08;
+    s16 unk_0A;
+    f32 unk_0C;
+} unk_func_84113658;
+extern u8 D_E0A0[];
+extern u8 D_49B780[];
+extern u8 D_8418455C[];
+extern void func_80003F74(u8 *, u8 *, u8 *, s32);
+void BattleAnim_LoadSpeciesCameraPreset(u8 *arg0) {
+    u8 *rom;
+    unk_func_84113658 *destination;
+    unk_func_84113658 record;
+    rom = D_49B780 + (((u32)D_E0A0 + (*(s16 *)(arg0 + 26) - 1) * 16) & 0xFFFFFF);
+    func_80003F74((u8 *)&record, rom, rom + 16, 0);
+    destination = (unk_func_84113658 *)(D_8418455C + 1092);
+    destination->unk_00 = record.unk_00;
+    destination->unk_02 = record.unk_02;
+    destination->unk_04 = record.unk_04;
+    destination->unk_08 = record.unk_08;
+    destination->unk_0A = record.unk_0A;
+    destination->unk_0C = record.unk_0C;
+}
 #endif
 
 #ifdef VERSION_US
@@ -3319,7 +3375,27 @@ void BattleAnim_Dispatch_226(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_380A00/func_8411A7D8.s")
+extern void func_8411FEE8(s32);
+extern s32 func_8006456C(s32);
+extern u8 *D_84193DD0;
+extern s32 D_841911F4;
+extern s32 D_84183D50;
+void BattleAnim_ResetPackedModelState(u8 *arg0) {
+    s32 variant;
+    struct {
+        u16 format_input;
+        u8 side;
+    } model;
+    *(s16 *)(arg0 + 2024) = 0;
+    arg0[2038] = 0;
+    func_8411FEE8(300);
+    model.side = func_8411E1F8((s32)arg0);
+    model.format_input = ((u16 (*)[8])(D_84193DD0 + 16))[func_8411E1F8((s32)arg0)][2];
+    variant = func_8006456C(model.format_input);
+    func_84112FD0(*(u8 **)(arg0 + 1472), *(u16 *)(arg0 + 1628),
+        *(F12State *)(((u8 (*)[16])(D_84193DD0 + 16))[model.side] + 8), variant);
+    *(s32 *)(arg0 + D_841911F4 * 4 + 1480) = D_84183D50;
+}
 #endif
 
 #ifdef VERSION_US
@@ -4218,7 +4294,7 @@ void BattleAnim_Dispatch_239(s32 arg0) {
 #define M2C_STRUCT_COPY(dst, src) ((dst) = (src))
 #endif
 
-M2C_UNK func_84113590(M2C_UNK);                     /* extern */
+void BattleAnim_LoadCameraTrackResource(u8);                     /* extern */
 
 void func_8411CC2C(s32 arg0) {
     func_84112158(D_84191208, 0xFC);
@@ -4230,7 +4306,7 @@ void func_8411CC2C(s32 arg0) {
     M2C_FIELD(D_841911E0, s16 *, 0x98) = 0;
     func_84111348(arg0, 0x1A);
     func_841112C8();
-    func_84113590(4);
+    BattleAnim_LoadCameraTrackResource(4);
     func_8410C304(M2C_FIELD(D_841911E4, u8 **, 0), D_8419120C, (s32) M2C_FIELD(D_841911E4, s16 *, 0x98));
     func_8411EF08((u8 *) arg0);
     M2C_FIELD(arg0, s8 *, 0x1D) = 0;
@@ -4460,7 +4536,7 @@ void BattleAnim_Dispatch_247(s32 arg0) {
 
 s32 func_8006A3E0();                                /* extern */
 s32 func_8006AC70();                                /* extern */
-M2C_UNK func_84113590(s32);                         /* extern */
+void BattleAnim_LoadCameraTrackResource(u8);                         /* extern */
 extern s32 D_841910D8;
 
 void func_8411D65C(void) {
@@ -4470,33 +4546,33 @@ void func_8411D65C(void) {
     switch (temp_v1) {                              /* irregular */
     case 0x300:
         if ((D_841910D8 >= 9) && (D_841910D8 < 0xD)) {
-            func_84113590(5);
+            BattleAnim_LoadCameraTrackResource(5);
             return;
         }
         if (func_8006AC70() == 0) {
-            func_84113590(5);
+            BattleAnim_LoadCameraTrackResource(5);
             return;
         }
-        func_84113590((func_8003570C() % 5U) & 0xFF);
+        BattleAnim_LoadCameraTrackResource((func_8003570C() % 5U) & 0xFF);
         return;
     case 0x0:
-        func_84113590((func_8003570C() % 5U) & 0xFF);
+        BattleAnim_LoadCameraTrackResource((func_8003570C() % 5U) & 0xFF);
         return;
     case 0x400:
-        func_84113590((func_8003570C() % 5U) & 0xFF);
+        BattleAnim_LoadCameraTrackResource((func_8003570C() % 5U) & 0xFF);
         return;
     case 0x200:
         if ((D_841910D8 >= 0x17) && (D_841910D8 < 0x1D)) {
-            func_84113590((func_8003570C() % 5U) & 0xFF);
+            BattleAnim_LoadCameraTrackResource((func_8003570C() % 5U) & 0xFF);
             return;
         }
-        func_84113590(5);
+        BattleAnim_LoadCameraTrackResource(5);
         return;
     case 0x600:
-        func_84113590(5);
+        BattleAnim_LoadCameraTrackResource(5);
         return;
     default:
-        func_84113590((func_8003570C() % 5U) & 0xFF);
+        BattleAnim_LoadCameraTrackResource((func_8003570C() % 5U) & 0xFF);
         return;
     }
 }
@@ -4541,7 +4617,7 @@ void func_8411DA2C(u8 *arg0) {
 extern void func_8411FF1C(void);
 extern void func_8411DA2C();
 extern void func_8411FEFC(void);
-extern void func_84111EC4(u8 *);
+extern void BattleAnim_ClearFinishedEventTrack(u8 *);
 
 void func_8411DA4C(void) {
     *(u16 *)((u8 *)D_84191208 + 0x7EC) &= ~1;
@@ -4552,8 +4628,8 @@ void func_8411DA4C(void) {
     func_841120A4((u8 *)D_84191208);
     func_841120A4((u8 *)D_8419120C);
     func_8411FEFC();
-    func_84111EC4((u8 *)D_84191208);
-    func_84111EC4((u8 *)D_8419120C);
+    BattleAnim_ClearFinishedEventTrack((u8 *)D_84191208);
+    BattleAnim_ClearFinishedEventTrack((u8 *)D_8419120C);
 }
 /* mkdraft:func_8411DA4C end */
 #endif
