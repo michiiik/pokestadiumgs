@@ -327,3 +327,62 @@ the US ROM MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`. No fake locals,
 unused reads, forced registers, artificial arguments, padding, or injected
 instructions are used. Other owners and the fragment 20 requeues remain
 outside this batch.
+
+## 2026-10-23: special model, periodic camera, and animation sequences
+
+Four native IDO 7.1 owners are accepted, totaling 1540 bytes:
+
+- `func_84112B64` / `BattleAnim_LoadSpecialModel` (308 bytes) selects
+  model 252 unless a side flag guards model IDs 50/51, reloads its resource
+  and model state, selects animation 251, applies side-format adjustments,
+  and clears the object halfword at offset 2026. Its callers in
+  `func_84112DB8` and `func_84112E40` establish the side-flag selection.
+  The model name remains generic; no decoded asset identity is asserted.
+- `func_84117744` / `BattleAnim_UpdateMoveFramesAndCamera` (316 bytes)
+  sets frame-control bytes for animation IDs 199, 205, 18, 46, 180, and
+  193. ID 193 also selects camera presets every 12 ticks below counter 37.
+  The frame byte is consumed by the existing animation/frame setters;
+  `func_84111348` installs the camera callback group after that selection.
+- `func_841187E4` / `BattleAnim_DispatchAnimationStart` (428 bytes)
+  checks the existing object predicate and phase zero, then dispatches
+  animation categories through the original 12-entry jump table. Category
+  10 selects a handler from the side flags; category 75 shares the default
+  handler. Keep the measured case order and combined guard: splitting the
+  guards and duplicating the default path produced a rejected 444-byte body.
+- `func_84119AB4` / `BattleAnim_UpdateModelEventSequence` (488 bytes)
+  handles phases 0, 1, 2, and 4 using the model-animation or event-track
+  completion predicate. Resource bytes 5420/5421 start the sequence;
+  5020/5021 restore its next animation/event. Counter thresholds 20, 30,
+  and 60 and the existing flag side effects retain their original order.
+
+The private native baseline required explicit object arguments in the two
+existing model/event-predicate callers; public master already has those
+corrections. The special-model function's stale integer forward declaration
+is corrected to an object pointer. Whole-module controls verify every caller
+instruction remains unchanged.
+
+An installation-order defect was isolated before acceptance: an unverified
+sequential winner was installed before earlier-source link-verified winners,
+so the shared declaration prefix moved too late for their data references.
+Captured diagnostics name the undefined resource symbol. Each one-owner-only
+declaration is now scoped with its function rather than depending on the
+combined winner order. Neither compiler output nor relocation data is patched.
+
+All four owners then pass the ordinary host-syntax-enabled full-ROM gate.
+The dispatcher is sequentially gated because its isolated link-shape verdict
+is unverified; matching instruction words alone are not its acceptance proof.
+Both successful gates immediately retain source, module, four collateral
+objects, layout/assembly inputs, ELF, linker output, and ROM. Independent
+hashes, module words/extents, relocation encodings, and the US ROM MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d` agree. No injected instructions, padding,
+fake locals, extra reads, artificial arguments, forced registers, or manual
+loop unrolling are used. Other owners and the fragment 20 requeues remain
+unresolved.
+
+Post-acceptance cleanup makes six side-record accesses explicitly relative
+to the 16-byte context header, using 16-byte rows and halfword indices 0,
+1, and 2. This keeps every access inside its selected row and preserves
+all game instructions and relocation encodings in original/header-relative/
+leading-blank whole-module controls. One access belongs to the previously
+accepted `BattleAnim_UpdateTimedEffectSequence`; its narrow view cleanup is
+included alongside the four new owners, without claiming another owner match.

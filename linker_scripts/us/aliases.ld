@@ -829,3 +829,7 @@ func_8410DEB4 = BattleAnim_AdjustCameraDistance;
 func_841146D4 = BattleAnim_ApplyAnimationRecord;
 func_84116F7C = BattleAnim_BeginMoveAnimation;
 func_8411D1A8 = BattleAnim_UpdateTimedEffectSequence;
+func_84112B64 = BattleAnim_LoadSpecialModel;
+func_84117744 = BattleAnim_UpdateMoveFramesAndCamera;
+func_841187E4 = BattleAnim_DispatchAnimationStart;
+func_84119AB4 = BattleAnim_UpdateModelEventSequence;
