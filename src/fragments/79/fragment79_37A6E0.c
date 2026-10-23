@@ -501,15 +501,78 @@ void BattleAnim_ModelDispatch_024(u8 *arg0, s32 arg1) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410D5CC.s")
+extern void func_800371B4(u8 *, u8 *, f32, s16, s16);
+void BattleAnim_AdjustCameraDistanceMild(u8 *arg0, f32 distance, s16 angle_x, s16 angle_y, u8 *origin, u8 *target) {
+    if (distance > *(f32 *)(arg0 + 128) * 1.5f) {
+        func_800371B4(origin, target, distance * 0.68f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.4f) {
+        func_800371B4(origin, target, distance * 0.71f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.3f) {
+        func_800371B4(origin, target, distance * 0.72f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.2f) {
+        func_800371B4(origin, target, distance * 0.73f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.1f) {
+        func_800371B4(origin, target, distance * 0.74f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.0f) {
+        func_800371B4(origin, target, distance * 0.75f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 0.9f) {
+        func_800371B4(origin, target, distance * 0.76f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 0.8f) {
+        func_800371B4(origin, target, distance * 0.78f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 0.7f) {
+        func_800371B4(origin, target, distance * 0.80f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 0.6f) {
+        func_800371B4(origin, target, distance * 0.86f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 0.5f) {
+        func_800371B4(origin, target, distance * 0.95f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 0.4f) {
+        func_800371B4(origin, target, distance * 0.99f, angle_x, angle_y);
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410D9B8.s")
+extern void func_800371B4(u8 *, u8 *, f32, s16, s16);
+void BattleAnim_AdjustCameraDistanceLowerBands(u8 *arg0, f32 distance, s16 angle_x, s16 angle_y, u8 *origin, u8 *target) {
+    if (distance > *(f32 *)(arg0 + 128) * 1.6f) {
+        func_800371B4(origin, target, distance * 0.6f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.5f) {
+        func_800371B4(origin, target, distance * 0.75f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.4f) {
+        func_800371B4(origin, target, distance * 0.85f, angle_x, angle_y);
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_8410DAC8.s")
+extern void func_800371B4(u8 *, u8 *, f32, s16, s16);
+void BattleAnim_AdjustCameraDistanceStrong(u8 *arg0, f32 distance, s16 angle_x, s16 angle_y, u8 *origin, u8 *target) {
+    if (distance > *(f32 *)(arg0 + 128) * 1.5f) {
+        func_800371B4(origin, target, distance * 0.3f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.4f) {
+        func_800371B4(origin, target, distance * 0.41f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.3f) {
+        func_800371B4(origin, target, distance * 0.42f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.2f) {
+        func_800371B4(origin, target, distance * 0.43f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.1f) {
+        func_800371B4(origin, target, distance * 0.44f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 1.0f) {
+        func_800371B4(origin, target, distance * 0.45f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 0.9f) {
+        func_800371B4(origin, target, distance * 0.56f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 0.8f) {
+        func_800371B4(origin, target, distance * 0.58f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 0.7f) {
+        func_800371B4(origin, target, distance * 0.6f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 0.6f) {
+        func_800371B4(origin, target, distance * 0.66f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 0.5f) {
+        func_800371B4(origin, target, distance * 0.75f, angle_x, angle_y);
+    } else if (distance > *(f32 *)(arg0 + 128) * 0.4f) {
+        func_800371B4(origin, target, distance * 0.89f, angle_x, angle_y);
+    }
+}
 #endif
 
 #ifdef VERSION_US

@@ -870,3 +870,6 @@ func_841170A0 = BattleAnim_InitializeCategoryAction;
 func_8411BCC8 = BattleAnim_UpdateCategoryCameraSequence;
 func_84113E7C = BattleAnim_ConfigureGuardedCategoryCamera;
 func_84114BF4 = BattleAnim_UpdateMoveTimeline;
+func_8410D5CC = BattleAnim_AdjustCameraDistanceMild;
+func_8410D9B8 = BattleAnim_AdjustCameraDistanceLowerBands;
+func_8410DAC8 = BattleAnim_AdjustCameraDistanceStrong;
