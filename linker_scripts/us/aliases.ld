@@ -840,3 +840,4 @@ func_84117E94 = BattleAnim_UpdateTimedMoveEvents;
 func_841119CC = BattleAnim_SelectCameraPreset;
 func_84110C6C = BattleAnim_UpdateCameraFromInput;
 func_84110B2C = BattleAnim_UpdateCameraWave;
+func_84116BC0 = BattleAnim_ConfigureAnimationCamera;
