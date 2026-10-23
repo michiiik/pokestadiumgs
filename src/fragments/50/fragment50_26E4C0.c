@@ -32,7 +32,14 @@ s32 Geometry_TestSphereContact(f32 *first, f32 radius, f32 *second, GeometryVec3
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26E4C0/func_86207EB0.s")
+f32 Geometry_ComputePlaneParameter(f32 *plane, f32 *point, f32 *direction) {
+    f32 denominator;
+    denominator = plane[2] * direction[2] +
+                  (plane[1] * direction[1] + direction[0] * plane[0]);
+    return denominator == 0 ? 0.0f :
+           -(plane[3] + (plane[2] * point[2] +
+                         (plane[1] * point[1] + point[0] * plane[0]))) / denominator;
+}
 
 s32 Geometry_TestSegmentContact(f32 *point, f32 radius, f32 *start, f32 *end, GeometryVec3 *normal, f32 *depth) {
     f32 distance;
