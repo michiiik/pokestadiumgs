@@ -915,3 +915,6 @@ func_86205A7C = SceneMotion_ResolvePlayerContacts;
 func_862061B0 = SceneModel_UpdateAnimatedPosition;
 func_86205F34 = SceneModel_UpdateAlternateAnimation;
 func_86206334 = SceneModel_InitPlayers;
+
+func_8AB02F94 = TextReference_GetText;
+func_8AB04BD4 = TextPanels_UpdateVisibility;

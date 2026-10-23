@@ -511,7 +511,7 @@ void func_8AB01454(s16 arg0) {
 
 #ifdef VERSION_US
 extern u8 D_8AB1678A;
-extern s32 func_8004C874(s32, s32);
+extern void *func_8004C874(s32, s32);
 extern void func_80026068(u32);
 extern s16 D_8AB16788;
 void func_8AB016E4(u8 arg0) {
@@ -793,7 +793,20 @@ void *func_8AB02EF8(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB02F94.s")
+extern u8 D_8AB1143C[];
+u8 *TextReference_GetText(u8 *references, u16 entry_index) {
+    u16 archive;
+    u16 entry;
+    u8 *text;
+
+    archive = *(u16 *)(references + entry_index * 4);
+    entry = *(u16 *)(references + entry_index * 4 + 2);
+    text = func_8004C874(archive, entry);
+    if (text == NULL) {
+        text = D_8AB1143C;
+    }
+    return text;
+}
 #endif
 
 #ifdef VERSION_US
@@ -977,7 +990,21 @@ void func_8AB04AE4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB04BD4.s")
+extern u8 D_8AB14218[];
+void TextPanels_UpdateVisibility(void) {
+    s32 index;
+    for (index = 0; index < 4; index++) {
+        if (*(s32 *)D_8AB14218 != 0) {
+            ((u16 **)D_8AB12668)[index][1] &= ~1;
+            ((u16 **)D_8AB141C8)[index][1] |= 1;
+        } else {
+            ((u16 **)D_8AB141C8)[index][1] &= ~1;
+            ((u16 **)D_8AB12668)[index][1] |= 1;
+        }
+        ((u16 **)D_8AB12678)[index][1] |= 1;
+        ((u16 **)D_8AB14458)[index][1] |= 1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
