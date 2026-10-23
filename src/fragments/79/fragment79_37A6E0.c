@@ -3408,6 +3408,7 @@ extern s32 func_8411DC80(u16, s32 *, s32);
 extern s32 func_8411E164();
 extern void func_8411FEE8(s32);
 extern void func_841206D0(u8 *);
+extern void func_84123F60(u8 *, s32);
 void func_84117CEC(u8 *arg0) {
     u8 pad[8];
     BattleAnim_UpdateMoveFramesAndCamera(arg0);
@@ -3470,7 +3471,76 @@ void func_84117DC4(u8 *arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_37A6E0/func_84117E94.s")
+extern void BattleAnim_UpdateMoveFramesAndCamera(u8 *arg0);
+extern void func_80023A3C(s32, s32, s32);
+extern void func_841087B8(s32 arg0, s32 arg1, s32 arg2);
+extern s32 func_84111C8C(u8 *);
+extern void func_84111D64(u8 *arg0, s32 arg1);
+extern void func_8411200C(u8 *arg0);
+extern void func_84112218(u8 *, s32, s32);
+extern void func_84112580(s32 arg0);
+extern void func_84117648(u8 *arg0);
+extern void func_841176E0(void *arg0);
+extern void func_84117880(u8 *arg0);
+extern void func_84117948(s32 arg0);
+extern void func_841179C4(u8 *arg0);
+extern void func_84117A24(u8 *arg0);
+extern void func_84117AA0(u8 *);
+extern void func_84117C18(void *arg0);
+extern s32 func_84117CAC(void *arg0);
+extern s32 func_8411E164();
+extern void func_84124104(u8 *, s32);
+extern u8 * D_84193DD0;
+void BattleAnim_UpdateTimedMoveEvents(u8 *arg0) {
+    BattleAnim_UpdateMoveFramesAndCamera(arg0);
+    if (*(s16 *)(arg0 + 2024) == 0) {
+        if (*(u16 *)(D_84193DD0 + 4) == 11) {
+            if (func_84111C8C(arg0) != 0) {
+                if (*(s16 *)(arg0 + 26) == 252) {
+                    if ((D_84193DD0[9] & 7) != 2) func_841179C4(arg0);
+                } else {
+                    if ((D_84193DD0[9] & 7) != 2) func_8411200C(arg0);
+                }
+            } else {
+                func_84112324(arg0);
+                func_841179C4(arg0);
+            }
+        } else {
+            func_84117948((s32)arg0);
+        }
+    }
+    func_841176E0(arg0);
+    if (func_84117CAC(arg0) != 0) {
+        func_841087B8(arg0[1560], func_8411E164((s32)arg0), (s32)arg0);
+        func_84123F60(arg0, arg0[1567]);
+        switch (*(u16 *)(D_84193DD0 + 4)) {
+        case 16: func_80023A3C(17, 0, 0); break;
+        case 20: func_80023A3C(18, 0, 0); break;
+        default: func_84117AA0(arg0); break;
+        }
+    }
+    func_84117C18(arg0);
+    func_84117A24(arg0);
+    func_84117880(arg0);
+    if (*(s16 *)(arg0 + 2024) >= *(s8 *)(arg0 + 1561) + 20 && arg0[1560] == 205) {
+        if (*(s16 *)(arg0 + 1624) == 16 || *(s16 *)(arg0 + 1624) == 17 || *(s16 *)(arg0 + 1624) == 18) {
+            func_84112218(arg0, 254, 1);
+        } else if (*(s16 *)(arg0 + 26) == 101) {
+            func_84111D64(arg0, 8);
+        } else {
+            func_84112218(arg0, 251, 1);
+        }
+    }
+    if (*(s16 *)(arg0 + 2024) >= *(s8 *)(arg0 + 1561)) {
+        func_84124104(arg0, arg0[1567]);
+    }
+    if (*(s8 *)(arg0 + 1561) + 10 == *(s16 *)(arg0 + 2024)) func_84112580((s32)arg0);
+    if (ModelAnim_IsFinished(arg0) != 0) {
+        func_84111D64(arg0, (*(u8 **)(arg0 + 724))[5020]);
+        if (*(u16 *)(D_84193DD0 + 4) == 11) func_84112324(arg0);
+    }
+    func_84117648(arg0);
+}
 #endif
 
 #ifdef VERSION_US
@@ -3683,7 +3753,7 @@ extern void func_84118704(u8 *arg0);
 extern void func_84118754(u8 *arg0);
 extern void func_84118794(u8 *arg0);
 extern u8 * D_84193DD0;
-extern void func_84117E94(u8 *);
+extern void BattleAnim_UpdateTimedMoveEvents(u8 *);
 void BattleAnim_DispatchAnimationStart(u8 *arg0) {
     if (func_841133EC((s32)arg0) == 0 && *(s8 *)(arg0 + 2038) == 0) {
         switch (*(u16 *)(D_84193DD0 + 4)) {
@@ -3702,11 +3772,11 @@ void BattleAnim_DispatchAnimationStart(u8 *arg0) {
             } else if (((u16 (*)[8])(D_84193DD0 + 16))[func_8411E1F8((s32)arg0)][1] & 2) {
                 func_84117DC4(arg0);
             } else {
-                func_84117E94(arg0);
+                BattleAnim_UpdateTimedMoveEvents(arg0);
             }
             break;
         case 75:
-        default: func_84117E94(arg0); break;
+        default: BattleAnim_UpdateTimedMoveEvents(arg0); break;
         }
     }
 }
