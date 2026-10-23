@@ -876,3 +876,6 @@ func_8410DAC8 = BattleAnim_AdjustCameraDistanceStrong;
 func_84122A0C = BattleAnim_UpdateTerrainPose;
 func_84122EEC = BattleAnim_InitSignedRotatedMotion;
 func_84123150 = BattleAnim_InitRotatedMotion;
+func_841212A0 = BattleAnim_UpdateStagedTurn;
+func_84121920 = BattleAnim_UpdateWideOscillation;
+func_84123CF4 = BattleAnim_UpdateTimedOscillation;

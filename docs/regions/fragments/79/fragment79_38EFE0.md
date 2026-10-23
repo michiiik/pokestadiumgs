@@ -94,3 +94,81 @@ struct/member/void address forms and initializer-versus-assignment copies
 do not resolve it. No candidate is installed. Next action: investigate the
 aggregate-copy/iterator lifetime with a calibrated compiler trace, retaining
 all real flag writes, frame setup calls, and both records.
+
+## 2026-10-23: staged turning and two-state oscillation
+
+Three runner-accepted owners add 1,188 code bytes / 297 MIPS instructions:
+
+- `func_841212A0` / `BattleAnim_UpdateStagedTurn` (396 bytes) advances the
+  actor's signed-byte stage count, performs the side-directed turn, and
+  computes its later angle step from a wrapped progress fraction. Two real
+  f32 locals preserve the integer-to-float rounding of the remaining angle
+  and the double calculation `(131072.0 - remaining) / 131072.0`. The
+  resulting f32 fraction is wrapped at 1.0, scaled by the original double
+  coefficient, converted to s16, and clamped to at least 3640. It retains
+  both direction-helper calls and the final facing-angle write. Multiplying
+  the signed direction by 16384 reproduces the original narrowed shifts
+  without left-shifting a negative C value.
+- `func_84121920` / `BattleAnim_UpdateWideOscillation` (408 bytes) copies
+  the original vector initializer, uses a two-case state switch, approaches
+  amplitude 50 then 0, advances the phase by 3640, updates the actor's
+  position, and calls the two-record follower `func_84120F5C` in each arm.
+  The second arm retains its additional low-amplitude callback.
+- `func_84123CF4` / `BattleAnim_UpdateTimedOscillation` (384 bytes) uses
+  its own copied vector initializer, increments the first-state counter,
+  approaches amplitude 0.6 at rate 0.4, and enters the second state after
+  count 30. The two phase increments are 25486 and 16384. The second state
+  approaches zero at rate 0.1 and retains the low-amplitude callback.
+
+For both oscillation owners, a real f32 distance local declared before the
+vector reproduces the frame and original vector-copy offsets. Writing the
+amplitude before the sine-table factor in each multiplication resolves the
+four swapped float-register instructions. Independent first-arm/second-arm
+composition probes verify that both arms need that order. The switches
+lower to the original short branches and emit no jump tables.
+
+All three candidates report `link_verified: true` and pass the ordinary
+host-syntax-enabled full-ROM gate. Successful artifacts are frozen
+immediately. Independent verification preserves the complete helper module,
+three complete camera modules and their 332 original function extents,
+complete linked fragment 79, semantic relocations, four collateral objects,
+external hashes, and ROM MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+Final pointer cleanup explicitly converts the byte field addresses to the
+float-helper pointer type. Normal and leading-blank complete-module controls
+preserve all game bytes and semantic relocations, followed by a fresh ROM
+gate. Original names remain aliases. Coverage and compiler tooling are unchanged;
+no instruction rewriting, padding, artificial storage/reads, forced
+registers/frame/ABI, or manual unrolling is introduced.
+
+### Damped-motion requeue
+
+`func_841204BC`: **requeue** after 16 compiling source candidates. Its ABI
+loads floating target/step values from the incoming word homes and narrows
+the fourth argument as an angle. A read-only control corrects the two old
+word-argument declarations and spells the callers' same IEEE-754 bits as
+`1.45f, 0.015f` and `2.0f, 0.002f`; the complete module stays identical.
+These interface changes are companion proposals only and remain uninstalled.
+Initial companion preflight failures are tooling diagnostics, not hypotheses.
+
+Real vector/scalar declaration order, velocity snapshots, named projections,
+and forward-force expression order do not close it. The best opcode shape
+is normalized 0.9286 / raw 0.4405 at 336 bytes; the strongest raw comparison
+is normalized 0.9048 / raw 0.5952 at the same length and an 88-byte frame.
+Declaring damping before previous speed corrects their stack homes; the
+remaining first reported difference is byte 65. Next action: continue from
+that real-local parent and inspect the post-call damping reload and force
+expression scheduling. No float-interface repair or candidate body lands
+without the candidate's successful full-ROM gate.
+
+### Camera up-vector rotation requeue
+
+`func_84121B18`: **requeue** after eight candidates. The original rotates
+camera up about its normalized view direction using the sine/cosine tables,
+then clamps negative actor height to zero. Separate real difference and
+normalized-direction locals produce the original 404-byte length but a
+64-byte frame versus 80, normalized 0.9109 / raw 0.6733. Reusing the input
+components shortens the code to 372 bytes. Declaration order and the shared
+Y product do not close it. Next action: recover the meaningful scalar
+lifetimes for the normalized direction, double `1.0 - cosine` calculation,
+and the three separately reloaded camera outputs. No frame padding or
+uninitialized extra local is installed.
