@@ -2,6 +2,14 @@
 
 
 #ifdef VERSION_US
+/* The first 24 bytes of the per-player model metadata. */
+typedef struct ScenePlayerSelectionPrefix {
+    s32 player_index;
+    s32 choice;
+    s32 pending_choice;
+    f32 position[3];
+} ScenePlayerSelectionPrefix;
+
 extern s32 D_8620E198;
 extern void func_8003F210(u8 *, s16);
 extern void ModelAnim_SetFrame(u8 *, s16);
@@ -11,11 +19,15 @@ extern u8 *D_87F119DC;
 extern s32 ModelAnim_IsFinished(u8 *);
 extern s32 func_8003EC54(u8 *);
 extern void func_87F02684(s32);
-extern void func_8620581C(s32, u8 *, u8 *);
+extern s32 func_8620581C(s32, u8 *, u8 *);
 extern f32 D_862090C0[];
 extern void func_87C03B60(u8 *, f32 *, f32 *);
-extern void func_86205F34(u8 *);
-
+extern void SceneModel_UpdateAlternateAnimation(u8 *);
+extern void func_8003F1DC(void *);
+extern void func_8003F114(u8 *, s16, s16, void *);
+extern s32 ModelAnim_HasCrossedFrame(u8 *, s16);
+extern void func_800277F0(u16, void *);
+extern u8 *func_87F025B8(u8 *, void (*)(void));
 
 void SceneModel_InitPlayerAttachment(u8 *source, s32 player_index) {
     u8 *flag_model;
@@ -214,7 +226,48 @@ void SceneModel_UpdateAnimationState(u8 *metadata) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26BF40/func_86205F34.s")
+void SceneModel_UpdateAlternateAnimation(u8 *metadata) {
+    s32 player_index;
+    s32 ticks;
+    s32 counter;
+
+    if (*(u32 *)((u8 *)(u32)D_8620E198 + ((ScenePlayerSelectionPrefix *)metadata)->player_index * 24 + 474044) & 0x80000000) {
+        if (*(s16 *)(D_87F119DC + 100) != 3) {
+            func_8003F1DC(D_87F119DC + 36);
+            func_8003F114(D_87F119DC + 36, 0, -1, *(void **)((u8 *)(u32)D_8620E198 + ((ScenePlayerSelectionPrefix *)metadata)->player_index * 8 + 336));
+            func_8003F210(D_87F119DC + 36, 3);
+            *(s16 *)(*(u8 **)(D_87F119DC + 104) + 6) = 66;
+            return;
+        }
+        if (ModelAnim_HasCrossedFrame(D_87F119DC + 36, 69) && (*(u8 **)(*(u8 **)((u8 *)(u32)D_8620E198 + 244) + ((ScenePlayerSelectionPrefix *)metadata)->player_index * 1728 + 12))[4] == 162) {
+            counter = metadata[26];
+            ticks = *(s32 *)((u8 *)(u32)D_8620E198 + 60);
+            if ((s32)counter < ticks * 2) {
+                if ((s32)counter % ticks == 0) {
+                    func_800277F0(48901, metadata + 24);
+                }
+                metadata[26]++;
+            }
+        }
+    } else if (ModelAnim_IsFinished(D_87F119DC + 36)) {
+        player_index = ((ScenePlayerSelectionPrefix *)metadata)->player_index;
+        if (*(u32 *)((u8 *)(u32)D_8620E198 + player_index * 24 + 474044) & 0x40000000) {
+            if (((ScenePlayerSelectionPrefix *)metadata)->choice != 0) {
+                SceneModel_SelectPlayerDirection(player_index, 0);
+                SceneModel_UpdateAnimationState(metadata);
+                return;
+            }
+            *(u32 *)((u8 *)(u32)D_8620E198 + player_index * 24 + 474044) |= 0x01000000;
+            return;
+        }
+        if (*(s16 *)(D_87F119DC + 100) != 4) {
+            func_8003F1DC(D_87F119DC + 36);
+            func_8003F114(D_87F119DC + 36, 0, -1, *(void **)((u8 *)(u32)D_8620E198 + ((ScenePlayerSelectionPrefix *)metadata)->player_index * 8 + 336));
+            func_8003F210(D_87F119DC + 36, 4);
+            *(s16 *)(*(u8 **)(D_87F119DC + 104) + 6) = 116;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -241,7 +294,7 @@ void SceneModel_UpdateAnimatedPosition(void) {
     *(f32 *)(attachment + 8) = rotation[1] + 180.0f;
     *(f32 *)(attachment + 12) = rotation[2];
     if (*(s32 *)((u8 *)(u32)D_8620E198 + 232) == 5) {
-        func_86205F34(metadata);
+        SceneModel_UpdateAlternateAnimation(metadata);
     } else {
         SceneModel_UpdateAnimationState(metadata);
     }
@@ -256,7 +309,56 @@ void func_86206304(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26BF40/func_86206334.s")
+void SceneModel_InitPlayers(void) {
+    void (*callback)(void);
+    u8 *model;
+    u8 *work;
+    s32 player_index;
+    u8 facing;
+    f32 scale;
+
+    callback = SceneModel_UpdateAnimatedPosition;
+    for (player_index = 0; player_index < 4; player_index++) {
+        model = func_87F025B8((u8 *)(u32)D_8620E198 + 467556, callback);
+        if (model != NULL) {
+            work = model + 36;
+            func_8003F1DC(work);
+            func_8003F114(work, 0, -1, *(void **)((u8 *)(u32)D_8620E198 + player_index * 8 + 332));
+            func_8003F210(work, 0);
+            work = *(u8 **)(model + 32);
+            scale = *(f32 *)((u8 *)(u32)D_8620E198 + 216) * 0.31f;
+            *(u32 *)(model + 12) |= 0x80000000;
+            *(f32 *)(model + 92) = scale;
+            *(f32 *)(model + 88) = scale;
+            *(f32 *)(model + 84) = scale;
+            work[26] = 0;
+            facing = *(u8 *)((u8 *)(u32)D_8620E198 + ((ScenePlayerSelectionPrefix *)work)->player_index * 24 + 474066);
+            switch (facing) {
+            case 0:
+                ((ScenePlayerSelectionPrefix *)work)->choice = 2;
+                ((ScenePlayerSelectionPrefix *)work)->pending_choice = 2;
+                break;
+            case 1:
+                ((ScenePlayerSelectionPrefix *)work)->choice = 4;
+                ((ScenePlayerSelectionPrefix *)work)->pending_choice = 4;
+                break;
+            case 2:
+                ((ScenePlayerSelectionPrefix *)work)->choice = 1;
+                ((ScenePlayerSelectionPrefix *)work)->pending_choice = 1;
+                break;
+            case 3:
+                ((ScenePlayerSelectionPrefix *)work)->choice = 3;
+                ((ScenePlayerSelectionPrefix *)work)->pending_choice = 3;
+                break;
+            }
+            func_862055F0(model, player_index, ((ScenePlayerSelectionPrefix *)work)->choice);
+            ((ScenePlayerSelectionPrefix *)work)->position[0] = *(f32 *)(model + 72);
+            ((ScenePlayerSelectionPrefix *)work)->position[1] = *(f32 *)(model + 76);
+            ((ScenePlayerSelectionPrefix *)work)->position[2] = *(f32 *)(model + 80);
+            SceneModel_InitPlayerAttachment(model, player_index);
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US

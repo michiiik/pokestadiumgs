@@ -251,3 +251,102 @@ temporary even though scheduling moves the index load first. Preserve actual
 resource signatures and callback behavior; do not add arguments or padding to
 force a frame. Five assembly owners remain in this source: `func_862055F0`,
 `func_8620581C`, `func_86205F34`, `func_86206334` and `func_86206508`.
+
+## Post-merge initializer trace: temporary-expression ordering / requeue
+
+The selected initializer now has eight successful whole-module stock/off/on/
+blank-line logging controls, including the accepted three-function batch.
+The uopt listing identifies `func_86206334` as procedure 18; the corresponding
+zero-based UGEN procedure 17 reports the original 104-byte frame. These are
+procedure identities, not inferred object instruction numbers.
+
+At the input address addition, the observed expression event has the index
+product as its left child and the context-root load as its right child, both
+with cost 1. It allocates the index/product temporaries before the context root.
+The original instructions require the root's earlier temporary even though
+assembler scheduling emits the index load first. Do not equate the trace's
+emitted ordinal directly with a final object row; the assembler reorders these
+loads. Eight further metadata-lifetime, byte-clear-order and scale-coefficient
+variants retained the same best 468-byte body/raw 0.9402 and did not close it.
+The tracked source remains assembly for this owner.
+
+Next action: compare address-node datatype and alias classification against the
+accepted animated-position callback's working unsigned index/pool addition.
+The loop's stack frame is already correct; preserve it and the original resource
+signatures. If a declaration repair is justified, isolate and gate that repair
+before another owner candidate rather than disguising it as an ABI change.
+The mode-specific `func_86205F34` assembly and standalone draft are also retained
+for the next same-file batch; its animation/resource calls use the same family
+already verified in these two merged batches.
+
+## 2026-10-24: accepted player initialization and alternate animation
+
+| Original owner | C name | Instruction bytes |
+| --- | --- | ---: |
+| `func_86206334` | `SceneModel_InitPlayers` | 468 |
+| `func_86205F34` | `SceneModel_UpdateAlternateAnimation` | 636 |
+
+Total: 1104 bytes. Both owners passed the normal host-syntax-enabled full ROM
+gate, complete-module/relocation checks, full data-partition reconstruction and
+linked-fragment/collateral checks. Naming and sharing the type below were gated
+again. There are no new padding helpers or instruction/register/ABI rewrites.
+
+### Verified metadata prefix closes the initializer
+
+The first 24 metadata bytes are three signed words (player index, current choice,
+pending choice) followed by three position floats. Using these actual fields
+closes all six previously unresolved integer-register words. The accepted body
+keeps the original four-iteration loop, resource callbacks, 104-byte frame and
+single work pointer reused for animation then metadata. Sharing this prefix at
+file scope preserves the complete original module. It is explicitly a prefix;
+the independently observed allocation stride is 28, and the sound/counter bytes
+after the position remain byte accesses.
+
+### Direct input-state access closes the alternate handler
+
+The metadata prefix recovers the early input address and animation paths. Reading
+the byte counter before context ticks recovers the signed remainder calculation,
+including the original divide guards. Removing the named input-address and flag
+locals lets ordinary repeated field accesses share the original base register;
+the winning form keeps the index local and inlines the flag read/store. The
+sound call is followed by a fresh byte increment, preserving a callback's possible
+changes to that state. Both animation-resource branches and their 66/116 frame
+metadata stores remain intact.
+
+### Contact return declaration: verified correction
+
+The original `func_8620581C` tail moves its collision result from v1 to v0. Its
+forward declaration was corrected from void to s32 before probing its body.
+That declaration-only delta was independently gated and frozen: the already
+accepted contact-loop caller, all 17 extents, complete module, data partition,
+linked fragments and full ROM remain byte-identical. The contact owner is still
+assembly; no unused arguments or ABI alterations were introduced.
+
+### Remaining three owners / next batch
+
+- `func_862055F0`: register-tie / requeue. The retained 308-byte pose candidate
+  remains raw 0.8701. Eight display-prefix variants, using the existing graph
+  header, rotation/position/scale layout, did not change the f16/f18 residual.
+  Continue from the calibrated temporary expression/free sequence at byte 128.
+- `func_8620581C`: requeue. The first reconstruction reaches 608 bytes and
+  normalized 0.9934 (raw 0.5592), but uses an 80-byte frame where the original
+  uses 88. Three scalar coordinates, arrays, three-field vectors and an actual
+  query record were compared without adding dummy locals or padding; the query
+  record adds stores and is worse. Next action: calibrate stack-area allocation
+  and liveness against the retained scalar body and actual three-pointer vector
+  normalizer before another source campaign. Preserve its integer return and
+  existing two-pointer impulse/projection calls.
+- `func_86206508`: requeue. The resource loader's most useful typed-table body
+  reaches normalized 0.9568/raw 0.5617 at 640 bytes, but still has a 112-byte
+  frame versus the original 96. Eight logging controls reproduce complete stock
+  modules and identify the selected procedure: uopt 19 / zero-based UGEN 18.
+  The observed frame is saved area 48, local area 48 and outgoing area 16. Typed
+  resource-pair access removes a roster-offset spill, but the frame remains too
+  large. Source-only byte-offset counters, declaration order and output-word
+  spellings did not close it. The resource value is the existing four-byte
+  signed hue/saturation/brightness adjustment union, passed by value; do not use
+  a guessed pointer value as its semantic type. Keep the real resource API
+  contracts and ordinary loops. The assembly extent includes its verified final
+  four-byte zero alignment tail; do not manufacture padding or unroll loops to
+  force it. Next action: trace the remaining local-area allocation and compare
+  the typed pair-table body with the 96-byte target's real live values.
