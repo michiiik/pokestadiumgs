@@ -3,13 +3,13 @@
 # Undocumented code
 
 <!-- AUTO_UNDOCUMENTED:START -->
-- Functions defined in `src/` with a `/* ... */` comment: **58 / 7,541 (0.8%)**
-- Functions with a real name: **1,610 / 10,901 (14.8%)** (9,291 still `func_XXXXXXXX`)
+- Functions defined in `src/` with a `/* ... */` comment: **58 / 7,550 (0.8%)**
+- Functions with a real name: **1,619 / 10,901 (14.9%)** (9,282 still `func_XXXXXXXX`)
 - Variables with a real name: **248 / 4,558 (5.4%)** (4,310 still `D_XXXXXXXX` / `jtbl_XXXXXXXX`)
 - Functions still using m2c `temp_*` / `var_*` locals: **917**
-- Functions with generic `arg0`, `arg1`, ... parameters: **4,672 / 7,541 (62.0%)**
-- Structs with generic fields (`unk_XX`, `pad`, `field_XX`): **727 / 1,334**
-- Struct fields with a real name: **3,711 / 5,811 (63.9%)**
+- Functions with generic `arg0`, `arg1`, ... parameters: **4,672 / 7,550 (61.9%)**
+- Structs with generic fields (`unk_XX`, `pad`, `field_XX`): **727 / 1,335**
+- Struct fields with a real name: **3,715 / 5,815 (63.9%)**
 - Raw `*(T *)(base + 0xNN)` offset accesses that bypass a struct field: **6,581**
 <!-- AUTO_UNDOCUMENTED:END -->
 
@@ -255,6 +255,7 @@ Generic fields are named unk/pad/field/filler with an optional hex suffix; neste
 | `src/67F00.c` | 7 | 7 | 17 | 6 | 1 | 7 | 0 |
 | `src/72C30.c` | 11 | 11 | 13 | 3 | 1 | 10 | 0 |
 | `src/fragments/44/fragment44_209BD0.c` | 6 | 6 | 16 | 11 | 1 | 3 | 1 |
+| `src/fragments/50/fragment50_26BF40.c` | 14 | 14 | 17 | 3 | 0 | 1 | 3 |
 | `src/fragments/79/fragment79_379450.c` | 8 | 8 | 11 | 10 | 0 | 7 | 2 |
 | `src/fragments/27/fragment27_code.c` | 13 | 13 | 5 | 3 | 3 | 13 | 0 |
 | `src/fragments/88/fragment88_code.c` | 9 | 9 | 18 | 7 | 0 | 3 | 0 |
@@ -293,7 +294,6 @@ Generic fields are named unk/pad/field/filler with an optional hex suffix; neste
 | `src/fragments/31/fragment31_1A60F0.c` | 4 | 4 | 15 | 10 | 0 | 0 | 0 |
 | `src/fragments/31/fragment31_17B150.c` | 2 | 2 | 23 | 3 | 0 | 0 | 0 |
 | `src/fragments/31/fragment31_19BCA0.c` | 4 | 4 | 10 | 6 | 0 | 1 | 7 |
-| `src/fragments/50/fragment50_26BF40.c` | 5 | 5 | 18 | 1 | 0 | 1 | 3 |
 | `src/fragments/79/fragment79_3D7DD0.c` | 8 | 8 | 5 | 6 | 4 | 5 | 0 |
 | `src/fragments/1/fragment1_tail.c` | 3 | 3 | 14 | 5 | 1 | 1 | 3 |
 | `src/fragments/31/fragment31_1A5AE0.c` | 4 | 4 | 17 | 6 | 0 | 0 | 0 |
