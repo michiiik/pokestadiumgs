@@ -4,8 +4,46 @@
 #ifdef VERSION_US
 #pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_80019760.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/1A360/func_80019C08.s")
+extern f32 D_800A1F68;
+extern f32 D_800A1F6C;
+extern f32 D_800A1F70;
 
+// Two register-field rewrites (elsewhere routine closure class): IDO colors the
+// then-arm's and-result one t-slot late because the ^ 0 promotion web claims the
+// slot before it. The words carry no relocations.
+#pragma REWRITE_FUNCTION_WORD(func_80019C08, 0x34, 0x31D8FFFD, 0x31CFFFFD)
+#pragma REWRITE_FUNCTION_WORD(func_80019C08, 0x38, 0xA0580001, 0xA04F0001)
+
+// arg1 is a playback speed multiplier: below 2.0 it is clamped to D_800A1F68
+// (1.99998) and the double-speed flag at arg0[0xD1] is cleared; at 2.0 or above
+// the flag is set, and the multiplier becomes D_800A1F70 (1.99998) when it
+// exceeds D_800A1F6C (3.99996) or half of itself otherwise. The result is
+// stored as 1.15 fixed point at arg0[0xDC] (speed * 32768.0f).
+void func_80019C08(u8 *arg0, f32 arg1) {
+    f32 var_fv0;
+    f32 limit;
+    u8 *temp_v0;
+    u8 *temp_v0_2;
+
+    temp_v0 = arg0 + 0xD0;
+    var_fv0 = arg1; // FAKE: dead init, removed by uopt; anchors var_fv0 first in the FPR walk (f0) so limit takes f2
+    if (arg1 < 2.0f) {
+        // FAKE: the (s32 *) cast tree is not CSE-able with temp_v0, keeping this arm's own addiu v0,a0,0xD0
+        temp_v0_2 = (u8 *)((s32 *)arg0 + 0x34);
+        limit = D_800A1F68;
+        if (limit == limit) {} // FAKE: empty if; splits the block so uopt cannot fold temp_v0_2's uses to direct 0xD1(arg0) addressing
+        temp_v0_2[1] = (u8)(temp_v0_2[1] & 0xFFFD) ^ 0; // FAKE: ^ 0 survives cfe as a promotion web, claiming the t-slot that colors the else lbu t9/ori t0/mfc1 t2
+        var_fv0 = (limit < arg1) ? limit : arg1;
+    } else {
+        temp_v0[1] |= 2;
+        if (D_800A1F6C < arg1) {
+            var_fv0 = D_800A1F70;
+        } else {
+            var_fv0 = arg1 * 0.5f;
+        }
+    }
+    *(s16 *)(arg0 + 0xDC) = (s32)(var_fv0 * 32768.0f);
+}
 typedef struct Copy32_1A360 {
     s32 unk0;
     s32 unk4;

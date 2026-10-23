@@ -55,7 +55,7 @@ s32 func_8410009C(u8 *arg0) {
 }
 
 extern u8 *D_8418C950;
-extern u32 D_8418C954;
+extern s32 D_8418C954;
 extern u8 *main_pool_alloc(s32 arg0, s32 arg1);
 void func_84100134(void) {
     D_8418C950 = main_pool_alloc(0xB6D0, 0);
@@ -65,8 +65,44 @@ void func_84100134(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84100174.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_36F8B0/func_84100260.s")
+extern void func_84100174(u8 *arg0);
+extern u8 *D_8418C950;
+extern s32 D_8418C954;
 
+u8 *func_84100260(void) {
+    s32 var_v1;
+    s32 var_v0;
+    u8 *var_a0_2;
+
+    var_v0 = D_8418C954;
+    var_v1 = 0;
+    var_a0_2 = D_8418C950 + var_v0 * 0x9C;
+loop_1:
+    if (*(s8 *)(var_a0_2 + 0x98) != 0) {
+        var_v0 += 1;
+        var_v1 += 1;
+        if (var_v0 >= 300) {
+            var_v0 = 0;
+            var_a0_2 = D_8418C950;
+        } else {
+            var_a0_2 += 0x9C;
+        }
+        if (var_v1 != 300) {
+            goto loop_1;
+        }
+    }
+    if (var_v1 == 300) {
+        var_a0_2 = NULL;
+    } else {
+        *(s8 *)(var_a0_2 + 0x98) = 1;
+        func_84100174(var_a0_2);
+        D_8418C954 = var_v0 + 1;
+        if (D_8418C954 >= 300) {
+            D_8418C954 = 0;
+        }
+    }
+    return var_a0_2;
+}
 extern u8 *func_84100260(void);
 u8 *func_84100328(void) {
     return func_84100260();

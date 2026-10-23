@@ -111,7 +111,54 @@ s32 func_864001E0(f32 *arg0, f32 arg1, f32 *arg2, f32 *arg3, f32 *arg4, f32 *arg
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/52/fragment52_27E4E0/func_864002CC.s")
+extern s32 func_80001FF0(void);
+extern s32 func_87F026E8(s32, void *);
+extern f32 D_86409990;
+extern f32 D_86409994;
+extern f32 D_86409998;
+extern f32 D_8640999C;
+extern s32 D_87F119D8;
+extern void *D_87F119DC;
+
+/* Per-frame update callback of the D_87F119DC node (registered through
+ * func_87F025B8 in func_86400804; the fragment 64 walker invokes it at
+ * node offset 8 and increments the 0x1C counter it tests here):
+ * position (0x48/0x4C/0x50) += velocity (0x10/0x14/0x18); scale
+ * (0x54/0x58/0x5C) *= growth factor, where flag 0x10000000 in word 0xC
+ * selects D_86409990 (35/33, 1.0606060f) over D_86409994 (1.05f);
+ * velocity decays, x/z (0x10/0x18) *= D_86409998 (0.8f) and y (0x14) *=
+ * D_8640999C (0.95f); s16 0x46 += 0xFF (255); once the walker's counter
+ * at 0x1C reaches the rounded 10Hz frame count ((f32)func_80001FF0() /
+ * 60.0f * 6.0f; func_80001FF0 returns 50 or 60 from osTvType), hands the
+ * node to func_87F026E8(D_87F119D8, D_87F119DC) - the same dequeue call
+ * as func_8630421C in fragment 51. */
+void func_864002CC(void) {
+    f32 var_fv0;
+    f32 var_fv1;
+    s32 var_a0;
+
+    *(f32 *)((u8 *)D_87F119DC + 0x48) += *(f32 *)((u8 *)D_87F119DC + 0x10);
+    *(f32 *)((u8 *)D_87F119DC + 0x4C) += *(f32 *)((u8 *)D_87F119DC + 0x14);
+    *(f32 *)((u8 *)D_87F119DC + 0x50) += *(f32 *)((u8 *)D_87F119DC + 0x18);
+    var_fv0 = (*(s32 *)((u8 *)D_87F119DC + 0xC) & 0x10000000) ? D_86409990 : D_86409994;
+    var_fv1 = D_86409998;
+    if (var_fv1 == var_fv1) {} // FAKE: fully-DCE'd self-compare (nothing reaches the ROM - not original karodo); the dead compare still mentions var_fv1 in uopt's FPR walk, demoting it behind var_fv0 (f0) so var_fv1 takes f2
+    *(f32 *)((u8 *)D_87F119DC + 0x54) = *(f32 *)((u8 *)D_87F119DC + 0x54) * var_fv0;
+    *(f32 *)((u8 *)D_87F119DC + 0x58) = *(f32 *)((u8 *)D_87F119DC + 0x58) * var_fv0;
+    *(f32 *)((u8 *)D_87F119DC + 0x5C) = *(f32 *)((u8 *)D_87F119DC + 0x5C) * var_fv0;
+    *(f32 *)((u8 *)D_87F119DC + 0x10) = *(f32 *)((u8 *)D_87F119DC + 0x10) * var_fv1;
+    *(f32 *)((u8 *)D_87F119DC + 0x14) = *(f32 *)((u8 *)D_87F119DC + 0x14) * D_8640999C;
+    *(f32 *)((u8 *)D_87F119DC + 0x18) = *(f32 *)((u8 *)D_87F119DC + 0x18) * var_fv1;
+    *(s16 *)((u8 *)D_87F119DC + 0x46) = *(s16 *)((u8 *)D_87F119DC + 0x46) + 0xFF;
+    if ((((f32)func_80001FF0() / 60.0f) * 6.0f) >= 0.0f) {
+        var_a0 = (s32)((((f32)func_80001FF0() / 60.0f) * 6.0f) + 0.5f);
+    } else {
+        var_a0 = (s32)((((f32)func_80001FF0() / 60.0f) * 6.0f) - 0.5f);
+    }
+    if (*(s32 *)((u8 *)D_87F119DC + 0x1C) >= var_a0) {
+        func_87F026E8(D_87F119D8, D_87F119DC);
+    }
+}
 #endif
 
 #ifdef VERSION_US

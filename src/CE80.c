@@ -163,7 +163,46 @@ s32 func_8000D0CC(s32 arg0, u8 *arg1, s16 arg2)
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/CE80/func_8000D710.s")
+// Appends the two custom-ucode commands for each of arg2's two slots
+// (slot data pointers at 0x270/0x274, second pointers at 0x280/0x284, and a
+// byte at 0 shared by both slots that lands in word 0 bits 16-23 of the
+// second command). Each command is one 8-byte Gfx entry: word 0 = opcode
+// 0x07 plus a 16-bit likely-TMEM address, word 1 = the data pointer. The
+// first command per slot is the 0x07020000 shape func_8000DB0C emits, with
+// arg1's low 16 bits as the address; the second is the 0x07000000 shape
+// func_8000DAE8 emits, with the fixed addresses 0xC70/0xE10 (0x1A0 apart,
+// the slot-pair stride func_8000DDC8 also emits). The ucode at ROM 0xA8600
+// identifies as "RSP Gfx ucode F3DEX       fifo 2.08" (F3DEX2 2.08 with the
+// name string patched), so opcode 0x07 is not stock G_QUAD; what the RSP
+// does with these commands is unverified.
+Gfx *func_8000D710(Gfx *arg0, s32 arg1, u8 *arg2)
+{
+    Gfx *cmd_gfx;
+    Gfx *cmd_gfx2;
+
+    if (*(s32 *)(arg2 + 0x270) != 0) {
+        cmd_gfx = arg0++;
+        cmd_gfx->words.w0 = (arg1 & 0xFFFF) | 0x07020000;
+        cmd_gfx->words.w1 = *(s32 *)(arg2 + 0x270);
+        cmd_gfx2 = arg0++;
+        // FAKE: the shift pair folds to << 0x10; the folded first shift
+        // claims one IDO temp-walk slot, which the t-register rotation of
+        // both slot blocks depends on.
+        cmd_gfx2->words.w0 = ((*(u8 *)arg2 << 8) << 8) | 0x07000000 | 0xC70;
+        cmd_gfx2->words.w1 = *(s32 *)(arg2 + 0x280);
+    }
+    if (*(s32 *)(arg2 + 0x274) != 0) {
+        cmd_gfx = arg0++;
+        cmd_gfx->words.w0 = (arg1 & 0xFFFF) | 0x07020000;
+        cmd_gfx->words.w1 = *(s32 *)(arg2 + 0x274);
+        cmd_gfx2 = arg0++;
+        // FAKE: same << 0x10 fold, spelled differently from the first slot's
+        // chain so uopt does not CSE the two folds into one walk-slot claim.
+        cmd_gfx2->words.w0 = ((*(u8 *)arg2 << 4) << 12) | 0x07000000 | 0xE10;
+        cmd_gfx2->words.w1 = *(s32 *)(arg2 + 0x284);
+    }
+    return arg0;
+}
 #endif
 
 #ifdef VERSION_US

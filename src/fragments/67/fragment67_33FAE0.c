@@ -560,7 +560,30 @@ s32 func_829045E4(void *arg0, s16 arg1, s16 arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33FAE0/func_829046A8.s")
+extern void *D_82919A08;
+extern f32 D_82917494;
+extern f32 Math_StepToF(f32, f32, f32, f32);
+void func_829046A8(void) {
+    void *ptr;
+
+    if (*(s16 *)((u8 *)&D_82919A08 + 0x38) < 4) {
+        if (Intro_StepRotationOvershoot((S1_unk_D_86002F58_004_000 *)D_82919A08, 2548, 0x7FFF) != 0) {
+            (*(s16 *)((u8 *)&D_82919A08 + 0x38)) += 1;
+        }
+    } else {
+        func_829045E4(D_82919A08, 2002, 0x7FFF);
+    }
+    ptr = D_82919A08;
+    if (*(f32 *)((u8 *)ptr + 0x28) <= 10.0f) {
+        f32 step = D_82917494;
+
+        *(f32 *)((u8 *)&D_82919A08 + 0x30) = Math_StepToF(*(f32 *)((u8 *)&D_82919A08 + 0x30), 3.0f, step, step);
+        ptr = D_82919A08;
+    } else {
+        *(f32 *)((u8 *)&D_82919A08 + 0x30) = 7.0f;
+    }
+    *(f32 *)((u8 *)D_82919A08 + 0x28) = Math_StepToF(*(f32 *)((u8 *)ptr + 0x28), 0.0f, *(f32 *)((u8 *)&D_82919A08 + 0x30), *(f32 *)((u8 *)&D_82919A08 + 0x30));
+}
 #endif
 
 #ifdef VERSION_US

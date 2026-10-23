@@ -136,8 +136,33 @@ void func_83501D3C(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_83503324.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_835034A8.s")
-
+s32 func_800225C4(s32);
+extern s32 D_83503BA8;
+extern s16 D_83503E80;
+void func_835034A8(void)
+{
+  *((s32 *) (((u8 *) (&D_83503BA8)) + 0x10)) = (*((s32 *) (((u8 *) (&D_83503BA8)) + 0x10))) + 1;
+  if (D_83503E80 == 0)
+  {
+    if ((*((s32 *) (((u8 *) (&D_83503BA8)) + 0x10))) == 110)
+    {
+      *((s32 *) (((u8 *) (&D_83503BA8)) + 0)) = 3;
+      func_800225C4(10);
+      *((s32 *) (((u8 *) (&D_83503BA8)) + 0xC)) = 4;
+      StageContext_SetClearColor(1);
+      StageFade_StartFromTransparent(10);
+    }
+  }
+  else
+  {
+    if ((*((s32 *) (((u8 *) (&D_83503BA8)) + 0x10))) == 100)
+    {
+      *((s32 *) (((u8 *) (&D_83503BA8)) + 0xC)) = 4;
+      StageContext_SetClearColor(1);
+      StageFade_StartFromTransparent(10);
+    }
+  }
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/1/fragment1_code/func_83503548.s")
 
 #endif

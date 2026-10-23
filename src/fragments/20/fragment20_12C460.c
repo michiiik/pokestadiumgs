@@ -1256,8 +1256,60 @@ s32 func_82610D14(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82610D6C.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82610E34.s")
 
+
+void *func_82604C40(s32 arg0, s32 arg1, void *arg2, s32 arg3);
+s32 func_82610E34(s32 arg0)
+{
+  s16 new_var2;
+  s32 new_var;
+  s32 found;
+  s32 i;
+  s32 j;
+  u8 *entry;
+  u8 *sub;
+  u8 *walker;
+  found = 1;
+  i = 0;
+  // FAKE: 0xFF & 2 is the constant 2.
+  while (i != (0xFF & 2))
+  {
+    entry = func_82604C40(6, i, ((u8 *) arg0) + 0x114, 0x14);
+    i += 1;
+    sub = entry + 0x30;
+    // FAKE: new_var is a second name for 0; j starts from it below.
+    new_var = 0;
+    // FAKE: - (-0x36) is + 0x36.
+    if ((*((s16 *) (((u8 *) entry) - (-0x36)))) > 0)
+    {
+      j = new_var;
+      new_var2 = *((s16 *) (sub + 6));
+      walker = sub;
+      do
+      {
+        j += 2;
+        if ((*((s16 *) (walker + 0x208))) > 0)
+        {
+          found = 0;
+        }
+        // FAKE: arithmetic nop; new_var stays 0.
+        new_var++;
+        new_var--;
+        walker += 2;
+      }
+      while (j < (new_var2 * 2));
+      // FAKE: arithmetic nop; sub is not read again.
+      sub++;
+      sub--;
+    }
+    if (found == 0)
+    {
+      break;
+    }
+  }
+
+  return found;
+}
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82610EE8.s")
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/20/fragment20_12C460/func_82610FF8.s")

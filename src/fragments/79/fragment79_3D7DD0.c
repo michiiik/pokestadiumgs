@@ -175,9 +175,60 @@ void BattleAnim_SixSlotTrail_Spawn(s16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 a
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84168B00.s")
+typedef struct { u8 pad_00[0xA8]; f32 eye[3]; } unk_func_84168B00;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84168C18.s")
+extern u32 func_841094A4(void);
+extern void Vec3f_CrossProductComponents(f32, f32, f32, f32, f32, f32, f32*, f32*, f32*);
+extern void func_80070C14(f32*, f32*, f32*);
+
+void BattleAnim_SixSlotTrail_ComputeCameraRelativeOffset(s32 arg0, f32* arg1, f32* arg2, f32* arg3, f32 arg4, UNUSED f32 arg5, UNUSED f32 arg6,
+                   UNUSED f32 arg7) {
+    UNUSED s32 pad[36];
+    unk_func_84168B00* temp_v0 = (unk_func_84168B00*)func_841094A4();
+    f32 sp6C;
+    f32 sp68;
+    f32 sp64;
+    f32 sp54;
+    f32 sp50;
+    f32 sp4C;
+    f32 sp60;
+    f32 sp5C;
+    f32 sp58;
+
+    sp60 = arg2[0] - temp_v0->eye[0];
+    sp5C = arg2[1] - temp_v0->eye[1];
+    sp58 = arg2[2] - temp_v0->eye[2];
+
+    sp6C = arg1[0];
+    sp68 = arg1[1];
+    sp64 = arg1[2];
+
+    Vec3f_CrossProductComponents(sp6C, sp68, sp64, sp60, sp5C, sp58, &sp54, &sp50, &sp4C);
+
+    func_80070C14(&sp54, &sp50, &sp4C);
+
+    switch (arg0) {
+        case 0:
+            arg3[0] = arg4 * sp54;
+            arg3[1] = arg4 * sp50;
+            arg3[2] = arg4 * sp4C;
+            break;
+
+        case 1:
+            arg3[0] = -arg4 * sp54;
+            arg3[1] = -arg4 * sp50;
+            arg3[2] = -arg4 * sp4C;
+            break;
+    }
+}
+void BattleAnim_SixSlotTrail_ComputeRotatedOffset(f32 arg0, f32* arg1, f32* arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
+    UNUSED Mtx sp70;
+    Mtx sp30;
+    UNUSED s32 pad;
+
+    guRotateF(&sp30, (360.0f * arg0) / 6.2831855f, 1.0f, 0.0f, 0.0f);
+    guMtxXFMF(&sp30, 0.0f, 0.0f, arg3, &arg2[0], &arg2[1], &arg2[2]);
+}
 
 extern void func_84109780(void *);
 extern f32 __sinf(f32);

@@ -44,7 +44,7 @@ void BattleAnim_EffectSecondaryOwnerAnchorPosition(f32 *position) {
 #endif
 
 #ifdef VERSION_US
-void BattleAnim_EffectTertiaryOwnerBonePosition(void) {
+void BattleAnim_EffectTertiaryOwnerBonePosition() {
     func_841098C0();
 }
 #endif
@@ -105,11 +105,85 @@ void func_841569C0(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841569E0.s")
+typedef struct { f32 x; f32 y; f32 z; } unk_func_841569E0;
+extern void func_80070C14(f32 *, f32 *, f32 *);
+void BattleAnim_CalcVectorAtToDm(f32* arg0, f32* arg1, f32* arg2, f32* arg3, f32* arg4, f32* arg5) {
+    unk_func_841569E0 anchor_pos;
+    unk_func_841569E0 bone_pos;
+    f32 anchor_x;
+    f32 anchor_y;
+    f32 anchor_z;
+    UNUSED s32 pad[3];
+    f32 diff_x;
+    f32 diff_y;
+    f32 diff_z;
+
+    BattleAnim_EffectSecondaryOwnerAnchorPosition(&anchor_pos);
+    BattleAnim_EffectTertiaryOwnerBonePosition(&bone_pos);
+
+    anchor_x = anchor_pos.x;
+    anchor_y = anchor_pos.y;
+    anchor_z = anchor_pos.z;
+
+    diff_x = bone_pos.x - anchor_pos.x;
+    diff_y = bone_pos.y - anchor_pos.y;
+    diff_z = bone_pos.z - anchor_pos.z;
+
+    if (diff_x == 0.0f || diff_y == 0.0f || diff_z == 0.0f) {} // karodo
+
+    func_80070C14(&diff_x, &diff_y, &diff_z);
+
+    *arg0 = anchor_x;
+    *arg1 = anchor_y;
+    *arg2 = anchor_z;
+    *arg3 = diff_x;
+    *arg4 = diff_y;
+    *arg5 = diff_z;
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_84156AB4.s")
+typedef struct { f32 x; f32 y; f32 z; } unk_func_84156AB4;
+extern void func_80070C14(f32 *, f32 *, f32 *);
+void BattleAnim_CalcVectorAtToDm2(f32* arg0, f32* arg1, f32* arg2, f32* arg3, f32* arg4, f32* arg5) {
+    unk_func_84156AB4 anchor_pos;
+    unk_func_84156AB4 bone_pos;
+    f32 anchor_x;
+    f32 anchor_y;
+    f32 anchor_z;
+    UNUSED s32 pad[2];
+    f32 bone_y;
+    f32 diff_x;
+    f32 diff_y;
+    f32 diff_z;
+
+    BattleAnim_EffectSecondaryOwnerAnchorPosition(&anchor_pos);
+    BattleAnim_EffectTertiaryOwnerBonePosition(&bone_pos);
+
+    anchor_x = anchor_pos.x;
+    anchor_y = anchor_pos.y;
+    anchor_z = anchor_pos.z;
+
+    bone_y = bone_pos.y;
+    if (bone_y < 0.0f) {
+        bone_y = 0.0f;
+    }
+
+    diff_x = bone_pos.x - anchor_pos.x;
+    diff_y = bone_y - anchor_pos.y;
+    diff_z = bone_pos.z - anchor_pos.z;
+
+    if (diff_x == 0.0f || diff_y == 0.0f || diff_z == 0.0f) {} // karodo
+
+    func_80070C14(&diff_x, &diff_y, &diff_z);
+
+    *arg0 = anchor_x;
+    *arg1 = anchor_y;
+    *arg2 = anchor_z;
+    *arg3 = diff_x;
+    *arg4 = diff_y;
+    *arg5 = diff_z;
+}
 #endif
 
 #ifdef VERSION_US
@@ -165,7 +239,7 @@ void func_84156CC4(void) {
 }
 
 #ifdef VERSION_US
-extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void BattleAnim_CalcVectorAtToDm(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 extern void func_8415CC74(f32, f32, f32, f32, f32, f32, s16, u8, u8, u8, u8, u8, u8, u8, f32, f32, f32, s16);
 extern void TrailEffectPool_Start(f32, f32, f32, f32, f32, f32, u8, u8, u8, u8, f32, f32, f32, s16);
 extern s32 TrailEffectPool_IsComplete(void);
@@ -181,7 +255,7 @@ void BattleAnim_StartEffect19Radial20_EmitVariantD(void) {
     s32 randomZ;
     s32 randomY;
 
-    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    BattleAnim_CalcVectorAtToDm(&x, &y, &z, &vx, &vy, &vz);
     vx *= 8.0f;
     vy *= 4.0f;
     vz = 0.0f;
@@ -297,7 +371,7 @@ void func_841570D4(void) {
 
 #ifdef VERSION_US
 extern f32 BattleAnim_EffectSecondaryOwnerModelScale(void);
-extern void func_84156AB4(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void BattleAnim_CalcVectorAtToDm2(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 extern void func_84162798(f32, f32, f32, f32, f32, f32, u8, u8, u8, u8, f32, s16);
 void BattleAnim_StartEffect7TexturedRibbonSheet_Emit(void) {
     f32 jitterX;
@@ -312,7 +386,7 @@ void BattleAnim_StartEffect7TexturedRibbonSheet_Emit(void) {
     f32 scale;
     s32 random;
     scale = BattleAnim_EffectSecondaryOwnerModelScale();
-    func_84156AB4(&x, &y, &z, &vx, &vy, &vz);
+    BattleAnim_CalcVectorAtToDm2(&x, &y, &z, &vx, &vy, &vz);
     vx *= 20.0f;
     vy *= 20.0f;
     vz *= 20.0f;
@@ -365,7 +439,7 @@ void BattleAnim_StartEffect7TexturedRibbonSheet_Draw(void) {
 #ifdef VERSION_US
 extern void func_8415C884(f32, f32, f32, f32, f32, f32, s16, u8, u8, u8, u8, u8, u8, u8, f32, f32, f32, s16);
 extern f32 BattleAnim_EffectSecondaryOwnerModelScale(void);
-extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void BattleAnim_CalcVectorAtToDm(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 void BattleAnim_StartEffect33Radial20_Emit(void) {
     f32 x;
     f32 y;
@@ -377,7 +451,7 @@ void BattleAnim_StartEffect33Radial20_Emit(void) {
     s32 randomZ;
     s32 randomY;
 
-    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    BattleAnim_CalcVectorAtToDm(&x, &y, &z, &vx, &vy, &vz);
     vx *= 8.0f;
     vy *= 4.0f;
     vz = 0.0f;
@@ -492,7 +566,7 @@ void BattleAnim_StartEffect98Radial20_EmitVariantD(void) {
     s32 randomZ;
     s32 randomY;
 
-    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    BattleAnim_CalcVectorAtToDm(&x, &y, &z, &vx, &vy, &vz);
     vx *= 8.0f;
     vy *= 4.0f;
     vz = 0.0f;
@@ -719,11 +793,11 @@ void BattleAnim_StartEffect44Trail40GridAlt_Draw(void) {
 
 #ifdef VERSION_US
 extern u16 D_841A4D00;
-extern void func_841639D0(void);
+extern void FourStreamTrail_Init(void);
 void BattleAnim_StartEffect45FourStreamTrail_Init(void) {
     D_841A4D00 = 0;
     BattleAnim_ResetSharedEffectMatrix();
-    func_841639D0();
+    FourStreamTrail_Init();
 }
 #endif
 
@@ -749,16 +823,16 @@ void BattleAnim_StartEffect45FourStreamTrail_Draw(void) {
 
 #ifdef VERSION_US
 extern u16 D_841A4D02;
-extern void func_841647D0(void);
+extern void OwnerLinkedFourStream_Init(void);
 void BattleAnim_StartEffect62OwnerLinkedFourStream_Init(void) {
     D_841A4D02 = 0;
     BattleAnim_ResetSharedEffectMatrix();
-    func_841647D0();
+    OwnerLinkedFourStream_Init();
 }
 #endif
 
 #ifdef VERSION_US
-extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void BattleAnim_CalcVectorAtToDm(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 extern u16 D_841A4D02;
 typedef struct { f32 x, y, z; } EmitterPosition;
 extern void OwnerLinkedFourStream_Start(f32, f32, f32, f32, f32, f32, u8, u8, u8, u8, f32, f32, f32, s16);
@@ -779,7 +853,7 @@ s32 BattleAnim_StartEffect62OwnerLinkedFourStream_Update(void) {
     f32 angle;
     *(s16 *)&D_841A4D02 += 1;
     if ((*(s16 *)&D_841A4D02 >> 2) < 4 && (*(s16 *)&D_841A4D02 & 3) == 0) {
-        func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+        BattleAnim_CalcVectorAtToDm(&x, &y, &z, &vx, &vy, &vz);
         angle = (2 - (((*(s16 *)&D_841A4D02 >> 2) + 2) % 3)) * 0.5235988f + 0.34906587f;
         vx *= 7.0f * __cosf(angle);
         vy = __sinf(angle) * 10.0f;
@@ -808,7 +882,7 @@ void BattleAnim_StartEffect62OwnerLinkedFourStream_Draw(void) {
 
 #ifdef VERSION_US
 extern void BattleAnim_ResetSharedEffectMatrix(void);
-extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void BattleAnim_CalcVectorAtToDm(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 extern u16 D_841A4D04;
 void BattleAnim_StartEffect67OwnerAnchoredFourStream_Init(void) {
     EmitterPosition position;
@@ -821,7 +895,7 @@ void BattleAnim_StartEffect67OwnerAnchoredFourStream_Init(void) {
     D_841A4D04 = 0;
     BattleAnim_ResetSharedEffectMatrix();
     OwnerAnchoredFourStream_Init();
-    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    BattleAnim_CalcVectorAtToDm(&x, &y, &z, &vx, &vy, &vz);
     vx *= 5.0;
     vy *= 5.0;
     vz *= 5.0;
@@ -854,11 +928,11 @@ void BattleAnim_StartEffect67OwnerAnchoredFourStream_Draw(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void BattleAnim_CalcVectorAtToDm(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 extern void func_8415C644(f32, f32, f32, f32, f32, f32, s32, s32, s32, s32, s32, f32, f32, f32, s32);
 void BattleAnim_StartEffect78Radial20_EmitVariantA(void) {
     f32 out[6];
-    func_841569E0(&out[5], &out[4], &out[3], &out[2], &out[1], &out[0]);
+    BattleAnim_CalcVectorAtToDm(&out[5], &out[4], &out[3], &out[2], &out[1], &out[0]);
     out[2] *= 6.0f;
     out[1] *= 6.0f;
     out[0] *= 6.0f;
@@ -899,7 +973,7 @@ void BattleAnim_StartEffect78Radial20_Draw(void) {
 typedef struct S1_unk_D_843C2C00_024 {
     s32 unk_00, unk_04, unk_08, unk_0C, unk_10, unk_14, unk_18, unk_1C;
 } S1_unk_D_843C2C00_024;
-extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void BattleAnim_CalcVectorAtToDm(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 extern f32 __cosf(f32);
 extern void DoubleTextureTrail_Spawn(f32, f32, f32, f32, f32, f32, f32, f32, f32, f32, f32, s16, s32, s32, s16, s16, s16, s16, s16, s16, s16, s16, S1_unk_D_843C2C00_024 *, S1_unk_D_843C2C00_024 *, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8);
 extern void BattleAnim_SixSlotTrail_Spawn(s16, f32, f32, f32, f32, f32, f32, u8, u8, u8, u8, u8, u8, u8, u8, u8, f32, f32, f32, s16, s32, s32, s16, s16, s16, s16, s16, s16, s16, s16, S1_unk_D_843C2C00_024 *, S1_unk_D_843C2C00_024 *);
@@ -927,7 +1001,7 @@ void BattleAnim_StartEffect26DoubleTextureTrail_Emit(void) {
     f32 vx;
     f32 vy;
     f32 vz;
-    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    BattleAnim_CalcVectorAtToDm(&x, &y, &z, &vx, &vy, &vz);
     vx *= 10.0f;
     vy *= 10.0f;
     vz *= 10.0f;
@@ -977,7 +1051,7 @@ void BattleAnim_StartEffect26DoubleTextureTrail_Draw(void) {
 
 #ifdef VERSION_US
 extern f32 __cosf(f32);
-extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void BattleAnim_CalcVectorAtToDm(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 void BattleAnim_StartEffect47SixSlotTrail_Emit(void) {
     f32 x;
     f32 y;
@@ -985,7 +1059,7 @@ void BattleAnim_StartEffect47SixSlotTrail_Emit(void) {
     f32 vx;
     f32 vy;
     f32 vz;
-    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    BattleAnim_CalcVectorAtToDm(&x, &y, &z, &vx, &vy, &vz);
     vy += 0.2f * __cosf(((guRandom() % 10) * 3.1415927f) / 10.0f);
     vz += 0.2f * __cosf(((guRandom() % 10) * 3.1415927f) / 10.0f);
     vx *= 12.0f;
@@ -1040,7 +1114,7 @@ void BattleAnim_StartEffect4DoubleTextureTrail_Emit(void) {
     f32 vx;
     f32 vy;
     f32 vz;
-    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    BattleAnim_CalcVectorAtToDm(&x, &y, &z, &vx, &vy, &vz);
     vx *= 10.0f;
     vy *= 10.0f;
     vz *= 10.0f;
@@ -1093,7 +1167,7 @@ void BattleAnim_StartEffect77DoubleTextureTrail_Emit(void) {
     f32 vx;
     f32 vy;
     f32 vz;
-    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    BattleAnim_CalcVectorAtToDm(&x, &y, &z, &vx, &vy, &vz);
     vx *= 10.0f;
     vy *= 10.0f;
     vz *= 10.0f;
@@ -1139,7 +1213,7 @@ void BattleAnim_StartEffect77DoubleTextureTrail_Draw(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void BattleAnim_CalcVectorAtToDm(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 void BattleAnim_StartEffect70DoubleTextureTrail_Emit(void) {
     f32 x;
     f32 y;
@@ -1147,7 +1221,7 @@ void BattleAnim_StartEffect70DoubleTextureTrail_Emit(void) {
     f32 vx;
     f32 vy;
     f32 vz;
-    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    BattleAnim_CalcVectorAtToDm(&x, &y, &z, &vx, &vy, &vz);
     vx *= 10.0f;
     vy *= 10.0f;
     vz *= 10.0f;
@@ -1191,7 +1265,7 @@ extern S1_unk_D_843C2C00_024 D_841872B0;
 extern S1_unk_D_843C2C00_024 D_841872D0;
 extern S1_unk_D_843C2C00_024 D_841872F0;
 extern S1_unk_D_843C2C00_024 D_84187310;
-extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void BattleAnim_CalcVectorAtToDm(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 void BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture(void) {
     f32 x;
     f32 y;
@@ -1199,7 +1273,7 @@ void BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture(void) {
     f32 vx;
     f32 vy;
     f32 vz;
-    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    BattleAnim_CalcVectorAtToDm(&x, &y, &z, &vx, &vy, &vz);
     vx *= 12.0f;
     vy *= 12.0f;
     vz *= 12.0f;
@@ -1224,7 +1298,7 @@ void BattleAnim_StartEffect39CombinedTrail_EmitDoubleTexture(void) {
 
 #ifdef VERSION_US
 extern f32 __cosf(f32);
-extern void func_841569E0(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
+extern void BattleAnim_CalcVectorAtToDm(f32 *, f32 *, f32 *, f32 *, f32 *, f32 *);
 void BattleAnim_StartEffect39CombinedTrail_EmitSixSlot(void) {
     f32 x;
     f32 y;
@@ -1232,7 +1306,7 @@ void BattleAnim_StartEffect39CombinedTrail_EmitSixSlot(void) {
     f32 vx;
     f32 vy;
     f32 vz;
-    func_841569E0(&x, &y, &z, &vx, &vy, &vz);
+    BattleAnim_CalcVectorAtToDm(&x, &y, &z, &vx, &vy, &vz);
     vy += 0.4f * __cosf(((guRandom() % 10) * 3.1415927f) / 10.0f);
     vz += 0.4f * __cosf(((guRandom() % 10) * 3.1415927f) / 10.0f);
     vx *= 12.0f;

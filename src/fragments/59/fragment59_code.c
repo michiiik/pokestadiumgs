@@ -302,7 +302,37 @@ void func_8690C6C4(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/59/fragment59_code/func_8690C7F0.s")
+extern Gfx *D_800D0510;
+extern u8 D_80094E38[];
+extern u8 D_80094F50[];
+extern s32 D_8690F9E0;
+extern s32 func_8004410C(s32, s32);
+extern void Gfx_DrawTextureRgba16(s16, s16, s16, s16, u8 *, s16, s32);
+
+void func_8690C7F0(s32 arg0) {
+    switch (arg0) {
+    case 0:
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        Gfx_DrawTextureRgba16(140, 111, 40, 40, (u8 *)func_8004410C(D_8690F9E0, 0), 40, 0);
+        gSPDisplayList(D_800D0510++, D_80094F50);
+        break;
+    case 1:
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        Gfx_DrawTextureRgba16(101, 111, 40, 40, (u8 *)func_8004410C(D_8690F9E0, 0), 40, 0);
+        Gfx_DrawTextureRgba16(179, 111, 40, 40, (u8 *)func_8004410C(D_8690F9E0, 1), 40, 0);
+        gSPDisplayList(D_800D0510++, D_80094F50);
+        break;
+    case 2:
+        gSPDisplayList(D_800D0510++, D_80094E38);
+        Gfx_DrawTextureRgba16(62, 111, 40, 40, (u8 *)func_8004410C(D_8690F9E0, 0), 40, 0);
+        Gfx_DrawTextureRgba16(140, 111, 40, 40, (u8 *)func_8004410C(D_8690F9E0, 1), 40, 0);
+        Gfx_DrawTextureRgba16(218, 111, 40, 40, (u8 *)func_8004410C(D_8690F9E0, 2), 40, 0);
+        gSPDisplayList(D_800D0510++, D_80094F50);
+        break;
+    case 3:
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US

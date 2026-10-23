@@ -38,7 +38,124 @@ void func_8280018C(u8 *arg0, s32 arg1) {
     func_81600B30(*(void **)(arg0 + 8));
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/10/fragment10_D4C50/func_828001FC.s")
+extern s32 func_8280276C(u8 *);
+extern void func_80064D28(void);
+extern void func_816018CC(s32);
+extern void func_828000CC(u8 *);
+extern void func_800086A4(s32);
+extern s32 StageContext_GetFadeMode(void);
+extern void StageFade_StartFromOpaque(s32);
+extern void StageFade_StartFromTransparent(s32);
+extern void StageContext_SetClearColor(u16);
+extern void func_80025CBC(s32);
+extern void func_800225C4(s32);
+s32 func_828001FC(u8 *arg0)
+{
+  s32 state = 0;
+  s32 result = -2;
+  s32 temp;
+  u8 *view;
+  view = arg0 + 0xC;
+  if (((*((s32 *) (((u8 *) (*((s16 **) (arg0 + 0xB8)))) + 4))) & 0xC00000) && (!((*((s32 *) (((u8 *) (*((s16 **) (arg0 + 0xB8)))) + 4))) & 0x10000000)))
+  {
+    func_800086A4(2);
+    StageFade_StartFromOpaque(5);
+  }
+  do
+  {
+    temp = func_8280276C(view);
+    func_80064D28();
+    func_816018CC(1);
+    func_8280018C(arg0, state != 1);
+    func_828000CC(arg0);
+    switch (state)
+    {
+      case 0:
+        if (result == (-2))
+      {
+        result = temp;
+      }
+        if (StageContext_GetFadeMode() == 0)
+      {
+        state = 1;
+      }
+        break;
+
+      case 1:
+        if (result == (-2))
+      {
+        result = temp;
+      }
+        if (result == (-2))
+      {
+        break;
+      }
+        if (result == (-1))
+      {
+        if ((*((s32 *) (((u8 *) (*((s16 **) (arg0 + 0xB8)))) + 4))) & 0xC00000)
+        {
+          state = 2;
+          if ((*((s32 *) (((u8 *) (*((s16 **) (arg0 + 0xB8)))) + 4))) & 0x400000)
+          {
+            StageContext_SetClearColor(1);
+          }
+          else
+            if ((*((s32 *) (((u8 *) (*((s16 **) (arg0 + 0xB8)))) + 4))) & 0x800000)
+          {
+            StageContext_SetClearColor(0xFFFF);
+          }
+          StageFade_StartFromTransparent(5);
+          *((s32 *) (arg0 + 0xBC)) = 1;
+        }
+        else
+        {
+          state = 3;
+        }
+      }
+      else
+        if ((*((s32 *) (((u8 *) (*((s16 **) (arg0 + 0xB8)))) + 4))) & 0x3000000)
+      {
+        state = 2;
+        if ((*((s32 *) (((u8 *) (*((s16 **) (arg0 + 0xB8)))) + 4))) & 0x1000000)
+        {
+          StageContext_SetClearColor(1);
+        }
+        else
+          if ((*((s32 *) (((u8 *) (*((s16 **) (arg0 + 0xB8)))) + 4))) & 0x2000000)
+        {
+          StageContext_SetClearColor(0xFFFF);
+        }
+        StageFade_StartFromTransparent(5);
+        *((s32 *) (arg0 + 0xBC)) = 1;
+      }
+      else
+      {
+        state = 3;
+      }
+        if (((result == (-1)) && ((*((s32 *) (((u8 *) (*((s16 **) (arg0 + 0xB8)))) + 4))) & 0x40000000)) || ((result >= 0) && ((*((s32 *) (((u8 *) (*((s16 **) (arg0 + 0xB8)))) + 4))) & 0x80000000)))
+      {
+        func_80025CBC(5);
+      }
+      else
+        if (((result == (-1)) && ((*((s32 *) (((u8 *) (*((s16 **) (arg0 + 0xB8)))) + 4))) & 0x10000)) || ((result >= 0) && ((*((s32 *) (((u8 *) (*((s16 **) (arg0 + 0xB8)))) + 4))) & 0x40000)))
+      {
+        func_800225C4(5);
+      }
+        break;
+
+      case 2:
+        if (StageContext_GetFadeMode() == 1)
+      {
+        state = 3;
+      }
+        break;
+
+    }
+
+  }
+  while (state != 3);
+  return result;
+}
 
 /* mkdraft:fragment10_main begin */
 extern s32 main_pool_push_state(s32);
