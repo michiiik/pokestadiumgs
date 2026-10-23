@@ -338,9 +338,9 @@ extern u8 *D_841911E8;
 extern u8 *func_8410B330(u8 *);
 extern s32 BattleAnim_StepToS16(s16 *, s16, s16);
 extern void func_841203B4(u8 *, f32, f32);
-extern void func_800371B4(u8 *, u8 *, f32, s16, s32);
+extern void func_800371B4(u8 *, u8 *, f32, s16, s16);
 extern void Vec3f_SetComponentsDuplicate(f32 *, f32, f32, f32);
-extern void func_80037120(s32, s32, s32 *, s16 *, s16 *);
+extern void func_80037120(void *, void *, f32 *, s16 *, s16 *);
 
 void func_8410C720(u8 *arg0, u8 *arg1, f32 arg2, f32 arg3, f32 arg4, s32 arg5) {
     f32 target[3];
