@@ -889,3 +889,5 @@ func_8620050C = SceneMotion_CreateThreeModels;
 func_86201790 = SceneMotion_IsCrossXZNonnegative;
 func_86203BA8 = SceneMotion_CopyNodePositionsToModels;
 func_86203C58 = SceneMotion_RunSubsteps;
+func_862009E4 = SceneCollision_TestBoundedPlaneHit;
+func_86203DE8 = SceneFlags_MarkWhenCountsMatch;
