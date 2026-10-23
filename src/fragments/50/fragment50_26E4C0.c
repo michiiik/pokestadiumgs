@@ -5,7 +5,26 @@
 typedef struct { f32 x, y, z; } GeometryVec3;
 extern GeometryVec3 *func_80035A10(GeometryVec3 *);
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_26E4C0/func_86207A80.s")
+s32 Geometry_IsPointInTriangleXZ(f32 point_x, f32 point_z, f32 first_x, f32 first_z, f32 second_x, f32 second_z, f32 third_x, f32 third_z) {
+    f32 ax, az, bx, bz, cx, cz;
+    f32 ab, bc, ca;
+    s32 result;
+    result = 0;
+    ax = first_x - point_x;
+    az = first_z - point_z;
+    bx = second_x - point_x;
+    bz = second_z - point_z;
+    cx = third_x - point_x;
+    cz = third_z - point_z;
+    ab = ax * bz - bx * az;
+    bc = bx * cz - cx * bz;
+    ca = cx * az - ax * cz;
+    if ((ax * bz >= bx * az && bc >= 0.0f && ca >= 0.0f) ||
+        (ab <= 0.0f && bc <= 0.0f && ca <= 0.0f)) {
+        result = 1;
+    }
+    return result;
+}
 
 void Geometry_ComputeLineProjection(f32 *point, f32 *start, f32 *end, f32 *distance, f32 *parameter, GeometryVec3 *closest) {
     f32 px;

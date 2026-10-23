@@ -100,24 +100,45 @@ semantic relocations. The named, typed and formatted cleanup passed a fresh
 the same residuals on the tested near-match candidates after complete current
 module and blank-line controls; the ordinary driver produced the final match.
 
-## Unresolved XZ predicate
+## Accepted XZ triangle predicate (US ROM, 2026-10-24)
 
-**requeue — `func_86207A80`**, 320 bytes. Let a, b and c be the three
-XZ vertices relative to the queried point. The positive path first compares
-`a.x*b.z >= b.x*a.z`, then requires the BC and CA cross products to be
-nonnegative. The fallback requires the AB, BC and CA cross products to be
-nonpositive. Preserve the direct product comparison on the positive path.
+`func_86207A80` → `Geometry_IsPointInTriangleXZ`, 320 bytes. Its eight
+scalar arguments are the queried XZ point and three XZ vertices. The caller
+`SceneCollision_TestBoundedPlaneHit` supplies the plane-hit point and the
+triangle's vertices. This consumer and the three oriented cross products
+establish the name.
+//@src/fragments/50/fragment50_266A60.c
 
-The `bc1fl` at `86207AD0` executes its subtraction delay slot only when the
-branch is taken to the negative path. On the positive fallthrough the slot
-is annulled; F6 still holds a.x when stored at stack offset zero. Thus the
-positive CA test uses a.x, exactly as the negative test does. The preceding
-region notes misread that annulled slot and described a false asymmetry.
-Fresh structured and goto-only m2c reconstructions agree with this register
-trace. No C body for this owner has been installed.
+Let a, b and c be the vertices relative to the queried point. Compute and
+retain AB, BC and CA cross products, then accept either common nonnegative
+or common nonpositive signs. Preserve the original positive AB test as the
+direct product comparison `a.x*b.z >= b.x*a.z`; the fallback uses the
+computed AB difference. BC/CA comparisons are inclusive in both orientations.
+Do not replace the direct product test with a difference test: they differ
+for some nonfinite/overflowed inputs. Zero-area configurations follow these
+same sign tests, without an added degeneracy rejection.
 
-Earlier candidates scoring up to 0.725 normalized used the wrong positive
-CA formula. Those measurements are invalid source hypotheses and must not
-seed further candidates. Next: probe the corrected two-orientation predicate
-with conditional third-vertex deltas, then classify its actual frame/branch
-residual. Do not infer source semantics from a normalized score.
+The winning source computes the three cross products once and reuses them
+in both orientation tests. This gives the compiler shared values whose
+subtractions survive the zero comparisons. Branch-local expressions had
+been reduced to product comparisons and did not match. Ordinary optimization
+sinks and duplicates the shared expressions as needed to reproduce the
+original 64-byte frame and 320-byte body. All locals represent coordinate
+deltas or cross products; no copied spill aliases or padding are introduced.
+
+The `bc1fl` at `86207AD0` executes its subtraction delay slot only on the
+taken negative path. Positive fallthrough annuls the slot; F6 still holds
+a.x when stored at stack offset zero. Both CA tests therefore use a.x.
+Structured and goto-only m2c reconstructions confirm this register trace.
+The earlier notes' apparent positive-path asymmetry came from overlooking
+that annulment and were corrected before this owner was installed.
+
+The runner accepted a full byte-identical US ROM and exact containing-module
+section bytes and semantic relocations. The named source is checked by a
+fresh ordinary `make COMPARE=1 RUN_CC_CHECK=1`, with retail MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+All five original assembly owners in this source file now have accepted C
+bodies: triangle predicate, line projection, sphere contact, plane parameter
+and segment contact. Their instruction bodies total 1448 bytes; the original
+1456-byte text module includes eight unchanged terminal alignment bytes.
