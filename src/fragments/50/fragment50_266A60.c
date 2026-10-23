@@ -180,7 +180,26 @@ void func_862007FC_padding(void) {}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_862009E4.s")
+typedef struct CollisionDirection3 { f32 x, y, z; } CollisionDirection3;
+extern f32 func_86207EB0(f32 *, f32 *, f32 *);
+extern s32 func_86207A80(f32, f32, f32, f32, f32, f32, f32, f32);
+s32 SceneCollision_TestBoundedPlaneHit(u8 *node, f32 *plane, f32 limit, f32 *first, f32 *second, f32 *third) {
+    s32 result;
+    f32 distance;
+    CollisionDirection3 direction;
+    f32 hit_x, hit_z;
+    result = 0;
+    direction.x = -plane[0];
+    direction.y = -plane[1];
+    direction.z = -plane[2];
+    distance = func_86207EB0(plane, (f32 *)(node + 72), (f32 *)&direction);
+    if (distance >= 0.0f && distance <= limit) {
+        hit_x = *(f32 *)(node + 72) + direction.x * distance;
+        hit_z = *(f32 *)(node + 80) + direction.z * distance;
+        if (func_86207A80(hit_x, hit_z, first[0], first[2], second[0], second[2], third[0], third[2])) result = 1;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
@@ -553,13 +572,30 @@ void func_86203D50(void) { if (*(s32 *)((u8 *)D_8620E198 + 0x90) == 0) { *(s16 *
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/50/fragment50_266A60/func_86203DE8.s")
+extern void * D_8620E198;
+void SceneFlags_MarkWhenCountsMatch(void) {
+    s32 offset;
+    s32 first_count, second_count;
+    u32 flags;
+    second_count = 0;
+    first_count = 0;
+    for (offset = 0; offset < 4; offset++) {
+        flags = *(u32 *)((u8 *)D_8620E198 + 474044 + offset * 24);
+        if (flags & 0x40000000) first_count++;
+        if (flags & 0x1000000) second_count++;
+    }
+    if (first_count == second_count) {
+        for (offset = 0; offset < 4; offset++) {
+            if (*(u32 *)((u8 *)D_8620E198 + 474044 + offset * 24) & 0x40000000) *(u32 *)((u8 *)D_8620E198 + 474044 + offset * 24) |= 0x80000000;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
 extern void *D_8620E198;
 extern void *func_87F0A3E8(void *);
-extern void func_86203DE8(void);
+extern void SceneFlags_MarkWhenCountsMatch(void);
 extern void SceneMotion_RunSubsteps(void);
 extern void func_86200020(s32 arg0);
 void func_86203ED8(void) {
@@ -570,7 +606,7 @@ void func_86203ED8(void) {
             *(s32 *)((u8 *)D_8620E198 + 0xE8) = 6;
         }
     }
-    func_86203DE8();
+    SceneFlags_MarkWhenCountsMatch();
     SceneMotion_RunSubsteps();
 }
 #endif
