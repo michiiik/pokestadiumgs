@@ -450,3 +450,37 @@ is colored v0 rather than emitted through the original temporary registers,
 which also shifts later temporary choices. Identify the real value/address
 lifetime before another source batch. Preserve the matched shuffle owners and
 the full 208-byte rodata window while doing so.
+
+## Accepted marker renderer
+
+`func_8AB04C94` is now `TextInterface_DrawMarkers` (580 bytes). It emits
+3-by-7-pixel rectangles at five-pixel X intervals, starting six pixels from
+both coordinates of the node referenced by `D_8AB14190`. `D_8AB1269C` supplies
+the count. Counts below four choose environment color 0xFF5A96FF; otherwise
+the color is 0xFFFF00FF. The function does not modify the count.
+
+The display-list setup decodes to the standard GBI pipe sync, one-cycle mode,
+texture enable, culling/lighting clear, affine texture perspective, opaque
+surface render mode and environment-only color/alpha combine. All setup and
+rectangle commands are written with their standard macros.
+
+An explicit spacing variable swapped the X/spacing carriers. Using `i * 5`
+recovers the original opcode sequence, but a named node pointer still swaps
+X and node registers. Direct reads of the global node's two coordinates match
+all instructions. The runner accepts this source with link verification and
+an ordinary full-ROM gate. The named source also passes a fresh ordinary gate;
+independent full-module, resolved-relocation, linked-fragment and collateral
+checks pass. The original function symbol remains a linker alias.
+
+## Earlier literal/table window / layout-prerequisite
+
+The current 0x236890 rodata window still excludes the five literals used by
+`func_8AB0148C` at ROM 0x2367D4..0x2367E4, both tables of `func_8AB02D14`
+at 0x2367E8/0x236818, and the table of `func_8AB03394` at 0x236848.
+A proposed earlier aligned start of 0x2367E0 covers all three tables and the
+last two literals, while leaving the first three literals in the shared blob.
+That proposal has not been split or ROM-gated. It is layout preparation for
+the table owners, not evidence that the entire float owner is ready. A start
+at 0x2367D0 intersects the preceding debug string and requires separate string
+ownership analysis. Gate any further layout split with the owners still in
+assembly before replaying C candidates.

@@ -1231,7 +1231,31 @@ void TextPanels_UpdateVisibility(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB04C94.s")
+extern u8 *D_8AB14190;
+void TextInterface_DrawMarkers(void) {
+    s32 i;
+    s16 x;
+    s16 y;
+    gDPPipeSync(D_800D0510++);
+    gDPSetCycleType(D_800D0510++, G_CYC_1CYCLE);
+    gSPTexture(D_800D0510++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON);
+    gSPClearGeometryMode(D_800D0510++, G_CULL_BACK | G_LIGHTING);
+    gDPSetTexturePersp(D_800D0510++, G_TP_NONE);
+    gDPSetRenderMode(D_800D0510++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
+    gDPSetCombineLERP(D_800D0510++, 0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT,
+                     0, 0, 0, ENVIRONMENT, 0, 0, 0, ENVIRONMENT);
+    if (D_8AB1269C < 4) {
+        gDPSetEnvColor(D_800D0510++, 0xFF, 0x5A, 0x96, 0xFF);
+    } else {
+        gDPSetEnvColor(D_800D0510++, 0xFF, 0xFF, 0, 0xFF);
+    }
+    for (i = 0; i < D_8AB1269C; i++) {
+        x = (*(s16 *)(D_8AB14190 + 8) + i * 5 + 6);
+        y = (*(s16 *)(D_8AB14190 + 10) + 6);
+        gSPTextureRectangle(D_800D0510++, x << 2, y << 2, (x + 3) << 2,
+                            (y + 7) << 2, G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+    }
+}
 #endif
 
 #ifdef VERSION_US
