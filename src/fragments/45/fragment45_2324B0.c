@@ -14,14 +14,48 @@ extern s16 D_8AB17238; void func_8AB0D4A4(void) { D_8AB17238 += 1; }
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E0F4.s")
 
-extern void func_8AB0E21C(s32);
+extern s32 func_8AB0E21C(s32);
 void func_8AB0E1FC(void) {
     func_8AB0E21C(0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E21C.s")
+extern void func_8AB04AE4(void);
+extern s32 StageContext_GetFadeMode(void);
+extern s32 func_8AB0E4BC(s32);
+s32 func_8AB0E21C(s32 arg0) {
+    s32 result = 34;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E280.s")
+    switch (arg0) {
+    case 0:
+        func_8AB04AE4();
+        break;
+    case 1:
+        if (StageContext_GetFadeMode() == 0) {
+            result = func_8AB0E4BC(0);
+        }
+        break;
+    }
+    return result;
+}
+
+extern s16 D_8AB1723A;
+extern s32 func_8AB0E2EC(s32);
+s32 func_8AB0E280(s32 arg0) {
+    s16 *counter = &D_8AB1723A;
+
+    switch (arg0) {
+    case 0:
+        *counter = 0;
+        break;
+    case 1:
+        if (*counter >= 10) {
+            func_8AB0E2EC(0);
+        }
+        *counter += 1;
+        break;
+    }
+    return 36;
+}
 
 extern void StageFade_StartFromTransparent(s32 arg0);
 extern s32 StageContext_GetFadeMode(void);
