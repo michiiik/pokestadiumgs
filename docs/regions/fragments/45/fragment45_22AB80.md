@@ -33,3 +33,30 @@ complete US ROM. It passes with `build/pokestadiumgs-us.z64: OK`, and `cmp`
 confirms byte-for-byte equality with retail. MD5 is
 `1561c75d11cedf356a8ddb1a4a5f9d5d`. The original 32-byte frame is preserved
 without dummy storage, forced registers, or instruction rewrites.
+
+## State 12 banner and panel delay
+
+`func_8AB073F4` has a matching C implementation (324 instruction bytes).
+Argument zero resets `D_8AB16A2C`, enables the banner at `D_8AB11D00`,
+calls the existing panel-visibility helper, and copies archive 57 entry 389
+into the banner buffer. It clears flag mask one on `D_8AB167AC` and the
+four nodes referenced by `D_8AB12678`, then clears flag mask two on
+`D_8AB16968`. It emits event 65550 with zero parameters and calls
+`func_800225C4(40)`.
+
+Argument one increments the signed-halfword counter and calls
+`TextHighlight_AnimateScales`. At counter 61 or above it enters
+`func_8AB07538(0)`; other paths return state 12. The update and draw
+dispatchers `func_8AB062C4` and `func_8AB064C4` pass one and two respectively.
+`func_8AB05B88` initializes the referenced nodes. The visibility, highlight,
+and event helpers are defined in `src/fragments/45/fragment45_2251A0.c`;
+`func_800225C4` is in `src/229E0.c`. These claims follow from source and
+original assembly inspection without assigning a broader meaning to flag
+mask two. IDO unrolls the ordinary four-node loop into the retail stores.
+
+Verification targets master `81a6f93f05a34a99eedc2717bbede0491a5cc3b7` plus
+this change. The normal syntax-enabled forced source compile and full
+`make -W src/fragments/45/fragment45_22AB80.c -j4 VERSION=us rom` pass with
+`build/pokestadiumgs-us.z64: OK`. `cmp` confirms byte-for-byte equality
+with retail; MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. The original
+32-byte frame is preserved without dummy storage or instruction rewrites.
