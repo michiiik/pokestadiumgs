@@ -942,7 +942,72 @@ s32 func_8AB02CB4(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB02D14.s")
+extern void func_8AB02644(u16, u16);
+void TextReference_BuildModeSelection(void) {
+    s32 mode;
+    u16 start;
+    func_8AB003E4();
+    mode = D_8AB1269E;
+    switch (mode) {
+    case 4:
+        start = func_8AB02BA8();
+        break;
+    case 5:
+        start = func_8AB02BA8();
+        break;
+    case 8:
+        start = func_8AB02C20();
+        break;
+    case 6:
+        start = func_8AB02C20();
+        break;
+    case 11:
+        start = func_8AB02CB4();
+        break;
+    case 1:
+        D_8AB12696 = 40;
+        start = 330;
+        break;
+    case 2:
+        D_8AB12696 = 22;
+        start = 370;
+        break;
+    case 3:
+        D_8AB12696 = 22;
+        start = 392;
+        break;
+    case 0:
+        D_8AB12696 = 268;
+        start = 330;
+        break;
+    default:
+        D_8AB12696 = 84;
+        start = 330;
+        break;
+    }
+    mode = D_8AB1269E;
+    switch (mode) {
+    case 1:
+        func_8AB02644((u16)(D_8AB12696), start);
+        break;
+    case 2:
+        func_8AB02644((u16)(D_8AB12696), start);
+        break;
+    case 3:
+        func_8AB02644((u16)(D_8AB12696), start);
+        break;
+    case 0:
+        func_8AB029BC((u16)(D_8AB12696), start);
+        break;
+    case 11:
+        ((u16 *)D_8AB14680)[0] = start;
+        break;
+    default:
+        func_8AB00020();
+        TextReference_BuildShuffledRange((u16)(D_8AB12696), start);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -1116,7 +1181,7 @@ void func_8AB032F0(s16 arg0)
 #endif
 
 #ifdef VERSION_US
-extern void func_8AB01288(void); extern void func_8AB02D14(void); void func_8AB03CE8(void) { func_8AB01288(); func_8AB02D14(); }
+extern void func_8AB01288(void); extern void TextReference_BuildModeSelection(void); void func_8AB03CE8(void) { func_8AB01288(); TextReference_BuildModeSelection(); }
 #endif
 
 #ifdef VERSION_US
