@@ -342,7 +342,101 @@ void func_8FD01A78(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD01B90.s")
+/* mkdraft:func_8FD01B90 begin */
+// For four lookup tables, finds the entry whose func_80049148(2, -1, ...)
+// value is largest and stores it with func_8004C54C (slots 29/30, 42, 43, 44)
+// after storing four func_8004C874(74, ...) values in slots 25-28.
+void func_8FD01B90(void)
+{
+  s32 value;
+  s32 i;
+  s32 best;
+  u32 mask; // FAKE: 0xFF held in a variable; the & mask spellings below are load-bearing
+  s32 best_i;
+  mask = 0xFF;
+  value = func_8004C874(74, 10);
+  func_8004C54C(25, value);
+  value = func_8004C874(74, 10);
+  func_8004C54C(26, value);
+  value = func_8004C874(74, 11);
+  func_8004C54C(27, value);
+  value = func_8004C874(74, 11);
+  func_8004C54C(28, value);
+  best = 0;
+  best_i = 1;
+  i = 1;
+  while (i < 252)
+  {
+    value = func_80062CE0(i & mask);
+    value = func_80049148(2, -1, value);
+    if (best < value)
+    {
+      best = value;
+      best_i = i;
+    }
+    i += 1;
+  }
+
+  i = best_i & mask;
+  value = func_80062CE0(i & 0xFF);
+  func_8004C54C(29, value);
+  value = func_80062CE0(i & mask);
+  best_i = 1; // FAKE: dead stores
+  i += 1;
+  func_8004C54C(30, value);
+  i = 1;
+  best = 0;
+  while (i < 256)
+  {
+    value = func_800635E0(i & 0xFF);
+    value = func_80049148(2, -1, value);
+    if (best < value)
+    {
+      best = value;
+      best_i = i;
+    }
+    i += 1;
+  }
+
+  best = 0;
+  value = func_800635E0(best_i & mask);
+  best_i = 1; // FAKE: dead stores
+  i += 1;
+  func_8004C54C(42, value);
+  i = 0;
+  while (i < 8)
+  {
+    value = func_8FD01AB8(i & mask);
+    value = func_80049148(2, -1, value);
+    if (best < value)
+    {
+      best = value;
+      best_i = i;
+    }
+    i += 1;
+  }
+
+  best = 0;
+  value = func_8FD01AB8(best_i & 0xFF);
+  func_8004C54C(43, value);
+  i = 0;
+  while (i != 18)
+  {
+    value = Type_ChartIndexToId(i);
+    value = func_80063270(value & 0xFF);
+    value = func_80049148(2, -1, value);
+    i += 1;
+    if (best < value)
+    {
+      best = value;
+    }
+  }
+
+  value = Type_ChartIndexToId(i);
+  value = func_80063270(value & 0xFF);
+  func_8004C54C(44, value);
+}
+/* mkdraft:func_8FD01B90 end */
 #endif
 
 #ifdef VERSION_US

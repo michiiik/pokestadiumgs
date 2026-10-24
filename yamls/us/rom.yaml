@@ -341,7 +341,7 @@
     - [0xA2B80, .rodata, 1C2D0] # jtbl_800A1F80 (+1 more)
     - [0xA2BD0, .rodata, 1CDC0] # jtbl_800A1FD0 (+2 more)
     - [0xA3260, rodata]
-    - [0xA3BD0, .rodata, 229E0] # jtbl_800A2FD0 + jtbl_800A2FEC + jtbl_800A3108 +
+    - [0xA3270, .rodata, 229E0] # jtbl_800A2FD0 + jtbl_800A2FEC + jtbl_800A3108 +
                                 # jtbl_800A312C + jtbl_800A3150 + jtbl_800A3174 +
                                 # jtbl_800A3198 (all still-GLOBAL_ASM func_80023A3C's own
                                 # jump tables; the whole run is included here, starting at a
@@ -358,6 +358,7 @@
                                 # jtbl_800A374C + jtbl_800A376C. Combined into one subsegment
                                 # (not split) because ld can only consume an object's .rodata
                                 # section once.
+                                # start moved down from 0xA3BD0 to cover jtbl_800A2670, jtbl_800A2B38, jtbl_800A2B64 (func_800226C0's switch tables; jtbl_datamig.py)
     - [0xA4590, rodata] # Include six tables from the next four audio owners.
     - [0xA4EC0, .rodata, 43700] # jtbl_800A42C0
     - [0xA4EE0, .rodata, 47580] # jtbl_800A43C0 (+2 more)
@@ -593,7 +594,8 @@
     - [0xE7C00, c,       fragments/12/fragment12_E7C00]
     - [0xECAB0, data,    fragments/12/fragment12_data]
     - [0xECE50, .rodata, fragments/12/fragment12_E7C00] # jtbl_81407B2C tail (3 words) + jtbl_81407B4C + jtbl_81407B6C + D_81407B8C, 16-byte aligned
-    - [0xECEA0, rodata]
+                                                        # end moved up from 0xECEA0 to cover jtbl_81407B94 (func_81406A30's switch table; jtbl_datamig.py)
+    - [0xECEC0, rodata]
 
   - name: fragment13
     type: code
@@ -1425,10 +1427,13 @@
     - [0x34E600, data,    fragments/67/fragment67_data]
     - [0x353EB0, .rodata, fragments/67/fragment67_33CB20] # jtbl_829173B0
     - [0x353ED0, rodata] # D_829173D0 through D_829173D8
-    - [0x353F10, .rodata, fragments/67/fragment67_33D6A0] # jtbl_82917410
+    - [0x353EE0, .rodata, fragments/67/fragment67_33D6A0] # jtbl_82917410
+                                                          # start moved down from 0x353F10 to cover jtbl_829173E0 (func_829011D0's switch table; jtbl_datamig.py)
     - [0x353F30, rodata] # D_82917430 through D_82917438
     - [0x353F40, .rodata, fragments/67/fragment67_33FAE0] # D_82917440 through jtbl_8291744C and D_82917478
     - [0x353F80, rodata]
+    - [0x354090, .rodata, fragments/67/fragment67_344D70] # jtbl_82917590 (func_82908F60's switch table; jtbl_datamig.py)
+    - [0x354130, rodata]
     - [0x354230, .rodata, fragments/67/fragment67_34AB40] # spline trio literals (datamig)
     - [0x354240, rodata]
     - [0x3542C0, .rodata, fragments/67/fragment67_34C8B0] # format strings and jtbl_829177CC
@@ -1595,6 +1600,8 @@
     - [0x3D3260, c,       fragments/79/fragment79_3D3260]
     - [0x3D4060, c,       fragments/79/fragment79_3D4060]
     - [0x3D4DA0, c,       fragments/79/fragment79_3D4DA0]
+    - [0x3D59C0, c,       fragments/79/fragment79_3D59C0]
+    - [0x3D67F0, c,       fragments/79/fragment79_3D67F0]
     - [0x3D7DD0, c,       fragments/79/fragment79_3D7DD0]
     - [0x3D9410, c,       fragments/79/fragment79_3D9410]
     - [0x3D99F0, c,       fragments/79/fragment79_3D99F0]
@@ -1622,7 +1629,9 @@
     - [0x3FC070, .rodata, fragments/79/fragment79_3D2C10] # D_8418C7E0..D_8418C80C
     - [0x3FC0A0, .rodata, fragments/79/fragment79_3D3260] # Trail constants, D_8418C810..D_8418C840
     - [0x3FC0E0, .rodata, fragments/79/fragment79_3D4060] # Owner-linked trail constants, D_8418C850..D_8418C89C
-    - [0x3FC130, .rodata, fragments/79/fragment79_3D4DA0] # Anchored/multi-trail constants, D_8418C8A0..D_8418C91C
+    - [0x3FC130, .rodata, fragments/79/fragment79_3D4DA0] # Owner-anchored trail constants, D_8418C8A0..D_8418C8D0
+    - [0x3FC170, .rodata, fragments/79/fragment79_3D59C0] # Trail pool constants, D_8418C8E0..D_8418C900
+    - [0x3FC1A0, .rodata, fragments/79/fragment79_3D67F0] # Double-texture trail constants, D_8418C910..D_8418C91C
     - [0x3FC1B0, .rodata,  fragments/79/fragment79_3D7DD0]
     - [0x3FC1D0, .rodata,  fragments/79/fragment79_3D9410]
     - [0x3FC1E0, rodata]

@@ -72,7 +72,29 @@ void TradeCable_UpdateLightFlashPulse(unk_D_88523100 *arg0) {
 
     arg0->unk_12 += 0x800;
 }
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88508D34.s")
+// Light fade-in (unk_1C rises by D_8850D574 to 9.0) with the sine pulse of
+// TradeCable_UpdateLightWaitPulse, then a hold that clears the light once unk_06 reaches 260.
+// Same body as Pokemon Stadium 1 TradeCable_UpdateLightFadeInThenPulse.
+extern f32 D_8850D574;
+void func_88508D34(unk_D_88523100 *arg0) {
+    if (arg0->unk_1C < 9.0f) {
+        arg0->unk_04 = D_88523034 + arg0->unk_02;
+        arg0->unk_06 = (s16)(2.0f * D_80087E50[(u16)(arg0->unk_12) >> 4] + ((2.0f * D_80087E50[(u16)(arg0->unk_12) >> 4]) > 0.0f ? 0.5f : -0.5f)) + 210;
+        arg0->unk_12 += 0x800;
+
+        arg0->unk_1C += D_8850D574;
+        if (arg0->unk_1C >= 9.0f) {
+            arg0->unk_1C = 9.0f;
+        }
+    } else {
+        arg0->unk_1C = 9.0f;
+        arg0->unk_06 += 2;
+        if (arg0->unk_06 >= 260) {
+            arg0->unk_00 = 0;
+            arg0->unk_06 = 0;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_88508E34.s")
 
@@ -195,7 +217,23 @@ void TradeCable_SpawnBallTrailGhost(unk_D_88523050 *arg0) {
         arg0->unk_10++;
     }
 }
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C5AA0/func_8850974C.s")
+// Counts down each live trail ghost timer (unk_04); a ghost reaching 0 decrements the live
+// ghost count unk_10. Same body as Pokemon Stadium 1 TradeCable_UpdateBallTrailGhosts
+// (src/fragments/trade_machine/trade_machine_2942C0.c there).
+void func_8850974C(u8 *arg0) {
+    unk_D_88523050 *ball = (unk_D_88523050 *)arg0;
+    s32 i;
+    unk_D_88523050_012 *ptr;
+
+    for (i = 0, ptr = &ball->unk_12[0]; i < 10; i++, ptr++) {
+        if (ptr->unk_04 != 0) {
+            ptr->unk_04--;
+            if (ptr->unk_04 <= 0) {
+                ball->unk_10--;
+            }
+        }
+    }
+}
 
 extern void func_8850974C(u8 *);
 extern void TradeCable_SpawnBallTrailGhost(unk_D_88523050 *);

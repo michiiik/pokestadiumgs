@@ -338,7 +338,44 @@ void Sched_HandlePreNMI(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/57C0/func_800051B0.s")
+// Retrace handler. Same body as Pokemon Stadium 1 Sched_HandleRetrace (src/scheduler.c there),
+// whose gRspTaskManager fields give the D_800CD020 offsets: 0xA08 OSTime of the last retrace,
+// 0xA34 frame count, 0xA38 pre-NMI counter (from 26 the SP is halted until osAfterPreNMI
+// returns 0), 0xA14 running task, 0xA18 audio task, 0xA1C graphics task. Starts the audio task
+// first (yielding a running task for it), else the graphics task, then notifies clients 'VTRE'.
+// The SP_STATUS_REG store assembles to the same lui/ori pair as the target, whose relocation
+// names the linker symbol SP_STATUS_REG (linker_scripts/us/hardware_regs.ld) instead.
+extern s32 osAfterPreNMI(void);
+extern void *Sched_TryStartTask(void *);
+extern s32 Sched_TryYieldActiveTask(void);
+void func_800051B0(void) {
+    *(OSTime *)((u8 *)D_800CD020 + 0xA08) = osGetTime();
+    D_800CD020[0xA34 / 4]++;
+
+    if ((*(s16 *)((u8 *)D_800CD020 + 0xA38) > 0) && (*(s16 *)((u8 *)D_800CD020 + 0xA38) < 30)) {
+        (*(s16 *)((u8 *)D_800CD020 + 0xA38))++;
+        if (*(s16 *)((u8 *)D_800CD020 + 0xA38) == 26) {
+            while (osAfterPreNMI() != 0) {
+                *(vu32 *)PHYS_TO_K1(SP_STATUS_REG) = 0x8000;
+            }
+        }
+    }
+
+    Sched_PromotePendingTasks();
+    func_80004FF4();
+
+    if (((void **)D_800CD020)[0xA18 / 4] != NULL) {
+        if (D_800CD020[0xA14 / 4] == 0) {
+            D_800CD020[0xA14 / 4] = (u32)Sched_TryStartTask(((void **)D_800CD020)[0xA18 / 4]);
+        } else {
+            Sched_TryYieldActiveTask();
+        }
+    } else if ((((void **)D_800CD020)[0xA1C / 4] != NULL) && (D_800CD020[0xA14 / 4] == 0)) {
+        D_800CD020[0xA14 / 4] = (u32)Sched_TryStartTask(((void **)D_800CD020)[0xA1C / 4]);
+    }
+
+    Sched_NotifyClients('VTRE');
+}
 #endif
 
 #ifdef VERSION_US

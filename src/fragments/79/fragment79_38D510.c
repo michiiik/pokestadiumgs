@@ -209,5 +209,60 @@ f32 func_8411EF90(u8 *arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411EFE4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_38D510/func_8411F1AC.s")
+/* mkdraft:func_8411F1AC begin */
+extern f32 D_84189818;
+extern f32 D_8418981C;
+extern s32 D_84191208;
+
+// Writes an x offset to arg1[0] (negated when arg0 is D_84191208) chosen by the
+// s16 at arg0+0x1A. Read as National Dex numbers, the special-cased values are
+// 208 Steelix, 95 Onix, 130 Gyarados, 249 Lugia, 250 Ho-Oh and 3 Venusaur
+// (inferred from the numbering; the field has no confirmed name).
+void func_8411F1AC(u8 *arg0, f32 *arg1)
+{
+    s16 val;
+
+    if (arg0 == (u8 *)D_84191208) {
+        arg1[1] = *(f32 *)((u8 *)arg0 + 0x650);
+        val = *(s16 *)((u8 *)arg0 + 0x1A);
+
+        if (val == 208) {
+            arg1[0] = D_84189818;
+        } else if (val == 95) {
+            arg1[0] = -225.0f;
+        } else if (val == 130) {
+            arg1[0] = -200.0f;
+        } else if (val == 249) {
+            arg1[0] = -200.0f;
+        } else if (val == 250) {
+            arg1[0] = -185.0f;
+        } else if (val == 3) {
+            arg1[0] = -185.0f;
+        } else {
+            arg1[0] = -150.0f;
+        }
+        arg1[2] = 0.0f;
+    } else {
+        arg1[1] = *(f32 *)((u8 *)arg0 + 0x650);
+        val = *(s16 *)((u8 *)arg0 + 0x1A);
+
+        if (val == 208) {
+            arg1[0] = D_8418981C;
+        } else if (val == 95) {
+            arg1[0] = 225.0f;
+        } else if (val == 130) {
+            arg1[0] = 200.0f;
+        } else if (val == 249) {
+            arg1[0] = 200.0f;
+        } else if (val == 250) {
+            arg1[0] = 185.0f;
+        } else if (val == 3) {
+            arg1[0] = 185.0f;
+        } else {
+            arg1[0] = 150.0f;
+        }
+        arg1[2] = 0.0f;
+    }
+}
+/* mkdraft:func_8411F1AC end */
 #endif

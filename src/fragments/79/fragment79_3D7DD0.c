@@ -361,6 +361,89 @@ Gfx* BattleAnim_SixSlotTrail_LoadTextures(Gfx* arg0, S1_unk_D_843C3508* arg1) {
     return arg0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84169618.s")
+extern Gfx D_84187DD0[];
+extern void *Gfx_AllocDisplayList(s32);
+extern void Gfx_SetCombineMode(Gfx *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+// Builds and draws each active six-slot trail: 40 vertices from the 20 points (offsets from
+// BattleAnim_SixSlotTrail_ComputeRotatedOffset in mode 0, the camera-relative variant in mode
+// 1), then the D_84187DD0 render state, combiner, prim/env colors, textures and segments.
+// Same body as Pokemon Stadium 1 BattleAnim_SixSlotTrail_DrawAll
+// (src/fragments/battle_engine/battle_engine_357C30.c there).
+Gfx *func_84169618(Gfx *arg0) {
+    s32 i;
+    S1_unk_D_843C3508 *var_s6;
+    S1_unk_D_843C3508_0A4 *var_s0;
+    s32 j;
+    s32 k;
+    S1_Vec3f spF0;
+    Vtx *var_s1;
+    s32 pad[12]; // FAKE: unused stack space (also in Stadium 1); sets the frame layout.
+
+    func_841094A4();
+
+    var_s6 = (S1_unk_D_843C3508 *)(D_84187DC0 + 2304);
+    for (i = 0; i < 6; i++, var_s6++) {
+        if (var_s6->unk_000 == 1) {
+            var_s0 = &var_s6->unk_0A4[0];
+
+            var_s6->unk_088 = Gfx_AllocDisplayList(sizeof(Vtx) * 40);
+            var_s1 = var_s6->unk_088;
+
+            for (j = 0; j < 20; j++, var_s0++) {
+                for (k = 0; k < 2; k++) {
+                    switch (var_s6->unk_002) {
+                        case 0:
+                            if (var_s0->unk_00 <= 0.0) {
+                                BattleAnim_SixSlotTrail_ComputeRotatedOffset(var_s0->unk_08 + ((k % 2) * 3.1415927f), &var_s0->unk_18.x, &spF0.x,
+                                              var_s0->unk_04, 1.0f, 0.0f, 0.0f);
+                            }
+                            break;
+
+                        case 1:
+                            if (var_s0->unk_00 <= 0.0) {
+                                BattleAnim_SixSlotTrail_ComputeCameraRelativeOffset(k % 2, &var_s0->unk_18.x, &var_s0->unk_0C.x, &spF0.x, var_s0->unk_04, 1.0f,
+                                              0.0f, 0.0f);
+                            }
+                            break;
+                    }
+
+                    var_s1->v.ob[0] = var_s0->unk_0C.x + spF0.x;
+                    var_s1->v.ob[1] = var_s0->unk_0C.y + spF0.y;
+                    var_s1->v.ob[2] = var_s0->unk_0C.z + spF0.z;
+
+                    var_s1->v.tc[0] = (k % 2) << 10;
+                    var_s1->v.tc[1] = (j * 0x400) / 20;
+
+                    var_s1->v.cn[0] = 0xFF;
+                    var_s1->v.cn[1] = 0xFF;
+                    var_s1->v.cn[2] = 0xFF;
+                    var_s1->v.cn[3] = 0x40;
+                    var_s1++;
+                }
+            }
+
+            gSPDisplayList(arg0++, D_84187DD0);
+
+            Gfx_SetCombineMode(
+                arg0++, var_s6->unk_028.unk_00, var_s6->unk_028.unk_04, var_s6->unk_028.unk_08, var_s6->unk_028.unk_0C,
+                var_s6->unk_028.unk_10, var_s6->unk_028.unk_14, var_s6->unk_028.unk_18, var_s6->unk_028.unk_1C,
+                var_s6->unk_048.unk_00, var_s6->unk_048.unk_04, var_s6->unk_048.unk_08, var_s6->unk_048.unk_0C,
+                var_s6->unk_048.unk_10, var_s6->unk_048.unk_14, var_s6->unk_048.unk_18, var_s6->unk_048.unk_1C);
+
+            gDPSetPrimColor(arg0++, 0, var_s6->unk_008.unk_04, var_s6->unk_008.unk_00.r, var_s6->unk_008.unk_00.g,
+                            var_s6->unk_008.unk_00.b, (u8)(var_s6->unk_008.unk_00.a * var_s6->unk_014));
+            gDPSetEnvColor(arg0++, var_s6->unk_00D.unk_00.r, var_s6->unk_00D.unk_00.g, var_s6->unk_00D.unk_00.b,
+                           (u8)(var_s6->unk_00D.unk_00.a * var_s6->unk_018));
+
+            arg0 = BattleAnim_SixSlotTrail_LoadTextures(arg0, var_s6);
+
+            gDPPipeSync(arg0++);
+
+            arg0 = BattleAnim_SixSlotTrail_DrawSegments(arg0, (Func84169214State *)var_s6);
+        }
+    }
+
+    return arg0;
+}
 
 #endif

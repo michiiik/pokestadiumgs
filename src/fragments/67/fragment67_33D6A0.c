@@ -134,7 +134,42 @@ void func_82900FDC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/67/fragment67_33D6A0/func_829011D0.s")
+extern s32 ModelAnim_IsAnimationDone(s32);
+extern s32 ModelAnim_IsEventTrackDone(s32);
+extern void ModelAnim_SetEventFrame(s32, s32);
+extern void ModelAnim_SetFrame(s32, s32);
+extern void func_8003F2C4(s32, s32, s32);
+extern void func_8003F3BC(s32, s32);
+extern s32 D_829188C8;
+
+// D_8291889C points at a model record: word 0 is passed with the record's
+// +4 animation state to func_8003F2C4, and byte 0x1A2 gates the update.
+// Switch on D_82918858 (its table jtbl_829173E0 is in this object's .rodata).
+void func_829011D0(void) {
+    if (*(u8 *)((u8 *)D_8291889C + 0x1A2) != 0) {
+        if (ModelAnim_IsAnimationDone(D_8291889C + 4) != 0) {
+            func_8003F2C4(*(s32 *)D_8291889C, D_8291889C + 4, 0);
+            ModelAnim_SetFrame(D_8291889C + 4, 0);
+        }
+        switch (D_82918858) {
+            case 1:
+                if (ModelAnim_IsEventTrackDone(D_8291889C + 4) != 0) {
+                    func_8003F3BC(D_8291889C + 4, 0xFF);
+                }
+                break;
+            case 2:
+            case 3:
+            case 5:
+            case 7:
+                if ((D_829188C8 % 50) == 0) {
+                    func_8003F3BC(D_8291889C + 4, 0);
+                    ModelAnim_SetEventFrame(D_8291889C + 4, 0);
+                }
+                break;
+        }
+        D_829188C8 += 1;
+    }
+}
 #endif
 
 #ifdef VERSION_US
