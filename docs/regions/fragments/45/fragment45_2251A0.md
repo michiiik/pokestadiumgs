@@ -325,3 +325,37 @@ literal alias; that proposal is excluded. Next action: compare the constant-2
 uopt coloring/interference in the existing implementation and the retained
 clean reconstruction, then find a real value-lifetime change. Preserve both
 full-ROM-matched image functions while doing so.
+
+## Accepted highlight scale animation and literal ownership
+
+`func_8AB03ED4` is now `TextHighlight_AnimateScales` (356 bytes). It applies
+`1.0f + cosine * amplitude` to both scale fields at offsets 64/68. Four panel
+highlights use stride 120 and amplitude 0.1f; their phase halfwords advance by
+2048. Four row highlights use stride 148 and amplitude 0.2f, reading the
+updated phases. The cosine lookup is `D_80088E50[phase >> 4]`, also used by
+rotation calculations in `src/229E0.c`. The original symbol remains an alias.
+
+The file's `.rodata` window now starts at ROM 0x236890 instead of 0x236930.
+Both boundaries are 16-byte aligned. Pinned spimdisasm 1.35.0-dev0 moves the
+0.1f/0.2f literals into this owner's `.late_rodata`, the neighboring 0.1f/0.9f
+literals into `func_8AB04038`, and tables `jtbl_8AB11720`/`jtbl_8AB11750` into
+`func_8AB04210` and `jtbl_8AB11780` into `func_8AB04EE8`. The existing table
+`jtbl_8AB117B0` stays in the same file. This assigns 208 existing ROM bytes to
+the source object without changing their linked positions.
+
+Treating the amplitudes as extern globals produced a setup-scheduling
+near-match. Ordinary float literals recover the intended instruction shape;
+the literal-pool ownership change lets those bytes link at their original
+addresses. The accepted C uses indexed loops and real amplitude values; IDO
+performs the observed pair unrolling of the row loop. Operand order matters:
+the gate accepted `1.0f + cosine * amplitude`.
+
+The still-assembly ownership split first passed the ordinary retail-ROM gate.
+The C replacement then passed the runner's sequential full-ROM gate; its
+object comparison reported relocation drift, so link verification alone was
+not its acceptance evidence. The named source also passed a fresh ordinary
+host-syntax-enabled gate. Independent checks cover the complete 23008-byte
+text, 208-byte rodata, all 81 function extents, resolved relocation targets,
+three linked fragments and four collateral objects. The US ROM MD5 remains
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. Neighboring assembly owners are not counted
+as newly decompiled functions.
