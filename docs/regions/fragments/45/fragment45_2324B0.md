@@ -263,3 +263,32 @@ instruction, newline and jump-target controls are rejected. A fresh full
 build and `cmp` preserve the retail ROM (MD5
 `1561c75d11cedf356a8ddb1a4a5f9d5d`). Behavior is established from the source,
 original disassembly and the text-copy implementation in `src/4CC20.c`.
+
+## State before prompt reveal
+
+`func_8AB0E684` is `TextMode8_HandlePrePromptState` (560 instruction bytes).
+State 39 initializes its timer, plays sound `0x10006`, and prepares the
+banner and four answer-row nodes. A positive sum of `D_8AB12694` and
+`D_8AB12698` enables the banner and selects one of three existing text
+entries. The initialization clears node flag bits, sets each answer-row
+node's halfword at offset 38 to five or six according to the row's active
+word at offset 12, and calls `func_8AB00478`.
+
+During phase one, it increments the signed 16-bit timer and enters
+`func_8AB0EF44(0)` after 60 frames when `D_8AB17224` is nonzero, or after
+45 frames otherwise. That callee initializes the reveal count and prompt
+buffer before calling `TextMode8_RevealPromptText` on subsequent updates.
+`func_8AB0E4BC` and `func_8AB0F484` both enter this state through phase zero;
+these producer and consumer operations support the name. The counter
+pointer follows the pattern in the matched neighboring state handlers,
+and the incremented value is stored inside each timing branch.
+
+Normal runner acceptance passes the syntax-enabled retail-US-ROM gate.
+The isolated probe masks only relocation fields with matching topology;
+acceptance comes from the full linked-ROM comparison. After naming and
+duplicate-declaration cleanup, before/after and leading-blank controls
+preserve the complete 9264-byte mode text, 24 function extents, 208-byte
+rodata and all relocation destinations. Changed instruction, newline and
+jump-target controls are rejected. A fresh full build and `cmp` preserve
+the retail ROM (MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`). These behavior
+claims follow from source, original disassembly and caller inspection.

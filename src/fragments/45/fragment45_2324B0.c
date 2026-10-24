@@ -136,7 +136,7 @@ extern s32 func_8AB0E2EC(s32);
 extern s32 func_8AB0E280(s32);
 extern s32 TextMode8_HandlePromptState(s32);
 extern s32 func_8AB0E4BC(s32);
-extern s32 func_8AB0E684(s32);
+extern s32 TextMode8_HandlePrePromptState(s32);
 extern s32 func_8AB0EF44(s32);
 extern s32 func_8AB0F0A8(s32);
 extern s32 TextMode8_HandleRowCleanupState(s32);
@@ -163,7 +163,7 @@ s32 TextMode8_UpdateState(s32 state) {
         state = func_8AB0E4BC(1);
         break;
     case 39:
-        state = func_8AB0E684(1);
+        state = TextMode8_HandlePrePromptState(1);
         break;
     case 40:
         state = func_8AB0EF44(1);
@@ -209,7 +209,7 @@ void TextMode8_DrawState(s32 state) {
         func_8AB0E4BC(2);
         break;
     case 39:
-        func_8AB0E684(2);
+        TextMode8_HandlePrePromptState(2);
         break;
     case 40:
         func_8AB0EF44(2);
@@ -348,7 +348,7 @@ extern void func_87F005F0(f32, f32);
 extern void func_87F006BC(void);
 extern u32 func_87F006AC(void);
 extern void func_8AB00BA4();
-extern s32 func_8AB0E684(s32);
+extern s32 TextMode8_HandlePrePromptState(s32);
 extern void *D_8AB11D00;
 extern u8 *D_8AB11D0C;
 extern u8 D_8AB126A8[];
@@ -384,7 +384,7 @@ s32 func_8AB0E4BC(s32 arg0) {
             break;
         case 3:
             *(u16 *)((u8 *)D_8AB11D00 + 2) = (u16)(*(u16 *)((u8 *)D_8AB11D00 + 2) & 0xFFFE);
-            sp1C = func_8AB0E684(0);
+            sp1C = TextMode8_HandlePrePromptState(0);
             break;
         }
         break;
@@ -394,7 +394,71 @@ s32 func_8AB0E4BC(s32 arg0) {
     }
     return sp1C;
 }
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E684.s")
+extern s16 D_8AB1723E;
+extern s16 D_8AB12694;
+extern s16 D_8AB12698;
+extern s32 D_8AB17224;
+extern s32 D_8AB112C0;
+extern void *D_8AB16FC8;
+extern u8 *D_8AB17208[];
+extern u8 *D_8AB17190[];
+extern s32 func_8004C594(s32, s32);
+extern void func_8AB00478(void);
+extern s32 func_8AB0EF44(s32 arg0);
+s32 TextMode8_HandlePrePromptState(s32 phase) {
+    s32 i;
+    s32 result = 39;
+    s16 *counter = &D_8AB1723E;
+    s16 elapsed;
+
+    switch (phase) {
+    case 0:
+        func_8AB00BA4(0x10006, 0, 0);
+        *counter = 0;
+        if (D_8AB12694 + D_8AB12698 > 0) {
+            *(u16 *)((u8 *)D_8AB11D00 + 2) |= 1;
+            func_8004C594(2, D_8AB12694 + 1);
+            if (D_8AB17224 != 0) {
+                func_8004C8A0(D_8AB126A8, 256, 58, 398);
+            } else if (D_8AB112C0 == 0) {
+                func_8004C8A0(D_8AB126A8, 256, 57, 753);
+            } else {
+                func_8004C8A0(D_8AB126A8, 256, 58, 397);
+            }
+        } else {
+            *(u16 *)((u8 *)D_8AB11D00 + 2) &= ~1;
+        }
+        func_8AB04AE4();
+        *(u16 *)((u8 *)D_8AB16FC8 + 2) &= ~1;
+
+        for (i = 0; i < 4; i++) {
+            *(u16 *)(D_8AB17208[i] + 2) &= ~2;
+            if (*(s32 *)(D_8AB12CB0 + i * 148 + 12) != 0) {
+                *(s16 *)(D_8AB17190[i] + 38) = 6;
+            } else {
+                *(s16 *)(D_8AB17190[i] + 38) = 5;
+                *(u16 *)(D_8AB17190[i] + 2) &= ~2;
+            }
+        }
+        func_8AB00478();
+        break;
+    case 1:
+        elapsed = *counter + 1;
+        if (D_8AB17224 != 0) {
+            *counter = elapsed;
+            if (elapsed >= 60) {
+                result = func_8AB0EF44(0);
+            }
+        } else {
+            *counter = elapsed;
+            if (elapsed >= 45) {
+                result = func_8AB0EF44(0);
+            }
+        }
+        break;
+    }
+    return result;
+}
 
 extern s32 D_8AB1268C;
 extern s8 *D_8AB112C4;
@@ -647,7 +711,7 @@ s32 TextMode8_HandleRowCleanupState(s32 phase) {
 extern void func_8AB01FBC(void);
 extern void func_8AB03ED4(void);
 extern void func_8AB012A4(void);
-extern s32 func_8AB0E684(s32);
+extern s32 TextMode8_HandlePrePromptState(s32);
 extern s16 D_8AB17246;
 s32 func_8AB0F484(s32 arg0) {
     s32 result = 0x2B;
@@ -662,7 +726,7 @@ s32 func_8AB0F484(s32 arg0) {
         func_8AB03ED4();
         if (*counter >= 0xB) {
             func_8AB012A4();
-            result = func_8AB0E684(0);
+            result = TextMode8_HandlePrePromptState(0);
         }
         break;
     }
