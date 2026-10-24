@@ -29,3 +29,35 @@ with the retail ROM; MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 The implementation preserves the original 24-byte frame without dummy
 storage, forced registers, or instruction rewrites. Behavior descriptions
 come from source and disassembly inspection.
+
+## Prompt text reveal
+
+`func_8AB0BE4C` has a matching C implementation (292 instruction bytes).
+It refreshes the 256-byte buffer at `D_8AB16D10` using the banner node's
+archive and entry halfwords at offsets 48 and 50, then advances through
+`D_8AB16F82` encoded characters. Newline and bytes below `0x80` advance
+one byte; other leading bytes advance two. Reaching the string terminator
+sets `D_8AB16F84` and returns zero. Otherwise it terminates the visible
+prefix and returns one.
+
+On even `D_8AB1268C` values, it compares the final visible character with
+the string referenced by `D_8AB112BC`, emits event 65549 for equality or
+65548 otherwise, and increments the reveal count. The original data pointer
+targets `D_8AB11A80`, whose ROM bytes are `0A 00`: a newline string.
+The caller `func_8AB0C414` initializes the count to one and the completion
+flag to zero before its update path calls the reveal helper. A positive
+count supplies the final-character pointer used after the loop.
+
+The copy helper is `func_8004C8A0` in `src/4CC20.c`; `HAL_Strcmp` in
+`src/C180.c` returns zero for equal terminated strings. The event wrapper
+is in `src/fragments/45/fragment45_2251A0.c`. The existing
+`TextMode8_RevealPromptText` in `src/fragments/45/fragment45_2324B0.c` uses
+the same loop with its own buffer, counters, and newline pointer. These
+claims follow from source, original assembly, and the decoded ROM data.
+
+Verification targets master `4d161470b602233a867ec15fe90e93adcb8faa4a` plus
+this change. The normal syntax-enabled forced compilation and complete
+`VERSION=us` ROM build pass with `build/pokestadiumgs-us.z64: OK`.
+`cmp` confirms byte-for-byte equality with retail, whose MD5 remains
+`1561c75d11cedf356a8ddb1a4a5f9d5d`. The original 40-byte frame is preserved
+without dummy storage, forced registers, or instruction rewrites.
