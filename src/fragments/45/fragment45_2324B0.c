@@ -507,7 +507,129 @@ void func_8AB0E9D8(u8 *arg0) {
     *(s16 *)(arg0 + 0x10) = 1;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E9E8.s")
+extern void *D_80087200;
+extern void *D_80087204;
+extern void *D_80087208;
+extern void *D_8008720C;
+extern s16 D_8AB17230;
+extern s16 D_8AB17232;
+extern void TextRow_SetOrangeState(s16);
+extern void func_8AB01414(s16);
+extern void func_8AB01454(s16);
+extern void func_8AB03DFC(s16, s16);
+extern void func_8AB04038(void);
+extern void TextHighlight_AnimateScales(void);
+extern void func_8AB0D4A4(void);
+extern void func_8AB0E9D8(u8 *arg0);
+void TextMode8_HandleAnswerInput(void) {
+    u32 row_address;
+    s32 i;
+    u16 buttons;
+    s32 player;
+    s32 animation;
+    u8 **player_slot;
+
+    D_8AB17230 = 0;
+    D_8AB17232 = 0;
+    for (i = 0; i < 4; i++) {
+        player = (i + D_8AB1268C) & 3;
+        row_address = (u32)(D_8AB12CB0 + player * 148);
+        animation = player + 6;
+        if (*(s16 *)(row_address + 4) == 0 && *(s32 *)(row_address + 12) == 0 && *(s16 *)row_address != 0) {
+            D_8AB17232++;
+            player_slot = &D_8AB17190[player];
+
+            switch (player) {
+            case 0:
+                buttons = *(u16 *)((u8 *)D_80087200 + 8);
+                break;
+            case 1:
+                buttons = *(u16 *)((u8 *)D_80087204 + 8);
+                break;
+            case 2:
+                buttons = *(u16 *)((u8 *)D_80087208 + 8);
+                break;
+            case 3:
+                buttons = *(u16 *)((u8 *)D_8008720C + 8);
+                break;
+            }
+            if (*(s16 *)row_address == 2) {
+                buttons = TextMode8_ChooseCpuAnswerMask((TextMode8AnswerRow *)row_address);
+                animation = player + 2;
+            }
+            if ((*(u16 *)(D_8AB17208[0] + 2) & 2) == 0 && (buttons & 8)) {
+                if (D_8AB1269A == 0) {
+                    TextRow_SetOrangeState(player);
+                    func_8AB01414(player);
+                    D_8AB17230 = 1;
+                } else {
+                    func_8AB03DFC(player, 0);
+                    func_8AB01454(player);
+                    func_8AB0E9D8((u8 *)row_address);
+                    *(u16 *)(*player_slot + 2) |= 2;
+                    *(s16 *)(*player_slot + 38) = 6;
+                }
+                *(s16 *)(row_address + 6) = 8;
+                *(u16 *)(D_8AB17208[0] + 2) |= 2;
+                *(s16 *)(D_8AB17208[0] + 38) = animation;
+            } else if ((*(u16 *)(D_8AB17208[1] + 2) & 2) == 0 && (buttons & 1)) {
+                if (D_8AB1269A == 1) {
+                    TextRow_SetOrangeState(player);
+                    func_8AB01414(player);
+                    D_8AB17230 = 1;
+                } else {
+                    func_8AB03DFC(player, 1);
+                    func_8AB01454(player);
+                    func_8AB0E9D8((u8 *)row_address);
+                    *(u16 *)(*player_slot + 2) |= 2;
+                    *(s16 *)(*player_slot + 38) = 6;
+                }
+                *(s16 *)(row_address + 6) = 1;
+                *(u16 *)(D_8AB17208[1] + 2) |= 2;
+                *(s16 *)(D_8AB17208[1] + 38) = animation;
+            } else if ((*(u16 *)(D_8AB17208[2] + 2) & 2) == 0 && (buttons & 4)) {
+                if (D_8AB1269A == 2) {
+                    TextRow_SetOrangeState(player);
+                    func_8AB01414(player);
+                    D_8AB17230 = 1;
+                } else {
+                    func_8AB03DFC(player, 2);
+                    func_8AB01454(player);
+                    func_8AB0E9D8((u8 *)row_address);
+                    *(u16 *)(*player_slot + 2) |= 2;
+                    *(s16 *)(*player_slot + 38) = 6;
+                }
+                *(s16 *)(row_address + 6) = 4;
+                *(u16 *)(D_8AB17208[2] + 2) |= 2;
+                *(s16 *)(D_8AB17208[2] + 38) = animation;
+            } else if ((*(u16 *)(D_8AB17208[3] + 2) & 2) == 0 && (buttons & 2)) {
+                if (D_8AB1269A == 3) {
+                    TextRow_SetOrangeState(player);
+                    func_8AB01414(player);
+                    D_8AB17230 = 1;
+                } else {
+                    func_8AB03DFC(player, 3);
+                    func_8AB01454(player);
+                    func_8AB0E9D8((u8 *)row_address);
+                    *(u16 *)(*player_slot + 2) |= 2;
+                    *(s16 *)(*player_slot + 38) = 6;
+                }
+                *(s16 *)(row_address + 6) = 2;
+                *(u16 *)(D_8AB17208[3] + 2) |= 2;
+                *(s16 *)(D_8AB17208[3] + 38) = animation;
+            }
+            if (D_8AB17230 == 1) {
+                D_8AB112C0 = 1;
+                *(s32 *)(row_address + 8) = 1;
+                *(u16 *)(*player_slot + 2) &= ~2;
+                *(s16 *)(*player_slot + 38) = 5;
+            }
+        }
+    }
+    TextHighlight_AnimateScales();
+    func_8AB04038();
+    func_8AB0D4A4();
+}
 
 extern u8 D_8AB12CB0[];
 extern u8 *D_8AB11D0C;
@@ -542,7 +664,7 @@ extern void TextMode8_InitCpuAnswerSettings(void);
 extern void _bzero(void *, s32);
 extern void TextPanels_UpdateVisibility(void);
 extern s32 func_8004C594(s32, s32);
-extern void func_8AB0E9E8(void);
+extern void TextMode8_HandleAnswerInput(void);
 extern s32 TextMode8_RevealPromptText(void);
 extern s32 func_8AB0F0A8(s32);
 extern s32 TextMode8_HandleRowCleanupState(s32);
@@ -566,7 +688,7 @@ s32 func_8AB0EF44(s32 arg0) {
         func_8AB004E0();
         break;
     case 1:
-        func_8AB0E9E8();
+        TextMode8_HandleAnswerInput();
         TextMode8_RevealPromptText();
         if (D_8AB1722E == 1) {
             result = func_8AB0F0A8(0);
@@ -593,7 +715,7 @@ extern s16 D_8AB17230;
 extern s16 D_8AB17232;
 extern s32 D_8AB17240;
 extern void func_8AB01728(void);
-extern void func_8AB0E9E8(void);
+extern void TextMode8_HandleAnswerInput(void);
 extern s32 func_80001FF0(void);
 extern void func_8AB00BA4();
 extern s32 TextMode8_HandleRowCleanupState(s32);
@@ -609,7 +731,7 @@ s32 func_8AB0F0A8(s32 arg0) {
         break;
     case 1:
         func_8AB01728();
-        func_8AB0E9E8();
+        TextMode8_HandleAnswerInput();
         if (D_8AB17240 % (func_80001FF0() / 4) == 0) {
             D_8AB1269C--;
             if (D_8AB1269C < 0) {

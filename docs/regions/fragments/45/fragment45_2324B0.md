@@ -292,3 +292,42 @@ rodata and all relocation destinations. Changed instruction, newline and
 jump-target controls are rejected. A fresh full build and `cmp` preserve
 the retail ROM (MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`). These behavior
 claims follow from source, original disassembly and caller inspection.
+
+## Answer input and feedback
+
+`func_8AB0E9E8` is `TextMode8_HandleAnswerInput` (316 instructions / 1264
+bytes). Mode 8's state dispatcher calls it while answer input is active.
+It rotates player order by `(iteration + D_8AB1268C) & 3`, skips rows whose
+halfword at offset 4 or word at offset 12 is set, and ignores controller
+kind zero. Human rows read the selected controller's halfword at offset 8;
+kind two substitutes `TextMode8_ChooseCpuAnswerMask`. Available answers
+have mask priority 8, 1, 4, 2.
+
+A correct answer sets the orange row state and the shared correct-answer
+flag. A wrong answer calls the existing row feedback helpers and marks
+the player node. Each selected answer writes its mask to the row and
+updates the choice node's flags and animation halfword at offset 38.
+Preserve the shared flag across the player loop: retail clears it once
+per frame, so later eligible rows can observe an earlier correct answer.
+The final calls advance highlight scales and the existing feedback state.
+These operations, the state-dispatch caller and the CPU-mask helper support
+the name; the controller halfword's pressed/held interpretation is not
+established by this routine alone.
+
+The row address is formed from the indexed 148-byte record as a 32-bit
+unsigned address, then used for field-offset accesses. Forming this address
+by pointer indexing before conversion preserves the original allocation;
+performing the whole calculation as integer arithmetic grows the function
+by eight bytes. The address representation also preserves four retail
+store-before-pointer-load orders. Both arguments of `func_8AB03DFC` use
+signed-halfword conversions, matching its argument-home reads. A real
+per-player node-slot pointer is shared by the wrong and correct feedback
+paths. The original masked player index covers every controller case.
+
+Normal runner acceptance passes the syntax-enabled retail-US-ROM gate.
+Post-acceptance address cleanup and naming preserve the complete 9264-byte
+mode text, 24 function extents, 208-byte rodata, and all relocation
+destinations in before/after and leading-blank controls. Mutated instruction,
+newline and jump-target controls are rejected. A fresh normal build and
+full byte comparison preserve retail MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+No object or instruction rewriting is needed for this owner.
