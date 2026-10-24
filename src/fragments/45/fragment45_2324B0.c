@@ -2,6 +2,11 @@
 
 
 #ifdef VERSION_US
+const char D_8AB11BC0[] = "\n";
+const char D_8AB11BC4[] = "player[%d] otetuki_flg = %d  otetuki_cnt = %d\n";
+const char D_8AB11BF4[] = "[%2d] operator %d  result %d\n";
+const char D_8AB11C14[] = "all_miss_flg == true\n";
+
 typedef struct TextMode8AnswerRow {
     u8 unk_00[144];
     s16 delay_frames;
@@ -123,9 +128,109 @@ s32 TextMode8_ChooseCpuAnswerMask(TextMode8AnswerRow *row) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0D5F4.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0DFC0.s")
+extern u8 *D_8AB16FA0;
+extern void func_800503A4(u8 *);
+extern void func_8AB0148C(s16);
+extern s32 func_8AB0E21C(s32);
+extern s32 func_8AB0E2EC(s32);
+extern s32 func_8AB0E280(s32);
+extern s32 TextMode8_HandlePromptState(s32);
+extern s32 func_8AB0E4BC(s32);
+extern s32 func_8AB0E684(s32);
+extern s32 func_8AB0EF44(s32);
+extern s32 func_8AB0F0A8(s32);
+extern s32 TextMode8_HandleRowCleanupState(s32);
+extern s32 func_8AB0F484(s32);
+extern s32 func_8AB0F518(s32);
+extern s32 func_8AB0F5F8(s32);
+s32 TextMode8_UpdateState(s32 state) {
+    s32 i;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E0F4.s")
+    switch (state) {
+    case 34:
+        state = func_8AB0E21C(1);
+        break;
+    case 35:
+        state = func_8AB0E2EC(1);
+        break;
+    case 36:
+        state = func_8AB0E280(1);
+        break;
+    case 37:
+        state = TextMode8_HandlePromptState(1);
+        break;
+    case 38:
+        state = func_8AB0E4BC(1);
+        break;
+    case 39:
+        state = func_8AB0E684(1);
+        break;
+    case 40:
+        state = func_8AB0EF44(1);
+        break;
+    case 41:
+        state = func_8AB0F0A8(1);
+        break;
+    case 42:
+        state = TextMode8_HandleRowCleanupState(1);
+        break;
+    case 43:
+        state = func_8AB0F484(1);
+        break;
+    case 44:
+        state = func_8AB0F518(1);
+        break;
+    case 45:
+        state = func_8AB0F5F8(1);
+        break;
+    }
+    for (i = 0; i < 4; i++) {
+        func_8AB0148C(i);
+    }
+    return state;
+}
+
+void TextMode8_DrawState(s32 state) {
+    func_800503A4(D_8AB16FA0);
+    switch (state) {
+    case 34:
+        func_8AB0E21C(2);
+        break;
+    case 35:
+        func_8AB0E2EC(2);
+        break;
+    case 36:
+        func_8AB0E280(2);
+        break;
+    case 37:
+        TextMode8_HandlePromptState(2);
+        break;
+    case 38:
+        func_8AB0E4BC(2);
+        break;
+    case 39:
+        func_8AB0E684(2);
+        break;
+    case 40:
+        func_8AB0EF44(2);
+        break;
+    case 41:
+        func_8AB0F0A8(2);
+        break;
+    case 42:
+        TextMode8_HandleRowCleanupState(2);
+        break;
+    case 43:
+        func_8AB0F484(2);
+        break;
+    case 44:
+        func_8AB0F518(2);
+        break;
+    case 45:
+        func_8AB0F5F8(2);
+        break;
+    }
+}
 
 extern s32 func_8AB0E21C(s32);
 s32 func_8AB0E1FC(void) {
