@@ -1091,7 +1091,32 @@ void TextRow_SetOrangeState(s16 row_index) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB03ED4.s")
+extern u8 D_8AB14278[];
+extern u8 D_8AB12CC8[];
+extern u16 D_8AB14660[];
+extern f32 D_80088E50[];
+void TextHighlight_AnimateScales(void) {
+    s32 i;
+    u8 *highlight;
+    f32 amplitude;
+    amplitude = 0.1f;
+    for (i = 0; i < 4; i++) {
+        highlight = D_8AB14278 + i * 120;
+        if (highlight != NULL) {
+            *(f32 *)(highlight + 64) = 1.0f + D_80088E50[D_8AB14660[i] >> 4] * amplitude;
+            *(f32 *)(highlight + 68) = 1.0f + D_80088E50[D_8AB14660[i] >> 4] * amplitude;
+            D_8AB14660[i] += 2048;
+        }
+    }
+    amplitude = 0.2f;
+    for (i = 0; i < 4; i++) {
+        highlight = D_8AB12CC8 + i * 148;
+        if (highlight != NULL) {
+            *(f32 *)(highlight + 64) = 1.0f + D_80088E50[D_8AB14660[i] >> 4] * amplitude;
+            *(f32 *)(highlight + 68) = 1.0f + D_80088E50[D_8AB14660[i] >> 4] * amplitude;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
