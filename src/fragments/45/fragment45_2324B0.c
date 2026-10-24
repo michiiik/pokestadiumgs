@@ -15,8 +15,8 @@ extern s16 D_8AB17238; void func_8AB0D4A4(void) { D_8AB17238 += 1; }
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E0F4.s")
 
 extern s32 func_8AB0E21C(s32);
-void func_8AB0E1FC(void) {
-    func_8AB0E21C(0);
+s32 func_8AB0E1FC(void) {
+    return func_8AB0E21C(0);
 }
 
 extern void func_8AB04AE4(void);
@@ -74,7 +74,51 @@ s32 func_8AB0E2EC(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E350.s")
+extern s16 D_8AB1723C;
+extern u8 *D_8AB11D0C;
+extern void *D_8AB11D00;
+extern u8 D_8AB126A8[], D_8AB127A8[], D_8AB12668[], D_8AB17110[];
+extern u8 *D_8AB12688;
+extern u16 D_8AB1268E;
+extern s32 D_8AB12CBC, D_8AB12D50, D_8AB12DE4, D_8AB12E78;
+extern s32 func_8004C54C(s32, s32);
+extern s32 func_8004C874(s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
+extern void func_8AB00B98(u8 *, u32);
+extern void func_8AB004E0(void);
+extern void func_8AC063AC(void *, u16);
+extern s32 func_8AB0E4BC(s32);
+s32 TextMode8_HandlePromptState(s32 phase) {
+    s16 *counter = &D_8AB1723C;
+    s32 result = 0x25;
+
+    switch (phase) {
+    case 0:
+        *counter = 0;
+        func_8004C54C(15, func_8004C874(0x39, (s8)D_8AB11D0C[0x14] + 0x269));
+        func_8004C8A0(D_8AB126A8, 0x100, 0x39, 0x172);
+        ((u16 *)D_8AB11D00)[1] |= 1;
+        func_8004C8A0(D_8AB127A8, 0x100, 0x39, 5);
+        ((u16 *)((void **)D_8AB12668)[0])[1] |= 1;
+        func_8AB00B98(((u8 **)D_8AB12668)[0], -1);
+        D_8AB12CBC = 0;
+        D_8AB12D50 = 0;
+        D_8AB12DE4 = 0;
+        D_8AB12E78 = 0;
+        func_8AB004E0();
+        break;
+    case 1:
+        func_8AC063AC(D_8AB17110, D_8AB1268E);
+        if (*counter >= 31) {
+            ((u16 *)((void **)D_8AB12668)[0])[1] &= ~1;
+            result = func_8AB0E4BC(0);
+            ((u16 *)D_8AB12688)[1] &= ~1;
+        }
+        *counter += 1;
+        break;
+    }
+    return result;
+}
 
 extern void *func_8004C8A0(void *, s32, s32, s32);
 extern void func_80021ED8(s32);

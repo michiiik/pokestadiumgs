@@ -34,3 +34,30 @@ byte-for-byte with `baseroms/us/baserom.z64`, with MD5
 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Both owners retain their original
 addresses and extents. The match uses ordinary C without instruction
 rewrites or forced registers.
+
+## Mode 8 prompt state and initial-state returns
+
+`func_8AB0E350` is matched as `TextMode8_HandlePromptState` (364 bytes,
+state 37). Phase zero prepares the prompt and first choice label, enables
+their graph nodes, clears the four row selection fields, and resets the
+prompt counter. Phase one advances the motion helper. Starting at counter
+31, it hides the choice node, enters `func_8AB0E4BC(0)`, and clears the other
+prompt node's visibility flag. The counter increments after that check.
+Other phases retain state 37.
+
+The signed-halfword counter pointer is declared before the signed-word
+result. This preserves the separate counter loads around the conditional
+call and the retail result spill at stack offset 24. Ordinary C reproduces
+all 364 bytes; no padding or instruction rewrite is needed. The original
+address name remains available through the linker alias.
+
+The existing mode wrappers `func_8AB06630`, `func_8AB08C4C`,
+`func_8AB0B52C`, `func_8AB0E1FC`, and `func_8AB1005C` now explicitly return
+the initial states produced by their callees. Their constructor caller
+consumes those signed-word results. This signature cleanup changes no
+instructions, function extents, or relocation destinations.
+
+Verification: calibrated whole-module controls, accepted runner provenance,
+and the syntax-enabled full US-ROM gate. The ROM remains byte-identical
+with MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Newer upstream C, including
+the fade and delay handlers merged in PR #1502, is preserved.

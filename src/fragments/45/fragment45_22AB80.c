@@ -29,8 +29,8 @@ void func_8AB06270(void *arg0, u16 arg1) {
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB064C4.s")
 
 extern s32 func_8AB06650(s32);
-void func_8AB06630(void) {
-    func_8AB06650(0);
+s32 func_8AB06630(void) {
+    return func_8AB06650(0);
 }
 
 extern s32 StageContext_GetFadeMode(void);
@@ -203,8 +203,8 @@ s32 func_8AB07DC4(s32 arg0)
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB08B14.s")
 
 extern s32 func_8AB08C6C(s32);
-void func_8AB08C4C(void) {
-    func_8AB08C6C(0);
+s32 func_8AB08C4C(void) {
+    return func_8AB08C6C(0);
 }
 
 extern s32 StageContext_GetFadeMode(void);
