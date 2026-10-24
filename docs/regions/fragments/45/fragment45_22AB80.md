@@ -60,3 +60,36 @@ this change. The normal syntax-enabled forced source compile and full
 `build/pokestadiumgs-us.z64: OK`. `cmp` confirms byte-for-byte equality
 with retail; MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. The original
 32-byte frame is preserved without dummy storage or instruction rewrites.
+
+## Prompt text reveal
+
+`func_8AB092F4` has a matching C implementation (292 instruction bytes).
+It refreshes the 256-byte buffer at `D_8AB16A60` using the banner node's
+archive and entry halfwords at offsets 48 and 50, then advances through
+`D_8AB16CCC` encoded characters. Newline and bytes below `0x80` advance one
+byte; other leading bytes advance two. Reaching the terminator sets
+`D_8AB16CCE` and returns zero. Otherwise it terminates the visible prefix
+and returns one.
+
+On even `D_8AB1268C` values, it compares the last visible character with
+the string referenced by `D_8AB1129C`, emits event 65549 for equality or
+65548 otherwise, and increments the reveal count. That pointer targets
+`D_8AB11A00`; retail ROM bytes at offset `0x236B80` are `0A 00`, a newline
+string. `func_8AB09A28` initializes the count to one and completion flag to
+zero before calling the reveal helper during updates. A positive count
+supplies the final-character pointer used after the loop.
+
+The copy helper is `func_8004C8A0` in `src/4CC20.c`; `HAL_Strcmp` in
+`src/C180.c` compares terminated strings. The event wrapper is in
+`src/fragments/45/fragment45_2251A0.c`. The sibling `func_8AB0BE4C` and
+`TextMode8_RevealPromptText` use the same loop with separate buffers and
+counters. These claims follow from source, original assembly, and decoded
+ROM data. This module's existing caller declaration now exposes the
+helper's signed-word result, which that caller ignores.
+
+Verification targets master `d2e5209aa98a2cc27afac6bf7748b21b65654034` plus
+this change. The normal syntax-enabled forced compilation and complete
+`make -W src/fragments/45/fragment45_22AB80.c -j4 VERSION=us rom` pass with
+`build/pokestadiumgs-us.z64: OK`. `cmp` confirms byte-for-byte equality
+with retail; MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. The original
+40-byte frame is preserved without dummy storage or instruction rewrites.

@@ -422,7 +422,47 @@ s32 func_8AB08F58(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB090B8.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB092F4.s")
+extern u8 D_8AB16A60[];
+extern s16 D_8AB16CCC;
+extern s16 D_8AB16CCE;
+extern u32 D_8AB1268C;
+extern s8 *D_8AB1129C;
+extern s32 HAL_Strcmp(const s8 *, const s8 *);
+extern void func_8AB00BA4(s32, s32, s32);
+s32 func_8AB092F4(void) {
+    u8 *node;
+    u8 *cursor;
+    u8 *last;
+    s32 i;
+
+    node = D_8AB11D00;
+    func_8004C8A0(D_8AB16A60, 256, *(u16 *)(node + 48), *(u16 *)(node + 50));
+    cursor = D_8AB16A60;
+    for (i = 0; i < D_8AB16CCC; i++) {
+        last = cursor;
+        if (*cursor == 0) {
+            D_8AB16CCE = 1;
+            return 0;
+        }
+        if (*cursor == 10) {
+            cursor++;
+        } else if ((*cursor & 0x80) == 0) {
+            cursor++;
+        } else {
+            cursor += 2;
+        }
+    }
+    *cursor = 0;
+    if ((D_8AB1268C & 1) == 0) {
+        if (HAL_Strcmp((s8 *)last, D_8AB1129C) == 0) {
+            func_8AB00BA4(65549, 0, 0);
+        } else {
+            func_8AB00BA4(65548, 0, 0);
+        }
+        D_8AB16CCC++;
+    }
+    return 1;
+}
 
 void func_8AB09418(u8 *arg0) {
     *(s32 *)(arg0 + 0xC) = 1;
@@ -455,7 +495,7 @@ s32 func_8AB099BC(s32 arg0) {
 extern void func_8AB03394(void);
 extern void func_8AB02438(void);
 extern void func_8AB04BD4(void);
-extern void func_8AB092F4(void);
+extern s32 func_8AB092F4(void);
 extern void func_8AB09428(void);
 extern s32 func_8AB00548(void);
 extern void _bzero(void *, s32);
