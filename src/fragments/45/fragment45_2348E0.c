@@ -111,7 +111,49 @@ s32 func_8AB10144(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2348E0/func_8AB10248.s")
+extern void *D_8AB17410;
+extern s16 D_8AB17400;
+extern u8 *D_8AB17438;
+extern void func_87F005F0(f32, f32);
+extern void func_87F006BC(void);
+extern u32 func_87F006AC(void);
+extern void func_800225C4(s32);
+extern void func_8AB00BA4(s32, s32, s32);
+extern void func_8003C6B8(u8 *);
+s32 func_8AB10248(s32 arg0) {
+    s32 result = 64;
+
+    switch (arg0) {
+    case 0:
+        func_87F005F0((f32)(*(s16 *)((u8 *)D_8AB17410 + 8) - 320),
+                     (f32)(240 - *(s16 *)((u8 *)D_8AB17410 + 10)));
+        func_8004C8A0(D_8AB126A8, 256, 57, 358);
+        D_8AB17400 = 3;
+        func_800225C4(90);
+        break;
+    case 1:
+        func_87F006BC();
+        switch ((s16)func_87F006AC()) {
+        case 1:
+            func_8AB00BA4(100, D_8AB17400, 0);
+            D_8AB17400 -= 1;
+            break;
+        case 2:
+            func_8AB00BA4(100, D_8AB17400, 0);
+            D_8AB17400 -= 1;
+            break;
+        case 3:
+            func_80021ED8(20);
+            result = func_8AB103B0(0);
+            break;
+        }
+        break;
+    case 2:
+        func_8003C6B8(D_8AB17438);
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US

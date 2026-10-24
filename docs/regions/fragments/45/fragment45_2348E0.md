@@ -139,3 +139,33 @@ this change. Forced compilation through the normal syntax-enabled
 `make -W src/fragments/45/fragment45_2348E0.c -j4 VERSION=us rom` passes,
 including the complete US ROM checksum. `cmp` confirms byte-for-byte
 equality with the retail ROM; MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+## State 64 countdown events
+
+`func_8AB10248` has a matching C implementation (360 instruction bytes).
+Argument zero initializes the fragment 64 countdown using the node at
+`D_8AB17410`: its signed coordinates become `(x - 320, 240 - y)` float
+arguments. It copies archive 57 entry 358 into the banner buffer, sets
+`D_8AB17400` to three, and calls `func_800225C4(90)`.
+
+Argument one updates the countdown and switches on the signed-halfword
+conversion of its status. Status one and status two each emit event 100
+with `D_8AB17400` as the parameter, then decrement that counter. Status
+three calls `func_80021ED8(20)` and enters `func_8AB103B0(0)`. Argument two
+renders the root at `D_8AB17438`; other paths retain state 64.
+
+The countdown initializer, updater, and status reader are `func_87F005F0`,
+`func_87F006BC`, and `func_87F006AC` in fragment 64. The reader returns the
+word at offset 12 of its shared countdown object. The event wrapper is in
+`src/fragments/45/fragment45_2251A0.c`. The root renderer is the
+`func_8003C6B8` alias for `Geo_RenderRootNode(u8 *)` in `src/229E0.c`.
+`func_8AB0F87C` initializes the referenced node and root; the update and
+draw dispatchers call this handler with one and two respectively. These
+operations follow from source and original disassembly inspection.
+
+Verification targets master `ecd5d21784a5733c3cbd38dc2532398ed3d05688` plus
+this change. The normal syntax-enabled forced source compilation and full
+`make -W src/fragments/45/fragment45_2348E0.c -j4 VERSION=us rom` pass with
+`build/pokestadiumgs-us.z64: OK`. The ROM compares byte-for-byte with retail;
+MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. No forced register, dummy storage,
+or instruction rewrite is used.
