@@ -3,8 +3,8 @@
 
 #ifdef VERSION_US
 extern u8 **D_87F11768;
-void fragment64_main(u8 *arg0) {
-    *D_87F11768 = arg0;
+void fragment64_main(s32 value) {
+    *(s32 *)D_87F11768 = value;
 }
 
 extern u8 D_87F11770[];

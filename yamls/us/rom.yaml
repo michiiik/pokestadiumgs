@@ -1107,7 +1107,7 @@
     - [0x2348E0, c,       fragments/45/fragment45_2348E0]
     - [0x2361E0, data,    fragments/45/fragment45_data]
     - [0x2367E0, .rodata, fragments/45/fragment45_2251A0] # Tail literals and jump tables, 16-byte aligned.
-    - [0x236960, rodata]
+    - [0x236990, rodata]
 
   - name: fragment46
     type: code

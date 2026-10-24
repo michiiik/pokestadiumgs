@@ -781,3 +781,67 @@ reverse register roles. The accepted runner label is
 `text-main-loop:global-transition-with-history-snapshot:parent-0:layout-separate`.
 The isolated probe is link-verified and the ordinary syntax-enabled full US
 ROM comparison passes with MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+## Entry table ownership and `TextInterface_Run`: accepted
+
+The next verified layout boundary extends this file's rodata from 384 to 432
+bytes. The twelve words at ROM 0x236960 through 0x23698C are
+`jtbl_8AB117E0`, consumed by `func_8AB05538`. Entries 0-3 select 0x8AB057B8,
+entries 4-10 select 0x8AB05800, and entry 11 selects 0x8AB05948. Every target
+lies inside that owner. The next debug string begins at ROM 0x236990 /
+VRAM 0x8AB11810, on a 16-byte boundary, and stays in the external tail.
+The pinned spimdisasm commit `fe1338434c99240eb4adca0b7860edc12b847565`
+re-splits the table into the owner's `.late_rodata`. The still-assembly ROM
+passes comparison before any C proposal is installed. The complete former
+rodata tail, all existing module instructions and relocation destinations,
+and the linked fragments are verified across the migration.
+
+`func_8AB05538` becomes `TextInterface_Run`. It stores the supplied configuration,
+loads its mode and controller-mask byte, prepares display/stage resources,
+loads and caches 598 archive entries, selects font resources by mode, allocates
+the audio buffer, constructs the interface and invokes `TextInterface_RunMainLoop`.
+The remaining calls tear down resources before returning zero. The constructor
+`func_8AB00084` independently clears 0x958 bytes for the 598 four-byte entries.
+These resource and main-loop operations support the entry function's name.
+
+Both m2c drafts omit the empty mode-11 switch case, including a draft supplied
+with the migrated table inside the assembly owner. The retail table explicitly
+jumps past font initialization for mode 11. A faithful switch must include
+`case 11: break;`; sending that mode through the default nine-font setup changes
+behavior and removes the original table shape. The apparent second argument
+on m2c's `func_8AB003A4(239, ...)` is also an unchanged loop-counter register,
+not an argument consumed by the wrapper or its callee.
+
+The accepted source parses the mode through the newly stored global
+configuration and uses an indexed cache write with a named archive-file result.
+The ordinary compiler generates the retail pointer induction variable and
+spill locations. A manually advanced cursor uses different homes. Declaring
+the index before the stage/archive/result locals recovers the original
+56-byte frame and all executable words. The accepted runner label is
+`text-entry:indexed-resource-cache:decl-order-0:loop-for`. Its probe differs
+only in relocation fields; the runner's sequential syntax-enabled full-ROM
+gate proves acceptance. A normalized probe or relocation mask alone is not
+acceptance evidence.
+
+The assembly owner's 1224-byte span includes a final alignment nop. IDO's C
+symbol is 1220 bytes and the compiler supplies the final four zero bytes as
+normal section alignment. The complete 23008-byte text section remains exact.
+Object comparison checks the actual zero word at the terminal boundary while
+preserving the other 80 function symbols' extents. No padding pragma, dummy
+local or instruction rewrite is introduced.
+
+Two earlier wrappers now explicitly accept and forward their resource IDs:
+`func_8AB003A4` to `func_8004C8C0`, and `func_8AB003C4` to `func_8004C4B0`.
+Their earlier zero-argument C definitions accidentally relied on the incoming
+argument register surviving an argument-free call. The callees in `src/4CC20.c`
+consume the ID. Four known/forwarding/leading-blank controls preserve the entire
+existing module, including all relocation destinations, before these companion
+edits are used with the new owner.
+
+`fragment64_main` in `src/fragments/64/fragment64_322C90.c` receives the integer
+20 from this entry path and stores that word at the beginning of its state.
+`func_87F00030` initializes the same word to 20. Correcting the setter's pointer
+parameter/store to an s32 parameter/store preserves its complete object and
+linked fragment. The full US-ROM comparison after naming and cleanup matches
+MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`, based on parent `59d9d6b9` plus this
+entry/table change; public integration starts at `26b6436b`.
