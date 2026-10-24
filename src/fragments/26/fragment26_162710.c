@@ -53,8 +53,6 @@ void func_81003F44(void) {
     D_81006788 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_162710/func_81003F58.s")
-
 typedef struct {
     u8 unknown[6];
     s16 enabled;
@@ -63,7 +61,9 @@ typedef struct {
 typedef struct {
     u8 unknown[0x1A];
     s16 model_id;
-    u8 unknown_1C[0x24];
+    u8 unknown_1C[0x14];
+    Vec3Local scale;
+    u8 unknown_3C[4];
     s16 animation_id;
     u8 unknown_42[6];
     s32 frame_fixed;
@@ -74,7 +74,126 @@ typedef struct {
 extern ParticleEffectModel26 *D_8009491C;
 extern ParticleTriggerFrames26 D_81006020[];
 extern s16 D_810060F8[];
-extern void func_81003F58(Func81003E60State *);
+extern Vec3Local D_81006188;
+extern f32 D_8100611C[];
+extern void *func_8003936C(s32);
+// Initializes an inactive slot from the current and parent matrix origins.
+// Species select particle scale, position jitter, velocity, and slot count.
+void Particle31_SpawnSpeciesEffect(Func81003E60State *slot) {
+    s32 i;
+    Vec3Local origin;
+    Vec3Local position;
+    Vec3Local direction;
+    s32 limit;
+    f32 length;
+    Vec3Local scale = D_81006188;
+    f32 sx;
+    f32 sy;
+    f32 sz;
+    ParticleEffectModel26 *model;
+    void *matrix;
+    f32 speed;
+
+    limit = 10;
+    matrix = func_8003936C(-1);
+    guMtxXFMF(matrix, 0, 0, 0, &origin.x, &origin.y, &origin.z);
+    matrix = func_8003936C(0);
+    guMtxXFMF(matrix, 0, 0, 0, &position.x, &position.y, &position.z);
+    model = D_8009491C;
+    sx = model->scale.x;
+    sy = model->scale.y;
+    sz = model->scale.z;
+    switch (model->model_id) {
+    case 109:
+    case 110:
+        speed = 0.5f;
+        scale.x = 1.0f;
+        scale.y = 1.0f;
+        scale.z = 1.0f;
+        break;
+    case 146:
+        speed = 1.0f;
+        scale.x = 0.1f;
+        scale.y = 0.1f;
+        scale.z = 0.1f;
+        position.x += (f32) ((guRandom() % 10) - 5) * sx;
+        position.y += (f32) ((guRandom() % 10) - 5) * sy;
+        position.z += (f32) ((guRandom() % 10) - 5) * sz;
+        break;
+    case 77:
+        speed = 0.5f;
+        scale.x = 0.002f;
+        scale.y = 0.002f;
+        scale.z = 0.002f;
+        position.x += (f32) ((guRandom() % 20) - 10) * sx;
+        position.y += (f32) ((guRandom() % 20) - 10) * sy;
+        position.z += (f32) ((guRandom() % 20) - 10) * sz;
+        break;
+    case 78:
+        speed = 0.5f;
+        scale.x = 0.002f;
+        scale.y = 0.002f;
+        scale.z = 0.002f;
+        position.x += (f32) ((guRandom() % 20) - 10) * sx;
+        position.y += (f32) ((guRandom() % 10) - 5) * sy;
+        position.z += (f32) ((guRandom() % 20) - 10) * sz;
+        break;
+    case 144:
+        speed = 0.0f;
+        scale.x = D_8100611C[0];
+        scale.y = D_8100611C[0];
+        scale.z = D_8100611C[0];
+        position.x += (f32) ((guRandom() % 20) - 10) * sx;
+        position.y += (f32) ((guRandom() % 20) - 10) * sy;
+        position.z += (f32) ((guRandom() % 20) - 10) * sz;
+        break;
+    case 134:
+        speed = 0.0f;
+        scale.x = D_8100611C[0];
+        scale.y = D_8100611C[0];
+        scale.z = D_8100611C[0];
+        position.x += (f32) ((guRandom() % 60) - 30) * sx;
+        position.y += (f32) ((guRandom() % 40) - 10) * sy;
+        position.z += (f32) ((guRandom() % 60) - 30) * sz;
+        break;
+    case 92:
+        speed = 0.0f;
+        limit = 3;
+        scale.x = 20.0f;
+        scale.y = 20.0f;
+        scale.z = 20.0f;
+        break;
+    default:
+        speed = 0.0f;
+        break;
+    }
+    for (i = 0; i < 10; i++) {
+        if (i >= limit) {
+            break;
+        }
+        if (slot->active == 0) {
+            direction.x = position.x - origin.x;
+            direction.y = position.y - origin.y;
+            direction.z = position.z - origin.z;
+            length = sqrtf((direction.x * direction.x) + (direction.y * direction.y) + (direction.z * direction.z));
+            if (length > 0.0f) {
+                direction.x /= length;
+                direction.y /= length;
+                direction.z /= length;
+            }
+            slot->velocity.x = (f32) (speed * direction.x);
+            slot->velocity.y = (f32) (speed * direction.y);
+            slot->velocity.z = (f32) (speed * direction.z);
+            slot->position = position;
+            slot->scale = scale;
+            slot->misc = 0;
+            slot->active = 1;
+            break;
+        }
+        slot++;
+    }
+}
+
 // Uses species-specific animation frames or random intervals to trigger particle creation.
 void Particle31_UpdateSpeciesEffectTrigger(Func81003E60State *slot) {
     ParticleEffectModel26 *model;
@@ -97,7 +216,7 @@ void Particle31_UpdateSpeciesEffectTrigger(Func81003E60State *slot) {
             switch (animation) {
             case 4:
                 if (frame == D_81006020[selection].frames[1]) {
-                    func_81003F58(slot);
+                    Particle31_SpawnSpeciesEffect(slot);
                     return;
                 }
                 break;
@@ -106,7 +225,7 @@ void Particle31_UpdateSpeciesEffectTrigger(Func81003E60State *slot) {
                 frame_ptr = D_81006020[selection].frames;
                 do {
                     if (frame == frame_ptr[2]) {
-                        func_81003F58(slot);
+                        Particle31_SpawnSpeciesEffect(slot);
                     }
                     byte_offset += 2;
                     frame_ptr++;
@@ -114,13 +233,13 @@ void Particle31_UpdateSpeciesEffectTrigger(Func81003E60State *slot) {
                 return;
             case 2:
                 if (frame == D_81006020[selection].frames[5]) {
-                    func_81003F58(slot);
+                    Particle31_SpawnSpeciesEffect(slot);
                     return;
                 }
                 break;
             default:
                 if (frame == D_81006020[selection].frames[0]) {
-                    func_81003F58(slot);
+                    Particle31_SpawnSpeciesEffect(slot);
                     return;
                 }
                 return;
@@ -129,29 +248,29 @@ void Particle31_UpdateSpeciesEffectTrigger(Func81003E60State *slot) {
         break;
     case 146:
         if (guRandom() % 60 == 0) {
-            func_81003F58(slot);
+            Particle31_SpawnSpeciesEffect(slot);
             return;
         }
         break;
     case 144:
         if (guRandom() % 30 == 0) {
-            func_81003F58(slot);
+            Particle31_SpawnSpeciesEffect(slot);
             return;
         }
         break;
     case 134:
         if (guRandom() % 7 == 0) {
-            func_81003F58(slot);
+            Particle31_SpawnSpeciesEffect(slot);
             return;
         }
         break;
     case 92:
-        func_81003F58(slot);
+        Particle31_SpawnSpeciesEffect(slot);
         return;
     case 77:
     case 78:
         if (guRandom() % 7 == 0) {
-            func_81003F58(slot);
+            Particle31_SpawnSpeciesEffect(slot);
         }
         break;
     }
