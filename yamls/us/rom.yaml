@@ -804,6 +804,8 @@
     - [0x1646B0, c,       fragments/26/fragment26_1646B0]
     - [0x164860, c,       fragments/26/fragment26_164860]
     - [0x1648D0, data,    fragments/26/fragment26_data]
+    - [0x164A80, .rodata, fragments/26/fragment26_162710] # Particle switch tables and their float constants.
+    - [0x165030, rodata,  fragments/26/fragment26_reloc] # Overlay relocation records; runtime BSS starts at the same VRAM.
 
   - name: fragment27
     type: code
