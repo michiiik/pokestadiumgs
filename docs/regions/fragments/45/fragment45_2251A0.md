@@ -237,22 +237,46 @@ maps the low nibble at node plus 39 as 2->0, 1->2, 0->1, default->0. The
 source arm order and real local storage recover the original 64-byte frame
 and dispatch. It returns zero on every path, as the original assembly does.
 
-## Image strips / requeue
+## Accepted preview image rendering
 
-`func_8AB02240` remains assembly. It draws an 80-by-80 RGBA16 image in twenty
-four-row strips, advances the source by 640 bytes per strip, and brackets the
-loop with `D_8AB111B0`/`D_80094F50` display lists. The fourth input supplies
-the primitive LOD fraction (`gDPSetPrimColor`'s second data argument), not the
-RGBA alpha byte. `func_8AB05300` obtains the image from `func_80043678` on the
-preview state, then stores it in `D_8AB16794`.
+Against public master `413f40ec4867ac200b5155adfa4ca4342e790270`:
 
-The word-coordinate candidate has the original 268-byte size (normalized
-0.9403, raw 0.7463), with differences in temporary allocation and width/stride
-argument normalization. An old-style six-argument helper declaration instead
-produces 260 bytes and rejects. No changed declaration or rejected image body
-is installed. Next action: recover `func_8AB01FC8`'s actual strip interface
-before changing more caller spellings; do not infer formal parameter widths
-solely from its narrowed hardware-coordinate uses.
+| Original owner | C name | Bytes |
+| --- | --- | ---: |
+| `func_8AB01FC8` | `TextPreview_DrawRgba16Rect` | 632 |
+| `func_8AB02240` | `TextPreview_DrawImage80` | 268 |
+
+Total: 900 new instruction bytes. Both owners have ordinary runner acceptance
+with direct link verification and independently frozen whole-module,
+linked-fragment, collateral and retail-ROM comparisons.
+
+The rectangle helper is exactly the standard `gDPLoadTextureBlock` and
+`gSPTextureRectangle` macros: RGBA16 pixels, a supplied source stride and
+height, clamped tiles, and 1:1 texture steps. Its signed-halfword coordinate,
+dimension and stride arguments reproduce the original parameter-home accesses.
+The first typed, separate-line proposal matches; no command words are written
+by hand and no instruction or relocation is post-processed.
+
+The image wrapper draws twenty four-row strips from an 80-by-80 image. An
+ordinary twenty-iteration loop indexes `y + row * 4` and advances the source
+pointer by 640 bytes. The compiler creates the original four-row induction
+step and 80-row limit. Fully indexing both the coordinate and source instead
+creates a byte-count induction variable and a 12800-byte limit; mutating both
+parameters changes normalization and scheduling. The mixed form closes the
+measured residual without changing the matched helper's interface.
+
+`D_8AB111B0`/`D_80094F50` bracket the loop. The fourth argument supplies the
+primitive LOD fraction through `gDPSetPrimColor`; its RGBA value remains opaque
+black. `func_8AB05300` obtains the pixel address from `func_80043678` on the
+preview state and stores it in `D_8AB16794`. The existing dispatcher now casts
+that address word explicitly at its two pointer-typed draw calls. The producer
+and image-descriptor access are defined in `src/43700.c`.
+
+The eight logical-line grouping probes for `func_8AB03DFC` retain the earlier
+216-byte result (normalized 0.7222, raw 0.6296). That family is a measured
+negative for the blue caller, not a reason to repeat it or declare the caller
+unreachable. Its next hypothesis must change the address-expression input to
+uopt rather than the tested statement groupings.
 
 ## Formatting-sensitive compiler input / verified replay identity
 
@@ -279,3 +303,25 @@ There is no formatting-replay blocker in this tested native runner. Integrators
 should use the existing identity module rather than a whitespace-collapsed key.
 The acceptance verifier remains unchanged: the rejected 352-byte proposals
 have layout drift and are not ROM matches.
+
+## Existing draw dispatcher / register-tie, requeue
+
+`func_8AB0234C` was already C at public baseline `413f40ec`. Its empty
+`if (D_8AB14678)` is now explicitly marked `FAKE`; this batch does not count
+that existing 160-byte function as a new decompilation or claim it is cleaned.
+The real operation checks view states 2/4 and ready state 2, draws with LOD
+fraction 255/0 respectively, then returns the ready field to state 1.
+
+Fifty-six cleanup fixtures cover state snapshots, direct global reads,
+equivalent guards, switch/if forms, ready-value predicates, node/coordinate
+locals and minimal removal of the empty check/repeated read. The closest
+ordinary C keeps 160 bytes and differs at six word positions: comparison
+operand order and the shared constant 2 using v1 instead of a1. None preserves
+the complete module. No rejected cleanup body is installed.
+
+A calibrated 90-second four-worker cleanup search reproduces all 40 parent
+words and relocation targets. Its best score is 45 from 50, through a redundant
+literal alias; that proposal is excluded. Next action: compare the constant-2
+uopt coloring/interference in the existing implementation and the retained
+clean reconstruction, then find a real value-lifetime change. Preserve both
+full-ROM-matched image functions while doing so.
