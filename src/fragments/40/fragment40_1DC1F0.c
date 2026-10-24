@@ -128,7 +128,55 @@ void MathUtil_BuildTransformMtx_fragment40(Mtx* arg0, f32 arg1, f32 arg2, f32 ar
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1DC1F0/func_88B010A0.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1DC1F0/func_88B01438.s")
+extern Gfx *D_800D0510;
+extern s32 func_8000731C(void);
+extern void *Gfx_AllocDisplayList(s32);
+extern void Gfx_SetViewportDimensions(void *, s16, s16);
+extern void Gfx_SetVertexAttributes(Vtx *, s16, s16, s16, s16, s16, u8, u8, u8, u8);
+extern Mtx D_80094890;
+// Draws an arg2 x arg3 quad at (arg0, arg1) in an orthographic screen projection, shaded
+// from RGBA color arg4 on the top edge to arg5 on the bottom (translucent surface mode);
+// nothing is drawn for a non-positive width or height. The shape of Pokemon Stadium 1
+// Gallery_SnapDrawGradientQuad (src/fragments/gallery_snap/gallery_snap.c there) with the
+// vertical gradient and geometry modes of the opaque Ui_DrawGradientQuad.
+//@src/4AC10.c
+void func_88B01438(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 *arg4, u8 *arg5) {
+    s16 *dims;
+    Vtx *vertices;
+    Mtx *matrix;
+    Vp *viewport;
+
+    if (arg2 <= 0 || arg3 <= 0) {
+        return;
+    }
+
+    dims = (s16 *)func_8000731C();
+    vertices = Gfx_AllocDisplayList(sizeof(Vtx) * 4);
+    matrix = Gfx_AllocDisplayList(sizeof(Mtx) * 1);
+    viewport = Gfx_AllocDisplayList(sizeof(Vp) * 1);
+
+    Gfx_SetViewportDimensions(viewport, dims[2], dims[3]);
+
+    gSPViewport(D_800D0510++, (u32)viewport & 0x1FFFFFFF);
+
+    guOrtho(matrix, 0.5f, (u16)dims[2] - 0.5f, (u16)dims[3] - 0.5f, 0.5f, -2.0f, 2.0f, 1.0f);
+    Gfx_SetVertexAttributes(&vertices[0], arg0, arg1, -1, 0, 0, arg4[0], arg4[1], arg4[2], arg4[3]);
+    Gfx_SetVertexAttributes(&vertices[1], arg0 + arg2, arg1, -1, 0, 0, arg4[0], arg4[1], arg4[2], arg4[3]);
+    Gfx_SetVertexAttributes(&vertices[2], arg0, arg1 + arg3, -1, 0, 0, arg5[0], arg5[1], arg5[2], arg5[3]);
+    Gfx_SetVertexAttributes(&vertices[3], arg0 + arg2, arg1 + arg3, -1, 0, 0, arg5[0], arg5[1], arg5[2], arg5[3]);
+
+    gDPPipeSync(D_800D0510++);
+    gDPSetCycleType(D_800D0510++, G_CYC_1CYCLE);
+    gSPClearGeometryMode(D_800D0510++, G_ZBUFFER | G_LIGHTING);
+    gSPSetGeometryMode(D_800D0510++, G_SHADE | G_SHADING_SMOOTH);
+    gDPSetCombineMode(D_800D0510++, G_CC_SHADE, G_CC_SHADE);
+    gDPSetRenderMode(D_800D0510++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+    gSPPerspNormalize(D_800D0510++, 0xFFFF);
+    gSPMatrix(D_800D0510++, (u32)matrix & 0x1FFFFFFF, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+    gSPMatrix(D_800D0510++, (u32)&D_80094890 & 0x1FFFFFFF, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPVertex(D_800D0510++, (u32)vertices & 0x1FFFFFFF, 4, 0);
+    gSP2Triangles(D_800D0510++, 0, 2, 3, 0, 0, 3, 1, 0);
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/40/fragment40_1DC1F0/func_88B01824.s")
 

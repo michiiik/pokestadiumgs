@@ -177,9 +177,86 @@ void func_841039F4(s16 arg0, s16 arg1, s16 arg2, f32 arg3) {
     func_841037A0(&mat);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84103A3C.s")
+// Rotation (sine/cosine tables D_80087E50/D_80088E50, indexed by the s16 angle >> 4) with
+// uniform scale arg3 and translation arg1. Same body as Pokemon Stadium 1
+// ParticleGfx_BuildTransformMatrix (src/fragments/particle_math/particle_math_261F90.c there).
+void func_84103A3C(S1_MtxF* arg0, S1_Vec3f arg1, S1_Vec3s arg2, f32 arg3) {
+    f32 temp_fa1;
+    f32 temp_fs0;
+    f32 temp_fs1;
+    f32 temp_ft4;
+    f32 temp_fv0;
+    f32 temp_fv1;
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84103BCC.s")
+    temp_ft4 = D_80087E50[(u16) arg2.x >> 4];
+    temp_fv0 = D_80088E50[(u16) arg2.x >> 4];
+
+    temp_fv1 = D_80087E50[(u16) arg2.y >> 4];
+    temp_fa1 = D_80088E50[(u16) arg2.y >> 4];
+
+    temp_fs0 = D_80087E50[(u16) arg2.z >> 4];
+    temp_fs1 = D_80088E50[(u16) arg2.z >> 4];
+
+    arg0->mf[0][0] = ((temp_fa1 * temp_fs1) + (temp_ft4 * temp_fv1 * temp_fs0)) * arg3;
+    arg0->mf[0][1] = temp_fv0 * temp_fs0 * arg3;
+    arg0->mf[0][2] = ((-temp_fv1 * temp_fs1) + (temp_ft4 * temp_fa1 * temp_fs0)) * arg3;
+    arg0->mf[0][3] = 0.0f;
+
+    arg0->mf[1][0] = ((-temp_fa1 * temp_fs0) + (temp_ft4 * temp_fv1 * temp_fs1)) * arg3;
+    arg0->mf[1][1] = temp_fv0 * temp_fs1 * arg3;
+    arg0->mf[1][2] = ((temp_fv1 * temp_fs0) + (temp_ft4 * temp_fa1 * temp_fs1)) * arg3;
+    arg0->mf[1][3] = 0.0f;
+
+    arg0->mf[2][0] = temp_fv0 * temp_fv1 * arg3;
+    arg0->mf[2][1] = -temp_ft4 * arg3;
+    arg0->mf[2][2] = temp_fv0 * temp_fa1 * arg3;
+    arg0->mf[2][3] = 0.0f;
+
+    arg0->mf[3][0] = arg1.x;
+    arg0->mf[3][1] = arg1.y;
+    arg0->mf[3][2] = arg1.z;
+    arg0->mf[3][3] = 1.0f;
+}
+
+// As func_84103A3C, but arg3 scales only the second row (Stadium 1
+// ParticleGfx_BuildTransformMatrixYScaled).
+void func_84103BCC(S1_MtxF* arg0, S1_Vec3f arg1, S1_Vec3s arg2, f32 arg3) {
+    f32 temp_fa0;
+    f32 temp_fa1;
+    f32 temp_fs0;
+    f32 temp_ft5;
+    f32 temp_fv0;
+    f32 temp_fv1;
+
+    temp_fa1 = D_80087E50[(u16) arg2.x >> 4];
+    temp_fv0 = D_80088E50[(u16) arg2.x >> 4];
+
+    temp_fv1 = D_80087E50[(u16) arg2.y >> 4];
+    temp_fa0 = D_80088E50[(u16) arg2.y >> 4];
+
+    temp_ft5 = D_80087E50[(u16) arg2.z >> 4];
+    temp_fs0 = D_80088E50[(u16) arg2.z >> 4];
+
+    arg0->mf[0][0] = (temp_fa0 * temp_fs0) + (temp_fa1 * temp_fv1 * temp_ft5);
+    arg0->mf[0][1] = temp_fv0 * temp_ft5;
+    arg0->mf[0][2] = (-temp_fv1 * temp_fs0) + (temp_fa1 * temp_fa0 * temp_ft5);
+    arg0->mf[0][3] = 0.0f;
+
+    arg0->mf[1][0] = ((-temp_fa0 * temp_ft5) + (temp_fa1 * temp_fv1 * temp_fs0)) * arg3;
+    arg0->mf[1][1] = temp_fv0 * temp_fs0 * arg3;
+    arg0->mf[1][2] = ((temp_fv1 * temp_ft5) + (temp_fa1 * temp_fa0 * temp_fs0)) * arg3;
+    arg0->mf[1][3] = 0.0f;
+
+    arg0->mf[2][0] = temp_fv0 * temp_fv1;
+    arg0->mf[2][1] = -temp_fa1;
+    arg0->mf[2][2] = temp_fv0 * temp_fa0;
+    arg0->mf[2][3] = 0.0f;
+
+    arg0->mf[3][0] = arg1.x;
+    arg0->mf[3][1] = arg1.y;
+    arg0->mf[3][2] = arg1.z;
+    arg0->mf[3][3] = 1.0f;
+}
 
 /* mkdraft:func_84103D2C begin */
 void func_84103D2C(S1_MtxF* arg0, S1_Vec3f arg1, S1_Vec3s arg2, f32 arg3, f32 arg4) {
@@ -319,7 +396,44 @@ void ParticleGfx_BuildBillboardRotatedMatrixYScaled(S1_MtxF* arg0, S1_MtxF* arg1
     arg0->mf[3][3] = 1.0f;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_372DE0/func_84104270.s")
+// Basis with normalized arg1 as row 1, rows 0 and 2 from cross products with the reference
+// vector (sin arg3, 0, cos arg3); scaled by arg4 and translated to arg2. Same body as Stadium 1 ParticleGfx_BuildDirectionMatrix
+// (src/fragments/particle_math/particle_math_261F90.c there); func_80035A10 normalizes in place.
+extern void Vec3f_SetComponentsDuplicate(S1_Vec3f *, f32, f32, f32);
+extern S1_Vec3f *func_80035A10(S1_Vec3f *);
+extern S1_Vec3f *Vec3f_CrossProduct(S1_Vec3f *, S1_Vec3f *, S1_Vec3f *);
+void func_84104270(S1_MtxF* arg0, S1_Vec3f arg1, S1_Vec3f arg2, s16 arg3, f32 arg4) {
+    S1_Vec3f sp3C;
+    S1_Vec3f sp30;
+    S1_Vec3f sp24;
+
+    Vec3f_SetComponentsDuplicate(&sp3C, D_80087E50[(u16) arg3 >> 4], 0.0f, D_80088E50[(u16) arg3 >> 4]);
+    func_80035A10(&arg1);
+    Vec3f_CrossProduct(&sp30, &arg1, &sp3C);
+    func_80035A10(&sp30);
+    Vec3f_CrossProduct(&sp24, &sp30, &arg1);
+    func_80035A10(&sp24);
+
+    arg0->mf[0][0] = sp30.x * arg4;
+    arg0->mf[0][1] = sp30.y * arg4;
+    arg0->mf[0][2] = sp30.z * arg4;
+    arg0->mf[3][0] = arg2.x;
+
+    arg0->mf[1][0] = arg1.x * arg4;
+    arg0->mf[1][1] = arg1.y * arg4;
+    arg0->mf[1][2] = arg1.z * arg4;
+    arg0->mf[3][1] = arg2.y;
+
+    arg0->mf[2][0] = sp24.x * arg4;
+    arg0->mf[2][1] = sp24.y * arg4;
+    arg0->mf[2][2] = sp24.z * arg4;
+    arg0->mf[3][2] = arg2.z;
+
+    arg0->mf[0][3] = 0.0f;
+    arg0->mf[1][3] = 0.0f;
+    arg0->mf[2][3] = 0.0f;
+    arg0->mf[3][3] = 1.0f;
+}
 
 extern void func_84103A3C(S1_MtxF *, S1_Vec3f, S1_Vec3s, f32);
 extern void func_841037A0(S1_MtxF *);

@@ -508,9 +508,9 @@ void func_82C03574(void) { func_8004C4B0(21); func_8004C4B0(19); }
 
 #ifdef VERSION_US
 extern s8 * HAL_Strcpy(s8 *, s8 *);
-extern void func_8004C594(s32, s32);
+extern s32 func_8004C594(s32, s32);
 extern s8 * func_8004C874(s32, s32);
-extern void func_8004C8A0(s32 *, s32, s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
 extern s32 func_82C026D4(s32 arg0);
 s32 func_82C0359C(s32 *arg0, s32 arg1, u8 *arg2) {
     s32 result = 0;
@@ -571,12 +571,137 @@ s32 func_82C03904(s32 arg0, s32 arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/83/fragment83_code/func_82C03974.s")
+// Fills the two text fields of arg0 (+4 and +0x54) from message bank 21,
+// choosing messages by the s16 type at arg2+0x34 and, for types 14 and the
+// default, by whether the bytes at arg2+0x36/0x37 are equal (100 at +0x37
+// with +0x36 < 2 selects the fixed pair 21/49). Returns 1.
+s32 func_82C03974(s32 arg0, s32 arg1, void *arg2)
+{
+  s16 temp_a1;
+  u8 var_v1;
+  u8 sp25;
+  u8 temp_a1_2;
+  u8 temp_a2;
+  u8 temp_a2_2;
+  switch (*((s16 *) (((u8 *) arg2) + 0x34)))
+  {
+    s32 temp_v1;
+    u32 var_a0;
+    case 1:
+
+    case 2:
+
+    case 3:
+
+    case 4:
+      HAL_Strcpy(arg0 + 4, func_8004C874(21, 22));
+      HAL_Strcpy(arg0 + 0x54, func_8004C874(21, 51));
+      break;
+
+
+    case 12:
+
+    case 13:
+      HAL_Strcpy(arg0 + 4, func_8004C874(21, 21));
+      if (!(arg1 & 0xFF00))
+    {
+      HAL_Strcpy(arg0 + 0x54, func_8004C874(21, 50));
+    }
+    else
+    {
+      HAL_Strcpy(arg0 + 0x54, func_8004C874(21, 49));
+    }
+      break;
+
+    case 6:
+      HAL_Strcpy(arg0 + 4, func_8004C874(21, 21));
+      HAL_Strcpy(arg0 + 0x54, func_8004C874(21, 49));
+      break;
+
+    case 14:
+      temp_a1 = *((u8 *) (((u8 *) arg2) + 0x37));
+      temp_a2 = *((u8 *) (((u8 *) arg2) + 0x36));
+      if (temp_a1 == temp_a2)
+    {
+      func_8004C594(3, (s32) temp_a1);
+      func_8004C8A0(arg0 + 4, 80, 21, 19);
+      func_8004C8A0(arg0 + 0x54, 360, 21, 45);
+    }
+    else
+    {
+      if ((((s32) temp_a2) < 2) && (temp_a1 == 100))
+      {
+        HAL_Strcpy(arg0 + 4, func_8004C874(21, 21));
+        HAL_Strcpy(arg0 + 0x54, func_8004C874(21, 49));
+      }
+      else
+      {
+        func_8004C594(2, (s32) temp_a2);
+        func_8004C594(3, (s32) (*((u8 *) (((u8 *) arg2) + 0x37))));
+        func_8004C8A0(arg0 + 4, 80, 21, 20);
+        func_8004C8A0(arg0 + 0x54, 360, 21, 47);
+      }
+    }
+      break;
+
+    default:
+      temp_v1 = arg1 & 0xFF00;
+      var_a0 = temp_v1 == 0x100;
+      if (var_a0 == 0)
+    {
+      var_a0 = temp_v1 == 0x700;
+    }
+      temp_a1_2 = *((u8 *) (((u8 *) arg2) + 0x37));
+      temp_a2_2 = *((u8 *) (((u8 *) arg2) + 0x36));
+      if (temp_a2_2 == temp_a1_2)
+    {
+      if (var_a0 & 0xFF)
+      {
+        var_v1 = 45;
+      }
+      else
+      {
+        var_v1 = 46;
+      }
+      sp25 = var_v1;
+      func_8004C594(3, (s32) temp_a1_2);
+      func_8004C8A0(arg0 + 4, 80, 21, 19);
+      func_8004C8A0(arg0 + 0x54, 360, 21, (s32) sp25);
+    }
+    else
+      if ((((s32) temp_a2_2) < 2) && (temp_a1_2 == 100))
+    {
+      HAL_Strcpy(arg0 + 4, func_8004C874(21, 21));
+      HAL_Strcpy(arg0 + 0x54, func_8004C874(21, 49));
+    }
+    else
+    {
+      var_v1 = var_a0;
+      if (var_v1)
+      {
+        var_v1 = 47;
+      }
+      else
+      {
+        var_v1 = 48;
+      }
+      func_8004C594(2, (s32) temp_a2_2);
+      func_8004C594(3, (s32) (*((u8 *) (((u8 *) arg2) + 0x37))));
+      func_8004C8A0(arg0 + 4, 80, 21, 20);
+      sp25 = var_v1;
+      func_8004C8A0(arg0 + 0x54, 360, 21, (s32) sp25);
+    }
+      break;
+
+  }
+
+  return 1;
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_8004C594(s32, s32);
-extern void func_8004C8A0(s32 *, s32, s32, s32);
+extern s32 func_8004C594(s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
 s32 func_82C03CA8(s32 arg0, s32 arg1, void *arg2) {
     s32 var_v1;
 
@@ -771,8 +896,8 @@ void func_82C0423C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8004C594(s32, s32);
-extern void func_8004C8A0(s32 *, s32, s32, s32);
+extern s32 func_8004C594(s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
 s32 func_82C026D4(s32);
 extern s32 D_82C04C50;
 extern u8 D_82C05E90;

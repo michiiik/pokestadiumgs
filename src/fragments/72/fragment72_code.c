@@ -123,8 +123,50 @@ void func_8F401750(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/72/fragment72_code/func_8F401828.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/72/fragment72_code/func_8F401918.s")
+extern void GfxImage_FillCurrent(void *, u16);
+extern s32 func_80008648(void);
+extern void func_800088DC(void);
+extern void func_80043E70(s32, s32);
+extern void func_8F400EE0(s32, s32);
+extern void func_8F401464(void);
+extern void func_8F401828(void);
 
+// Per-frame draw callback; arg0 1/2/3 selects the mode-specific setup.
+// D_8F4020C0 is an unnamed struct: a pointer at +0x10 and an s16 countdown at +4.
+void func_8F401918(s32 arg0) {
+    s32 sp1C;
+    s32 sp18;
+    u8 *state;
+
+    sp1C = 0;
+    sp18 = 0;
+    state = (u8 *)&D_8F4020C0;
+    if (*(void **)(state + 0x10) != NULL) {
+        func_80043E70((s32)*(void **)(state + 0x10), 1);
+    }
+    func_800088DC();
+    if (*(s16 *)(state + 4) != 0) {
+        GfxImage_FillCurrent(&D_800D0510, 0x7BDF);
+        if (*(s16 *)(state + 4) > 0) {
+            *(s16 *)(state + 4) -= 1;
+        }
+    }
+    if (arg0 == 1) {
+        func_8F401464();
+    }
+    func_8F401750();
+    func_8F401828();
+    switch (arg0) {
+        case 2:
+            sp1C = 1;
+            break;
+        case 3:
+            sp18 = 1;
+            break;
+    }
+    func_8F400EE0(sp1C, sp18);
+    func_80008648();
+}
 extern void func_800226C0(s32);
 extern void *D_80087200;
 

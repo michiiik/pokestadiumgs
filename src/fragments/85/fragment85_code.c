@@ -342,7 +342,89 @@ void func_8FD01A78(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/85/fragment85_code/func_8FD01B90.s")
+// Initializes message slots 25-30 and 42-44 using measured lookup-table entries.
+// The final type lookup uses the completed scan index, 18, as in the retail code.
+extern void *func_8004C874(s32, s32);
+extern s32 func_8004C54C(s32, s32);
+extern s32 func_80049148(s32, s32, const char *, ...);
+extern s32 *func_80062CE0(u8);
+extern s32 *func_800635E0(u8);
+extern s32 func_80063270(u8);
+extern s32 Type_ChartIndexToId(s32);
+extern void *func_8FD01AB8(u8);
+void func_8FD01B90(void) {
+    s32 value;
+    s32 i;
+    s32 best;
+    s32 best_i;
+    value = (s32)func_8004C874(74, 10);
+    func_8004C54C(25, value);
+    value = (s32)func_8004C874(74, 10);
+    func_8004C54C(26, value);
+    value = (s32)func_8004C874(74, 11);
+    func_8004C54C(27, value);
+    value = (s32)func_8004C874(74, 11);
+    func_8004C54C(28, value);
+    best = 0;
+    best_i = 1;
+    i = 1;
+    while (i < 252) {
+        value = (s32)func_80062CE0(i);
+        value = func_80049148(2, -1, (const char *)value);
+        if (best < value) {
+            best = value;
+            best_i = i;
+        }
+        i += 1;
+    }
+    i = (u8)best_i;
+    value = (s32)func_80062CE0(i);
+    func_8004C54C(29, value);
+    value = (s32)func_80062CE0(i);
+    best_i = 1;
+    func_8004C54C(30, value);
+    i = 1;
+    best = 0;
+    while (i < 256) {
+        value = (s32)func_800635E0(i);
+        value = func_80049148(2, -1, (const char *)value);
+        if (best < value) {
+            best = value;
+            best_i = i;
+        }
+        i += 1;
+    }
+    best = 0;
+    value = (s32)func_800635E0(best_i);
+    best_i = 1;
+    func_8004C54C(42, value);
+    i = 0;
+    while (i < 8) {
+        value = (s32)func_8FD01AB8(i);
+        value = func_80049148(2, -1, (const char *)value);
+        if (best < value) {
+            best = value;
+            best_i = i;
+        }
+        i += 1;
+    }
+    best = 0;
+    value = (s32)func_8FD01AB8(best_i);
+    func_8004C54C(43, value);
+    i = 0;
+    while (i != 18) {
+        value = Type_ChartIndexToId(i);
+        value = func_80063270(value);
+        value = func_80049148(2, -1, (const char *)value);
+        i += 1;
+        if (best < value) {
+            best = value;
+        }
+    }
+    value = Type_ChartIndexToId(i);
+    value = func_80063270(value);
+    func_8004C54C(44, value);
+}
 #endif
 
 #ifdef VERSION_US

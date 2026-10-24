@@ -6,7 +6,39 @@
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C1BC0/func_88504704.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C1BC0/func_885047B4.s")
+// Readiness code for a trade record from its state byte arg0[0]: state 0 gives 4, 3 or 0 from
+// bytes 3 and 2; state 2 gives 1; states 3 and 5 give 2; others -1. Same body as Pokemon
+// Stadium 1 Trade_GetBoxSlotSaveReadiness (src/fragments/trade_machine/trade_machine_28ED00.c
+// there) plus the state-5 case.
+s16 func_885047B4(u8 *arg0) {
+    s16 ret;
+
+    switch (arg0[0]) {
+        case 0:
+            if (arg0[3] == 0) {
+                ret = 4;
+            } else if (arg0[2] == 0) {
+                ret = 3;
+            } else {
+                ret = 0;
+            }
+            break;
+
+        case 2:
+            ret = 1;
+            break;
+
+        case 3:
+        case 5:
+            ret = 2;
+            break;
+
+        default:
+            ret = -1;
+            break;
+    }
+    return ret;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C1BC0/func_88504828.s")
 
@@ -93,7 +125,61 @@ void func_88504EB8(void) {
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C1BC0/func_88505038.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/34/fragment34_1C1BC0/func_88505264.s")
+// Slot records indexed from 0 (index - 1 is compared with D_88523009); field offsets are
+// Stadium 1 TradeSlotInfo + 6, from the accesses in func_88505264.
+typedef struct {
+    /* 0x000 */ u8 unk_000[0xC];
+    /* 0x00C */ s16 unk_00C;
+    /* 0x00E */ s16 unk_00E;
+    /* 0x010 */ s16 unk_010;
+    /* 0x012 */ s16 unk_012;
+    /* 0x014 */ s16 unk_014;
+    /* 0x016 */ s16 unk_016;
+    /* 0x018 */ s16 unk_018;
+    /* 0x01A */ s16 unk_01A;
+    /* 0x01C */ f32 unk_01C;
+    /* 0x020 */ f32 unk_020;
+    /* 0x024 */ f32 unk_024;
+    /* 0x028 */ u8 unk_028[0x194 - 0x28];
+} unk_D_885229B0;
+extern unk_D_885229B0 D_885229B0[];
+extern s16 D_8850D2C2[];
+extern f32 D_80088E50[];
+extern f32 D_8850D4E0;
+extern f32 D_8850D4E4;
+extern s32 MathUtil_Random16(void);
+// Bob/sway animation of one slot: unk_00C and unk_018 follow the sine of phase unk_012, the
+// scales unk_020/unk_024 follow phase unk_014; the slot after D_88523009 moves at double
+// amplitude. D_8850D2C2[index] is the per-slot phase step. Same body as Pokemon Stadium 1
+// Trade_UpdateBoxSlotBob (src/fragments/trade_machine/trade_machine_28ED00.c there).
+void func_88505264(unk_D_885229B0 *arg0) {
+    s32 temp_lo = arg0 - &D_885229B0[0];
+    s16 var_a2;
+    s16 var_a3;
+    f32 var_fv0;
+    f32 var_fv1;
+
+    if (temp_lo - 1 == D_88523009) {
+        var_fv0 = 1.5f;
+        var_a2 = D_8850D2C2[temp_lo] * 2;
+        var_fv1 = D_8850D4E0;
+        var_a3 = 0x3000;
+    } else {
+        var_a2 = D_8850D2C2[temp_lo];
+        var_fv1 = D_8850D4E4;
+        var_a3 = 0x2000;
+        var_fv0 = 1.0f;
+    }
+
+    arg0->unk_00C = arg0->unk_010 - (D_80087E50[(u16) arg0->unk_012 >> 4] * (6.0f * var_fv0));
+
+    arg0->unk_018 = D_80087E50[(u16) arg0->unk_012 >> 4] * (1536.0f * var_fv0);
+    arg0->unk_020 = (D_80087E50[(u16) arg0->unk_014 >> 4] * var_fv1) + 1.0f;
+    arg0->unk_024 = (D_80088E50[(u16) arg0->unk_014 >> 4] * var_fv1) + 1.0f;
+
+    arg0->unk_012 += var_a2;
+    arg0->unk_014 += var_a3 + ((MathUtil_Random16() & 0xF) * 16);
+}
 
 extern void func_88505038(void *arg0, s32 arg1);
 void func_885053E8(void *arg0) {
@@ -106,9 +192,8 @@ void func_885053E8(void *arg0) {
     }
 }
 
-extern void func_88505264(void);
-void func_88505440(void) {
-    func_88505264();
+void func_88505440(unk_D_885229B0 *arg0) {
+    func_88505264(arg0);
 }
 
 extern void func_88505038(void *arg0, s32 arg1);
@@ -133,7 +218,7 @@ void func_88505514(void *arg0) {
 void Trade_UpdateBoxSlotShrink(void *arg0)
 {
   s16 temp_v0;
-  func_88505264();
+  func_88505264(arg0);
  *((s16 *) (((u8 *) arg0) + 0x16)) = (s16) ((*((s16 *) (((u8 *) arg0) + 0x16))) - 1); temp_v0 = *((s16 *) (((u8 *) arg0) + 0x16));
   *((f32 *) (((u8 *) arg0) + 0x1C)) = (f32) (((f32) temp_v0) / 8);
   if (temp_v0 <= 0)

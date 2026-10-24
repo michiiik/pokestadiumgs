@@ -361,6 +361,14 @@ Gfx* BattleAnim_SixSlotTrail_LoadTextures(Gfx* arg0, S1_unk_D_843C3508* arg1) {
     return arg0;
 }
 
+extern Gfx D_84187DD0[];
+extern void *Gfx_AllocDisplayList(s32);
+extern void Gfx_SetCombineMode(Gfx *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
+// Builds and draws each active six-slot trail: 40 vertices from the 20 points (offsets from
+// BattleAnim_SixSlotTrail_ComputeRotatedOffset in mode 0, the camera-relative variant in mode
+// 1), then the D_84187DD0 render state, combiner, prim/env colors, textures and segments.
+// Same body as Pokemon Stadium 1 BattleAnim_SixSlotTrail_DrawAll
+// (src/fragments/battle_engine/battle_engine_357C30.c there).
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D7DD0/func_84169618.s")
 
 #endif

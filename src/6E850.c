@@ -708,7 +708,39 @@ void func_80070C14(f32 *arg0, f32 *arg1, f32 *arg2) { f32 x = *arg0; f32 y = *ar
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/6E850/func_80070C68.s")
+extern s16 MathUtil_Atan2s(f32, f32);
+extern void guTranslate(Mtx *, f32, f32, f32);
+extern void guMtxCatL(Mtx *, Mtx *, Mtx *);
+extern void func_8007DCD4(Mtx *, f32, f32, f32, f32);
+extern f64 D_800A59F0;
+extern f64 D_800A59F8;
+extern f64 D_800A5A00;
+extern f64 D_800A5A08;
+// Writes to mtx a translation to (arg1, arg2, arg3) followed by rotations that aim along the
+// direction to (arg4, arg5, arg6): heading about -Y, then elevation about +X, each converting
+// a MathUtil_Atan2s angle with a D_800A59F0/D_800A59F8 (D_800A5A00/D_800A5A08) ratio.
+// Same body as Pokemon Stadium 1 Mtx_BuildTranslatedDirectionRotation (src/gallery.c there);
+// func_8007DCD4 sits where S1 calls guRotate (same arguments).
+void func_80070C68(Mtx *mtx, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
+    f32 sp10C;
+    f32 sp108;
+    struct { f32 x, y, z; } direction;
+    Mtx spB8;
+    Mtx sp78;
+    Mtx sp38;
+
+    direction.x = arg4 - arg1;
+    direction.z = arg6 - arg3;
+    sp108 = (f32) (((f64) (f32) MathUtil_Atan2s(-direction.z, direction.x) * D_800A59F0) / D_800A59F8);
+    direction.y = arg5 - arg2;
+    sp10C = (f32) (((f64) (f32) MathUtil_Atan2s(-direction.y, sqrtf((direction.x * direction.x) + (direction.z * direction.z))) * D_800A5A00) / D_800A5A08);
+    guTranslate(&spB8, arg1, arg2, arg3);
+    func_8007DCD4(&sp78, sp108, 0.0f, -1.0f, 0.0f);
+    guMtxCatL(&sp78, &spB8, &spB8);
+    func_8007DCD4(&sp38, sp10C, 1.0f, 0.0f, 0.0f);
+    guMtxCatL(&sp38, &spB8, &spB8);
+    *mtx = spB8;
+}
 #endif
 
 #ifdef VERSION_US

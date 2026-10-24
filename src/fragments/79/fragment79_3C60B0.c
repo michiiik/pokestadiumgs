@@ -802,7 +802,58 @@ void BattleAnim_StartEffect45FourStreamTrail_Init(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3C60B0/func_841580C8.s")
+// Effect 45 update: spawns one four-stream trail per frame for frames 1-3 at the secondary
+// owner bone position; returns -1 at frame 50, else FourStreamTrail_IsComplete() from frame 2.
+// Same body as Pokemon Stadium 1 BattleAnim_StartEffect45FourStreamTrail_Update
+// (src/fragments/battle_engine/battle_engine_343BA0.c there).
+extern void func_80070C14(f32 *, f32 *, f32 *);
+extern void FourStreamTrail_Start(f32, f32, f32, f32, f32, f32, u8, u8, u8, u8, f32, f32, f32, s16);
+extern s32 FourStreamTrail_IsComplete(void);
+extern f32 __sinf(f32);
+extern f32 __cosf(f32);
+s32 func_841580C8(void) {
+    s32 var_v1;
+    f32 sp68[3];
+    f32 sp64;
+    f32 sp60;
+    f32 sp5C;
+    f32 sp58;
+    f32 sp54;
+    f32 sp50;
+    f32 sp4C;
+
+    *(s16 *)&D_841A4D00 += 1;
+    if (*(s16 *)&D_841A4D00 >= 50) {
+        return -1;
+    }
+
+    if (*(s16 *)&D_841A4D00 < 4) {
+        BattleAnim_EffectSecondaryOwnerBonePosition((s32)(u32)sp68);
+        sp64 = sp68[0];
+        sp60 = sp68[1];
+        sp5C = sp68[2];
+        sp58 = 1.0f;
+        sp4C = (((*(s16 *)&D_841A4D00 % 3) * 3.1415927f) / 3.0) + 0.5235987901687622;
+        sp54 = (f64)__sinf(sp4C);
+        sp50 = (f64)__cosf(sp4C);
+        func_80070C14(&sp58, &sp54, &sp50);
+        sp54 *= 20.0;
+        sp50 *= 20.0;
+        sp58 = 10.0f;
+        if (sp64 < 0.0) {
+            sp58 = -sp58;
+        }
+        FourStreamTrail_Start(sp64, sp60, sp5C, sp58, sp54, sp50, 192, 255, 255, 128, (((guRandom() % 2) * 2) - 1) * 0.3,
+                              2.0f, 13.0f, 40);
+    }
+
+    if (*(s16 *)&D_841A4D00 >= 2) {
+        var_v1 = FourStreamTrail_IsComplete();
+    } else {
+        var_v1 = 0;
+    }
+    return var_v1;
+}
 #endif
 
 #ifdef VERSION_US

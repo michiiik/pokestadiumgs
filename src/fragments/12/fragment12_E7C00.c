@@ -851,7 +851,22 @@ void func_814054CC(u8 *arg0, void *arg1)
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81406700.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/12/fragment12_E7C00/func_81406A30.s")
+void func_81406A30(void *arg0) {
+    switch (*(u8 *)((u8 *)arg0 + 6)) {
+        case 0:
+        case 4:
+        case 6:
+            break;
+        case 2:
+        case 3:
+        case 5:
+            *(f32 *)arg0 = 16.0f;
+            /* fallthrough */
+        case 1:
+            *(u8 *)((u8 *)arg0 + 6) = 6;
+            break;
+    }
+}
 
 s32 func_81406A74(u8 *arg0) {
     return arg0[6] == 5 && arg0[0x30] == 2;

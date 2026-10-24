@@ -207,5 +207,12 @@ s32 OwnerLinkedFourStream_IsComplete(void) {
     return 0;
 }
 
+extern Gfx D_84187B78[];
+extern Gfx D_84188A70[];
+extern void *Gfx_AllocDisplayList(s32);
+extern void func_8007D454(void *, f32, f32, f32);
+// Draws each active owner-linked stream: a 0.09-scale marker (D_84188A70) at the head sample,
+// then a 30-vertex strip from the 15 samples. Same body as Pokemon Stadium 1
+// OwnerLinkedFourStream_Draw (src/fragments/battle_engine/battle_engine_353370.c there).
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/79/fragment79_3D4060/func_841650A8.s")
 #endif
