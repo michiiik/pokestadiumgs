@@ -27,7 +27,7 @@ Gfx *DisplayList_BuildAnimatedModelTexture(Gfx *gfx, Func810059D0Addresses *addr
 }
 
 typedef struct { u8 pad[0x14]; Func810059D0Addresses *addresses; Gfx *gfx; } AnimatedModelTextureState26;
-extern u8 *D_8009491C; extern u16 D_80094904; extern void *func_8003F54C(void *); extern Gfx *Gfx_AllocDisplayList(s32);
+extern u8 *D_8009491C; extern u16 D_80094904; extern void *func_8003F54C(void *); extern u32 Gfx_AllocDisplayList(s32);
 void func_81005AC0(s32 phase, AnimatedModelTextureState26 *state) {
     Gfx *gfx;
     Func810059D0Addresses *addresses;
@@ -36,7 +36,7 @@ void func_81005AC0(s32 phase, AnimatedModelTextureState26 *state) {
         if (func_8003F54C(D_8009491C) != NULL) {
             index = D_80094904;
             addresses = state->addresses;
-            gfx = Gfx_AllocDisplayList(320);
+            gfx = (Gfx *)Gfx_AllocDisplayList(320);
             state->gfx = gfx;
             DisplayList_BuildAnimatedModelTexture(gfx, addresses, index % 8);
         }

@@ -941,3 +941,5 @@ func_8AB0E0F4 = TextMode8_DrawState;
 func_8AB0E8B4 = TextMode8_RevealPromptText;
 func_8AB0E684 = TextMode8_HandlePrePromptState;
 func_8AB0E9E8 = TextMode8_HandleAnswerInput;
+func_81005B50 = DisplayList_BuildScrollingDualTexture;
+func_81005DB4 = DisplayList_InitScrollingDualTexture;
