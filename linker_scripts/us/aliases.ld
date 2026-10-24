@@ -919,3 +919,6 @@ func_86206334 = SceneModel_InitPlayers;
 func_8AB02F94 = TextReference_GetText;
 func_8AB04BD4 = TextPanels_UpdateVisibility;
 func_8AB03D10 = TextRow_SetOrangeState;
+func_8AB0178C = TextNumber_DrawCallback;
+func_8AB01850 = TextLabel_DrawCallback;
+func_8AB01ED4 = TextPreview_InitializeModel;
