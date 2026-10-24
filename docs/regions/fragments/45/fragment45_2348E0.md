@@ -31,3 +31,36 @@ The complete US ROM passes checksum verification and compares byte-for-byte
 with the retail ROM; MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 The original 32-byte frame is preserved without dummy storage, forced
 registers, or instruction rewrites.
+
+## Banner and panel visibility delay
+
+`func_8AB10DE4` now has a matching C implementation (304 instruction bytes).
+It defaults to state 71. Argument zero resets `D_8AB17450`, enables bit zero
+of the node flags at `D_8AB11D00`, and calls `func_8AB04AE4` to hide the
+panel groups. It copies archive 57 entry 389 into the 256-byte
+`D_8AB126A8` buffer, clears the visibility bit on `D_8AB1725C` and the four
+nodes referenced by `D_8AB12678`, emits event 65550 with two zero parameters,
+and calls `func_800225C4(40)`.
+
+Argument one increments the signed-halfword counter and calls
+`TextHighlight_AnimateScales`. At counter 61 or above, it returns
+`func_8AB10F14(0)` instead of state 71. Other arguments leave state 71
+unchanged. The preceding handler `func_8AB10D30` enters this state after
+resetting the other four panels' words at offsets 40 and 44.
+
+The four-node visibility update is an ordinary four-iteration C loop;
+IDO unrolls it into the original stores. The counter pointer precedes the
+result declaration, reproducing the result's stack offset 24. No forced
+register, dummy storage, or instruction rewrite is used.
+
+The text-copy function is the four-argument pointer-returning
+`func_8004C8A0` in `src/4CC20.c`. The three-word event wrapper and the
+panel-visibility and highlight helpers are defined in
+`src/fragments/45/fragment45_2251A0.c`; `func_800225C4` is defined in
+`src/229E0.c`. Behavior descriptions follow these sources and the original
+disassembly, without assigning a broader meaning to the remaining globals.
+
+Verification targets master `c3398bdda46be6bd771ef943820dbd644e2a5aa9` plus
+this change. The normal syntax-enabled forced source compile and complete
+`VERSION=us` ROM build pass. `cmp` confirms byte-for-byte equality with the
+retail ROM; MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
