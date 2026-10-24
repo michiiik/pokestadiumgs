@@ -194,7 +194,40 @@ s32 func_8AB072EC(s32 arg0)
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB073F4.s")
+extern s16 D_8AB16A2C;
+extern void *D_8AB167AC;
+extern void *D_8AB16968;
+extern void TextHighlight_AnimateScales(void);
+extern s32 func_8AB07538(s32);
+s32 func_8AB073F4(s32 arg0) {
+    s16 *counter = &D_8AB16A2C;
+    s32 result = 12;
+    s32 i;
+
+    switch (arg0) {
+    case 0:
+        *counter = 0;
+        *(u16 *)((u8 *)D_8AB11D00 + 2) |= 1;
+        func_8AB04AE4();
+        func_8004C8A0(D_8AB126A8, 256, 57, 389);
+        *(u16 *)((u8 *)D_8AB167AC + 2) &= ~1;
+        for (i = 0; i < 4; i++) {
+            *(u16 *)(D_8AB12678[i] + 2) &= ~1;
+        }
+        *(u16 *)((u8 *)D_8AB16968 + 2) &= ~2;
+        func_8AB00BA4(65550, 0, 0);
+        func_800225C4(40);
+        break;
+    case 1:
+        *counter += 1;
+        TextHighlight_AnimateScales();
+        if (*counter >= 61) {
+            result = func_8AB07538(0);
+        }
+        break;
+    }
+    return result;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB07538.s")
 
