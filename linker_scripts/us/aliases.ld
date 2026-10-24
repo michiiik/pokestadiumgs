@@ -948,3 +948,5 @@ func_81005DB4 = DisplayList_InitScrollingDualTexture;
 func_810045C4 = Particle31_UpdateSpeciesEffectTrigger;
 func_81003F58 = Particle31_SpawnSpeciesEffect;
 func_81005524 = Particle31_DisplayListCallback;
+
+func_81004818 = Particle31_DrawAndUpdateSpeciesEffect;
