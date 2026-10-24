@@ -135,7 +135,42 @@ s32 func_8AB10D30(s32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2348E0/func_8AB10DE4.s")
+extern s16 D_8AB17450;
+extern void *D_8AB11D00;
+extern u8 D_8AB126A8[];
+extern void *D_8AB1725C;
+extern void *func_8004C8A0(void *, s32, s32, s32);
+extern void func_8AB00BA4(s32, s32, s32);
+extern void func_800225C4(s32);
+extern s32 func_8AB10F14(s32);
+s32 func_8AB10DE4(s32 arg0) {
+    s16 *counter = &D_8AB17450;
+    s32 result = 71;
+    s32 i;
+
+    switch (arg0) {
+    case 0:
+        *counter = 0;
+        *(u16 *)((u8 *)D_8AB11D00 + 2) |= 1;
+        func_8AB04AE4();
+        func_8004C8A0(D_8AB126A8, 256, 57, 389);
+        *(u16 *)((u8 *)D_8AB1725C + 2) &= ~1;
+        for (i = 0; i < 4; i++) {
+            *(u16 *)(D_8AB12678[i] + 2) &= ~1;
+        }
+        func_8AB00BA4(65550, 0, 0);
+        func_800225C4(40);
+        break;
+    case 1:
+        *counter += 1;
+        TextHighlight_AnimateScales();
+        if (*counter >= 61) {
+            result = func_8AB10F14(0);
+        }
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
