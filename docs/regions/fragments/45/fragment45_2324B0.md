@@ -61,3 +61,33 @@ Verification: calibrated whole-module controls, accepted runner provenance,
 and the syntax-enabled full US-ROM gate. The ROM remains byte-identical
 with MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Newer upstream C, including
 the fade and delay handlers merged in PR #1502, is preserved.
+
+## Selected-row delay state
+
+`func_8AB0F518` now has a matching C implementation (224 instruction bytes).
+It defaults to state 44. Argument zero resets `D_8AB17248`, enables the node
+at `D_8AB11D00`, loads text archive 57 entry 389 into `D_8AB126A8`, and clears
+the visibility bit on the node at `D_8AB16FC8`. It then emits event 102 with
+two zero parameters, calls `func_800225C4(40)`, and plays sound 52998.
+
+Argument one increments the signed-halfword counter before calling
+`TextHighlight_AnimateScales`. When the counter reaches at least 61, the
+handler returns `func_8AB0F5F8(0)` instead of state 44. Other arguments retain
+state 44 without those updates. The caller `func_8AB0EED8` records the first
+row whose halfword at offset 2 equals one, stores its index in the interface
+configuration, and enters this handler with argument zero.
+
+The event wrapper's three signed-word parameters are established by its
+definition in `src/fragments/45/fragment45_2251A0.c`. The sound helper's
+`void (u16)` declaration follows `Audio_PlayDefaultSound` in `src/229E0.c`;
+the original call's address name is an existing linker alias. The counter
+pointer is declared before the result, reproducing the original result slot
+at stack offset 24 without dummy storage or instruction rewrites.
+
+Verification targets the complete source tree of master
+`3349f81941add45a9d3ae2493a68d4964c77c201` plus this change. A fresh
+syntax-enabled compile via
+`make -W src/fragments/45/fragment45_2324B0.c -j4 VERSION=us rom`
+passes the US ROM checksum, and `cmp` confirms byte-for-byte equality with
+the retail ROM. MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+These behavior claims come from source and disassembly inspection.

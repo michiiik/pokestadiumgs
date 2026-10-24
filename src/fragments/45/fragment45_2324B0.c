@@ -300,7 +300,36 @@ s32 func_8AB0F484(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0F518.s")
+extern s16 D_8AB17248;
+extern void *D_8AB16FC8;
+extern void func_8AB00BA4(s32, s32, s32);
+extern void Audio_PlayDefaultSound(u16);
+extern void TextHighlight_AnimateScales(void);
+extern s32 func_8AB0F5F8(s32);
+s32 func_8AB0F518(s32 arg0) {
+    s16 *counter = &D_8AB17248;
+    s32 result = 44;
+
+    switch (arg0) {
+    case 0:
+        *counter = 0;
+        *(u16 *)((u8 *)D_8AB11D00 + 2) |= 1;
+        func_8004C8A0(D_8AB126A8, 256, 57, 389);
+        *(u16 *)((u8 *)D_8AB16FC8 + 2) &= ~1;
+        func_8AB00BA4(102, 0, 0);
+        func_800225C4(40);
+        Audio_PlayDefaultSound(52998);
+        break;
+    case 1:
+        *counter += 1;
+        TextHighlight_AnimateScales();
+        if (*counter >= 61) {
+            result = func_8AB0F5F8(0);
+        }
+        break;
+    }
+    return result;
+}
 
 extern s16 D_8AB126A0;
 extern void *D_8AB16FC8;
