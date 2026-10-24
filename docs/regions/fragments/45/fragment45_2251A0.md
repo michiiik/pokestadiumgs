@@ -612,3 +612,172 @@ MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`. The earlier interpreter's
 interleaved epilogue and other unresolved owners remain assembly. Private
 compiler observers, probes, frozen objects and ROM artifacts are excluded
 from the public change, as are coverage and layout files.
+
+## Icon cache callback `func_8AB01C88`: requeue
+
+The owner remains assembly: 588 bytes with a 112-byte frame. Against native
+revision `bbb98ccb`, forty compiled C variants reconstruct the allocation,
+cache refresh and drawing path. Eight earlier compile failures referenced a
+type defined later in the file; those are declaration-placement diagnostics,
+not valid source-shape experiments. The best normalized similarity is 0.8435
+with raw similarity 0.4422. The scalar-coordinate parent has normalized
+0.8163 and raw 0.4694. Neither is a byte match.
+
+The graph record's pointer at offset 32 selects a cache containing a choice
+pointer at 0, pixel buffer at 4, signed cached entry at 8 and validity word at
+12. The choice supplies archive/entry halfwords at 48/50. Phase 0 allocates
+3200 bytes and clears validity. Phase 1 reloads the pixels when archive is
+zero and either validity is clear or the entry changed. It calls the real
+three-argument `func_8004D878` with the buffer, cached entry plus one and a
+null record. A nonzero archive clears validity instead. The draw path queries
+its parent coordinates, loads a 40-by-40 RGBA16 texture with clamp addressing,
+and draws a 53-by-53 rectangle with 0x300 texture steps in `G_CYC_COPY`.
+`GfxRect_DrawTextured` in `src/44E70.c` implements that cycle mode's horizontal
+step adjustment. The separate resource loader definition in `src/4CC20.c`
+establishes its actual pointer return and three parameters.
+
+Scalar versus pair coordinates, separate versus shared coordinate storage,
+cache struct versus byte views, declaration order, initial-buffer capture,
+switch versus if dispatch, an early allocation return, combined versus
+individual texture macros, statement grouping and legacy call promotions have
+been compared. A coordinate pair brings the instruction shape closer but
+puts its fields in different stack homes. No volatile storage, extra stack
+space or padding is introduced to force the scalar homes.
+
+The checksum-matched ROM independently contains an additional `jr ra; nop`
+at VRAM 0x8AB01ECC / ROM 0x22704C, after the callback's ordinary return.
+The runner calls this `duplicate_jr_nop_tail`; the C proposals produce a
+normal return. Its source or boundary explanation remains unknown. Do not
+invent an empty helper to supply the bytes or assume this is an established
+compiler limitation.
+
+A stock-compiler diagnostic reproduces the retained 7.1 candidate's function
+bytes from identical source. IDO 5.3 also preserves the 76-byte known getter
+control, including its leading-blank variant, but produces 584-byte callback
+proposals: normalized 0.8299 for scalar coordinates and 0.8776 for the pair.
+Neither reproduces the extra tail. The known-source rows retain this owner
+in assembly; their exact target comparison is not a C match. No alternate
+historical compiler has been identified, and the build compiler is unchanged.
+
+Next action: capture the stock compiler's phase streams for the retained
+scalar and pair parents, locate the coordinate homing and display-list
+scheduling decisions, and investigate the eight-byte tail's provenance.
+Keep compiler/debug-option tests diagnostic until known-source controls and
+the complete retail-ROM gate establish their scope. Do not repeat the source
+families above.
+
+## Wobbling texture renderer `func_8AB019B8`: requeue
+
+This owner remains assembly after 56 compiled C variants and eight initial
+declaration failures. The best proposal has the original 588-byte size and
+48-byte frame, normalized similarity 0.9728 and raw similarity 0.3061. The
+remaining opcode-order differences are concentrated in the initial integer/
+float expression; register differences extend through the function.
+
+The renderer converts x to quarter-pixel coordinates with signed-halfword
+wrapping, adds a 40-quarter-pixel sine displacement, and truncates back to a
+signed halfword. Its phase wraps the frame counter shifted by 12 to sixteen
+bits. Direct decoding of the checksum-matched ROM verifies sine-table values
+0, approximately 0.3826834, approximately 0.7071068 and 1 at angles 0, 4096,
+8192 and 16384. Thus the displacement amplitude is ten pixels. The texture
+comes from the record's archive/entry fields at 36/38. The renderer queries
+its width and height, loads it through `func_8004D1FC`, and emits either a
+normal texture rectangle or a horizontally mirrored rectangle. Bit 0 of the
+record's first halfword selects mirroring; the field at 12 supplies the
+mirrored starting S coordinate. The display-list setup/restoration pointers
+are `D_80094E38` and `D_80094F50`.
+
+The unit already uses the loader through implicit declarations before this
+owner. Adding its actual `s32 func_8004D1FC(u8 *)` prototype only beside the
+new owner conflicts with that earlier implicit-int declaration. A companion
+that inserts the prototype before `func_8AB00BC4` is valid: declaration-only
+and leading-blank controls preserve the complete existing module, all 81
+extents and resolved relocation targets. Keep the existing byte-array
+spelling of `D_80094E38`; adding a conflicting Gfx-array extern is another
+compile diagnostic, not a source hypothesis.
+
+Dimension declaration order, reusing x versus a separate fixed-point local,
+operand order, integer versus float scale literals, halfword versus byte
+flag reads, phase locals, a named amplitude, and multiply-versus-shift forms
+of the phase and x arithmetic have been tested. A signed-word x parameter,
+with its forward declaration changed in the same transaction, produces a
+worse 584-byte shape. An explicit motion-result temporary sinks part of the
+position calculation past the resource calls and duplicates it in the two
+draw branches, producing 648 bytes. Replaying it with the validated loader
+prototype still produces 648 bytes, isolating that source-shape failure from
+the declaration correction. None of these bodies is installed.
+
+The repeated best-parent first difference is the frame-counter load:
+retail uses `lw t7, 0(t6)`, while the parent uses `lw t6, 0(t6)`. The original
+also materializes the float scale before the sine-table load. Named phases
+and amplitudes do not recover that prefix; ordinary arithmetic spelling
+changes compile back to the same residual. The original width/height homes
+are sp+0x2C/sp+0x2A, with the texture pointer at sp+0x24 and mirror flag at
+sp+0x20. Next action: observe the counter-address load and initial expression
+at the compiler phase boundary, then target a measured lowering difference.
+Do not add a redundant alias or a guessed global record simply to obtain a
+different load register. The normal syntax-enabled retail-ROM gate remains
+mandatory for any eventual match.
+
+## Texture renderer phase-capture follow-up: requeue
+
+The follow-up against native parent `96d64a47` compiles 32 additional proposals.
+Splitting the horizontal-coordinate calculation into `x_fixed = x * 4;`
+and a compound addition of the floating displacement recovers all 147 retail
+opcodes, the 588-byte size and the 48-byte frame. The best runner raw similarity
+is 0.3333. Register rotation still begins at the frame-counter load, and the
+height home remains sp+0x2E instead of sp+0x2A. This body remains uninstalled.
+The two assignments preserve the signed-halfword wrap before the float addition.
+
+Normal IDO 7.1 `cc -v -keep` captures were calibrated against both the existing
+module and the retained candidate. For each, stock, captured and leading-blank
+builds preserve the complete module; identity replay of the actual binary G/T
+assembler inputs preserves instruction bits and relocation topology/addends.
+The readable UGEN listing from that same binary pipeline shows `li.s f4,40.0`
+before the symbolic counter load in the split candidate. It still emits one
+symbolic `lw t6,D_8AB1268C`, rather than establishing the retail address/value
+register distinction. This locates the candidate's form; it does not establish
+what the unavailable original compiler input contained.
+
+A probe-only byte-storage/indirect-access diagnostic collapses to the same load
+and does not justify changing the scalar counter representation. Narrowing the
+height query return, or both dimension-query returns, to u16 also leaves the
+residual unchanged; existing s32 prototypes are retained. Stock IDO 5.3 preserves
+the 76-byte getter control but generates a 584-byte split renderer, so that
+compiler comparison does not supply a match or justify changing the build.
+
+A calibrated 180-second, four-worker permuter search lowers its own score from
+2063 to 868. The five retained programs have the same parsed syntax tree as the
+base modulo commutative bitwise AND, including their naturally expanded GBI
+operations. Full-unit runner checks nevertheless reject all five; the best has
+normalized similarity 0.9932. Three simpler statement-grouping proposals retain
+the original 1.0 opcode similarity and the same register/height-home residual.
+Keep the split source as the next baseline. Investigate the first UGEN temporary
+allocation and the real halfword homes; do not repeat the ruled-out storage,
+return-category, compiler-version or formatting families above.
+
+## Main input/render loop `TextInterface_RunMainLoop`: accepted
+
+`func_8AB05300` is replaced by 568 bytes of genuine C. The US assembly selects
+controllers by testing bits 0 through 3 of the configuration byte at offset 14,
+in priority order. Each branch copies 40 bytes from the corresponding pointer
+at `D_80087200`, `D_80087204`, `D_80087208` or `D_8008720C` into `D_8AB13F00`,
+and stores the selected zero-based port at `D_8AB13F2C`. A normal aggregate copy
+of an opaque ten-word snapshot reproduces IDO's three-word copy loop and final
+word. No manually unrolled copy or guessed controller fields are needed.
+
+Each iteration polls input through `func_80064D28`, adjusts the snapshot through
+`func_8AB05254`, and advances `D_8AB14188` through `func_8AB051AC`. A saved previous
+state is passed to the frame renderer `func_8AB04EE8`. When `D_8AB126A0` is 1,
+`func_80043678` supplies the RGBA16 preview address and the flag becomes 2.
+The loop exits when the new state is zero and invokes `func_8AB01FBC`. These
+input, dispatch and rendering operations support the new function name.
+
+Initial aggregate-copy proposals reproduce 140 of 142 instruction words.
+Saving the previous state separately while passing the global current state
+to the transition routine recovers the remaining `lw a0` / `move s0,a0` pair;
+passing the saved local or assigning it inside the call argument produces the
+reverse register roles. The accepted runner label is
+`text-main-loop:global-transition-with-history-snapshot:parent-0:layout-separate`.
+The isolated probe is link-verified and the ordinary syntax-enabled full US
+ROM comparison passes with MD5 `1561c75d11cedf356a8ddb1a4a5f9d5d`.
