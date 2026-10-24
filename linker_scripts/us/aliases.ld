@@ -947,3 +947,4 @@ func_81005DB4 = DisplayList_InitScrollingDualTexture;
 /* Species-dependent particle emission. */
 func_810045C4 = Particle31_UpdateSpeciesEffectTrigger;
 func_81003F58 = Particle31_SpawnSpeciesEffect;
+func_81005524 = Particle31_DisplayListCallback;
