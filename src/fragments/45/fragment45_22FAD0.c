@@ -13,7 +13,24 @@ s32 func_8AB0B52C(void) {
     return func_8AB0B67C(0);
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22FAD0/func_8AB0B54C.s")
+extern s16 D_8AB16F6C;
+extern s16 D_8AB16F7C;
+extern s16 D_8AB16F60;
+extern u8 *D_8AB11D0C;
+extern s32 func_8AB0CA58(s32);
+extern void Audio_PlayDefaultSound(u16);
+s32 func_8AB0B54C(s32 arg0) {
+    if (D_8AB16F6C <= 0) {
+        D_8AB16F6C = 0;
+        arg0 = func_8AB0CA58(0);
+        D_8AB16F60 = 0;
+        D_8AB11D0C[15] = 0;
+    } else if ((D_8AB16F6C < 4) && (D_8AB16F6C != D_8AB16F7C)) {
+        Audio_PlayDefaultSound(52992);
+    }
+    D_8AB16F7C = D_8AB16F6C;
+    return arg0;
+}
 
 extern s32 func_8AB0B54C(s32);
 extern s32 func_80001FF0(void);
