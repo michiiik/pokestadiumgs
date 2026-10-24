@@ -472,15 +472,40 @@ an ordinary full-ROM gate. The named source also passes a fresh ordinary gate;
 independent full-module, resolved-relocation, linked-fragment and collateral
 checks pass. The original function symbol remains a linker alias.
 
-## Earlier literal/table window / layout-prerequisite
+## Accepted mode-selection initializer and earlier table ownership
 
-The current 0x236890 rodata window still excludes the five literals used by
-`func_8AB0148C` at ROM 0x2367D4..0x2367E4, both tables of `func_8AB02D14`
-at 0x2367E8/0x236818, and the table of `func_8AB03394` at 0x236848.
-A proposed earlier aligned start of 0x2367E0 covers all three tables and the
-last two literals, while leaving the first three literals in the shared blob.
-That proposal has not been split or ROM-gated. It is layout preparation for
-the table owners, not evidence that the entire float owner is ready. A start
-at 0x2367D0 intersects the preceding debug string and requires separate string
-ownership analysis. Gate any further layout split with the owners still in
-assembly before replaying C candidates.
+The file's `.rodata` window now starts at ROM 0x2367E0, extending the previous
+0x236890 window by 176 bytes. Its 384 bytes retain their original linked
+positions. Pinned spimdisasm 1.35.0-dev0 assigns the last two literals of
+`func_8AB0148C`, both `func_8AB02D14` tables at 0x2367E8/0x236818 and the
+`func_8AB03394` table at 0x236848 to their owning assembly functions. The
+still-assembly layout passed the ordinary host-syntax-enabled retail-ROM
+gate and independent linked-fragment/collateral checks before C probing.
+
+`func_8AB02D14` is now `TextReference_BuildModeSelection` (484 bytes). It clears
+reference state through `func_8AB003E4`, then selects the start/count by mode
+or the existing subtype helpers. Its second switch calls `func_8AB02644` in
+modes 1/2/3, the consecutive-range initializer in mode 0, writes one reference
+in mode 11, or resets and builds a shuffled range otherwise. It refreshes the
+mode before that second dispatch. Both twelve-entry tables preserve the
+original source-case order and branch targets.
+
+A word-sized `mode` declared before halfword `start` gives the original
+`start` home at sp+0x1A. Halfword-mode versions or the opposite declaration
+order instead put it at sp+0x1E. Both locals are used by the two switches;
+the matching source adds no padding or dummy values. The runner's
+relocation-masked object hit was not link-verified, so acceptance came from
+the sequential ordinary full-ROM gate. The final named source passed another
+ordinary gate and independent complete-module/resolved-relocation checks.
+The original function symbol remains a linker alias, and the existing
+`func_8AB03CE8` C wrapper calls the new name at that same address.
+
+### Remaining early float ownership / layout-prerequisite
+
+The first three literals used by `func_8AB0148C` at ROM
+0x2367D4/0x2367D8/0x2367DC remain in the shared blob. Only its last two literals
+are inside the new window. That float owner is still assembly and is not
+fully ready for a literal-based C reconstruction. A start at 0x2367D0
+intersects the preceding debug string and requires separate string ownership
+analysis. `func_8AB03394` remains assembly, but its complete table is now owned.
+Neither neighbor is counted as a new decompilation in this batch.
