@@ -100,7 +100,38 @@ s32 func_8AB10D28(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2348E0/func_8AB10D30.s")
+extern s16 D_8AB1744E;
+extern u8 *D_8AB12668[];
+extern u8 *D_8AB12678[];
+extern void func_8AB01FBC(void);
+extern void TextHighlight_AnimateScales(void);
+extern void func_8AB00B98(u8 *, u32);
+extern s32 func_8AB10DE4(s32);
+s32 func_8AB10D30(s32 arg0) {
+    s32 result = 70;
+    s16 *counter = &D_8AB1744E;
+    u8 **panel;
+
+    switch (arg0) {
+    case 0:
+        *counter = 0;
+        func_8AB01FBC();
+        break;
+    case 1:
+        *counter += 1;
+        TextHighlight_AnimateScales();
+        if (*counter >= 11) {
+            panel = D_8AB12668;
+            do {
+                func_8AB00B98(*panel, -1U);
+                panel++;
+            } while (panel != D_8AB12678);
+            result = func_8AB10DE4(0);
+        }
+        break;
+    }
+    return result;
+}
 #endif
 
 #ifdef VERSION_US
