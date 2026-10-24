@@ -173,11 +173,17 @@ s32 func_8AB002F8(s16 arg0, s16 arg1)
 #endif
 
 #ifdef VERSION_US
-extern void func_8004C8C0(void); void func_8AB003A4(void) { func_8004C8C0(); }
+extern s32 func_8004C8C0(s32);
+void func_8AB003A4(s32 archive) {
+    func_8004C8C0(archive);
+}
 #endif
 
 #ifdef VERSION_US
-extern void func_8004C4B0(void); void func_8AB003C4(void) { func_8004C4B0(); }
+extern s32 func_8004C4B0(s32);
+void func_8AB003C4(s32 entry) {
+    func_8004C4B0(entry);
+}
 #endif
 
 #ifdef VERSION_US
@@ -1502,5 +1508,141 @@ void TextInterface_RunMainLoop(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB05538.s")
+extern u8 D_1000000[];
+extern u8 D_446E30[];
+extern u8 D_447D00[];
+extern u8 D_47D310[];
+extern u8 D_48B920[];
+extern u8 D_8AB16478[];
+extern s32 D_8AB12CA8;
+extern s32 main_pool_push_state(s32);
+extern s32 main_pool_pop_state(s32);
+extern s32 main_pool_alloc(s32, s32);
+extern s32 func_80055948(s32);
+extern void Gfx_InitDisplayListBuffers(s32, s32);
+extern void Gfx_FreeDisplayListBuffers(void);
+extern s32 StageContext_Allocate(s32, s32, s32, s32, s32, s32);
+extern void func_80008514(s32);
+extern void func_80008574(void);
+extern s32 func_8004C09C(s32);
+extern s32 func_8004D690(s32);
+extern void func_8004C398(void);
+extern void func_80027EE0(u16);
+extern void func_87F00030(void);
+extern void fragment64_main(s32);
+extern u8 *Asset_LoadToSegment(s32, u8 *, u8 *, s32);
+extern s32 BinArchive_Open(u8 *, u8 *, s32, s32);
+extern void *func_80004B4C(s32, s32);
+extern u8 *func_80047588(s32, s32);
+extern void func_800476A0(u8 *, s32);
+extern s32 func_800476FC(s32, s32);
+extern s32 func_80047738(s32, s32, s32, s32);
+extern void func_80047610(void);
+extern void Audio_InitializeBufferMemory(void *);
+extern void func_800251F8(s32);
+extern void func_8002602C(void);
+extern void func_80051D64(s32, s32);
+extern s32 func_80054E48(s32);
+extern void func_8AB04210(void);
+s32 TextInterface_Run(s32 arg0, u8 *configuration) {
+    s32 index;
+    s32 stage;
+    s32 archive;
+    void *resource;
+
+    func_8AB00084();
+    D_8AB11D0C = configuration;
+    D_8AB1269E = *(u16 *)D_8AB11D0C;
+    if (D_8AB1269E == 8) {
+        func_80027EE0(4095);
+    }
+    D_8AB12CA8 = 0;
+    if ((D_8AB11D0C[14] & 0xF) == 0) {
+        D_8AB12CA8 = 1;
+    }
+    main_pool_push_state(0x504D515A);
+    func_80055948(3);
+    Gfx_InitDisplayListBuffers(65536, 0);
+    stage = StageContext_Allocate(1, 0, 2, 0, 2, 1);
+    func_8004C09C(271);
+    if ((D_8AB1269E == 1) || (D_8AB1269E == 2) || (D_8AB1269E == 3) || (D_8AB1269E == 11)) {
+        D_8AB11D08 = func_8004D690(14);
+    } else {
+        func_8AB003A4(276);
+        D_8AB11D08 = 0;
+    }
+    func_87F00030();
+    fragment64_main(20);
+    if (D_8AB1269E != 11) {
+        func_8AB00020();
+    }
+    Asset_LoadToSegment(((u32)D_1000000 & 0x0F000000) >> 24, D_446E30, D_447D00, 0);
+    archive = BinArchive_Open(D_47D310, D_48B920, 1, 1);
+    for (index = 0; index < 598; index++) {
+        resource = func_80004B4C(archive, index);
+        ((void **)D_8AB11D10)[index] = resource;
+    }
+    func_8AB003A4(239);
+    func_8AB003A4(280);
+    func_8AB003A4(51);
+    func_8AB003A4(147);
+    func_80047588(24, 0);
+    func_8AB003C4(58);
+    func_8AB003C4(12);
+    func_8AB003C4(0);
+    func_8AB003C4(8);
+    func_8AB003C4(9);
+    func_8AB003C4(57);
+    func_8AB003C4(6);
+    func_8AB003C4(1);
+    func_8AB003C4(2);
+    func_8AB003C4(3);
+    func_8AB003C4(14);
+    func_8AB003C4(49);
+    func_8AB003C4(42);
+    switch (D_8AB1269E) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+        func_800476A0(D_8AB16478, 1);
+        func_800476FC((s32)D_8AB16478, 1);
+        func_80047738(0, func_8004C990(187, 1), 0, 0);
+        break;
+    default:
+        func_8AB003A4(435);
+        func_800476A0(D_8AB16478, 9);
+        func_800476FC((s32)D_8AB16478, 9);
+        func_80047738(0, func_8004C990(51, 0), 0, 0);
+        func_80047738(1, func_8004C990(435, 5), 0, 0);
+        func_80047738(2, func_8004C990(435, 6), 0, 0);
+        func_80047738(3, func_8004C990(435, 7), 0, 0);
+        func_80047738(4, func_8004C990(435, 8), 0, 0);
+        func_80047738(5, func_8004C990(435, 1), 0, 0);
+        func_80047738(6, func_8004C990(435, 2), 0, 0);
+        func_80047738(7, func_8004C990(435, 3), 0, 0);
+        func_80047738(8, func_8004C990(435, 4), 0, 0);
+        break;
+    case 11:
+        break;
+    }
+    Audio_InitializeBufferMemory((void *)main_pool_alloc(33792, 0));
+    func_800251F8(0);
+    func_8AB04210();
+    func_80008514(stage);
+    TextInterface_RunMainLoop();
+    func_80008574();
+    func_8002602C();
+    func_800251F8(1);
+    if (D_8AB1269E == 8) {
+        func_80027EE0(4094);
+    }
+    func_80051D64(19, 0);
+    func_80054E48(3);
+    func_80047610();
+    func_8004C398();
+    Gfx_FreeDisplayListBuffers();
+    main_pool_pop_state(0x504D515A);
+    return 0;
+}
 #endif
