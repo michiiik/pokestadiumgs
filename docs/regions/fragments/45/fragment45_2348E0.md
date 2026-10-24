@@ -105,3 +105,37 @@ check and compilation before linking the full `VERSION=us` ROM. The checksum
 passes, and `cmp` confirms byte-for-byte equality with the retail ROM;
 MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`. Behavior descriptions are
 based on source and disassembly inspection.
+
+## State 63 banner and controller branches
+
+`func_8AB10144` has a matching C implementation (260 instruction bytes).
+Argument zero copies archive 57 entry 652 into the 256-byte banner buffer
+at `D_8AB126A8`, enables bit zero of the banner node flags, initializes
+`D_8AB17388` from the node at `D_8AB17380`, and enables that node.
+
+Argument one updates the highlight and reads the controller halfword at
+offset eight through `D_80087200`. Mask `0x8000` takes priority: it hides
+the node, calls `func_80021ED8(20)`, and returns `func_8AB103B0(0)`.
+Otherwise, mask `0x4000` enters `func_8AB100E0(0)` and forwards command
+three through `func_8AB00B78`. All other paths return state 63. The
+controller halfword's pressed/held interpretation is not established here.
+
+The update dispatcher `func_8AB0FE10` calls this handler with argument one;
+the draw dispatcher `func_8AB0FF40` calls it with argument two. The initial
+fade-wait handler `func_8AB1007C` enters it with zero. The node and highlight
+record are initialized together in `func_8AB0F87C`. The highlight helpers
+are defined in `src/fragments/43/fragment43_1E5A10.c`; the command wrapper
+is in `src/fragments/45/fragment45_2251A0.c`. These sources and the original
+assembly establish the operations described here without assigning a
+broader meaning to the text entry or the remaining unknown symbols.
+
+The controller halfword is zero-extended into a signed-word local before
+mask testing. This ordinary local type preserves the retail register reuse
+and scheduling; no forced register, dummy storage, or instruction rewrite
+is used.
+
+Verification targets master `0c1149fda5a2c12460d751632ad253e9b5ffd0ec` plus
+this change. Forced compilation through the normal syntax-enabled
+`make -W src/fragments/45/fragment45_2348E0.c -j4 VERSION=us rom` passes,
+including the complete US ROM checksum. `cmp` confirms byte-for-byte
+equality with the retail ROM; MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`.
