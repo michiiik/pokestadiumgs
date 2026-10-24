@@ -396,7 +396,47 @@ s32 func_8AB0E4BC(s32 arg0) {
 }
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E684.s")
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0E8B4.s")
+extern s32 D_8AB1268C;
+extern s8 *D_8AB112C4;
+extern s16 D_8AB1722C;
+extern s16 D_8AB1722E;
+extern u8 D_8AB16FD0[];
+extern s32 HAL_Strcmp(const s8 *, const s8 *);
+extern void func_8AB00BA4(s32, s32, s32);
+s32 TextMode8_RevealPromptText(void) {
+    u8 *node;
+    u8 *cursor;
+    u8 *last;
+    s32 i;
+
+    node = D_8AB11D00;
+    func_8004C8A0(D_8AB16FD0, 256, *(u16 *)(node + 48), *(u16 *)(node + 50));
+    cursor = D_8AB16FD0;
+    for (i = 0; i < D_8AB1722C; i++) {
+        last = cursor;
+        if (*cursor == 0) {
+            D_8AB1722E = 1;
+            return 0;
+        }
+        if (*cursor == 10) {
+            cursor++;
+        } else if ((*cursor & 0x80) == 0) {
+            cursor++;
+        } else {
+            cursor += 2;
+        }
+    }
+    *cursor = 0;
+    if ((D_8AB1268C & 1) == 0) {
+        if (HAL_Strcmp((s8 *)last, D_8AB112C4) == 0) {
+            func_8AB00BA4(0x1000D, 0, 0);
+        } else {
+            func_8AB00BA4(0x1000C, 0, 0);
+        }
+        D_8AB1722C++;
+    }
+    return 1;
+}
 
 void func_8AB0E9D8(u8 *arg0) {
     *(s32 *)(arg0 + 0xC) = 1;
@@ -439,7 +479,7 @@ extern void _bzero(void *, s32);
 extern void TextPanels_UpdateVisibility(void);
 extern s32 func_8004C594(s32, s32);
 extern void func_8AB0E9E8(void);
-extern s32 func_8AB0E8B4(void);
+extern s32 TextMode8_RevealPromptText(void);
 extern s32 func_8AB0F0A8(s32);
 extern s32 TextMode8_HandleRowCleanupState(s32);
 s32 func_8AB0EF44(s32 arg0) {
@@ -463,7 +503,7 @@ s32 func_8AB0EF44(s32 arg0) {
         break;
     case 1:
         func_8AB0E9E8();
-        func_8AB0E8B4();
+        TextMode8_RevealPromptText();
         if (D_8AB1722E == 1) {
             result = func_8AB0F0A8(0);
         }

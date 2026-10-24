@@ -237,3 +237,29 @@ shared rodata, four linked fragments, collateral objects and frozen build
 hashes are independently compared. `cmp` confirms byte-for-byte equality
 with the retail US ROM; MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 These behavior claims are based on source, disassembly and data inspection.
+
+## Prompt text reveal
+
+`func_8AB0E8B4` is `TextMode8_RevealPromptText` (292 instruction bytes).
+It copies the text selected by the archive and entry halfwords at offsets
+48 and 50 of `D_8AB11D00` into the 256-byte buffer `D_8AB16FD0`, then
+truncates that text after the requested number of logical characters.
+A newline advances one byte; another high-bit byte advances two bytes;
+other characters advance one byte. Reaching NUL sets `D_8AB1722E` and
+returns zero. Otherwise it returns one and, on even frames, plays the
+newline or ordinary-character sound and increases the reveal count.
+
+The phase-zero caller `func_8AB0EF44` starts that count at one and clears
+the completion flag. Its phase-one path calls the reveal function and
+uses the completion flag to advance to `func_8AB0F0A8`. These producer and
+consumer operations support the name. The source reads unsigned bytes
+directly and keeps the original two-key, four-argument text-copy API.
+
+Normal runner acceptance passes the syntax-enabled retail-US-ROM gate.
+After naming and removal of duplicate forward declarations, before/after
+and leading-blank controls preserve the complete 9264-byte mode text,
+24 function extents, 208-byte rodata and relocation destinations. Changed
+instruction, newline and jump-target controls are rejected. A fresh full
+build and `cmp` preserve the retail ROM (MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`). Behavior is established from the source,
+original disassembly and the text-copy implementation in `src/4CC20.c`.
