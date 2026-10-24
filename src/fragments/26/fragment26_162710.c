@@ -290,7 +290,43 @@ Gfx *Particle31_BuildDisplayList(Gfx *gfx, Func81005480Slot *slots, void *arg2, 
     return gfx;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_162710/func_81005524.s")
+typedef struct {
+    u8 unknown[0x14];
+    void *addresses;
+    Gfx *gfx;
+} ParticleDisplayListState26;
+extern u32 Gfx_AllocDisplayList(s32);
+void Particle31_DisplayListCallback(s32 phase, ParticleDisplayListState26 *state) {
+    ParticleEffectModel26 *context;
+    Gfx *display_list;
+    void *addresses;
+    Gfx *gfx;
+    u8 legacy_slot; //!bug Retail passes an uninitialized byte to the unused legacy argument.
+    addresses = state->addresses;
+    if (phase == 2) {
+        context = D_8009491C;
+        D_8100678C = func_8003F54C(context);
+        if (D_8100678C != NULL) {
+            D_81006780 = (Func81003E60StateRetry *)D_8100678C->pool;
+            if (D_81006780 != NULL) {
+                if (D_81006788 == 0) {
+                    display_list = (Gfx *)Gfx_AllocDisplayList(1280);
+                    state->gfx = display_list;
+                } else {
+                    display_list = (Gfx *)Gfx_AllocDisplayList(128);
+                    state->gfx = display_list;
+                }
+                gfx = state->gfx;
+                Particle31_UpdateSpeciesEffectTrigger((Func81003E60State *)D_81006780);
+                if (D_81006788 == 0) {
+                    gfx = Particle31_BuildDisplayList(gfx, (Func81005480Slot *)D_81006780, addresses, legacy_slot);
+                }
+                gSPEndDisplayList(gfx);
+                D_81006788++;
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_162710/func_81005628.s")
 
