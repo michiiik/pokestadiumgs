@@ -509,3 +509,106 @@ fully ready for a literal-based C reconstruction. A start at 0x2367D0
 intersects the preceding debug string and requires separate string ownership
 analysis. `func_8AB03394` remains assembly, but its complete table is now owned.
 Neither neighbor is counted as a new decompilation in this batch.
+
+## Command interpreter `func_8AB03394`: requeue / layout-prerequisite
+
+The 384-byte rodata window introduced with the mode-selection dispatcher
+owns this interpreter's complete 18-entry table. Table ownership is ready;
+the function remains assembly. Against native revision `1f74b338`, 32 compiled
+source proposals reconstruct the command parser, reference-list editing,
+question selection, and three distractors. The best proposal has normalized
+similarity 0.9380 and raw similarity 0.5427, with 2,356 bytes versus the
+original 2,388 and a 184-byte frame versus 200. These are rejected probe
+results, not acceptance evidence.
+
+The parser resets three reference counts, retries `func_8AB02EF8` once if
+it returns null, and consumes unsigned halfwords until `0xFFFF`. A high-bit
+command selects one of 18 operations. Operations set header text, choose a
+preload mode, copy reference lists, append archive/entry pairs, mark pairs
+with `0xFFFE`, replace a pair, or set the panel-selection word. After list
+compaction and question selection, the distractor loop rejects both repeated
+indices and strings equal to the selected answer or any earlier distractor.
+It selects exactly three entries. The final stores clear two halfwords in
+each of four row records spaced 148 bytes apart.
+
+Loop-top terminator checks and an explicit retry loop improve the opcode
+shape. Separate command-local source/destination/reference variables and a
+separate question-text lifetime also help. Shared versus scoped variables,
+command width, pair-copy spelling, pointer versus indexed initialization,
+unsigned selection indices, array versus struct halfword fields, payload
+statement grouping, and row-store grouping have been compared. One replayed
+body was refused in preflight; it did not consume a compile attempt. No
+source body was installed. Real one-argument signatures for
+`func_8AB016E4` and `func_8AB01F80` were preserved; a live value in `$a1`
+is not sufficient evidence to add an argument.
+
+The checksum-matched US ROM independently exposes an epilogue prerequisite:
+owner offsets `0x8F4` and `0x900` load `$at` pages for two adjacent row
+halfword stores. Offset `0x90C` loads the page for `D_8AB12DDC` and
+`D_8AB12DDE`, with the return-address restore at `0x910` before stores at
+`0x914`/`0x918`. Offset `0x91C` loads the page for `D_8AB12E70` and
+`D_8AB12E72`; nine saved-register restores intervene before stores at
+`0x944`/`0x948`. None redefines `$at`. The latter two runs are interleaved,
+which the current contiguous-only coalescing implementation does not cover.
+Direct word decoding verifies these sites in a ROM with MD5
+`1561c75d11cedf356a8ddb1a4a5f9d5d`; this conclusion does not depend on the
+symbolic scanner's handling of addends.
+
+Next action: retain the best parser reconstruction and diagnose the genuine
+source/assembler provenance of the interleaved epilogue before further
+allocator-only searches. The frame and payload-access residuals also remain;
+resolving epilogue provenance alone would not establish a match. Do not
+replace the owner with a near-match, add frame storage, or rewrite its
+instruction words.
+
+## Accepted paired-reference selection and bounded random return
+
+Match `func_8AB02644` as `TextReference_BuildShuffledPairs`: one new C owner,
+888 instruction bytes. The compatibility alias preserves the address-keyed
+name. Existing mode-selection calls use the descriptive name. The previously
+accepted random helper remains the same machine code and is excluded from
+the new-owner count.
+
+The function fills consecutive reference IDs and halves the count. When the
+halved count is at least two, it performs 500 distinct-index pair swaps,
+randomly reverses each of ten pairs, then compacts ten selected IDs and their
+companion words. The final byte values use the selected ID minus 330, 370,
+or 392 in modes 1, 2, or 3; the signed-halfword result is divided by two and
+incremented. Other modes use -2 before that arithmetic. All three passes
+remain inside the count guard. Each pair's two elements are distinct data
+members; the fill and compaction loops are ordinary C loops, with compiler
+unrolling preserved.
+
+The orientation pass computes its adjacent indices independently as `i * 2`
+and `i * 2 + 1`. Computing the second from an already narrowed first index
+loses an original instruction. A separate signed-halfword mode-offset local
+preserves the original 888-byte size and 40-byte frame. With the old random
+return declaration, all opcodes matched but 19 register words differed,
+starting at offset `0xEC`.
+
+`func_8AB023EC` returns zero for a zero bound and otherwise explicitly masks
+its result with `0xFFFF`. Its return declaration and existing later prototype
+now use `u16`, matching that bounded value. Two declaration-only object
+controls, including a leading-blank source, preserve the complete existing
+module. The correct return width resolves the caller's remaining register
+rotation. The runner accepts the candidate with direct link verification and
+the ordinary syntax-enabled retail-ROM gate. No instruction rewrite or
+register constraint is involved.
+
+The native source/allocator investigation was against revision `0ce3757f`.
+The permuter reproduced the retained parent across all 222 instruction words
+and normalized callee/data relocations, but its four-worker, 90-second search
+stayed at score 130. A logging-only compiler observer passed eight full-module
+controls covering a known matched getter and the retained caller, with stock,
+observer-off, observer-on and leading-blank builds. Interference-edge logging
+passed the same eight controls. These diagnostics led to the bounded-return
+hypothesis; their normalized comparisons are not acceptance evidence.
+
+The accepted runner transaction and final named, declaration-cleaned source
+are separately gated and frozen. Independent verification covers all 23,008
+text bytes, 384 rodata bytes, 81 function starts/extents and resolved relocation
+targets, plus linked fragments 45/50/79 and four collateral objects. US ROM
+MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`. The earlier interpreter's
+interleaved epilogue and other unresolved owners remain assembly. Private
+compiler observers, probes, frozen objects and ROM artifacts are excluded
+from the public change, as are coverage and layout files.
