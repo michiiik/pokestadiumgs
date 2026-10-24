@@ -543,11 +543,89 @@ void func_8AB01728(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB0178C.s")
+typedef struct TextCallbackColorBytes { u8 bytes[4]; } TextCallbackColorBytes;
+extern void func_800504BC(s16 *);
+void TextNumber_DrawCallback(s32 phase, void *record) {
+    u8 *node;
+    TextCallbackColorBytes color;
+    s16 *value_pointer;
+    s16 coordinates[2];
+    s16 x;
+    s16 y;
+    s16 value;
+    node = record;
+    value_pointer = *(s16 **)(node + 32);
+    value = *value_pointer;
+    if (value < 0) { value = 0; }
+    switch (phase) {
+    case 0:
+        *(u16 *)(node + 2) &= 0xFFFD;
+        break;
+    case 1:
+        func_800504BC(coordinates);
+        x = *(s16 *)(node + 8) + coordinates[0];
+        y = *(s16 *)(node + 10) + coordinates[1];
+        color = *(TextCallbackColorBytes *)(node + 40);
+        func_8AB00BC4(x, y, value, color.bytes[0], color.bytes[1], color.bytes[2]);
+        break;
+    }
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01850.s")
+extern u8 D_8AB11400[];
+extern void func_800498C4(void);
+extern void Font_EnableTwoCycleTexturing(void);
+extern void Font_DisableTwoCycleTexturing(void);
+extern void func_800496A4(s32, s32);
+extern s32 func_80049668(s32);
+extern void func_8004989C(s32);
+extern void func_8004972C(s32, s32, s32, s32);
+extern void func_800497E4(s32, s32, s32, s32);
+extern void func_800495F8(s32, s32, s32, const char *, ...);
+extern void func_800499EC(void);
+s32 TextLabel_DrawCallback(s32 phase, void *record) {
+    s16 x;
+    s16 y;
+    s16 coordinates[2];
+    char *text;
+    u16 alignment;
+    TextCallbackColorBytes foreground;
+    TextCallbackColorBytes shadow;
+    u8 *node;
+    node = record;
+    text = *(char **)(node + 32);
+    switch (phase) {
+    case 0:
+        *(u16 *)(node + 2) &= 0xFFFD;
+        break;
+    case 1:
+        if (((u32)node == D_8AB11D00) && (text == NULL)) { text = (char *)D_8AB11400; }
+        func_800504BC(coordinates);
+        x = *(s16 *)(node + 8) + coordinates[0];
+        y = *(s16 *)(node + 10) + coordinates[1];
+        foreground = *(TextCallbackColorBytes *)(node + 40);
+        shadow = *(TextCallbackColorBytes *)(node + 44);
+        func_800498C4();
+        Font_EnableTwoCycleTexturing();
+        func_800496A4(*(u16 *)(node + 36), 0);
+        func_80049668(1);
+        func_8004989C(32);
+        func_8004972C(foreground.bytes[0], foreground.bytes[1], foreground.bytes[2], foreground.bytes[3]);
+        func_800497E4(shadow.bytes[0], shadow.bytes[1], shadow.bytes[2], shadow.bytes[3]);
+        switch (node[39] & 0xF) {
+        case 2: alignment = 0; break;
+        case 1: alignment = 2; break;
+        case 0: alignment = 1; break;
+        default: alignment = 0; break;
+        }
+        func_800495F8(x, y, alignment, text);
+        Font_DisableTwoCycleTexturing();
+        func_800499EC();
+        break;
+    }
+    return 0;
+}
 #endif
 
 #ifdef VERSION_US
@@ -585,7 +663,22 @@ s32 func_8AB01C04(s32 mode, void *record) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01ED4.s")
+extern void *D_8AB16790;
+extern void *D_8AB1678C;
+extern void *PokeIcon_AllocLoadContext(u32);
+extern void *ModelPreview_Create(void *, s32, s32);
+extern s32 func_80042D54(u8 *, u16);
+extern s32 func_80042FBC(void *, s32);
+void TextPreview_InitializeModel(s16 species) {
+    D_8AB16790 = PokeIcon_AllocLoadContext(1);
+    D_8AB1678C = ModelPreview_Create(D_8AB16790, 80, 80);
+    func_80042D54((u8 *)D_8AB1678C, 0);
+    func_80042FBC(D_8AB1678C, species);
+    *(u16 *)D_8AB1678C |= 0x100;
+    *(u16 *)D_8AB1678C &= ~2;
+    *(u16 *)D_8AB1678C &= ~4;
+    D_8AB126A0 = 0;
+}
 #endif
 
 #ifdef VERSION_US

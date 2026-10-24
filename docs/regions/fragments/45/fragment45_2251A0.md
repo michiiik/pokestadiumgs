@@ -109,7 +109,7 @@ signature and adds no newly decompiled owner.
 `func_8AB03D10` is now `TextRow_SetOrangeState` (236 bytes). It emits the
 three-word event, increments the row count when entering from state zero,
 enables the selected panel and optional secondary node, writes orange
-`0xFF500080` and mode zero to their highlight records, then records state one.
+`0xFF500080` and texture entry zero to their highlight records, then records state one.
 The input dispatchers in `fragment45_22AB80/func_8AB06D78` and
 `fragment45_2348E0/func_8AB1075C` call it for the current panel index and ignore
 its return. The name describes the observed writes without assigning an
@@ -126,7 +126,7 @@ pass. The old symbol remains a linker alias for existing assembly callers.
 ## Blue row state / requeue
 
 `func_8AB03DFC` remains assembly. Its ordinary C reconstruction emits event two,
-sets blue `0x1E82FF80` and mode one on the selected highlight and optional
+sets blue `0x1E82FF80` and texture entry one on the selected highlight and optional
 secondary node, and writes row state two. Base-plus-offset construction
 recovers the original 216-byte extent, but the address-calculation schedule
 still differs (best normalized 0.7407, raw 0.5926 among that family).
@@ -162,3 +162,120 @@ campaigns accept no preload owner. A word-valued key-pair local reproduces the
 while-assignment forms change frame sizes or instruction order. These measured
 negatives narrow the next lifetime experiment; they do not establish that the
 original archive register is unreachable from ordinary C.
+
+## Blue-state construction evidence / requeue
+
+The constructor `func_8AB04210` passes the four embedded addresses
+`D_8AB12CC8`, `D_8AB12D5C`, `D_8AB12DF0`, `D_8AB12E84` (row base plus 24,
+stride 148) to `func_8AC05E40`, then binds each through `func_8AC06400` to the
+node pointer at row plus 20. Both callees are in fragment 43's
+`src/fragments/43/fragment43_1E5A10.c`. The same constructor initializes the
+four 120-byte `D_8AB14278` highlight records with those callees.
+
+`func_8AC05E40` clears 120 bytes, copies the 56-byte resource header, and
+registers `func_8AC049A8` against the destination. `func_8AC06400` initializes
+the two scale floats at offsets 64/68 and derives the center at 72/76 from
+node coordinates and dimensions. This establishes that the row's secondary
+highlight at plus 24 is the same concrete 120-byte object as a panel
+highlight; it is stronger evidence than matching offsets alone. Next action:
+read that renderer and use the actual embedded-object relation to test the
+blue caller's pointer lifetimes, without inventing fields or padding to fill
+the still-unexplained row prefix and final four bytes.
+
+## Highlight texture key / requeue
+
+The callback `func_8AC049A8` in fragment 43 loads unsigned halfwords at
+highlight offsets 36 and 38 into a0/a1 and passes them to `func_8004C990`.
+That lookup selects the archive at the first key and an indexed texture entry
+at the second; `src/4CC20.c` also uses it to populate
+`D_80128080.texture`. Therefore the row-state stores at highlight plus 38
+(and row plus 62) select texture entry zero or one. They are not a distinct
+animation-mode field.
+
+Eight embedded-highlight lifetime variants and eight unsigned/key-prefix views
+reproduce the earlier blue-state outcomes: the 216-byte split-base construction
+has an exact prologue and exact state-update tail, with differences localized
+to offsets 64 through 156 in the interleaved row/highlight address calculations.
+A field-typing change alone does not close that instruction-order residual.
+
+## Accepted model preview and text callbacks
+
+Against public master `1b390fce1b246409ad8b2cb7c8fb675770fe7f0f`:
+
+| Original owner | C name | Bytes |
+| --- | --- | ---: |
+| `func_8AB01ED4` | `TextPreview_InitializeModel` | 172 |
+| `func_8AB0178C` | `TextNumber_DrawCallback` | 196 |
+| `func_8AB01850` | `TextLabel_DrawCallback` | 360 |
+
+Total: 728 bytes. All three have normal runner acceptance and independently
+frozen full-module/linked-fragment/collateral proofs. The initializer uses the
+existing `PokeIcon_AllocLoadContext` alias instead of its address-keyed name;
+its sequential retail-ROM gate verifies that relocation spelling. Both
+callbacks have direct link verification.
+
+The initializer allocates the context, creates an 80-by-80 model preview,
+sets its clear color to zero, selects the species, sets flag 0x100, clears
+flags 2/4, and clears `D_8AB126A0`. The producer and preview API are defined
+in `src/229E0.c` and `src/43700.c`.
+
+The number callback reads the signed halfword through the node's data pointer,
+clamps negative values to zero, obtains the current origin with
+`func_800504BC`, and adds the node's relative coordinates. It copies the actual
+four-byte color and passes RGB to `func_8AB00BC4`, which draws decimal digit
+textures. Phase zero clears node flag 2; phase one draws. A real counter
+pointer, coordinate pair, color copy and coordinate locals recover the
+72-byte frame. Computing coordinates before the color copy, then arranging
+those existing locals, closes the measured stack offsets and operand order;
+no extra storage is added.
+
+The label callback uses the same origin and two four-byte foreground/shadow
+colors. If the distinguished node's text pointer is null, it uses the existing
+`D_8AB11400` string (`NULL`, decoded from the linked retail fragment). Font
+setup and drawing use the APIs in `src/47580.c`. Its unsigned alignment local
+maps the low nibble at node plus 39 as 2->0, 1->2, 0->1, default->0. The
+source arm order and real local storage recover the original 64-byte frame
+and dispatch. It returns zero on every path, as the original assembly does.
+
+## Image strips / requeue
+
+`func_8AB02240` remains assembly. It draws an 80-by-80 RGBA16 image in twenty
+four-row strips, advances the source by 640 bytes per strip, and brackets the
+loop with `D_8AB111B0`/`D_80094F50` display lists. The fourth input supplies
+the primitive LOD fraction (`gDPSetPrimColor`'s second data argument), not the
+RGBA alpha byte. `func_8AB05300` obtains the image from `func_80043678` on the
+preview state, then stores it in `D_8AB16794`.
+
+The word-coordinate candidate has the original 268-byte size (normalized
+0.9403, raw 0.7463), with differences in temporary allocation and width/stride
+argument normalization. An old-style six-argument helper declaration instead
+produces 260 bytes and rejects. No changed declaration or rejected image body
+is installed. Next action: recover `func_8AB01FC8`'s actual strip interface
+before changing more caller spellings; do not infer formal parameter widths
+solely from its narrowed hardware-coordinate uses.
+
+## Formatting-sensitive compiler input / verified replay identity
+
+A calibrated 90-second four-worker label search reproduced all 88 parent
+words/relocations, then reduced its score from 974 to 723 through formatting
+alone. The label was subsequently matched through token-changing source
+mechanisms above; the formatted search result itself was never installed.
+
+Eight fresh stock whole-module controls compare the known source, calibrated
+parent, and two token-identical formatting fixtures, each with and without
+20 leading blank lines. The known source preserves the complete retail module;
+the parent reproduces its retained function words; each uniform-blank pair
+preserves complete sections, extents and relocations. The two fixtures both
+have 352-byte label bodies but different generated instruction bytes.
+
+`tools/candidate_identity.py`, merged in PR #850, already preserves the
+token-bearing logical-line groups that distinguish these two fixtures. An
+audit of the active native runner confirms its rejected-body preflight calls
+that identity for both bodies and shared declarations. The fixture's formatted
+body remains eligible after the other form is rejected; exact, indentation-only
+and leading-blank repeats are refused. All 14 existing identity tests pass.
+
+There is no formatting-replay blocker in this tested native runner. Integrators
+should use the existing identity module rather than a whitespace-collapsed key.
+The acceptance verifier remains unchanged: the rejected 352-byte proposals
+have layout drift and are not ROM matches.
