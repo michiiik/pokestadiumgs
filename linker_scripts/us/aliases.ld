@@ -933,3 +933,6 @@ func_8AB02644 = TextReference_BuildShuffledPairs;
 func_8AB05300 = TextInterface_RunMainLoop;
 func_8AB05538 = TextInterface_Run;
 func_8AB0E350 = TextMode8_HandlePromptState;
+func_8AB0D330 = TextMode8_InitCpuAnswerSettings;
+func_8AB0D4BC = TextMode8_ChooseCpuAnswerMask;
+func_8AB0F2F0 = TextMode8_HandleRowCleanupState;

@@ -125,3 +125,58 @@ the retail ROM. MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. Ordinary C
 preserves the 32-byte frame and result at stack offset 28, without dummy
 storage, forced registers, or instruction rewrites. Behavior descriptions
 are based on source and disassembly inspection.
+
+## CPU answers and row-cleanup state
+
+| Original owner | C name | Instruction bytes |
+| --- | --- | ---: |
+| `func_8AB0D330` | `TextMode8_InitCpuAnswerSettings` | 372 |
+| `func_8AB0D4BC` | `TextMode8_ChooseCpuAnswerMask` | 312 |
+| `func_8AB0F2F0` | `TextMode8_HandleRowCleanupState` | 404 |
+
+These three owners contribute 1088 bytes of matching C. Their address names
+remain linker aliases for assembly callers.
+
+The initializer writes delay and correct-answer chance into the last two
+signed halfwords of each 148-byte player row, at offsets 144 and 146.
+Configuration byte two selects the ranges below; nonzero `D_8AB12CA8` selects
+configuration four. Each row receives independent random draws. The delay
+coefficient is multiplied by `func_80001FF0() / 2`, and the shared answer
+clock is reset after all four rows are initialized.
+
+| Configuration | Delay coefficient, inclusive | Correct-answer chance, inclusive |
+| --- | --- | --- |
+| 1 | 7-10 | 15-65 |
+| 2 | 6-9 | 25-75 |
+| 3 | 5-8 | 35-85 |
+| 4 | 4-7 | 45-95 |
+| Other | 5 | 50 |
+
+The answer helper returns zero until the shared clock reaches that row's
+delay. A draw below the row's chance selects the correct-answer index;
+otherwise a one-to-three offset modulo four chooses a different index.
+Indices zero through three map to input masks 8, 1, 4 and 2. The producer
+`TextChoice_ShuffleAndRefresh` tracks the correct index across swaps in
+`src/fragments/45/fragment45_2251A0.c`. The consumer `func_8AB0E9E8` reads
+controller input for human rows and this helper's mask for CPU rows, then
+compares the selected answer with that same correct index.
+
+The cleanup handler defaults to state 42. Phase zero checks whether every
+active row is in state two. If so, it calls the existing row-update helper
+for all four rows and sets `D_8AB17224`; otherwise it updates only active
+rows still in state zero. Phase one increments the signed-halfword counter,
+updates highlight scales, emits event 102 at `func_80001FF0() / 4`, and
+enters `func_8AB0F484(0)` at counter 31. Phase two and other phases retain
+state 42. Declaring the result before its counter pointer recovers its
+retail stack slot without extra storage.
+
+Verification against master `fef41e0a`: normal runner acceptance and the
+syntax-enabled full US-ROM gate for each owner, followed by complete-module
+controls and a repeat ROM gate after naming and typed-row cleanup. The
+cleanup handler's array-end relocation uses the same fixed address as the
+adjacent end label and passes the sequential ROM gate. The complete module
+retains all 9264 text bytes, 24 function extents and resolved relocation
+destinations. A changed-frame negative control is rejected. Frozen linked
+fragments, collateral objects and retail ROM are compared independently;
+US MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`. These behavior descriptions
+come from source, disassembly and data-producer/consumer inspection.

@@ -2,11 +2,124 @@
 
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0D330.s")
+typedef struct TextMode8AnswerRow {
+    u8 unk_00[144];
+    s16 delay_frames;
+    s16 correct_chance;
+} TextMode8AnswerRow;
+extern u8 *D_8AB11D0C;
+extern u8 D_8AB12CB0[];
+extern s16 D_8AB17238;
+extern s32 D_8AB12CA8;
+extern u16 func_8AB023EC(u32);
+extern s32 func_80001FF0(void);
+void TextMode8_InitCpuAnswerSettings(void) {
+    s16 lower_delay;
+    s32 upper_delay;
+    s32 lower_chance;
+    s32 upper_chance;
+    u16 delay_draw;
+    s32 difficulty;
+    s32 i;
+    TextMode8AnswerRow *row;
+
+    difficulty = D_8AB11D0C[2];
+    if (D_8AB12CA8 != 0) {
+        difficulty = 4;
+    }
+    switch (difficulty) {
+    case 1:
+        lower_delay = 7;
+        upper_delay = 10;
+        lower_chance = 15;
+        upper_chance = 65;
+        break;
+    case 2:
+        lower_delay = 6;
+        upper_delay = 9;
+        lower_chance = 25;
+        upper_chance = 75;
+        break;
+    case 3:
+        lower_delay = 5;
+        upper_delay = 8;
+        lower_chance = 35;
+        upper_chance = 85;
+        break;
+    case 4:
+        lower_delay = 4;
+        upper_delay = 7;
+        lower_chance = 45;
+        upper_chance = 95;
+        break;
+    default:
+        lower_delay = 5;
+        upper_delay = 5;
+        lower_chance = 50;
+        upper_chance = 50;
+        break;
+    }
+    row = (TextMode8AnswerRow *)D_8AB12CB0;
+    for (i = 0; i < 4; i++) {
+        delay_draw = func_8AB023EC(upper_delay - lower_delay + 1);
+        row->delay_frames = (func_80001FF0() / 2) * (lower_delay + delay_draw);
+        row->correct_chance = func_8AB023EC(upper_chance - lower_chance + 1) + lower_chance;
+        row++;
+    }
+    D_8AB17238 = 0;
+}
 
 extern s16 D_8AB17238; void func_8AB0D4A4(void) { D_8AB17238 += 1; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0D4BC.s")
+extern s16 D_8AB1269A;
+extern u16 func_8AB023EC(u32);
+extern s16 D_8AB17238;
+s32 TextMode8_ChooseCpuAnswerMask(TextMode8AnswerRow *row) {
+    s16 choice;
+
+    if (D_8AB17238 < row->delay_frames) {
+        return 0;
+    }
+    if ((s16)func_8AB023EC(100) < row->correct_chance) {
+        switch (D_8AB1269A) {
+        case 0:
+            choice = 8;
+            break;
+        case 1:
+            choice = 1;
+            break;
+        case 2:
+            choice = 4;
+            break;
+        case 3:
+            choice = 2;
+            break;
+        default:
+            choice = 0;
+            break;
+        }
+    } else {
+        choice = (func_8AB023EC(3) + D_8AB1269A + 1) % 4;
+        switch (choice) {
+        case 0:
+            choice = 8;
+            break;
+        case 1:
+            choice = 1;
+            break;
+        case 2:
+            choice = 4;
+            break;
+        case 3:
+            choice = 2;
+            break;
+        default:
+            choice = 0;
+            break;
+        }
+    }
+    return choice;
+}
 
 #pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0D5F4.s")
 
@@ -216,14 +329,14 @@ extern u8 D_8AB16FD0[];
 extern void *D_8AB16FC8;
 extern void func_8AB03394(void);
 extern void TextChoice_ShuffleAndRefresh(void);
-extern void func_8AB0D330(void);
+extern void TextMode8_InitCpuAnswerSettings(void);
 extern void _bzero(void *, s32);
 extern void TextPanels_UpdateVisibility(void);
 extern s32 func_8004C594(s32, s32);
 extern void func_8AB0E9E8(void);
 extern s32 func_8AB0E8B4(void);
 extern s32 func_8AB0F0A8(s32);
-extern s32 func_8AB0F2F0(s32);
+extern s32 TextMode8_HandleRowCleanupState(s32);
 s32 func_8AB0EF44(s32 arg0) {
     s32 result = 40;
 
@@ -231,7 +344,7 @@ s32 func_8AB0EF44(s32 arg0) {
     case 0:
         func_8AB03394();
         TextChoice_ShuffleAndRefresh();
-        func_8AB0D330();
+        TextMode8_InitCpuAnswerSettings();
         D_8AB1722C = 1;
         D_8AB1722E = 0;
         _bzero(D_8AB16FD0, 256);
@@ -250,7 +363,7 @@ s32 func_8AB0EF44(s32 arg0) {
             result = func_8AB0F0A8(0);
         }
         if (D_8AB17230 == 1) {
-            result = func_8AB0F2F0(0);
+            result = TextMode8_HandleRowCleanupState(0);
             if (D_8AB1722E == 0) {
                 func_8004C8A0(D_8AB16FD0, 256,
                               *(u16 *)((u8 *)D_8AB11D00 + 48),
@@ -274,7 +387,7 @@ extern void func_8AB01728(void);
 extern void func_8AB0E9E8(void);
 extern s32 func_80001FF0(void);
 extern void func_8AB00BA4();
-extern s32 func_8AB0F2F0(s32);
+extern s32 TextMode8_HandleRowCleanupState(s32);
 
 s32 func_8AB0F0A8(s32 arg0) {
     s16 n;
@@ -305,7 +418,7 @@ s32 func_8AB0F0A8(s32 arg0) {
             }
         }
         if (D_8AB17232 == 0 || D_8AB17230 == 1) {
-            result = func_8AB0F2F0(0);
+            result = TextMode8_HandleRowCleanupState(0);
         }
         result = func_8AB0EED8(result);
         D_8AB17240++;
@@ -330,7 +443,61 @@ void func_8AB0F29C(u8 *arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0F2F0.s")
+extern s16 D_8AB17244;
+extern u8 D_8AB12CB0[];
+extern s32 D_8AB17224;
+extern void func_8AB0F29C(u8 *, s32);
+extern void TextHighlight_AnimateScales(void);
+extern s32 func_80001FF0(void);
+extern void func_8AB00BA4(s32, s32, s32);
+extern s32 func_8AB0F484(s32);
+s32 TextMode8_HandleRowCleanupState(s32 phase) {
+    s32 result = 42;
+    s16 *counter = &D_8AB17244;
+    s32 i;
+    s32 all_wrong;
+    u8 *row;
+
+    switch (phase) {
+    case 0:
+        *counter = 0;
+        all_wrong = 1;
+        for (i = 0; i < 4; i++) {
+            row = D_8AB12CB0 + i * 148;
+            if (*(s16 *)row != 0 && *(s16 *)(row + 4) != 2) {
+                all_wrong = 0;
+            }
+        }
+        if (all_wrong) {
+            for (i = 0; i < 4; i++) {
+                row = D_8AB12CB0 + i * 148;
+                func_8AB0F29C(row, i);
+            }
+            D_8AB17224 = 1;
+        } else {
+            for (i = 0; i < 4; i++) {
+                row = D_8AB12CB0 + i * 148;
+                if (*(s16 *)row != 0 && *(s16 *)(row + 4) == 0) {
+                    func_8AB0F29C(row, i);
+                }
+            }
+        }
+        break;
+    case 1:
+        *counter += 1;
+        TextHighlight_AnimateScales();
+        if (*counter == func_80001FF0() / 4) {
+            func_8AB00BA4(102, 0, 0);
+        }
+        if (*counter >= 31) {
+            result = func_8AB0F484(0);
+        }
+        break;
+    case 2:
+        break;
+    }
+    return result;
+}
 
 extern void func_8AB01FBC(void);
 extern void func_8AB03ED4(void);
