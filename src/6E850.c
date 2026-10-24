@@ -724,18 +724,16 @@ extern f64 D_800A5A08;
 void func_80070C68(Mtx *mtx, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
     f32 sp10C;
     f32 sp108;
-    UNUSED s32 pad;
-    UNUSED s32 pad2;
-    f32 temp_fa1;
-    f32 temp_fv0;
+    struct { f32 x, y, z; } direction;
     Mtx spB8;
     Mtx sp78;
     Mtx sp38;
 
-    temp_fa1 = arg4 - arg1;
-    temp_fv0 = arg6 - arg3;
-    sp108 = (f32) (((f64) (f32) MathUtil_Atan2s(-temp_fv0, temp_fa1) * D_800A59F0) / D_800A59F8);
-    sp10C = (f32) (((f64) (f32) MathUtil_Atan2s(-(arg5 - arg2), sqrtf((temp_fa1 * temp_fa1) + (temp_fv0 * temp_fv0))) * D_800A5A00) / D_800A5A08);
+    direction.x = arg4 - arg1;
+    direction.z = arg6 - arg3;
+    sp108 = (f32) (((f64) (f32) MathUtil_Atan2s(-direction.z, direction.x) * D_800A59F0) / D_800A59F8);
+    direction.y = arg5 - arg2;
+    sp10C = (f32) (((f64) (f32) MathUtil_Atan2s(-direction.y, sqrtf((direction.x * direction.x) + (direction.z * direction.z))) * D_800A5A00) / D_800A5A08);
     guTranslate(&spB8, arg1, arg2, arg3);
     func_8007DCD4(&sp78, sp108, 0.0f, -1.0f, 0.0f);
     guMtxCatL(&sp78, &spB8, &spB8);
