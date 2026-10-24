@@ -61,7 +61,9 @@ typedef struct {
 typedef struct {
     u8 unknown[0x1A];
     s16 model_id;
-    u8 unknown_1C[0x14];
+    u8 unknown_1C;
+    u8 opacity;
+    u8 unknown_1E[0x12];
     Vec3Local scale;
     u8 unknown_3C[4];
     s16 animation_id;
@@ -276,15 +278,212 @@ void Particle31_UpdateSpeciesEffectTrigger(Func81003E60State *slot) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/26/fragment26_162710/func_81004818.s")
-
 typedef struct { s16 active; u8 data[0x2A]; } Func81005480Slot;
-extern Gfx *func_81004818(Gfx *, Func81005480Slot *, void *, s16);
+
+typedef struct { f32 mf[4][4]; } ParticleMatrixF26;
+typedef struct { u8 r, g, b; } ParticleRgb26;
+// Rendering consumes the first eight texture frames (particle age 0 through 15).
+// This view describes the accessed prefix of the callback's resource table.
+typedef struct { u32 setup, geometry; u32 textures[8]; } ParticleRenderResources26;
+typedef struct { u8 unknown[2]; u8 flags; } ParticleRenderFlags26;
+typedef struct { u8 unknown[0x2C]; void *(*query)(s32, s32); } ParticleRenderController26;
+extern u8 *D_80094920;
+extern ParticleRgb26 D_81006194, D_81006198, D_8100619C, D_810061A0;
+extern u8 *D_80094908;
+extern void func_80070DEC(f32 [4][4], void *);
+extern void MtxF_Copy(u32 *, u32 *);
+extern u32 Gfx_AllocDisplayList(s32);
+// Draws one species effect and advances its motion when the pool is enabled.
+Gfx *Particle31_DrawAndUpdateSpeciesEffect(Gfx *gfx, Func81005480Slot *raw_slot, void *raw_resources, s16 legacy_slot) {
+    Mtx *matrix_out;
+    Mtx scale_matrix;
+    Mtx translation;
+    Mtx orientation;
+    Mtx model_translation;
+    s16 alpha;
+    ParticleMatrixF26 view_rotation;
+    ParticleMatrixF26 model_matrix;
+    f32 curve_scale;
+    f32 z;
+    f32 y;
+    f32 x;
+    ParticleEffectModel26 *model;
+    ParticleRgb26 primary = D_81006194;
+    ParticleRgb26 environment = D_81006198;
+    ParticleRgb26 alternate_primary = D_8100619C;
+    ParticleRgb26 alternate_environment = D_810061A0;
+    ParticleRgb26 *primary_color;
+    ParticleRgb26 *environment_color;
+    Func81003E60State *slot;
+    ParticleRenderResources26 *resources;
+
+    slot = (Func81003E60State *)raw_slot;
+    resources = raw_resources;
+    matrix_out = (Mtx *)Gfx_AllocDisplayList(64);
+    func_80070DEC(view_rotation.mf, D_80094908 + 0x64);
+    guMtxF2L(view_rotation.mf, &orientation);
+    model = D_8009491C;
+    guScale(&scale_matrix, model->scale.x * slot->scale.x * 0.1f,
+            model->scale.y * slot->scale.y * 0.1f,
+            model->scale.z * slot->scale.z * 0.1f);
+    if (D_8009491C->model_id == 92) {
+        MtxF_Copy((u32 *)&model_matrix, (u32 *)func_8003936C(0));
+        guMtxXFMF(model_matrix.mf, 0, 0, 0, &x, &y, &z);
+        guTranslate(&model_translation, x, y, z);
+        guMtxCatL(&scale_matrix, &model_translation, matrix_out);
+    } else {
+        guTranslate(&translation, slot->position.x, slot->position.y, slot->position.z);
+        guMtxCatL(&scale_matrix, &translation, matrix_out);
+    }
+    guMtxCatL(&orientation, matrix_out, matrix_out);
+    gSPMatrix(gfx++, matrix_out, G_MTX_PUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPDisplayList(gfx++, resources->setup);
+    switch (D_8009491C->model_id) {
+    case 109:
+    case 110:
+        gDPLoadTextureBlock_4b(gfx++, resources->textures[slot->misc / 2], G_IM_FMT_I, 32, 32, 0, G_TX_NOMIRROR | G_TX_CLAMP,
+                               G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+        gDPSetPrimColor(gfx++, 0, 0, 0x0A, 0x00, 0x00, 0xC8 - (slot->misc * 13));
+        break;
+    case 92:
+        primary_color = &primary;
+        environment_color = &environment;
+        if (D_80094920 != NULL) {
+            if (((ParticleRenderFlags26 *)(((ParticleRenderController26 *)D_80094920)->query(0, 0)))->flags & 0x80) {
+                primary_color = &alternate_primary;
+                environment_color = &alternate_environment;
+            }
+        }
+        gDPLoadTextureBlock_4b(gfx++, resources->textures[slot->misc / 2], G_IM_FMT_I, 32, 32, 0, G_TX_CLAMP, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+        gDPSetEnvColor(gfx++, environment_color->r, environment_color->g, environment_color->b, 0);
+        if (slot->misc < 10) {
+            alpha = D_8009491C->opacity;
+        } else {
+            alpha = ((655 - slot->misc * 40) * D_8009491C->opacity) / 255;
+        }
+        gDPSetPrimColor(gfx++, 0, 0, primary_color->r, primary_color->g, primary_color->b, alpha);
+        break;
+    case 146:
+    case 77:
+    case 78:
+        gDPLoadTextureBlock_4b(gfx++, resources->textures[slot->misc / 2], G_IM_FMT_I, 32, 32, 0, G_TX_NOMIRROR | G_TX_CLAMP,
+                               G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+        gDPSetPrimColor(gfx++, 0, 0, 0xFF, 0xFF, 0x00, 0xFA - (slot->misc * 3));
+        break;
+    case 134:
+    case 144:
+        gDPLoadTextureBlock(gfx++, resources->textures[slot->misc / 2], G_IM_FMT_IA, G_IM_SIZ_16b, 32, 32, 0,
+                            G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
+                            G_TX_NOLOD);
+        if (slot->misc < 4) {
+            gDPSetPrimColor(gfx++, 0, 0, 0xFF, 0xFF, 0xFF, (slot->misc * 20) + 0xB4);
+        } else {
+            gDPSetPrimColor(gfx++, 0, 0, 0xFF, 0xFF, 0xFF, 0x122 - (slot->misc * 10));
+        }
+        break;
+    default:
+        gDPLoadTextureBlock_4b(gfx++, resources->textures[slot->misc / 2], G_IM_FMT_I, 32, 32, 0, G_TX_NOMIRROR | G_TX_CLAMP,
+                               G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+        gDPSetPrimColor(gfx++, 0, 0, 0x0A, 0x00, 0x00, 0xC8 - (slot->misc * 13));
+        break;
+    }
+    gSPDisplayList(gfx++, resources->geometry);
+    gSPPopMatrix(gfx++, G_MTX_MODELVIEW);
+    if (((ParticlePoolHeader26 *)D_8100678C)->enabled == 1) {
+        model = D_8009491C;
+        switch (model->model_id) {
+        case 109:
+        case 110:
+            slot->position.y += 0.5f * model->scale.y;
+            slot->misc++;
+            slot->scale.x += 0.1f;
+            slot->scale.y += 0.1f;
+            slot->scale.z += 0.1f;
+            if (slot->misc >= 16) {
+                slot->active = 0;
+            }
+            break;
+        case 92:
+            slot->misc += 2;
+            if (slot->misc >= 16) {
+                slot->active = 0;
+            }
+            break;
+        case 146:
+            slot->position.y += 1.5f * model->scale.y;
+            slot->misc++;
+            slot->scale.x += 0.005f;
+            slot->scale.y += 0.005f;
+            slot->scale.z += 0.005f;
+            if (slot->misc >= 16) {
+                slot->active = 0;
+            }
+            break;
+        case 77:
+            slot->position.y += 0.75f * model->scale.y;
+            slot->misc++;
+            slot->scale.x += 0.005f;
+            slot->scale.y += 0.005f;
+            slot->scale.z += 0.005f;
+            if (slot->misc >= 16) {
+                slot->active = 0;
+            }
+            break;
+        case 78:
+            slot->position.y += model->scale.y;
+            slot->misc++;
+            slot->scale.x += 0.005f;
+            slot->scale.y += 0.005f;
+            slot->scale.z += 0.005f;
+            if (slot->misc >= 16) {
+                slot->active = 0;
+            }
+            break;
+        case 144:
+            slot->position.y -= 0.5f * model->scale.y;
+            slot->misc++;
+            curve_scale = D_8100611C[slot->misc % 12];
+            slot->scale.x = curve_scale;
+            slot->scale.y = curve_scale;
+            slot->scale.z = curve_scale;
+            if ((slot->misc >= 12) || (slot->position.y < 0.0f)) {
+                slot->active = 0;
+            }
+            break;
+        case 134:
+            slot->misc++;
+            curve_scale = D_8100611C[slot->misc % 12];
+            slot->scale.x = curve_scale;
+            slot->scale.y = curve_scale;
+            slot->scale.z = curve_scale;
+            if ((slot->misc >= 12) || (slot->position.y < 0.0f)) {
+                slot->active = 0;
+            }
+            break;
+        default:
+            slot->misc++;
+            if (slot->misc >= 16) {
+                slot->active = 0;
+            }
+            break;
+        }
+        slot->position.x = (f32) (slot->position.x + slot->velocity.x);
+        slot->position.y = (f32) (slot->position.y + slot->velocity.y);
+        slot->position.z = (f32) (slot->position.z + slot->velocity.z);
+        slot->velocity.x *= 0.9f;
+        slot->velocity.y *= 0.9f;
+        slot->velocity.z *= 0.9f;
+        D_81006784 += 1;
+    }
+    return gfx;
+}
+
+extern Gfx *Particle31_DrawAndUpdateSpeciesEffect(Gfx *, Func81005480Slot *, void *, s16);
 Gfx *Particle31_BuildDisplayList(Gfx *gfx, Func81005480Slot *slots, void *arg2, s16 arg3) {
     s32 i;
     for (i = 0; i < 10; i++, slots++) {
         if (slots->active == 1) {
-            gfx = func_81004818(gfx, slots, arg2, arg3);
+            gfx = Particle31_DrawAndUpdateSpeciesEffect(gfx, slots, arg2, arg3);
         }
     }
     return gfx;
@@ -295,7 +494,6 @@ typedef struct {
     void *addresses;
     Gfx *gfx;
 } ParticleDisplayListState26;
-extern u32 Gfx_AllocDisplayList(s32);
 void Particle31_DisplayListCallback(s32 phase, ParticleDisplayListState26 *state) {
     ParticleEffectModel26 *context;
     Gfx *display_list;
