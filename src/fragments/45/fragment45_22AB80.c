@@ -42,7 +42,47 @@ extern s32 StageContext_GetFadeMode(void);
 extern void StageFade_StartFromTransparent(s32);
 s32 func_8AB066B4(s32 arg0) { s32 result = 3; switch (arg0) { case 0: StageFade_StartFromTransparent(5); break; case 1: if (StageContext_GetFadeMode() == 1) result = 0; break; } return result; }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_22AB80/func_8AB06718.s")
+extern void *D_8AB11D00;
+extern u8 D_8AB126A8[];
+extern void *D_8AB168D0;
+extern u8 D_8AB168D8[];
+extern void *D_8AB16978;
+extern u8 D_8AB16980[];
+extern u16 D_8AB1268E;
+extern void *D_80087200;
+extern void *func_8004C8A0(void *, s32, s32, s32);
+extern void func_8AC06400(void *, void *);
+extern void func_8AC063AC(void *, u16);
+extern s32 func_8AB0683C(s32);
+extern void func_8AB00B78(s32);
+s32 func_8AB06718(s32 arg0) {
+    s32 result = 4;
+    s32 buttons;
+
+    switch (arg0) {
+    case 0:
+        func_8004C8A0(D_8AB126A8, 256, 57, 361);
+        *(u16 *)((u8 *)D_8AB11D00 + 2) |= 1;
+        func_8AC06400(D_8AB168D8, D_8AB168D0);
+        func_8AC06400(D_8AB16980, D_8AB16978);
+        *(u16 *)((u8 *)D_8AB168D0 + 2) |= 1;
+        break;
+    case 1:
+        func_8AC063AC(D_8AB168D8, D_8AB1268E);
+        buttons = *(u16 *)((u8 *)D_80087200 + 8);
+        if (buttons & 0x8000) {
+            *(u16 *)((u8 *)D_8AB168D0 + 2) &= ~1;
+            result = func_8AB0683C(0);
+            func_8AB00B78(194);
+        } else if (buttons & 0x4000) {
+            func_8AB05A00();
+            result = func_8AB066B4(0);
+            func_8AB00B78(3);
+        }
+        break;
+    }
+    return result;
+}
 
 extern void *D_8AB16964;
 extern u8 D_8AB126A8[];
@@ -244,7 +284,7 @@ s32 func_8AB08D3C(s32 arg0) {
 extern void *D_80087200;
 extern s32 func_800279C4(s32);
 extern s32 func_8AB00548(void);
-extern s32 func_8AB00B78(s32);
+extern void func_8AB00B78(s32);
 extern s32 func_8AB08F58(s32);
 extern void func_8AC063AC(void *, u16);
 extern void func_8AC06400(void *, void *);
