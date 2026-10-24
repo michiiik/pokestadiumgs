@@ -760,7 +760,49 @@ s32 func_8AB023EC(u32 arg0) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB02438.s")
+typedef struct TextChoiceNodeCopy { s32 unk_words[12]; u16 archive; u16 entry; } TextChoiceNodeCopy;
+extern u8 D_8AB14268[];
+extern u8 D_8AB14458[];
+extern void *func_8004C8A0(void *, s32, s32, s32);
+void TextChoice_ShuffleAndRefresh(void) {
+    s32 i;
+    s16 first;
+    s16 second;
+    TextChoiceNodeCopy saved;
+    D_8AB1269A = 0;
+    for (i = 0; i < 100; i++) {
+        first = func_8AB023EC(4);
+        second = func_8AB023EC(4);
+        while (first == second) {
+            second = func_8AB023EC(4);
+        }
+        saved = *(((TextChoiceNodeCopy **)D_8AB12668)[first]);
+        ((TextChoiceNodeCopy **)D_8AB12668)[first]->archive = ((TextChoiceNodeCopy **)D_8AB12668)[second]->archive;
+        ((TextChoiceNodeCopy **)D_8AB12668)[first]->entry = ((TextChoiceNodeCopy **)D_8AB12668)[second]->entry;
+        ((TextChoiceNodeCopy **)D_8AB12668)[second]->archive = saved.archive;
+        ((TextChoiceNodeCopy **)D_8AB12668)[second]->entry = saved.entry;
+        if (first == D_8AB1269A) {
+            D_8AB1269A = second;
+        } else if (second == D_8AB1269A) {
+            D_8AB1269A = first;
+        }
+    }
+    for (i = 0; i < 4; i++) {
+        if (((TextChoiceNodeCopy **)D_8AB12668)[i] != NULL) {
+            func_8004C8A0(D_8AB127A8 + i * 256, 256,
+                         ((TextChoiceNodeCopy **)D_8AB12668)[i]->archive,
+                         ((TextChoiceNodeCopy **)D_8AB12668)[i]->entry);
+        }
+        if (((u8 **)D_8AB14268)[i] != NULL) {
+            *(u16 *)(((u8 **)D_8AB14268)[i] + 2) &= ~1;
+        }
+        if (((u8 **)D_8AB14458)[i] != NULL) {
+            *(u16 *)(((u8 **)D_8AB14458)[i] + 2) |= 1;
+        }
+        *(s16 *)(D_8AB12CB0 + i * 148 + 4) = 0;
+    }
+    D_8AB1269C = 20;
+}
 #endif
 
 #ifdef VERSION_US
@@ -778,7 +820,27 @@ void func_8AB029BC(u16 count, u16 start) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB02A58.s")
+void TextReference_BuildShuffledRange(u16 count, u16 start) {
+    s32 i;
+    s16 first;
+    s16 second;
+    s32 value;
+    for (i = 0; i < count; i++) {
+        ((u16 *)D_8AB14680)[i] = start + i;
+    }
+    if (count >= 2) {
+        for (i = 0; i < 500; i++) {
+            first = func_8AB023EC(count);
+            second = func_8AB023EC(count);
+            while (first == second) {
+                second = func_8AB023EC(count);
+            }
+            value = ((u16 *)D_8AB14680)[first];
+            ((u16 *)D_8AB14680)[first] = ((u16 *)D_8AB14680)[second];
+            ((u16 *)D_8AB14680)[second] = value;
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US

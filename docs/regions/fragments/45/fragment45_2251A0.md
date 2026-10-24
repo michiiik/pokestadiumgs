@@ -359,3 +359,94 @@ text, 208-byte rodata, all 81 function extents, resolved relocation targets,
 three linked fragments and four collateral objects. The US ROM MD5 remains
 `1561c75d11cedf356a8ddb1a4a5f9d5d`. Neighboring assembly owners are not counted
 as newly decompiled functions.
+
+## Edge-scale animation / tooling-blocked, requeue
+
+`func_8AB04038` remains assembly (472 bytes). Constructor `func_8AB04210`
+initializes four 120-byte highlight records at `D_8AB14468`, `D_8AB144E0`,
+`D_8AB14558` and `D_8AB145D0` through `func_8AC05E40`, then binds each through
+`func_8AC06400`. The animation advances four halfword phases at `D_8AB14670`
+through `D_8AB14676` by 4096. It applies 0.1f cosine plus 0.9f to alternating
+Y/X/Y/X scale fields. Their corresponding center-relative offsets use
+minus/plus/plus/minus cosine times the appropriate dimension times 0.1f.
+These are four distinct edge operations; proposed C retains a phase loop and
+does not manually unroll that loop.
+
+Sixteen calibrated runner proposals test first-record scalar/record access,
+walking/indexed remaining records, amplitude locals, an actual phase pointer,
+and one four-phase versus two two-phase loops. No owner is accepted. The
+proposals have 400-504 bytes and differ in address scheduling, repeated cosine
+loads and float allocation; the best normalized result is 0.5678 (412 bytes),
+which is not an instruction-equivalent near-match.
+
+The frozen linked fragment confirms a shared `lui $at` at owner offset 8 and
+four `sh` instructions at offsets 20/40/60/80 addressing 0x8AB14670/72/74/76,
+without any intervening write to $at. Unrelated instructions separate the
+stores. The ordinary phase-loop proposal emits three extra `lui $at` loads.
+This is the interleaved shape excluded by the current contiguous-only
+coalescing mechanism. The existing symbolic scanner misses this site because
+its `%lo` parser stops at addend-bearing operands; the evidence here comes
+from decoding the frozen linked words and checking the register writes.
+
+Next action: preserve this concrete interleaved-site evidence and resolve a
+compiler-faithful address-reuse mechanism before spending another body batch.
+The literal ownership prerequisite is fixed; it does not resolve this separate
+shared-address shape. Keep the accepted scale animator and its ordinary ROM
+proof intact while continuing other owners.
+
+## Accepted reference and choice shuffles
+
+`func_8AB02A58` is now `TextReference_BuildShuffledRange` (336 bytes). Like the
+neighboring `func_8AB029BC`, it first writes consecutive IDs into
+`D_8AB14680`. For counts of at least two, it performs 500 swaps, drawing two
+signed-halfword indices through `func_8AB023EC` and resampling the second until
+they differ. `func_8AB02EF8` consumes those IDs as indices into the text-reference
+pointer table `D_8AB11D10`.
+
+`func_8AB02438` is now `TextChoice_ShuffleAndRefresh` (524 bytes). It performs
+100 distinct-index swaps of archive/entry pairs at node offsets 48/50 and
+updates the selected-choice index `D_8AB1269A` when that choice moves. Its real
+52-byte node copy supplies the saved pair; the preceding twelve words remain
+unknown node data. It then calls `func_8004C8A0` for four 256-byte buffers,
+updates the associated visibility flags, clears four row states and sets
+`D_8AB1269C` to 20. `func_8AB04C94` uses that field as its marker draw count
+and switches color below four. Texture lookup semantics follow the
+archive/entry parameters of `func_8004C8A0` in `src/4CC20.c`.
+
+Both owners accepted on their first candidate with object link verification
+and ordinary host-syntax-enabled full-ROM gates. Independent complete-module,
+resolved-relocation, linked-fragment and collateral checks pass. Both original
+symbols remain linker aliases. The new accepted batch totals 860 bytes.
+
+## Frame rendering dispatcher / register-tie, requeue
+
+`func_8AB04EE8` remains assembly (708 bytes). Its `jtbl_8AB11780` ownership is
+ready after the aligned literal-window split. The recovered flow updates the
+countdown and background, enables/disables six nodes in modes 4/6/8, renders
+through the mode table, draws the preview, increments/wraps the frame counter
+and submits the frame. Source case order is 0/1/2/3, 11, 4/5, 6, 8, default.
+
+Forty calibrated proposals cover direct/pointer timer access, real background
+and node snapshots, typed flag headers, real flag locals and the final frame
+status return. A background snapshot recovers the original opcode sequence
+and 708-byte size (raw 0.5819). The best clean proposal additionally loads,
+masks and stores the final node's flags through a real u16 local; it remains
+708 bytes/opcode-equivalent and reaches raw 0.8079. Grouping node snapshots
+and forwarding the final s32 frame-status return do not resolve the residual.
+The boolean countdown assignment changes the owner to 688 bytes and is worse.
+
+A 90-second four-worker source search first reproduces all 177 masked words,
+callee targets and twelve owner-relative table branches of the retained
+parent. The calibrated search descends from score 730 to 485 only by adding
+a dead assignment of node flags to the background variable. That proposal is
+excluded. Context calibration resolves internal-definition versus external-
+prototype callee spellings by actual symbol identity and checks all table
+branches; no native hypothesis was accepted from the search.
+
+Next action: capture calibrated uopt/ugen traces for the best clean flag-local
+proposal. Its first address load at offset 32 uses t4 where the original uses
+a0; offset 92 uses a0 where the original uses t6. The final node's flag value
+is colored v0 rather than emitted through the original temporary registers,
+which also shifts later temporary choices. Identify the real value/address
+lifetime before another source batch. Preserve the matched shuffle owners and
+the full 208-byte rodata window while doing so.
