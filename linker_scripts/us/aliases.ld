@@ -943,3 +943,6 @@ func_8AB0E684 = TextMode8_HandlePrePromptState;
 func_8AB0E9E8 = TextMode8_HandleAnswerInput;
 func_81005B50 = DisplayList_BuildScrollingDualTexture;
 func_81005DB4 = DisplayList_InitScrollingDualTexture;
+
+/* Species-dependent particle emission. */
+func_810045C4 = Particle31_UpdateSpeciesEffectTrigger;
