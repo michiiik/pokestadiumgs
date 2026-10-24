@@ -3,13 +3,13 @@
 # Undocumented code
 
 <!-- AUTO_UNDOCUMENTED:START -->
-- Functions defined in `src/` with a `/* ... */` comment: **58 / 7,557 (0.8%)**
-- Functions with a real name: **1,625 / 10,901 (14.9%)** (9,276 still `func_XXXXXXXX`)
-- Variables with a real name: **248 / 4,563 (5.4%)** (4,315 still `D_XXXXXXXX` / `jtbl_XXXXXXXX`)
+- Functions defined in `src/` with a `/* ... */` comment: **58 / 7,572 (0.8%)**
+- Functions with a real name: **1,636 / 10,901 (15.0%)** (9,265 still `func_XXXXXXXX`)
+- Variables with a real name: **248 / 4,575 (5.4%)** (4,327 still `D_XXXXXXXX` / `jtbl_XXXXXXXX`)
 - Functions still using m2c `temp_*` / `var_*` locals: **917**
-- Functions with generic `arg0`, `arg1`, ... parameters: **4,672 / 7,557 (61.8%)**
-- Structs with generic fields (`unk_XX`, `pad`, `field_XX`): **727 / 1,336**
-- Struct fields with a real name: **3,716 / 5,816 (63.9%)**
+- Functions with generic `arg0`, `arg1`, ... parameters: **4,674 / 7,572 (61.7%)**
+- Structs with generic fields (`unk_XX`, `pad`, `field_XX`): **727 / 1,338**
+- Struct fields with a real name: **3,720 / 5,820 (63.9%)**
 - Raw `*(T *)(base + 0xNN)` offset accesses that bypass a struct field: **6,581**
 <!-- AUTO_UNDOCUMENTED:END -->
 
@@ -44,6 +44,7 @@ Generic fields are named unk/pad/field/filler with an optional hex suffix; neste
 | `src/615D0.c` | 67 | 67 | 78 | 8 | 4 | 47 | 122 |
 | `src/fragments/61/fragment61_code.c` | 34 | 34 | 80 | 58 | 6 | 15 | 131 |
 | `src/fragments/11/fragment11_D9520.c` | 67 | 66 | 121 | 70 | 2 | 55 | 3 |
+| `src/fragments/45/fragment45_2251A0.c` | 67 | 67 | 117 | 74 | 9 | 24 | 22 |
 | `src/fragments/24/fragment24_150C10.c` | 49 | 46 | 115 | 35 | 15 | 32 | 67 |
 | `src/fragments/52/fragment52_27E4E0.c` | 27 | 26 | 97 | 33 | 6 | 12 | 128 |
 | `src/fragments/44/fragment44_1FD260.c` | 35 | 32 | 83 | 131 | 1 | 6 | 43 |
@@ -51,7 +52,6 @@ Generic fields are named unk/pad/field/filler with an optional hex suffix; neste
 | `src/fragments/14/fragment14_FF070.c` | 60 | 59 | 113 | 11 | 9 | 60 | 33 |
 | `src/fragments/63/fragment63_312AE0.c` | 44 | 44 | 82 | 26 | 7 | 34 | 88 |
 | `src/fragments/12/fragment12_E7C00.c` | 49 | 49 | 84 | 11 | 10 | 47 | 77 |
-| `src/fragments/45/fragment45_2251A0.c` | 55 | 55 | 106 | 61 | 9 | 23 | 22 |
 | `src/fragments/17/fragment17_113A60.c` | 46 | 46 | 105 | 66 | 8 | 27 | 23 |
 | `src/fragments/53/fragment53_code.c` | 28 | 27 | 88 | 65 | 4 | 11 | 79 |
 | `src/fragments/82/fragment82_4238F0.c` | 56 | 56 | 80 | 31 | 5 | 38 | 56 |
@@ -126,6 +126,7 @@ Generic fields are named unk/pad/field/filler with an optional hex suffix; neste
 | `src/fragments/51/fragment51_275E40.c` | 18 | 18 | 65 | 14 | 2 | 6 | 8 |
 | `src/4420.c` | 30 | 30 | 26 | 6 | 6 | 23 | 21 |
 | `src/fragments/44/fragment44_207AF0.c` | 18 | 18 | 43 | 26 | 6 | 13 | 4 |
+| `src/fragments/45/fragment45_2324B0.c` | 12 | 12 | 46 | 29 | 0 | 10 | 10 |
 | `src/fragments/47/fragment47_24AE60.c` | 21 | 21 | 53 | 2 | 2 | 18 | 11 |
 | `src/1CDC0.c` | 16 | 16 | 40 | 5 | 3 | 16 | 26 |
 | `src/fragments/85/fragment85_code.c` | 23 | 23 | 53 | 19 | 2 | 8 | 0 |
@@ -149,7 +150,6 @@ Generic fields are named unk/pad/field/filler with an optional hex suffix; neste
 | `src/fragments/17/fragment17_11B210.c` | 20 | 20 | 35 | 15 | 3 | 10 | 6 |
 | `src/fragments/32/fragment32_1B1330.c` | 14 | 14 | 50 | 21 | 0 | 4 | 0 |
 | `src/fragments/38/fragment38_1D5610.c` | 17 | 17 | 36 | 9 | 0 | 0 | 26 |
-| `src/fragments/45/fragment45_2324B0.c` | 9 | 9 | 43 | 18 | 0 | 8 | 10 |
 | `src/4F800.c` | 20 | 20 | 34 | 12 | 0 | 18 | 3 |
 | `src/4C2E0.c` | 25 | 25 | 29 | 8 | 4 | 20 | 0 |
 | `src/56F90.c` | 31 | 31 | 15 | 17 | 2 | 21 | 0 |
@@ -279,10 +279,10 @@ Generic fields are named unk/pad/field/filler with an optional hex suffix; neste
 | `src/fragments/11/fragment11_E35C0.c` | 11 | 11 | 11 | 0 | 0 | 11 | 0 |
 | `src/fragments/41/fragment41_code.c` | 6 | 6 | 20 | 4 | 0 | 3 | 0 |
 | `src/fragments/52/fragment52_2871C0.c` | 4 | 4 | 16 | 1 | 0 | 2 | 10 |
-| `src/fragments/64/fragment64_322C90.c` | 5 | 5 | 18 | 6 | 2 | 1 | 1 |
 | `src/fragments/79/fragment79_3CB430.c` | 13 | 13 | 8 | 9 | 2 | 1 | 0 |
 | `src/fragments/31/fragment31_1A3960.c` | 7 | 7 | 19 | 6 | 0 | 0 | 0 |
 | `src/fragments/52/fragment52_2862C0.c` | 5 | 4 | 9 | 1 | 0 | 2 | 16 |
+| `src/fragments/64/fragment64_322C90.c` | 5 | 5 | 18 | 6 | 2 | 0 | 1 |
 | `src/fragments/79/fragment79_379E90.c` | 6 | 6 | 13 | 10 | 0 | 2 | 1 |
 | `src/3280.c` | 13 | 12 | 2 | 4 | 0 | 12 | 1 |
 | `src/fragments/44/fragment44_2030B0.c` | 4 | 4 | 16 | 9 | 0 | 2 | 0 |
