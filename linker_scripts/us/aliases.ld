@@ -925,3 +925,5 @@ func_8AB01ED4 = TextPreview_InitializeModel;
 func_8AB01FC8 = TextPreview_DrawRgba16Rect;
 func_8AB02240 = TextPreview_DrawImage80;
 func_8AB03ED4 = TextHighlight_AnimateScales;
+func_8AB02A58 = TextReference_BuildShuffledRange;
+func_8AB02438 = TextChoice_ShuffleAndRefresh;
