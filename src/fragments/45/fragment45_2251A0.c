@@ -751,7 +751,7 @@ void func_8AB0234C(void)
 #ifdef VERSION_US
 u32 func_8003570C();
 
-s32 func_8AB023EC(u32 arg0) {
+u16 func_8AB023EC(u32 arg0) {
     if (arg0 == 0) {
         return 0;
     }
@@ -806,7 +806,59 @@ void TextChoice_ShuffleAndRefresh(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB02644.s")
+void TextReference_BuildShuffledPairs(u16 count, u16 start) {
+    s32 i;
+    s16 first;
+    s16 second;
+    s32 saved;
+    for (i = 0; i < count; i++) {
+        ((u16 *)D_8AB14680)[i] = start + i;
+    }
+    count = count / 2;
+    if (count >= 2) {
+        for (i = 0; i < 500; i++) {
+            first = func_8AB023EC(count);
+            second = func_8AB023EC(count);
+            while (first == second) {
+                second = func_8AB023EC(count);
+            }
+            first *= 2;
+            second *= 2;
+            saved = ((u16 *)D_8AB14680)[first];
+            ((u16 *)D_8AB14680)[first] = ((u16 *)D_8AB14680)[second];
+            ((u16 *)D_8AB14680)[second] = saved;
+            first++;
+            second++;
+            saved = ((u16 *)D_8AB14680)[first];
+            ((u16 *)D_8AB14680)[first] = ((u16 *)D_8AB14680)[second];
+            ((u16 *)D_8AB14680)[second] = saved;
+        }
+        for (i = 0; i < 10; i++) {
+            if (func_8AB023EC(100) >= 50) {
+                first = i * 2;
+                second = i * 2 + 1;
+                saved = ((u16 *)D_8AB14680)[first];
+                ((u16 *)D_8AB14680)[first] = ((u16 *)D_8AB14680)[second];
+                ((u16 *)D_8AB14680)[second] = saved;
+            }
+        }
+        for (i = 0; i < 10; i++) {
+            ((u16 *)D_8AB14680)[i] = ((u16 *)D_8AB14680)[i * 2];
+            ((u32 *)D_8AB148B0)[i] = ((u32 *)D_8AB148B0)[i * 2];
+            {
+                s16 mode_offset;
+                switch (D_8AB1269E) {
+                case 1: mode_offset = ((u16 *)D_8AB14680)[i] - 330; break;
+                case 2: mode_offset = ((u16 *)D_8AB14680)[i] - 370; break;
+                case 3: mode_offset = ((u16 *)D_8AB14680)[i] - 392; break;
+                default: mode_offset = -2; break;
+                }
+                mode_offset = mode_offset / 2 + 1;
+                ((s8 *)D_8AB11D0C)[i + 4] = mode_offset;
+            }
+        }
+    }
+}
 #endif
 
 #ifdef VERSION_US
@@ -942,7 +994,7 @@ s32 func_8AB02CB4(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8AB02644(u16, u16);
+extern void TextReference_BuildShuffledPairs(u16, u16);
 void TextReference_BuildModeSelection(void) {
     s32 mode;
     u16 start;
@@ -988,13 +1040,13 @@ void TextReference_BuildModeSelection(void) {
     mode = D_8AB1269E;
     switch (mode) {
     case 1:
-        func_8AB02644((u16)(D_8AB12696), start);
+        TextReference_BuildShuffledPairs((u16)(D_8AB12696), start);
         break;
     case 2:
-        func_8AB02644((u16)(D_8AB12696), start);
+        TextReference_BuildShuffledPairs((u16)(D_8AB12696), start);
         break;
     case 3:
-        func_8AB02644((u16)(D_8AB12696), start);
+        TextReference_BuildShuffledPairs((u16)(D_8AB12696), start);
         break;
     case 0:
         func_8AB029BC((u16)(D_8AB12696), start);
@@ -1141,7 +1193,7 @@ void func_8AB0318C(void) {
 #endif
 
 #ifdef VERSION_US
-extern s32 func_8AB023EC(u32 arg0);
+extern u16 func_8AB023EC(u32 arg0);
 extern s16 D_8AB13F30[];
 extern s16 D_8AB1466A;
 void func_8AB0322C(void) {

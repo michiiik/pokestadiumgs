@@ -929,3 +929,4 @@ func_8AB02A58 = TextReference_BuildShuffledRange;
 func_8AB02438 = TextChoice_ShuffleAndRefresh;
 func_8AB04C94 = TextInterface_DrawMarkers;
 func_8AB02D14 = TextReference_BuildModeSelection;
+func_8AB02644 = TextReference_BuildShuffledPairs;
