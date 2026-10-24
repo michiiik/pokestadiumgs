@@ -508,9 +508,9 @@ void func_82C03574(void) { func_8004C4B0(21); func_8004C4B0(19); }
 
 #ifdef VERSION_US
 extern s8 * HAL_Strcpy(s8 *, s8 *);
-extern void func_8004C594(s32, s32);
+extern s32 func_8004C594(s32, s32);
 extern s8 * func_8004C874(s32, s32);
-extern void func_8004C8A0(s32 *, s32, s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
 extern s32 func_82C026D4(s32 arg0);
 s32 func_82C0359C(s32 *arg0, s32 arg1, u8 *arg2) {
     s32 result = 0;
@@ -571,7 +571,6 @@ s32 func_82C03904(s32 arg0, s32 arg1, void *arg2) {
 #endif
 
 #ifdef VERSION_US
-/* mkdraft:func_82C03974 begin */
 // Fills the two text fields of arg0 (+4 and +0x54) from message bank 21,
 // choosing messages by the s16 type at arg2+0x34 and, for types 14 and the
 // default, by whether the bytes at arg2+0x36/0x37 are equal (100 at +0x37
@@ -626,7 +625,6 @@ s32 func_82C03974(s32 arg0, s32 arg1, void *arg2)
     {
       func_8004C594(3, (s32) temp_a1);
       func_8004C8A0(arg0 + 4, 80, 21, 19);
-      var_v1 = 48; // FAKE: dead store
       func_8004C8A0(arg0 + 0x54, 360, 21, 45);
     }
     else
@@ -666,10 +664,6 @@ s32 func_82C03974(s32 arg0, s32 arg1, void *arg2)
         var_v1 = 46;
       }
       sp25 = var_v1;
-      // FAKE: empty if on a doubled test; both spellings are load-bearing
-      if ((var_v1 && var_v1) != 0U)
-      {
-      }
       func_8004C594(3, (s32) temp_a1_2);
       func_8004C8A0(arg0 + 4, 80, 21, 19);
       func_8004C8A0(arg0 + 0x54, 360, 21, (s32) sp25);
@@ -682,10 +676,6 @@ s32 func_82C03974(s32 arg0, s32 arg1, void *arg2)
     }
     else
     {
-      // FAKE: empty if on a doubled test
-      if ((!arg0) && (!arg0))
-      {
-      }
       var_v1 = var_a0;
       if (var_v1)
       {
@@ -707,12 +697,11 @@ s32 func_82C03974(s32 arg0, s32 arg1, void *arg2)
 
   return 1;
 }
-/* mkdraft:func_82C03974 end */
 #endif
 
 #ifdef VERSION_US
-extern void func_8004C594(s32, s32);
-extern void func_8004C8A0(s32 *, s32, s32, s32);
+extern s32 func_8004C594(s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
 s32 func_82C03CA8(s32 arg0, s32 arg1, void *arg2) {
     s32 var_v1;
 
@@ -907,8 +896,8 @@ void func_82C0423C(void) {
 #endif
 
 #ifdef VERSION_US
-extern void func_8004C594(s32, s32);
-extern void func_8004C8A0(s32 *, s32, s32, s32);
+extern s32 func_8004C594(s32, s32);
+extern void *func_8004C8A0(void *, s32, s32, s32);
 s32 func_82C026D4(s32);
 extern s32 D_82C04C50;
 extern u8 D_82C05E90;
