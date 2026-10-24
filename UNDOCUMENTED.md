@@ -3,13 +3,13 @@
 # Undocumented code
 
 <!-- AUTO_UNDOCUMENTED:START -->
-- Functions defined in `src/` with a `/* ... */` comment: **58 / 7,550 (0.8%)**
-- Functions with a real name: **1,619 / 10,901 (14.9%)** (9,282 still `func_XXXXXXXX`)
-- Variables with a real name: **248 / 4,558 (5.4%)** (4,310 still `D_XXXXXXXX` / `jtbl_XXXXXXXX`)
+- Functions defined in `src/` with a `/* ... */` comment: **58 / 7,557 (0.8%)**
+- Functions with a real name: **1,625 / 10,901 (14.9%)** (9,276 still `func_XXXXXXXX`)
+- Variables with a real name: **248 / 4,563 (5.4%)** (4,315 still `D_XXXXXXXX` / `jtbl_XXXXXXXX`)
 - Functions still using m2c `temp_*` / `var_*` locals: **917**
-- Functions with generic `arg0`, `arg1`, ... parameters: **4,672 / 7,550 (61.9%)**
-- Structs with generic fields (`unk_XX`, `pad`, `field_XX`): **727 / 1,335**
-- Struct fields with a real name: **3,715 / 5,815 (63.9%)**
+- Functions with generic `arg0`, `arg1`, ... parameters: **4,672 / 7,557 (61.8%)**
+- Structs with generic fields (`unk_XX`, `pad`, `field_XX`): **727 / 1,336**
+- Struct fields with a real name: **3,716 / 5,816 (63.9%)**
 - Raw `*(T *)(base + 0xNN)` offset accesses that bypass a struct field: **6,581**
 <!-- AUTO_UNDOCUMENTED:END -->
 
@@ -51,11 +51,11 @@ Generic fields are named unk/pad/field/filler with an optional hex suffix; neste
 | `src/fragments/14/fragment14_FF070.c` | 60 | 59 | 113 | 11 | 9 | 60 | 33 |
 | `src/fragments/63/fragment63_312AE0.c` | 44 | 44 | 82 | 26 | 7 | 34 | 88 |
 | `src/fragments/12/fragment12_E7C00.c` | 49 | 49 | 84 | 11 | 10 | 47 | 77 |
+| `src/fragments/45/fragment45_2251A0.c` | 55 | 55 | 106 | 61 | 9 | 23 | 22 |
 | `src/fragments/17/fragment17_113A60.c` | 46 | 46 | 105 | 66 | 8 | 27 | 23 |
 | `src/fragments/53/fragment53_code.c` | 28 | 27 | 88 | 65 | 4 | 11 | 79 |
 | `src/fragments/82/fragment82_4238F0.c` | 56 | 56 | 80 | 31 | 5 | 38 | 56 |
 | `src/fragments/60/fragment60_code.c` | 32 | 32 | 81 | 37 | 9 | 22 | 84 |
-| `src/fragments/45/fragment45_2251A0.c` | 48 | 48 | 103 | 56 | 9 | 23 | 22 |
 | `src/fragments/79/fragment79_3C60B0.c` | 111 | 111 | 80 | 45 | 0 | 5 | 13 |
 | `src/21C0.c` | 1 | 1 | 252 | 0 | 0 | 0 | 0 |
 | `src/fragments/4/fragment4_AFAA0.c` | 70 | 70 | 78 | 24 | 1 | 57 | 21 |
