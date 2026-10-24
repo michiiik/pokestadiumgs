@@ -206,7 +206,64 @@ s32 func_8AB0EED8(s32 arg0) {
     return result;
 }
 
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2324B0/func_8AB0EF44.s")
+extern s16 D_8AB1722C;
+extern s16 D_8AB1722E;
+extern s16 D_8AB17230;
+extern s16 D_8AB12694;
+extern s32 D_8AB112C0;
+extern s32 D_8AB17224;
+extern u8 D_8AB16FD0[];
+extern void *D_8AB16FC8;
+extern void func_8AB03394(void);
+extern void TextChoice_ShuffleAndRefresh(void);
+extern void func_8AB0D330(void);
+extern void _bzero(void *, s32);
+extern void TextPanels_UpdateVisibility(void);
+extern s32 func_8004C594(s32, s32);
+extern void func_8AB0E9E8(void);
+extern s32 func_8AB0E8B4(void);
+extern s32 func_8AB0F0A8(s32);
+extern s32 func_8AB0F2F0(s32);
+s32 func_8AB0EF44(s32 arg0) {
+    s32 result = 40;
+
+    switch (arg0) {
+    case 0:
+        func_8AB03394();
+        TextChoice_ShuffleAndRefresh();
+        func_8AB0D330();
+        D_8AB1722C = 1;
+        D_8AB1722E = 0;
+        _bzero(D_8AB16FD0, 256);
+        *(u16 *)((u8 *)D_8AB16FC8 + 2) |= 1;
+        *(u16 *)((u8 *)D_8AB11D00 + 2) &= ~1;
+        TextPanels_UpdateVisibility();
+        func_8004C594(2, D_8AB12694 + 1);
+        D_8AB112C0 = 0;
+        D_8AB17224 = 0;
+        func_8AB004E0();
+        break;
+    case 1:
+        func_8AB0E9E8();
+        func_8AB0E8B4();
+        if (D_8AB1722E == 1) {
+            result = func_8AB0F0A8(0);
+        }
+        if (D_8AB17230 == 1) {
+            result = func_8AB0F2F0(0);
+            if (D_8AB1722E == 0) {
+                func_8004C8A0(D_8AB16FD0, 256,
+                              *(u16 *)((u8 *)D_8AB11D00 + 48),
+                              *(u16 *)((u8 *)D_8AB11D00 + 50));
+            }
+        }
+        result = func_8AB0EED8(result);
+        break;
+    case 2:
+        break;
+    }
+    return result;
+}
 
 /* mkdraft:func_8AB0F0A8 begin */
 extern s16 D_8AB1269C;

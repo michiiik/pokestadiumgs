@@ -91,3 +91,37 @@ syntax-enabled compile via
 passes the US ROM checksum, and `cmp` confirms byte-for-byte equality with
 the retail ROM. MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
 These behavior claims come from source and disassembly inspection.
+
+## Prompt dispatch state
+
+`func_8AB0EF44` now has a matching C implementation (356 instruction bytes).
+It defaults to state 40. Argument zero runs the reference-command parser,
+shuffles the choices, and calls `func_8AB0D330`. It sets `D_8AB1722C` to one,
+clears `D_8AB1722E` and the 256-byte `D_8AB16FD0` buffer, enables the node at
+`D_8AB16FC8`, hides the node at `D_8AB11D00`, and updates panel visibility.
+It then sets text substitution slot two to `D_8AB12694 + 1`, clears
+`D_8AB112C0` and `D_8AB17224`, and calls `func_8AB004E0`.
+
+Argument one calls the input and text-update helpers `func_8AB0E9E8` and
+`func_8AB0E8B4`. If `D_8AB1722E` equals one, it obtains a candidate state
+from `func_8AB0F0A8(0)`. A separate check of `D_8AB17230` can replace that
+candidate with `func_8AB0F2F0(0)`; when `D_8AB1722E` is then zero, it also
+refreshes the buffer from the node's archive and entry keys at offsets 48
+and 50. Finally, `func_8AB0EED8` can replace the candidate when a selected
+row enters its delay state. Argument two and other values return state 40
+without these updates. The separate checks preserve that transition order.
+
+`func_8004C594` in `src/4CC20.c` validates a substitution-slot index and writes
+its signed-word value. `func_8004C5E0` reads that slot to format a number
+during text expansion. The parser, choice shuffle, panel-visibility update,
+and `func_8AB004E0` are in `src/fragments/45/fragment45_2251A0.c`. Other
+callee names and state words retain their address-based names where their
+broader interpretation is unresolved.
+
+Verification targets master `1459ffd283b2b7f0b0f2ae3d04cfb50ced6e0aa3` plus
+this change. The normal syntax-enabled forced source compile and full
+`VERSION=us` ROM build pass, and `cmp` confirms byte-for-byte equality with
+the retail ROM. MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. Ordinary C
+preserves the 32-byte frame and result at stack offset 28, without dummy
+storage, forced registers, or instruction rewrites. Behavior descriptions
+are based on source and disassembly inspection.
