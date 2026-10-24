@@ -64,3 +64,44 @@ Verification targets master `c3398bdda46be6bd771ef943820dbd644e2a5aa9` plus
 this change. The normal syntax-enabled forced source compile and complete
 `VERSION=us` ROM build pass. `cmp` confirms byte-for-byte equality with the
 retail ROM; MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+
+## State 73 text and controller transition
+
+`func_8AB10F14` now has a matching C implementation (324 instruction bytes).
+Argument zero clears `D_8AB17452`, hides the node at `D_8AB1725C`, and copies
+text from archive 57 into the banner buffer. It selects entry 16 when
+`D_8AB12CB4` equals one and entry 17 otherwise. It enables the banner,
+hides the panel groups, calls `func_80021ED8(7)`, enables the node at
+`D_8AB17380`, and initializes its highlight record at `D_8AB17388`.
+
+Argument one updates that highlight through `func_8AC063AC`. If the
+controller halfword at offset eight through `D_80087200` has mask `0x8000`
+set, it hides the node, enters `func_8AB100E0(0)`, and calls
+`func_8AB00B78(194)`. Otherwise it retains state 73. Other arguments also
+retain state 73. The existing fade handler starts a fade from transparent
+when entered with zero.
+
+`func_8AC06400` in `src/fragments/43/fragment43_1E5A10.c` initializes two
+scale fields to one and computes a center from the supplied node. The
+neighboring `func_8AC063AC` updates those scales from the indexed sine table.
+These concrete operations establish the highlight-record role; the text
+entry contents and broader result interpretation are not assigned names.
+
+The wrapper `func_8AB00B78` in `src/fragments/45/fragment45_2251A0.c` now
+explicitly accepts and forwards its signed-word argument. The original
+`func_800226C0` assembly in `asm/us/nonmatchings/229E0` stores incoming
+`a0` and uses that word as its command selector. The former no-argument
+wrapper relied on the incoming register surviving an argument-free call.
+Explicit forwarding preserves the wrapper's instruction bytes and makes
+this caller's argument flow visible in C.
+
+The assembly owner's 332-byte span includes eight terminal alignment bytes.
+IDO emits a 324-byte C function and supplies the same eight zero bytes as
+ordinary text-section alignment. No padding pragma or dummy storage is used.
+
+Verification targets master `161db93c73f8792da98ba0ae6a0215f3efd9655b` plus
+this change. Both changed C files were forced through the normal host syntax
+check and compilation before linking the full `VERSION=us` ROM. The checksum
+passes, and `cmp` confirms byte-for-byte equality with the retail ROM;
+MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`. Behavior descriptions are
+based on source and disassembly inspection.

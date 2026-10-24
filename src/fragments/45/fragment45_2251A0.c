@@ -350,7 +350,10 @@ loop_2:
 #endif
 
 #ifdef VERSION_US
-extern s32 func_800226C0(void); void func_8AB00B78(void) { func_800226C0(); }
+extern void func_800226C0(s32);
+void func_8AB00B78(s32 arg0) {
+    func_800226C0(arg0);
+}
 #endif
 
 #ifdef VERSION_US
