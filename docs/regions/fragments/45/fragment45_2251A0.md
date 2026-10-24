@@ -254,7 +254,7 @@ is installed. Next action: recover `func_8AB01FC8`'s actual strip interface
 before changing more caller spellings; do not infer formal parameter widths
 solely from its narrowed hardware-coordinate uses.
 
-## Formatting-sensitive compiler input / tooling-blocked replay
+## Formatting-sensitive compiler input / verified replay identity
 
 A calibrated 90-second four-worker label search reproduced all 88 parent
 words/relocations, then reduced its score from 974 to 723 through formatting
@@ -268,8 +268,14 @@ the parent reproduces its retained function words; each uniform-blank pair
 preserves complete sections, extents and relocations. The two fixtures both
 have 352-byte label bodies but different generated instruction bytes.
 
-This is evidence against treating whitespace-insensitive body identity as
-compiler-input equivalence. The runner's rejected-body preflight currently
-uses that identity, so formatting-only replays require a tooling correction
-and regression fixture first. Keep the acceptance verifier unchanged: the
-rejected 352-byte proposals have layout drift and are not ROM matches.
+`tools/candidate_identity.py`, merged in PR #850, already preserves the
+token-bearing logical-line groups that distinguish these two fixtures. An
+audit of the active native runner confirms its rejected-body preflight calls
+that identity for both bodies and shared declarations. The fixture's formatted
+body remains eligible after the other form is rejected; exact, indentation-only
+and leading-blank repeats are refused. All 14 existing identity tests pass.
+
+There is no formatting-replay blocker in this tested native runner. Integrators
+should use the existing identity module rather than a whitespace-collapsed key.
+The acceptance verifier remains unchanged: the rejected 352-byte proposals
+have layout drift and are not ROM matches.
