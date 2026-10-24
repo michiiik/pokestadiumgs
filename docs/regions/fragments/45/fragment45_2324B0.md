@@ -180,3 +180,60 @@ destinations. A changed-frame negative control is rejected. Frozen linked
 fragments, collateral objects and retail ROM are compared independently;
 US MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`. These behavior descriptions
 come from source, disassembly and data-producer/consumer inspection.
+
+## Mode 8 update and draw dispatchers
+
+| Original owner | C name | Instruction bytes |
+| --- | --- | ---: |
+| `func_8AB0DFC0` | `TextMode8_UpdateState` | 308 |
+| `func_8AB0E0F4` | `TextMode8_DrawState` | 264 |
+
+Both switches cover states 34 through 45. The update dispatcher calls the
+selected handler with phase one, saves its next-state value, advances
+`func_8AB0148C` for answer-effect indices zero through three, and returns
+the saved state.
+An unknown state is returned unchanged after those four effect updates.
+The existing caller `func_8AB051AC` selects this dispatcher for mode eight.
+
+The draw dispatcher first traverses the graph at `D_8AB16FA0` through
+`func_800503A4`, then calls the selected handler with phase two. Unknown
+states still draw that graph. Its frame-rendering caller `func_8AB04EE8`
+follows it with `TextInterface_DrawMarkers`; phase two of `func_8AB0E4BC`
+also draws its model through `func_8003C6B8`. Those consumers support the
+draw name.
+
+| State | Handler |
+| --- | --- |
+| 34 | `func_8AB0E21C` |
+| 35 | `func_8AB0E2EC` |
+| 36 | `func_8AB0E280` |
+| 37 | `TextMode8_HandlePromptState` |
+| 38 | `func_8AB0E4BC` |
+| 39 | `func_8AB0E684` |
+| 40 | `func_8AB0EF44` |
+| 41 | `func_8AB0F0A8` |
+| 42 | `TextMode8_HandleRowCleanupState` |
+| 43 | `func_8AB0F484` |
+| 44 | `func_8AB0F518` |
+| 45 | `func_8AB0F5F8` |
+
+The source file now owns its original 208-byte rodata window at ROM
+`0x236D40..0x236E10` / VRAM `0x8AB11BC0..0x8AB11C90`. Four existing strings
+occupy the first 108 bytes, including their ordinary alignment; the two
+12-entry switch tables follow at offsets 108 and 156, with natural final
+alignment. The strings are ordinary unsized readonly character arrays with
+the exact retail contents. The earlier shared prefix and following tail
+remain separate rodata inputs in their original order. No storage addresses
+or linked bytes change.
+
+The layout is verified while both dispatchers are still assembly, before
+any C switch probe. Normal runner acceptance then passes the syntax-enabled
+full retail-ROM gate for each switch. After naming and the caller update,
+controls preserve the complete 9264-byte mode text, 24 function extents,
+208-byte rodata window and relocation destinations, together with the full
+23008-byte caller module. Leading-blank controls agree; changed instruction,
+string and jump-target negative controls are rejected. The entire former
+shared rodata, four linked fragments, collateral objects and frozen build
+hashes are independently compared. `cmp` confirms byte-for-byte equality
+with the retail US ROM; MD5 remains `1561c75d11cedf356a8ddb1a4a5f9d5d`.
+These behavior claims are based on source, disassembly and data inspection.
