@@ -572,7 +572,7 @@ s16 ModelRenderer_GetObjectType(void) {
 #ifdef VERSION_US
 extern u16 *func_8003F54C(void *);
 extern s16 D_80129078;
-extern void func_81003ECC(void);
+extern void func_81003ECC(void *);
 void func_8007074C(void *arg0)
 {
   u32 new_var;
