@@ -1455,7 +1455,50 @@ void func_8AB05254(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB05300.s")
+// The input loop copies the selected port's complete 40-byte controller state.
+typedef struct TextControllerSnapshot {
+    u32 words[10];
+} TextControllerSnapshot;
+extern void *D_80087200;
+extern void *D_80087204;
+extern void *D_80087208;
+extern void *D_8008720C;
+extern s32 D_8AB14188;
+extern void func_800086A4(s32);
+extern s32 StageFade_StartFromOpaque(s32);
+extern void func_80064D28(void);
+extern s32 func_80043678(u8 *);
+extern void func_8AB04EE8(s32);
+void TextInterface_RunMainLoop(void) {
+    s32 previous_state;
+    func_800086A4(2);
+    StageFade_StartFromOpaque(5);
+    do {
+        func_80064D28();
+        if (D_8AB11D0C[14] & 1) {
+            *(TextControllerSnapshot *)D_8AB13F00 = *(TextControllerSnapshot *)D_80087200;
+            D_8AB13F2C = 0;
+        } else if (D_8AB11D0C[14] & 2) {
+            *(TextControllerSnapshot *)D_8AB13F00 = *(TextControllerSnapshot *)D_80087204;
+            D_8AB13F2C = 1;
+        } else if (D_8AB11D0C[14] & 4) {
+            *(TextControllerSnapshot *)D_8AB13F00 = *(TextControllerSnapshot *)D_80087208;
+            D_8AB13F2C = 2;
+        } else if (D_8AB11D0C[14] & 8) {
+            *(TextControllerSnapshot *)D_8AB13F00 = *(TextControllerSnapshot *)D_8008720C;
+            D_8AB13F2C = 3;
+        }
+        func_8AB05254();
+        previous_state = D_8AB14188;
+        D_8AB14188 = func_8AB051AC(D_8AB14188);
+        if (D_8AB126A0 == 1) {
+            D_8AB16794 = func_80043678(D_8AB1678C);
+            D_8AB126A0 = 2;
+        }
+        func_8AB04EE8(previous_state);
+    } while (D_8AB14188 != 0);
+    func_8AB01FBC();
+}
 #endif
 
 #ifdef VERSION_US
