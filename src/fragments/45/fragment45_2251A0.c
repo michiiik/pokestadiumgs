@@ -29,7 +29,8 @@ extern u8 D_8AB12CB0[];
 extern u32 D_8AB11D00;
 extern u32 D_8AB11D04;
 extern u32 D_8AB11D08;
-// Word loaded with lw and passed as func_8AB02240's third argument (a2).
+// RGBA16 preview image address returned by func_80043678.
+//@src/43700.c
 extern s32 D_8AB16794;
 extern u8 *D_8AB11D0C;
 extern u32 D_8AB12688;
@@ -699,11 +700,25 @@ void func_8AB01FBC(void) {
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB01FC8.s")
+void TextPreview_DrawRgba16Rect(s16 x, s16 y, s16 width, s16 height, void *image, s16 stride) {
+    gDPLoadTextureBlock(D_800D0510++, image, G_IM_FMT_RGBA, G_IM_SIZ_16b, stride, height, 0, G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+    gSPTextureRectangle(D_800D0510++, x << 2, y << 2, (x + width) << 2, (y + height) << 2, G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+}
 #endif
 
 #ifdef VERSION_US
-#pragma GLOBAL_ASM("asm/us/nonmatchings/fragments/45/fragment45_2251A0/func_8AB02240.s")
+extern Gfx D_8AB111B0[];
+extern Gfx D_80094F50[];
+void TextPreview_DrawImage80(s32 x, s32 y, u8 *image, s16 lod_fraction) {
+    s32 row;
+    gSPDisplayList(D_800D0510++, D_8AB111B0);
+    gDPSetPrimColor(D_800D0510++, 0, lod_fraction, 0, 0, 0, 255);
+    for (row = 0; row < 20; row += 1) {
+        TextPreview_DrawRgba16Rect((s16)x, (s16)(y + row * 4), 80, 4, image, 80);
+        image += 640;
+    }
+    gSPDisplayList(D_800D0510++, D_80094F50);
+}
 #endif
 
 #ifdef VERSION_US
@@ -712,7 +727,7 @@ void func_8AB0234C(void)
   int new_var;
   if (((D_8AB14678 == 4) || (D_8AB14678 == 2)) && (D_8AB126A0 == 2))
   {
-    if (D_8AB14678)
+    if (D_8AB14678) // FAKE: empty state check in the existing matching dispatcher.
     {
     }
     new_var = D_8AB14678;
@@ -721,12 +736,12 @@ void func_8AB0234C(void)
       new_var = D_8AB14678;
       if (new_var == 4)
       {
-        func_8AB02240(*((s16 *) (((u8 *) D_8AB11D04) + 8)), *((s16 *) (((u8 *) D_8AB11D04) + 0xA)), D_8AB16794, 0);
+        TextPreview_DrawImage80(*((s16 *) (((u8 *) D_8AB11D04) + 8)), *((s16 *) (((u8 *) D_8AB11D04) + 0xA)), (u8 *)(u32)D_8AB16794, 0);
       }
     }
     else
     {
-      func_8AB02240(*((s16 *) (((u8 *) D_8AB11D04) + 8)), *((s16 *) (((u8 *) D_8AB11D04) + 0xA)), D_8AB16794, 0xFF);
+      TextPreview_DrawImage80(*((s16 *) (((u8 *) D_8AB11D04) + 8)), *((s16 *) (((u8 *) D_8AB11D04) + 0xA)), (u8 *)(u32)D_8AB16794, 0xFF);
     }
     D_8AB126A0 = 1;
   }
