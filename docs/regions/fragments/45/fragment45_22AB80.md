@@ -93,3 +93,35 @@ this change. The normal syntax-enabled forced compilation and complete
 `build/pokestadiumgs-us.z64: OK`. `cmp` confirms byte-for-byte equality
 with retail; MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. The original
 40-byte frame is preserved without dummy storage or instruction rewrites.
+
+## State 30 node flags and delay
+
+`func_8AB0A074` has a matching C implementation (304 instruction bytes).
+Argument zero resets `D_8AB16CDC`, enables the banner at `D_8AB11D00`, and
+clears flag mask two on the four nodes referenced by `D_8AB16C20`. It
+copies archive 57 entry 389 into the banner buffer, hides `D_8AB16A58`,
+emits event 102 with zero parameters, plays sound 52998, and calls
+`func_800225C4(40)`.
+
+Argument one increments the signed-halfword counter and animates highlights.
+At counter 61 or above it enters `func_8AB0A720(0)`; other paths return
+state 30. `func_8AB099BC` enters this state after finding a player record
+whose halfword at offset two equals ten. The draw dispatcher `func_8AB08B14`
+passes argument two. `func_8AB080A0` initializes all four node pointers and
+binds the text callback and buffer to `D_8AB16A58`.
+
+The sibling callback `func_8AB09DCC` independently accesses the same node
+flag field through `D_8AB16C20[index][1]`. An ordinary four-iteration loop
+clears those flags; IDO unrolls it into the retail stores. The sound call's
+original `func_800279C4` symbol aliases `Audio_PlayDefaultSound(u16)` in
+`src/229E0.c`, whose actual signature is used here. The event and highlight
+helpers are in `src/fragments/45/fragment45_2251A0.c`. These descriptions
+follow from source and original assembly inspection; flag mask two retains
+its unresolved broader role.
+
+Verification targets master `fe54e8ef49f3ec53f3d80d9f384236441ba659c2` plus
+this change. The normal syntax-enabled forced source compilation and full
+`make -W src/fragments/45/fragment45_22AB80.c -j4 VERSION=us rom` pass with
+`build/pokestadiumgs-us.z64: OK`. `cmp` confirms byte-for-byte equality
+with retail; MD5 is `1561c75d11cedf356a8ddb1a4a5f9d5d`. The original
+32-byte frame is preserved without dummy storage or instruction rewrites.
