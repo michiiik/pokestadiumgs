@@ -938,3 +938,4 @@ func_8AB0D4BC = TextMode8_ChooseCpuAnswerMask;
 func_8AB0F2F0 = TextMode8_HandleRowCleanupState;
 func_8AB0DFC0 = TextMode8_UpdateState;
 func_8AB0E0F4 = TextMode8_DrawState;
+func_8AB0E8B4 = TextMode8_RevealPromptText;
